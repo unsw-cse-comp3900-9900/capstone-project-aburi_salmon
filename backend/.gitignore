@@ -110,3 +110,6 @@ config.py
 .api_cache/
 
 testdb.py
+
+config.py
+.idea/
