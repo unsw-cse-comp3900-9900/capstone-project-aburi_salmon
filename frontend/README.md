@@ -1,6 +1,7 @@
-# Aburi Salmon "Waiter" Frontend COMP3900 Project
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Getting Started
+## Available Scripts
+
 
 We are using React Single-page application for the frontend provided by `create-react-app`. The following lines are `create-react-app`-rendered README.
 
@@ -40,6 +41,7 @@ Your app is ready to be deployed!
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
 ### `yarn eject`
+
 
 **Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
