@@ -12,12 +12,6 @@ import Popup from "reactjs-popup";
 //Tried but ...:https://github.com/benawad/react-typescript-material-ui-form/tree/1_form
 
 // Personal todo list:
-// Learn react hooks
-// Add error handling
-// Add tokens
-
-// Do pop up box
-// Work on authentication
 
 //modals: https://react-bootstrap.github.io/components/modal/
 
@@ -38,8 +32,7 @@ export const LoginForm = () => {
             alert('All fields are required');
         } else {
             alert('Incorrect username/password');
-            //setHelperText('Incorrect username/password');
-            //setError(true);
+            
         }
     }
 
