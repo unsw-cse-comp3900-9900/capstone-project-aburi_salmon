@@ -1,4 +1,5 @@
 import React from 'react';
+
 import './App.css';
 import { Router, Switch, Route} from 'react-router-dom';
 import Home from './pages/Home/Homepage';
@@ -29,6 +30,7 @@ class App extends React.Component{
   )
 }
 }
+
 
 
 export default App;
