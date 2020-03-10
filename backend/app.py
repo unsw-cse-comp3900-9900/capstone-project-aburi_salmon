@@ -19,6 +19,13 @@ dbConfig = DbConfig(config.DB_HOST, config.DB_PORT, config.DB_DATABASE, config.D
 
 # Enable httponly cookie
 flask_app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+# Never expires
+flask_app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False
+# Persistent
+flask_app.config['JWT_SESSION_COOKIE'] = False
+# Enable CORS
+flask_app.config['JWT_COOKIE_CSRF_PROTECT'] = False
+# With secret on JWT_SECRET_KEY
 flask_app.config['JWT_SECRET_KEY'] = config.JWT_SECRET_KEY
 
 ## Exported variables to routes
