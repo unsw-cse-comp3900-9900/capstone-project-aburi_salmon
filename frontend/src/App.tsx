@@ -13,7 +13,10 @@ import history from './history';
 // https://stackoverflow.com/questions/42672842/how-to-get-history-on-react-router-v4
 
 
-function App(){
+class App extends React.Component{
+
+  
+  render(){
   return(
     <Router history={history}>
       <Switch>
@@ -24,6 +27,7 @@ function App(){
       </Switch>
     </Router>
   )
+}
 }
 
 

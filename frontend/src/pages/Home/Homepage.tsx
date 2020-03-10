@@ -40,34 +40,7 @@ class Home extends React.Component {
     }
 }
 
-/*
-function Start() {
-    return (
-        <button className="myButton"
-            onClick={() => history.push('/menu')}
-        > Start Ordering </button>
-    );
-}
 
-function Login(){
-    return (
-        <a href="/loginregister">
-            <div className="stafflogin"><u>Staff login</u></div>
-        </a>
-    );
-}
-
-
-function Home(){
-    return (
-        <div className="wrapper">
-            <img src={restlogo} className="restlogo" alt="Logo" />
-            <Start />
-            <Login />
-        </div>
-    );
-}
-*/
 
 export default Home;
 
