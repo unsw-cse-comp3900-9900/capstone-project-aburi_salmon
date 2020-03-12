@@ -100,3 +100,20 @@ class DB:
             staff_type_id=rows[0][2]
         )
         
+    def register(self, username, password, name, staff_type_id):
+        c = self.__conn.cursor()
+
+        try:
+            c.execute("INSERT INTO staff (username, password, name, staff_type_id) VALUES (%s, %s, %s, %s);",
+                      (username, password, name, staff_type_id))
+        except Exception as e:
+            c.execute("ROLLBACK")
+            self.__conn.commit()
+            print(e)
+            c.close()
+            #return None
+            raise e
+
+        c.close()
+        self.__conn.commit()
+        return True

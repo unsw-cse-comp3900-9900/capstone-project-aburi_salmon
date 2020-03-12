@@ -6,7 +6,7 @@ from flask_jwt_extended import create_access_token, set_access_cookies, unset_jw
 
 import config
 from app import api, db
-from model.request_model import login_model
+from model.request_model import login_model, signup_model
 from util.hasher import hash_password
 from util.user import User
 
@@ -56,11 +56,20 @@ class Logout(Resource):
 
 @auth.route("/signup", strict_slashes=False)
 class Signup(Resource):
+    @auth.response(200, 'Success')
+    @auth.response(400, 'Malformed request')
+    @auth.response(409, 'Username is already taken')
+    @auth.expect(signup_model)
     def post(self):
+        if not request.json:
+            abort(400, 'Malformed request, format is not application/json')
+
         creds = request.get_json()
+        name = creds.get('name')
         username = creds.get('username')
         payload_password = creds.get('password')
         registration_key = creds.get('registration_key')
+      #  staff_type_id = creds.get('staff_type_id')
 
         if username is None or payload_password is None:
             abort(400, 'Malformed request, email and password is not supplied')
@@ -71,12 +80,33 @@ class Signup(Resource):
         if len(payload_password) < 8:
             abort(400, 'Minimum length of password is 8')
 
-        if db.validate_key(registration_key):
-            abort(403, 'Registration key mismatch')
+        if registration_key == "staff1":
+            staff_type_id = 1
+        elif registration_key == "staff2":
+            staff_type_id = 2
+        elif registration_key == "staff3":
+            staff_type_id = 3
+        else:
+            abort(403, 'Wrong registration key')
 
-        db_password = hash_password(payload_password)
+        #if db.validate_key(registration_key):
+        #    abort(403, 'Registration key mismatch')
+
+        #db_password = hash_password(payload_password)
+        db_password = payload_password
+
+        reg = db.register(username, db_password, name, staff_type_id)
+
+        if reg is None:
+            abort(400, 'Backend is not working as intended or the supplied information was malformed. Make sure that your username is unique.')
+
+        response = jsonify({
+            'status': 'success'
+        })
+
+        return
 
         # Do things here
         # Store credentials into db based on registration key
         # Return response successful
-        pass
+        #pass
