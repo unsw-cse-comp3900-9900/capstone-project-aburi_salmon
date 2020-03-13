@@ -74,6 +74,9 @@ class Signup(Resource):
         if username is None or payload_password is None:
             abort(400, 'Malformed request, email and password is not supplied')
         
+        if not db.available_username(username):
+            abort(409, 'Username \'{}\' is taken'.format(username))
+        
         if registration_key is None:
             abort(400, 'Malformed request, registration key is not supplied')
 
@@ -105,8 +108,3 @@ class Signup(Resource):
         })
 
         return
-
-        # Do things here
-        # Store credentials into db based on registration key
-        # Return response successful
-        #pass

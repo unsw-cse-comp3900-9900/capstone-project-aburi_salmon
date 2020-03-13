@@ -75,6 +75,45 @@ class DB:
         c.close()
         return rows[0][0]
         
+    def register(self, username, password, name, staff_type_id):
+        c = self.__conn.cursor()
+
+        try:
+            c.execute("INSERT INTO staff (username, password, name, staff_type_id) VALUES (%s, %s, %s, %s);",
+                      (username, password, name, staff_type_id))
+        except Exception as e:
+            c.execute("ROLLBACK")
+            self.__conn.commit()
+            print(e)
+            c.close()
+            #return None
+            raise e
+
+        c.close()
+        self.__conn.commit()
+        return True
+
+    def available_username(self, username):
+        c = self.__conn.cursor()
+
+        try:
+            c.execute("SELECT COUNT(*) FROM staff WHERE username = %s;", (username,))
+        except Exception as e:
+            c.execute("ROLLBACK")
+            self.__conn.commit()
+            print(e)
+            c.close()
+            return None
+
+        rows = c.fetchall()
+        if len(rows) == 0:
+            c.close()
+            return None
+        rlen = rows[0][0]
+
+        c.close()
+        return (rlen == 0)
+
     def get_profile(self, username):
         c = self.__conn.cursor()
 
@@ -99,21 +138,3 @@ class DB:
             name=rows[0][1],
             staff_type_id=rows[0][2]
         )
-        
-    def register(self, username, password, name, staff_type_id):
-        c = self.__conn.cursor()
-
-        try:
-            c.execute("INSERT INTO staff (username, password, name, staff_type_id) VALUES (%s, %s, %s, %s);",
-                      (username, password, name, staff_type_id))
-        except Exception as e:
-            c.execute("ROLLBACK")
-            self.__conn.commit()
-            print(e)
-            c.close()
-            #return None
-            raise e
-
-        c.close()
-        self.__conn.commit()
-        return True
