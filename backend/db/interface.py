@@ -36,7 +36,7 @@ class DB:
 
         try:
             # This might be different, depending on your table and column name
-            c.execute("SELECT password FROM users WHERE username = %s;", (username,))
+            c.execute("SELECT password FROM staff WHERE username = %s;", (username,))
         except Exception as e:
             c.execute("ROLLBACK")
             self.__conn.commit()
