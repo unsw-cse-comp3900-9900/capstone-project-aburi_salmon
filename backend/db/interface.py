@@ -75,6 +75,23 @@ class DB:
         c.close()
         return rows[0][0]
         
+    def add_registration_key(self, registration_key):
+        c = self.__conn.cursor()
+        print(registration_key)
+        try:
+            c.execute("INSERT INTO staff_registration (registration_key) VALUES (%s);", (registration_key,))
+        except Exception as e:
+            c.execute("ROLLBACK")
+            self.__conn.commit()
+            print(e)
+            c.close()
+            #return None
+            raise e
+
+        c.close()
+        self.__conn.commit()
+        return True
+
     def register(self, username, password, name, staff_type_id):
         c = self.__conn.cursor()
 
