@@ -59,7 +59,7 @@ class DB:
 
         try:
             # This might be different, depending on your table and column name
-            c.execute("SELECT COUNT(*) FROM roles WHERE key = %s;", (key,))
+            c.execute("SELECT id FROM staff_registration WHERE registration_key = %s;", (key,))
         except Exception as e:
             c.execute("ROLLBACK")
             self.__conn.commit()
@@ -73,4 +73,68 @@ class DB:
             return False
 
         c.close()
-        return rows[0][0] == 1
+        return rows[0][0]
+        
+    def register(self, username, password, name, staff_type_id):
+        c = self.__conn.cursor()
+
+        try:
+            c.execute("INSERT INTO staff (username, password, name, staff_type_id) VALUES (%s, %s, %s, %s);",
+                      (username, password, name, staff_type_id))
+        except Exception as e:
+            c.execute("ROLLBACK")
+            self.__conn.commit()
+            print(e)
+            c.close()
+            #return None
+            raise e
+
+        c.close()
+        self.__conn.commit()
+        return True
+
+    def available_username(self, username):
+        c = self.__conn.cursor()
+
+        try:
+            c.execute("SELECT COUNT(*) FROM staff WHERE username = %s;", (username,))
+        except Exception as e:
+            c.execute("ROLLBACK")
+            self.__conn.commit()
+            print(e)
+            c.close()
+            return None
+
+        rows = c.fetchall()
+        if len(rows) == 0:
+            c.close()
+            return None
+        rlen = rows[0][0]
+
+        c.close()
+        return (rlen == 0)
+
+    def get_profile(self, username):
+        c = self.__conn.cursor()
+
+        try:
+            # This might be different, depending on your table and column name
+            c.execute("SELECT username, name, staff_type_id FROM staff WHERE username = %s;", (username,))
+        except Exception as e:
+            c.execute("ROLLBACK")
+            self.__conn.commit()
+            print(e)
+            c.close()
+            return None
+
+        rows = c.fetchall()
+        if len(rows) == 0:
+            c.close()
+            return None
+
+        c.close()
+        return dict(
+            username=rows[0][0],
+            name=rows[0][1],
+            staff_type_id=rows[0][2]
+        )
