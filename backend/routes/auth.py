@@ -35,7 +35,7 @@ class Login(Resource):
 
         # Create identity for session, by using User object with role = 1 and table = None
         # Change this so that the role follows the staff_type_id of the user
-        identity = User(username, 1, None)
+        identity = User(username, db.get_profile(username).get('staff_type_id'), None)
         access_token = create_access_token(identity=identity)
 
         response = jsonify({
