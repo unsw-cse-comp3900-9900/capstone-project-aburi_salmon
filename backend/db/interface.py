@@ -8,6 +8,38 @@ class DB:
     def __init__(self, dbConfig=DbConfig):
         self.__conn = psycopg2.connect(dbConfig.config())
 
+    def __query(self, query, params):
+        c = self.__conn.cursor()
+        try:
+            c.execute(query, params)
+        except Exception as e:
+            c.execute("ROLLBACK")
+            self.__conn.commit()
+            print(e)
+            c.close()
+            return None
+
+        rows = c.fetchall()
+        
+        c.close()
+        return rows if len(rows) else None
+
+    def __update(self, update, params):
+        c = self.__conn.cursor()
+        try:
+            # This might be different, depending on your table and column name
+            c.execute(update, params)
+        except Exception as e:
+            c.execute("ROLLBACK")
+            self.__conn.commit()
+            print(e)
+            c.close()
+            return False
+
+        c.close()
+        self.__conn.commit()
+        return True
+
     def return_number(self, number):
         c = self.__conn.cursor()
 
@@ -32,24 +64,10 @@ class DB:
     # NOTE: Take these functions as example since you might have different implementations
     
     def login(self, username, password):
-        c = self.__conn.cursor()
-
-        try:
-            # This might be different, depending on your table and column name
-            c.execute("SELECT password FROM staff WHERE username = %s;", (username,))
-        except Exception as e:
-            c.execute("ROLLBACK")
-            self.__conn.commit()
-            print(e)
-            c.close()
+        rows = self.__query("SELECT password FROM staff WHERE username = %s;", [username])
+        if (rows == None):
             return False
 
-        rows = c.fetchall()
-        if len(rows) == 0:
-            c.close()
-            return False
-
-        c.close()
         # This compares two strings to prevent timing attack
         result = hmac.compare_digest(rows[0][0], password)
         return result
@@ -138,3 +156,17 @@ class DB:
             name=rows[0][1],
             staff_type_id=rows[0][2]
         )
+
+    def get_ordered_items(self):
+        rows = self.__query('SELECT * FROM item_order WHERE status_id < %s', [3])
+        orders = [{
+            'id': row[0],
+            'item_id': row[1],
+            'order_id': row[2],
+            'quantity': row[3],
+            'status_id': row[4]
+            } for row in rows]
+        return orders
+
+    def update_ordered_item_status(self, id, status):
+        return self.__update("UPDATE item_order SET status_id = %s WHERE id = %s", [status, id])

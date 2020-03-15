@@ -40,6 +40,8 @@ def run_app(host, port):
     import routes.auth
     import routes.session
     import routes.profile
+    import routes.kitchen
+
 
     ## When SocketIO is enabled, comment this
     flask_app.run(host=host, port=port, debug=True)
