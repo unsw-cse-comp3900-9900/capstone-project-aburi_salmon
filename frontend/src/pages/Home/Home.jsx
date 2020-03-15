@@ -10,11 +10,11 @@ import { styles } from './styles';
 // import './Homepage.css';
 
 class PureHome extends React.Component {
-  start() {
+  goToMenu() {
     history.push('/menu');
   }
 
-  login() {
+  goToLogin() {
     history.push('/login');
   }
 
@@ -22,12 +22,10 @@ class PureHome extends React.Component {
     return (
       <div>
         <img src={restlogo} className="restlogo" alt="Logo" />
-        {this.start()}
-        <button className="myButton" onClick={() => this.start()}>
+        <button className="myButton" onClick={() => this.goToMenu()}>
           Start Ordering
                 </button>
-        {this.login()}
-        <Link component="button" variant="h5" color="inherit" onClick={() => this.login()}>
+        <Link component="button" variant="h5" color="inherit" onClick={() => this.goToLogin()}>
           Log In
                 </Link>
       </div>
