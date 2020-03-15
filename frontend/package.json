@@ -1,31 +1,29 @@
 {
-
-  "name": "create-react-app-typescript-todo-example-2020",
+  "name": "my-app",
   "version": "0.1.0",
   "private": true,
+  "devDependencies": {
+    "react-scripts": "3.0.1"
+  },
   "dependencies": {
-    "@material-ui/core": "^4.9.5",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1",
-    "@types/jest": "^24.9.1",
-    "@types/node": "^12.12.29",
-    "@types/react": "^16.9.23",
-    "@types/react-dom": "^16.9.5",
-    "@types/react-modal": "^3.10.5",
-    "formik": "^2.1.4",
-    "react": "^16.13.0",
-    "react-bootstrap": "^1.0.0-beta.17",
-    "react-dom": "^16.13.0",
-    "react-modal": "^3.11.2",
-    "react-redux": "^7.2.0",
-    "react-router-dom": "^5.1.2",
-    "react-scripts": "3.4.0",
-    "reactjs-popup": "^1.5.0",
-    "redux-thunk": "^2.3.0",
-    "redux-thunk-recursion-detect": "^1.1.4",
-    "typescript": "^3.7.5"
-
+    "@fortawesome/fontawesome-svg-core": "^1.2.25",
+    "@fortawesome/free-regular-svg-icons": "^5.11.2",
+    "@fortawesome/free-solid-svg-icons": "^5.11.2",
+    "@fortawesome/react-fontawesome": "^0.1.7",
+    "@material-ui/core": "^4.5.0",
+    "@material-ui/icons": "^4.4.3",
+    "@types/react-router-dom": "^5.1.3",
+    "axios": "^0.19.2",
+    "history": "^4.9.0",
+    "lodash": "^4.17.15",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-grid-layout": "^0.17.1",
+    "react-loading": "^2.0.3",
+    "react-rating": "^2.0.0",
+    "react-router-dom": "^5.0.1",
+    "react-slick": "^0.25.2",
+    "socket.io-client": "^2.3.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -35,7 +33,6 @@
   },
   "eslintConfig": {
     "extends": "react-app"
-
   },
   "browserslist": {
     "production": [
@@ -48,9 +45,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "@types/react-router-dom": "^5.1.3"
-
   }
 }
