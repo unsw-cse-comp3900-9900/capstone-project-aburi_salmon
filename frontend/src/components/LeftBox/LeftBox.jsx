@@ -17,6 +17,7 @@ class LeftBoxClass extends React.Component {
       <div className={classes.leftbox}>
         left box
         {/* I want this component to have 2 children */}
+        {this.props.children}
       </div>
     );
   }

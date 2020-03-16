@@ -20,10 +20,10 @@ class RightBarClass extends React.Component {
         right bar
         {/* I want this component to have 3 children */}
 
-        {/* { this.props.children ? this.props.children : this.doNothing() }
-        // { this.props.children[0] ? this.props.children[0] : this.doNothing() }
-        // { this.props.children[1] }
-        // { this.props.children[2] } */}
+        { this.props.children }
+        {/* { this.props.children[0] }
+        { this.props.children[1] }
+        { this.props.children[2] }  */}
       </div>
     );
   }
