@@ -1,13 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { withStyles } from '@material-ui/core';
-
+import './../Home/Homepage.css';
 import history from './../../history';
-import restlogo from './../../assets/Hojiak.png';
-import { styles } from './styles';
+//import restlogo from './../../assets/Hojiak.png';
 
-// Comment this when everything is moved to styles
-// import './Homepage.css';
 
 class PureHome extends React.Component {
   goToMenu() {
@@ -20,19 +16,20 @@ class PureHome extends React.Component {
 
   render() {
     return (
-      <div>
-        <img src={restlogo} className="restlogo" alt="Logo" />
-        <button className="myButton" onClick={() => this.goToMenu()}>
-          Start Ordering
-                </button>
-        <Link component="button" variant="h5" color="inherit" onClick={() => this.goToLogin()}>
-          Log In
-                </Link>
+      <div className="wrapper">
+        {/*<img src={restlogo} className="restlogo" alt="Logo" />*/}
+          <h1 className="restlogo">Restuarant Name</h1>
+          <button className="myButton" onClick={() => this.goToMenu()}>
+            Start Ordering
+          </button>
+          <Link className="stafflogin" variant="h5" color="inherit" onClick={() => this.goToLogin()}>
+            Log In
+          </Link>
       </div>
     );
   }
 }
 
-export const Home = withStyles(styles)(PureHome);
-// export default PureHome;
+export const Home = PureHome;
+
 
