@@ -124,6 +124,9 @@ class DB:
             staff_type_id=rows[0][2]
         )
 
+    def update_staff(self, username, name, staff_type_id):
+        return self.__update("UPDATE staff SET name = %s, staff_type_id = %s WHERE username = %s", [name, staff_type_id, username])
+
     def get_ordered_items(self):
         rows = self.__query('SELECT * FROM item_order WHERE status_id < %s', [3])
 
