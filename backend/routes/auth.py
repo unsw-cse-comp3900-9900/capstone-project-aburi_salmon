@@ -18,8 +18,11 @@ class Login(Resource):
     @auth.expect(login_model)
     def post(self):
         creds = request.get_json()
+        print('credentials')
+        print(creds)
         username = creds.get('username')
         payload_password = creds.get('password')
+
 
         if username is None or payload_password is None:
             abort(400, 'Malformed request, email and password is not supplied')

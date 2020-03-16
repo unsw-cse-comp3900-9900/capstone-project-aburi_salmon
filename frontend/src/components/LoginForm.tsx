@@ -23,17 +23,43 @@ export const LoginForm = () => {
     const [error, setError] = useState(false);
    
     
-    const handleLogin = () => {
-        if (username ==="Yemi" && password ==="1234") {
-            history.push('/staff');
+    const handleLogin = async (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+        event.preventDefault();
+
+        try {
+            const response = await fetch('http://localhost:5000/auth/login', {
+                method: 'POST',
+                body: JSON.stringify({
+                    username,
+                    password,
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                mode: 'cors'
+            });
+
+            if (response.status !== 200) {
+                setError(true);
+            }
+        } catch (err) {
+            console.error(err);
             setError(true);
-            alert('you are logged in');
-        } else if (username === "" || password === "") {
-            alert('All fields are required');
-        } else {
-            alert('Incorrect username/password');
-            
         }
+
+
+
+        // if (username ==="Yemi" && password ==="1234") {
+        //     history.push('/staff');
+        //     setError(true);
+        //     alert('you are logged in');
+        // } else if (username === "" || password === "") {
+        //     alert('All fields are required');
+        // } else {
+        //     alert('Incorrect username/password');
+            
+        // }
     }
 
     return(
@@ -73,7 +99,7 @@ export const LoginForm = () => {
                         <button
                             type="submit"
                             className=" loginbut "
-                            onClick = {() => handleLogin()}
+                            onClick = {handleLogin}
                             > Login </button>
                    
 
