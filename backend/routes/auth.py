@@ -1,4 +1,5 @@
 import pdb
+import re
 
 from flask import request, jsonify
 from flask_restx import Resource, abort, reqparse, fields
@@ -71,11 +72,19 @@ class Signup(Resource):
         registration_key = creds.get('registration_key')
       #  staff_type_id = creds.get('staff_type_id')
 
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
         if username is None or payload_password is None:
-            abort(400, 'Malformed request, email and password is not supplied')
+            abort(400, 'Malformed request, username or password is not supplied')
         
         if not db.available_username(username):
             abort(409, 'Username \'{}\' is taken'.format(username))
+
+        if(regex.search(name) != None): 
+            abort(400, 'Malformed request, name cannot have special characters')
+
+        if(regex.search(username) != None): 
+            abort(400, 'Malformed request, username cannot have special characters')
         
         if registration_key is None:
             abort(400, 'Malformed request, registration key is not supplied')
