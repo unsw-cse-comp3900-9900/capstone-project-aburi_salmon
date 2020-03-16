@@ -1,3 +1,5 @@
+import enum
+
 from flask_restx import fields
 
 from app import api
@@ -8,6 +10,11 @@ login_model = api.model('login', {
     "username": fields.String(description='Username'),
     "password": fields.String(description='Password')
 })
+
+class StaffType(enum.Enum):
+    WAIT = 1
+    KITCHEN = 2
+    MANAGER = 3
 
 signup_model = api.model('signup', {
     "name": fields.String(description='Name'),

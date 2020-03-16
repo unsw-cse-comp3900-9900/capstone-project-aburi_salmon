@@ -12,8 +12,6 @@ import config
 
 # Init Flask object
 flask_app = Flask(__name__)
-# Set CORS
-CORS(flask_app)
 
 dbConfig = DbConfig(config.DB_HOST, config.DB_PORT, config.DB_DATABASE, config.DB_USER, config.DB_PASSWORD)
 
@@ -38,6 +36,9 @@ def run_app(host, port):
     ## Example routes
     import routes.example
     import routes.auth
+    import routes.manager
+    # import routes.kitchenstaff
+    # import routes.waitstaff
     import routes.session
     import routes.profile
     import routes.kitchen
