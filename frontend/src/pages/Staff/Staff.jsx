@@ -17,8 +17,8 @@ class StaffPage extends React.Component {
     render() {
         return (
             <div>
-                <h1>Staff is {localStorage.getItem('username') || 'failed'}</h1>
                 {this.isStaff()}
+                <h1>Staff is {localStorage.getItem('username') || 'failed'}</h1>
             </div>
         );
     }

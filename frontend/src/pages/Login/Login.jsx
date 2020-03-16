@@ -1,5 +1,4 @@
 import React from 'react';
-import { withStyles } from '@material-ui/core';
 import './../Login/LoginRegister.css';
 import backbut from './../../assets/backbut2.png';
 import { LoginForm } from './../Login/LoginForm';
