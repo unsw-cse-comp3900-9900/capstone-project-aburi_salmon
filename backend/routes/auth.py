@@ -10,7 +10,7 @@ from model.request_model import login_model, signup_model
 from util.hasher import hash_password
 from util.user import User
 
-auth = api.namespace('auth', description='Example route')
+auth = api.namespace('auth', description='Authentication route')
 
 @auth.route("/login", strict_slashes=False)
 class Login(Resource):
