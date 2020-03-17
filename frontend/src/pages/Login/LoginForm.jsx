@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { TextField, withStyles, Button, Snackbar } from '@material-ui/core';
+import React from 'react';
+import { TextField, Button, Snackbar } from '@material-ui/core';
 import './../Login/LoginRegister.css';
 import restlogo from './../../assets/Hojiak.png';
 import history from './../../history';
@@ -15,7 +15,7 @@ class PureLogin extends React.Component {
             password: '',
             usererror: false, //used to highlight username error
             passerror: false, //used to highlight password error
-            isOpen: true, //open snackbar alert
+            isOpen: false, //open snackbar alert
             severity: 'success', //type of alert
             alertMessage: 'None', //displayed message
         }
@@ -36,36 +36,59 @@ class PureLogin extends React.Component {
         }).then((msg) => {
             //alert(msg.status);
             if (msg.status === 200) {
-                alert('You are logged in');
+                
+                alert('you have successfully logged on');
                 localStorage.setItem('username', this.state.username);
                 localStorage.setItem('staff', 'true');
+                this.loginSuccess();
                 history.push('/staff');
             } else {
-                this.setState({isOpen: true});
-                this.alertMessage = 'Needs more than 0 character';
-                alert(msg.statusText);
+                this.setError(msg.statusText);
             }
         }).catch((status) => {
             console.log(status);
         });
     }
 
+    loginSuccess(){
+        //return (<Alert severity="success">This is a success message!</Alert>);
+        this.setState({ isOpen: true });
+        this.setState({ alertMessage: "You have successfully logged in" });
+        this.setState({ severity: 'success' });
+    }
+
     setError(message){
         this.setState({isOpen: true});
         this.setState({alertMessage: message });
         this.setState({severity: 'error' });
-        this.setState({passerror: true });
-        this.setState({usererror: true });
-        alert(message);
+    }
+
+    /*
+    Current Checks:
+    - Username and password aren't empty
+    - Username consist of only letters or spaces
+    */
+
+    resetError(){
+        this.setState({ passerror: false });
+        this.setState({ usererror: false });
     }
 
     handleLogin() {
+        this.resetError();
         if (this.state.username === '' && this.state.password === '') {
-            this.setError('Needs more than 0 character');
+            this.setError('All fields need to be filled');
+            this.setState({passerror: true });
+            this.setState({usererror: true });
         } else if (this.state.password === '') {
-            this.setError('Needs more than 0 character');
+            this.setError('Password Required');
+            this.setState({ passerror: true });
         } else if (this.state.username === '') {
-            this.setError('Needs more than 0 character');
+            this.setError('Username Required');
+            this.setState({ usererror: true });
+        } else if (!/^[a-zA-Z/s]+$/.test(this.state.username)) {
+            this.setError('Username can only be letters or spaces')
+            this.setState({ usererror: true });
         } else {
             this.checkLogin();
         }
@@ -74,15 +97,18 @@ class PureLogin extends React.Component {
     render() {
         return (
             <div className="loginbox">
-                <Snackbar open={this.isOpen}>
+                <Snackbar 
+                open={this.state.isOpen} 
+                anchorOrigin={{vertical: 'top', horizontal:'center'}}
+                >
                     <Alert
-                        severity={this.severity}
+                        severity={this.state.severity}
                         action={
-                            <Button color="inherit" size="small" onClick={() => this.setState({isOpen: true})}>
+                            <Button color="inherit" size="small" onClick={() => this.setState({isOpen: false})}>
                                 OK
                             </Button>
                         }
-                    >{this.alertMessage}</Alert>
+                    >{this.state.alertMessage}</Alert>
                 </Snackbar>
                 {/*<img src={restlogo} className="logoimage" alt="logo" />*/}
                 <h1><b>Login</b></h1>
@@ -91,7 +117,7 @@ class PureLogin extends React.Component {
                     id="username"
                     onChange={(e) => this.setState({ username: e.target.value })}
                     placeholder="username"
-                    error={this.usererror}
+                    error={this.state.usererror}
                     size="small"
                 />
 
@@ -102,7 +128,7 @@ class PureLogin extends React.Component {
                     id="password"
                     type="password"
                     placeholder="password"
-                    error={this.passerror}
+                    error={this.state.passerror}
                     size="small"
                     onChange={(e) => this.setState({ password: e.target.value })}
                 />
