@@ -70,9 +70,13 @@ class Signup(Resource):
         username = creds.get('username')
         payload_password = creds.get('password')
         registration_key = creds.get('registration_key')
-      #  staff_type_id = creds.get('staff_type_id')
+        # staff_type_id = creds.get('staff_type_id')
 
-        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+        # Name only allows a-z, A-Z, and space
+        regex_name = re.compile('[^a-zA-Z\s]')
+
+        # Username only allows a-z, A-Z, 0-9, and underscore
+        regex_username = re.compile('[^a-zA-Z0-9_]')
 
         if username is None or payload_password is None:
             abort(400, 'Malformed request, username or password is not supplied')
@@ -80,11 +84,11 @@ class Signup(Resource):
         if not db.available_username(username):
             abort(409, 'Username \'{}\' is taken'.format(username))
 
-        if(regex.search(name) != None): 
-            abort(400, 'Malformed request, name cannot have special characters')
+        if(regex_name.search(name) != None): 
+            abort(400, 'Malformed request, name should only contain a-z, A-Z, and space')
 
-        if(regex.search(username) != None): 
-            abort(400, 'Malformed request, username cannot have special characters')
+        if(regex_username.search(username) != None): 
+            abort(400, 'Malformed request, username should only contain a-z, A-Z, 0-9, and underscore')
         
         if registration_key is None:
             abort(400, 'Malformed request, registration key is not supplied')
