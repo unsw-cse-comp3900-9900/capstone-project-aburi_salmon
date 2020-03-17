@@ -3,7 +3,7 @@ import { TextField, Button, Snackbar } from '@material-ui/core';
 import './../Login/LoginRegister.css';
 import restlogo from './../../assets/Hojiak.png';
 import history from './../../history';
-import { Alert} from '@material-ui/lab';
+import { Alert } from '@material-ui/lab';
 
 
 class PureLogin extends React.Component {
@@ -21,17 +21,18 @@ class PureLogin extends React.Component {
         }
     }
 
-    checkLogin(){
-        fetch("/auth/login", {
+    checkLogin() {
+        fetch("http://localhost:5000/auth/login", {
             method: 'POST',
             body: JSON.stringify({
                 username: this.state.username,
                 password: this.state.password
             }),
             headers: {
-                'Content-Type': 'application/json',
-                'Connection': 'keep-alive'
-            }
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            mode: 'cors'
         }).then((msg) => {
             //alert(msg.status);
             if (msg.status === 200) {
@@ -135,7 +136,7 @@ class PureLogin extends React.Component {
                 <br></br>
                 <br></br>
                 <button className=" loginbut "
-                    onClick={() => {this.handleLogin()}}
+                    onClick={() => { this.handleLogin() }}
                 >Login</button>
             </div>
         );

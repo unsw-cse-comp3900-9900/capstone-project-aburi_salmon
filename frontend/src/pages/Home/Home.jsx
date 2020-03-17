@@ -6,8 +6,8 @@ import history from './../../history';
 
 
 class PureHome extends React.Component {
-  goToMenu() {
-    history.push('/menu');
+  goToTable() {
+    history.push('/table');
   }
 
   goToLogin() {
@@ -55,7 +55,7 @@ class PureHome extends React.Component {
       <div className="wrapper">
         {/*<img src={restlogo} className="restlogo" alt="Logo" />*/}
           <h1 className="restlogo">Restuarant Name</h1>
-          <button className="myButton" onClick={() => this.goToMenu()}>
+          <button className="myButton" onClick={() => this.goToTable()}>
             Start Ordering
           </button>
           {this.isLoggedIn()}

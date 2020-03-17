@@ -66,8 +66,10 @@ CREATE TABLE "staff_type" (
 );
 
 CREATE TABLE "staff_registration" (
-  "id" int PRIMARY KEY NOT NULL,
-  "registration_key" varchar NOT NULL
+  "id" SERIAL PRIMARY KEY,
+  "staff_type_id" int NOT NULL,
+  "registration_key" varchar NOT NULL,
+  "used" boolean NOT NULL
 );
 
 ALTER TABLE "order" ADD FOREIGN KEY ("table_id") REFERENCES "table" ("id");
@@ -88,4 +90,4 @@ ALTER TABLE "category_item" ADD FOREIGN KEY ("item_id") REFERENCES "item" ("id")
 
 ALTER TABLE "staff" ADD FOREIGN KEY ("staff_type_id") REFERENCES "staff_type" ("id");
 
-ALTER TABLE "staff_registration" ADD FOREIGN KEY ("id") REFERENCES "staff_type" ("id");
+ALTER TABLE "staff_registration" ADD FOREIGN KEY ("staff_type_id") REFERENCES "staff_type" ("id");

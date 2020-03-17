@@ -57,7 +57,8 @@ if __name__ == "__main__":
             main()
         else:
             usage()
-    except:
+    except Exception as e:
+        print(e)
         print("Something bad happened. Try debugging.")
         print("Check import on your latest code.")
         usage()
