@@ -1,16 +1,14 @@
 
 
 import React from 'react';
-import { withStyles } from '@material-ui/core';
+import { withStyles, WithStyles } from '@material-ui/core';
 
 import { styles } from './styles';
 // import './../LeftBox/LeftBox.css';
 
-class LeftBoxClass extends React.Component {
-  constructor(props) {
-    super(props);
-  }
+interface IProps extends WithStyles<typeof styles> { }
 
+class LeftBoxClass extends React.Component<IProps, {}> {
   render() {
     const { classes } = this.props;
     return (

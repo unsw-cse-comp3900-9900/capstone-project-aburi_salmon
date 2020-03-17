@@ -1,9 +1,9 @@
 import React from 'react';
-import { withStyles, createStyles, AppBar, Toolbar, Typography, Button } from '@material-ui/core';
+import { withStyles, createStyles, AppBar, Toolbar, Typography, Button, WithStyles, Theme } from '@material-ui/core';
 import background from './../../assets/FoodBackground.jpg';
-import history from './../../history';
+import history from '../../history';
 
-const styles = (theme) =>
+const styles = (theme: Theme) =>
     createStyles({
         title: {
             flexGrow: 1,
@@ -21,9 +21,11 @@ const styles = (theme) =>
     });
 
 
-class PureStaffMain extends React.Component {
+interface IProps extends WithStyles<typeof styles> { }
 
-    logOut(){
+class PureStaffMain extends React.Component<IProps, {}> {
+
+    logOut() {
         localStorage.setItem('username', null);
         localStorage.setItem('staff', 'false');
         fetch("/auth/logout", {
@@ -49,7 +51,7 @@ class PureStaffMain extends React.Component {
                         <Typography variant="h6" className={classes.title}>
                             Staff
                     </Typography>
-                        <Button color="inherit" onClick = {() => this.logOut()}>Logout</Button>
+                        <Button color="inherit" onClick={() => this.logOut()}>Logout</Button>
                     </Toolbar>
                 </AppBar>
                 <br></br>

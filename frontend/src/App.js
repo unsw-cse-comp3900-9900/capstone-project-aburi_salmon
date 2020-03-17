@@ -9,6 +9,7 @@ import { theme } from './theme/theme';
 
 class App extends React.Component {
   render() {
+    // I couldn't put MuiThemeProvider if this file is moved to a .tsx file
     return (
       <MuiThemeProvider theme={theme}>
         <Router history={history} >

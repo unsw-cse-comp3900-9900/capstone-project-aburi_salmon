@@ -1,14 +1,12 @@
 import React from 'react';
-import { withStyles } from '@material-ui/core';
+import { withStyles, WithStyles } from '@material-ui/core';
 
 import { styles } from './styles';
 // import './../RightBar/RightBar.css';
 
-class RightBarClass extends React.Component {
-  constructor(props) {
-    super(props);    
-  }
+interface IProps extends WithStyles<typeof styles> { }
 
+class RightBarClass extends React.Component<IProps, {}> {
   doNothing() {
 
   }

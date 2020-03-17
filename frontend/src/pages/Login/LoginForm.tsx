@@ -1,12 +1,25 @@
 import React from 'react';
 import { TextField, Button, Snackbar } from '@material-ui/core';
+import { Color } from '@material-ui/lab';
 import './../Login/LoginRegister.css';
 import restlogo from './../../assets/Hojiak.png';
-import history from './../../history';
+import history from '../../history';
 import { Alert } from '@material-ui/lab';
 
+interface IState {
+    username: string;
+    password: string;
+    usererror: boolean;
+    passerror: boolean;
+    error: boolean;
+    severity: Color;
+    isOpen: boolean;
+    alertMessage: string;
+}
 
-class PureLogin extends React.Component {
+
+
+class PureLogin extends React.Component<{}, IState> {
 
     constructor(props) {
         super(props);
