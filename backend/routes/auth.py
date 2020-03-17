@@ -78,8 +78,8 @@ class Signup(Resource):
         # Username only allows a-z, A-Z, 0-9, and underscore
         regex_username = re.compile('[^a-zA-Z0-9_]')
 
-        if username is None or payload_password is None:
-            abort(400, 'Malformed request, username or password is not supplied')
+        if username is None or payload_password is None or name is None:
+            abort(400, 'Malformed request, username or password or name is not supplied')
         
         if not db.available_username(username):
             abort(409, 'Username \'{}\' is taken'.format(username))
