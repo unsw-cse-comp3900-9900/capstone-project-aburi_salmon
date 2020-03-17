@@ -36,5 +36,5 @@ pip install <package_name>
 # pip install flask
 
 # Storing inside requirements.txt
-pip freeze > requirements.txt
+pip freeze | grep -v 'pkg-resources' > requirements.txt
 ```
