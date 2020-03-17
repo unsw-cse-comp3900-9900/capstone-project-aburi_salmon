@@ -20,7 +20,6 @@ class PureRegister extends React.Component {
             severity: 'success',
             isOpen: false,
             alertMessage: '',
-            passerror: false,
         }
     }
 
@@ -41,10 +40,8 @@ class PureRegister extends React.Component {
             //alert(msg.status);
             if (msg.status === 200) {
                 alert('You have signed up successfully, please try to log in');
-                this.context.logIn(this.state.username);
                 localStorage.setItem('username', null);
                 localStorage.setItem('staff', 'false');
-                history.push('/');
             } else {
                 alert(msg.statusText);
             }
@@ -64,6 +61,13 @@ class PureRegister extends React.Component {
        this.setState({passerror: false}); 
     }
 
+    /*
+    Current error handling
+    - Everthing must be filled in
+    - Name must be only letters and spaces
+    - Password must have at least one letter and number
+    */
+
     handleRegister(e){
         e.preventDefault();
         //If any fields are empty
@@ -79,8 +83,18 @@ class PureRegister extends React.Component {
             this.setState({passerror: true });
         } else if (this.state.repassword !== this.state.password) {
             this.setError('Passwords not consistent');
-            this.setState({ passerror: true })
-        } else {
+            this.setState({ passerror: true });
+        } else if (!/^[a-zA-Z/s]+$/.test(this.state.name)){
+            this.setError('Username can only be letters')
+            this.setState({ error: true });
+            this.setState({ passerror: true });
+        } else if (/^[a-zA-Z/s]+$/.test(this.state.password)){
+            this.setError('Password must contain at least one number');
+            this.setState({ passerror: true });
+        } else if (/^[0-9/s]+$/.test(this.state.password)){
+            this.setError('Password must contain at least one letter');
+            this.setState({ passerror: true });
+        } else{
             this.checkRegister();
         }
     }

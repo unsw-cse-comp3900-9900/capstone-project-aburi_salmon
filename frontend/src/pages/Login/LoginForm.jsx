@@ -35,10 +35,11 @@ class PureLogin extends React.Component {
         }).then((msg) => {
             //alert(msg.status);
             if (msg.status === 200) {
-                this.loginSuccess();
+                
                 alert('you have successfully logged on');
                 localStorage.setItem('username', this.state.username);
                 localStorage.setItem('staff', 'true');
+                this.loginSuccess();
                 history.push('/staff');
             } else {
                 this.setError(msg.statusText);
@@ -49,6 +50,7 @@ class PureLogin extends React.Component {
     }
 
     loginSuccess(){
+        //return (<Alert severity="success">This is a success message!</Alert>);
         this.setState({ isOpen: true });
         this.setState({ alertMessage: "You have successfully logged in" });
         this.setState({ severity: 'success' });
@@ -58,12 +60,21 @@ class PureLogin extends React.Component {
         this.setState({isOpen: true});
         this.setState({alertMessage: message });
         this.setState({severity: 'error' });
-        //alert(message);
+    }
+
+    /*
+    Current Checks:
+    - Username and password aren't empty
+    - Username consist of only letters or spaces
+    */
+
+    resetError(){
+        this.setState({ passerror: false });
+        this.setState({ usererror: false });
     }
 
     handleLogin() {
-        this.setState({ passerror: false });
-        this.setState({ usererror: false });
+        this.resetError();
         if (this.state.username === '' && this.state.password === '') {
             this.setError('All fields need to be filled');
             this.setState({passerror: true });
@@ -73,6 +84,9 @@ class PureLogin extends React.Component {
             this.setState({ passerror: true });
         } else if (this.state.username === '') {
             this.setError('Username Required');
+            this.setState({ usererror: true });
+        } else if (!/^[a-zA-Z/s]+$/.test(this.state.username)) {
+            this.setError('Username can only be letters or spaces')
             this.setState({ usererror: true });
         } else {
             this.checkLogin();

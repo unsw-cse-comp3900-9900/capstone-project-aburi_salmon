@@ -26,6 +26,17 @@ class PureStaffMain extends React.Component {
     logOut(){
         localStorage.setItem('username', null);
         localStorage.setItem('staff', 'false');
+        fetch("/auth/logout", {
+            method: 'POST',
+        }).then((msg) => {
+            if (msg.status === 200) {
+                alert('you have successfully logged out');
+            } else {
+                alert('msg.status');
+            }
+        }).catch((status) => {
+            console.log(status);
+        });
         history.push('/');
     }
 

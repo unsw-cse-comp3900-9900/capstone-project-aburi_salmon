@@ -14,6 +14,42 @@ class PureHome extends React.Component {
     history.push('/login');
   }
 
+
+  logOut() {
+    localStorage.setItem('username', null);
+    localStorage.setItem('staff', 'false');
+    fetch("/auth/logout", {
+      method: 'POST',
+    }).then((msg) => {
+      if (msg.status === 200) {
+        alert('you have successfully logged out');
+      } else {
+        alert('msg.status');
+      }
+    }).catch((status) => {
+      console.log(status);
+    });
+    history.push('/');
+  }
+
+  isLoggedIn(){
+    if (localStorage.getItem('staff') !== 'true') {
+      return(
+        <Link className="stafflogin" variant="h5" color="inherit" onClick={() => this.goToLogin()}>
+            Log In
+          </Link>
+      );
+    }
+    else {
+      return(
+      <Link className="stafflogin" variant="h5" color="inherit" onClick={() => this.logOut()}>
+        Log Out
+          </Link>
+      );
+    }
+    
+  }
+
   render() {
     return (
       <div className="wrapper">
@@ -22,9 +58,8 @@ class PureHome extends React.Component {
           <button className="myButton" onClick={() => this.goToMenu()}>
             Start Ordering
           </button>
-          <Link className="stafflogin" variant="h5" color="inherit" onClick={() => this.goToLogin()}>
-            Log In
-          </Link>
+          {this.isLoggedIn()}
+          
       </div>
     );
   }
