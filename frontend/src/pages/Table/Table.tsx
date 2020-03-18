@@ -9,7 +9,7 @@ import {styles} from './styles';
 interface IProps extends WithStyles<typeof styles> { }
 
 interface IState {
-  value: string | Number;
+  value: string;
   allowed: boolean;
 }
 
@@ -26,7 +26,7 @@ class TablePage extends React.Component<IProps, IState> {
     history.push("/");
   }
 
-  setTableNumber(tableNumber) {
+  setTableNumber(tableNumber: string) {
     this.setState({
       value: tableNumber,
       allowed: true
@@ -42,9 +42,9 @@ class TablePage extends React.Component<IProps, IState> {
           hardcoded buttons should be illegal too...
           */}
           <div>
-            <Button variant="contained" color="primary" onClick={() => this.setTableNumber(1)}>1</Button>
-            <Button variant="contained" color="primary" onClick={() => this.setTableNumber(2)}>2</Button>
-            <Button variant="contained" color="primary" onClick={() => this.setTableNumber(3)}>3</Button>
+            <Button variant="contained" color="primary" onClick={() => this.setTableNumber("1")}>1</Button>
+            <Button variant="contained" color="primary" onClick={() => this.setTableNumber("2")}>2</Button>
+            <Button variant="contained" color="primary" onClick={() => this.setTableNumber("3")}>3</Button>
           </div>
         </LeftBox>
         <RightBar>

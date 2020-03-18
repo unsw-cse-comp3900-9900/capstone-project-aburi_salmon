@@ -16,7 +16,7 @@ class PureHome extends React.Component {
 
 
   logOut() {
-    localStorage.setItem('username', null);
+    localStorage.setItem('username', "");
     localStorage.setItem('staff', 'false');
     fetch("/auth/logout", {
       method: 'POST',
@@ -32,29 +32,7 @@ class PureHome extends React.Component {
     history.push('/');
   }
 
-  isLoggedIn() {
-    if (localStorage.getItem('staff') !== 'true') {
-      return (
-        // <Link className="stafflogin" variant="h5" color="inherit" onClick={() => this.goToLogin()}>
-        //   Log In
-        // </Link>
-        <Link onClick={() => this.goToLogin()}>
-          Log In
-        </Link>
-      );
-    }
-    else {
-      return (
-        // <Link className="stafflogin" variant="h5" color="inherit" onClick={() => this.logOut()}>
-        //   Log Out
-        // </Link>
-        <Link onClick={() => this.logOut()}>
-          Log Out
-        </Link>
-      );
-    }
-
-  }
+  
 
   render() {
     return (
@@ -64,11 +42,29 @@ class PureHome extends React.Component {
         <button className="myButton" onClick={() => this.goToTable()}>
           Start Ordering
           </button>
-        {this.isLoggedIn()}
-
+        {isLoggedIn()}
+      
       </div>
     );
   }
+}
+
+const isLoggedIn = () => {
+  if (localStorage.getItem('staff') !== 'true') {
+    return (
+      <Link to='/login'>
+        Log In
+      </Link>
+    );
+  }
+  else {
+    return (
+      <Link to='/table'>
+        Log Out
+      </Link>
+    );
+  }
+
 }
 
 export const Home = PureHome;

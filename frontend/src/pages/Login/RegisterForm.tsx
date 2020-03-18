@@ -19,8 +19,8 @@ interface IState {
 }
 
 class PureRegister extends React.Component<{}, IState> {
-
-    constructor(props) {
+    // If Props is specified, use React.Component<IProps, IState>
+    constructor(props: any) {
         super(props);
         this.state = {
             username: 'Hey',
@@ -53,7 +53,7 @@ class PureRegister extends React.Component<{}, IState> {
             //alert(msg.status);
             if (msg.status === 200) {
                 alert('You have signed up successfully, please try to log in');
-                localStorage.setItem('username', null);
+                localStorage.setItem('username', "");
                 localStorage.setItem('staff', 'false');
             } else {
                 alert(msg.statusText);
@@ -63,7 +63,7 @@ class PureRegister extends React.Component<{}, IState> {
         });
     }
 
-    setError(message) {
+    setError(message: string) {
         this.setState({ isOpen: true });
         this.setState({ alertMessage: message });
         this.setState({ severity: 'error' });
@@ -81,7 +81,7 @@ class PureRegister extends React.Component<{}, IState> {
     - Password must have at least one letter and number
     */
 
-    handleRegister(e) {
+    handleRegister(e: React.MouseEvent) {
         e.preventDefault();
         //If any fields are empty
         this.resetError();
@@ -190,7 +190,7 @@ class PureRegister extends React.Component<{}, IState> {
 
                 <br></br>
                 <button className=" loginbut "
-                    onClick={(e) => this.handleRegister(e)}
+                    onClick={(e: React.MouseEvent) => this.handleRegister(e)}
                 > Register </button>
 
             </div>

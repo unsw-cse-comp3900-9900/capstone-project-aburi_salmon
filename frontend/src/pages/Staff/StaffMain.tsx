@@ -26,7 +26,7 @@ interface IProps extends WithStyles<typeof styles> { }
 class PureStaffMain extends React.Component<IProps, {}> {
 
     logOut() {
-        localStorage.setItem('username', null);
+        localStorage.setItem('username', "");
         localStorage.setItem('staff', 'false');
         fetch("/auth/logout", {
             method: 'POST',
