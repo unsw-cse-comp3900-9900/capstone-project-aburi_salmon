@@ -1,12 +1,20 @@
 import React from 'react';
-import { withStyles, Button, TextField } from '@material-ui/core';
+import { withStyles, Button, TextField, WithStyles, createStyles } from '@material-ui/core';
 
-import history from './../../history';
-import { LeftBox, RightBar } from './../../components';
-import { styles } from './styles';
+import history from '../../history';
+import { LeftBox, RightBar } from '../../components';
 
-class TablePage extends React.Component {
-  constructor(props) {
+import {styles} from './styles';
+
+interface IProps extends WithStyles<typeof styles> { }
+
+interface IState {
+  value: string;
+  allowed: boolean;
+}
+
+class TablePage extends React.Component<IProps, IState> {
+  constructor(props: IProps) {
     super(props);
     this.state = {
       value: 'Select your table number',
@@ -18,7 +26,7 @@ class TablePage extends React.Component {
     history.push("/");
   }
 
-  setTableNumber(tableNumber) {
+  setTableNumber(tableNumber: string) {
     this.setState({
       value: tableNumber,
       allowed: true
@@ -34,9 +42,9 @@ class TablePage extends React.Component {
           hardcoded buttons should be illegal too...
           */}
           <div>
-            <Button variant="contained" color="primary" onClick={() => this.setTableNumber(1)}>1</Button>
-            <Button variant="contained" color="primary" onClick={() => this.setTableNumber(2)}>2</Button>
-            <Button variant="contained" color="primary" onClick={() => this.setTableNumber(3)}>3</Button>
+            <Button variant="contained" color="primary" onClick={() => this.setTableNumber("1")}>1</Button>
+            <Button variant="contained" color="primary" onClick={() => this.setTableNumber("2")}>2</Button>
+            <Button variant="contained" color="primary" onClick={() => this.setTableNumber("3")}>3</Button>
           </div>
         </LeftBox>
         <RightBar>

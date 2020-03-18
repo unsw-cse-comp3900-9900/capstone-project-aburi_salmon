@@ -3,7 +3,7 @@ import {withStyles } from '@material-ui/core';
 import { styles } from './styles';
 import {Restricted} from './Restricted';
 import {StaffMain} from './StaffMain';
-import history from './../../history';
+import history from '../../history';
 
 class StaffPage extends React.Component {
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './../Home/Homepage.css';
-import history from './../../history';
+import history from '../../history';
 //import restlogo from './../../assets/Hojiak.png';
 
 
@@ -16,7 +16,7 @@ class PureHome extends React.Component {
 
 
   logOut() {
-    localStorage.setItem('username', null);
+    localStorage.setItem('username', "");
     localStorage.setItem('staff', 'false');
     fetch("/auth/logout", {
       method: 'POST',
@@ -32,37 +32,39 @@ class PureHome extends React.Component {
     history.push('/');
   }
 
-  isLoggedIn(){
-    if (localStorage.getItem('staff') !== 'true') {
-      return(
-        <Link className="stafflogin" variant="h5" color="inherit" onClick={() => this.goToLogin()}>
-            Log In
-          </Link>
-      );
-    }
-    else {
-      return(
-      <Link className="stafflogin" variant="h5" color="inherit" onClick={() => this.logOut()}>
-        Log Out
-          </Link>
-      );
-    }
-    
-  }
+  
 
   render() {
     return (
       <div className="wrapper">
         {/*<img src={restlogo} className="restlogo" alt="Logo" />*/}
-          <h1 className="restlogo">Restuarant Name</h1>
-          <button className="myButton" onClick={() => this.goToTable()}>
-            Start Ordering
+        <h1 className="restlogo">Restuarant Name</h1>
+        <button className="myButton" onClick={() => this.goToTable()}>
+          Start Ordering
           </button>
-          {this.isLoggedIn()}
-          
+        {isLoggedIn()}
+      
       </div>
     );
   }
+}
+
+const isLoggedIn = () => {
+  if (localStorage.getItem('staff') !== 'true') {
+    return (
+      <Link to='/login'>
+        Log In
+      </Link>
+    );
+  }
+  else {
+    return (
+      <Link to='/table'>
+        Log Out
+      </Link>
+    );
+  }
+
 }
 
 export const Home = PureHome;
