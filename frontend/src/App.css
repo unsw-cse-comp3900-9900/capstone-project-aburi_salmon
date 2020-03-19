@@ -1,5 +1,9 @@
 .App {
   text-align: center;
+/** 'height' property is added so that the screen supports full screen (100%) 
+ * feel free to change because it doesn't work lol
+ */
+  height: 100%;
 }
 
 .App-logo {

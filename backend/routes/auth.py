@@ -1,4 +1,5 @@
 import pdb
+import re
 
 from flask import request, jsonify
 from flask_restx import Resource, abort, reqparse, fields
@@ -10,7 +11,7 @@ from model.request_model import login_model, signup_model
 from util.hasher import hash_password
 from util.user import User
 
-auth = api.namespace('auth', description='Example route')
+auth = api.namespace('auth', description='Authentication route')
 
 @auth.route("/login", strict_slashes=False)
 class Login(Resource):
@@ -35,7 +36,7 @@ class Login(Resource):
 
         # Create identity for session, by using User object with role = 1 and table = None
         # Change this so that the role follows the staff_type_id of the user
-        identity = User(username, 1, None)
+        identity = User(username, db.get_profile(username).get('staff_type_id'), None)
         access_token = create_access_token(identity=identity)
 
         response = jsonify({
@@ -69,10 +70,25 @@ class Signup(Resource):
         username = creds.get('username')
         payload_password = creds.get('password')
         registration_key = creds.get('registration_key')
-      #  staff_type_id = creds.get('staff_type_id')
+        # staff_type_id = creds.get('staff_type_id')
 
-        if username is None or payload_password is None:
-            abort(400, 'Malformed request, email and password is not supplied')
+        # Name only allows a-z, A-Z, and space
+        regex_name = re.compile('[^a-zA-Z\s]')
+
+        # Username only allows a-z, A-Z, 0-9, and underscore
+        regex_username = re.compile('[^a-zA-Z0-9_]')
+
+        if username is None or payload_password is None or name is None:
+            abort(400, 'Malformed request, username or password or name is not supplied')
+        
+        if not db.available_username(username):
+            abort(409, 'Username \'{}\' is taken'.format(username))
+
+        if(regex_name.search(name) != None): 
+            abort(400, 'Malformed request, name should only contain a-z, A-Z, and space')
+
+        if(regex_username.search(username) != None): 
+            abort(400, 'Malformed request, username should only contain a-z, A-Z, 0-9, and underscore')
         
         if registration_key is None:
             abort(400, 'Malformed request, registration key is not supplied')
@@ -105,8 +121,3 @@ class Signup(Resource):
         })
 
         return
-
-        # Do things here
-        # Store credentials into db based on registration key
-        # Return response successful
-        #pass

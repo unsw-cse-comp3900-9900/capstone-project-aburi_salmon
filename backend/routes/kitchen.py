@@ -1,33 +1,33 @@
-import pdb
-
 from flask import request, jsonify
 from flask_restx import Resource, abort, reqparse, fields
-from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies
+from flask_jwt_extended import get_jwt_claims, jwt_required
 
-import config
 from app import api, db
-from model.request_model import *
-from util.hasher import hash_password
-from util.user import User
+from model.request_model import edit_order_item_status_model
 
-import uuid
+kitchen = api.namespace('kitchen', description='Kitchen Staff Route')
 
-
-
-@auth.route('/kitchen', strict_slashes=False)
+@kitchen.route('/')
 class Kitchen(Resource):
+    @jwt_required
+    @kitchen.response(200, 'Success')
+    @kitchen.response(400, 'Invalid request')
     def get(self):
-        # Initialise database
+        orders = db.get_ordered_items()
+        return { 'orders': orders }
 
-        ordered_items = db.orders(username)
+    @jwt_required
+    @kitchen.expect(edit_order_item_status_model)
+    @kitchen.response(200, 'Success')
+    @kitchen.response(400, 'Invalid request')
+    @kitchen.response(500, 'Something went wrong')
+    def put(self):
+        order_update = request.get_json()
+        id = order_update.get('id')
+        status = order_update.get('status')
 
-
-
-    def beginCooking(item_id):
-        db.beginCooking(item_id)
-                  
-    def finishCooking(self):
-        db.finish_Cooking(item_id)
-
-
-
+        if (db.update_ordered_item_status(id, status)):
+            return 'Success'
+        
+        return 500, 'Something went wrong'
+        

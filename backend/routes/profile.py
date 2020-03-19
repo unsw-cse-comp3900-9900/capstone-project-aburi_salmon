@@ -2,91 +2,76 @@ import pdb
 
 from flask import request, jsonify
 from flask_restx import Resource, abort, reqparse, fields
-from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies
+from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_claims, get_jwt_identity, jwt_required
 
 import config
 from app import api, db
-from model.request_model import *
+from model.request_model import edit_profile_model
 from util.hasher import hash_password
 from util.user import User
 
-profile = api.namespace('profile', description='Example route')
+profile = api.namespace('profile', description='Profile route')
 
-@auth.route('/profile', strict_slashes=False)
-class Profile(Resource):
-    @auth.response(200, 'Success')
-    @auth.response(400, 'Malformed request. Missing email')
-    @auth.response(404, 'User not found.')
+
+@profile.route("/profile", strict_slashes=False)
+class GetProfile(Resource):
+    @jwt_required
     def get(self):
-       # print('Get request received')
-       # print(request)
-        if not request.json:
-            abort(400, 'Malformed request, format is not application/json')
+        # Gets username from JWT
+        curr_user = get_jwt_identity()   #username
         
+        profile_dict = db.get_profile(curr_user)
+        curr_name = profile_dict['name']
+        curr_staff_type_id =profile_dict['staff_type_id']
 
-#get the username from example.py
-        profile = db.get_profile(username)
+        print(curr_user)
+        print(curr_name)
+        print(curr_staff_type_id)
 
+        return profile_dict
 
-        return jsonify(profile)
-
-
-
-        return {
-            "username": db.get_usernamename(username)
-            "name": db.get_name(username)
-            "staff_type_id": db.get_staff_type_id(username)
-        }
-
-
-
-
-
-
-
-
-
-
-
-        email = request.get_json().get('email')
-        print(email)
-        if email is None:
-            abort(400, 'Malformed request, missing email')
-
-        print("Request was successful but...")
-
-        if db.available_email(email):
-            abort(404, 'User not found.')
-        
-        return {
-            "displayname": db.get_displayname(email)
-        }
-
-
-
-
-
-
-@auth.route('/edit', strict_slashes=False)
-class Profile(Resource):
-    @auth.response(200, 'Success')
-    @auth.response(400, 'Malformed request. Missing email')
-    @auth.response(404, 'User not found.')
-    @auth.expect(edit_profile_model)
+    @profile.expect(edit_profile_model)
     def post(self):
-       # print('Get request received')
-       # print(request)
+        profile_dict = self.get()
+        curr_name = profile_dict['name']
+        curr_staff_type_id =profile_dict['staff_type_id']
+
         if not request.json:
             abort(400, 'Malformed request, format is not application/json')
-        
 
         creds = request.get_json()
         new_name = creds.get('name')
-        new_username = creds.get('username')
-        new_staff_type_id = creds.get('staff_type_id')
+    #    new_username = creds.get('username')
+        new_registration_key = creds.get('registration_key')
+    #    staff_type_id = creds.get('staff_type_id')
 
-        profile = db.get_profile(username)
-        profile.name = new_name
-        profile.username = new_username
+        # Staff can only update their name and staff type
+        username = profile_dict['username']
 
-        #update query in interface.py
+        if new_name is None:
+            name = curr_name
+        else:
+            name = new_name
+
+        if new_registration_key is None:
+            staff_type_id = curr_staff_type_id
+        else:
+            if new_registration_key == "staff1":
+                staff_type_id = 1
+            elif new_registration_key == "staff2":
+                staff_type_id = 2
+            elif new_registration_key == "staff3":
+                staff_type_id = 3
+            else:
+                abort(403, 'Wrong registration key')
+        
+        upd = db.update_staff(username, name, staff_type_id)
+
+        if upd is None:
+            abort(400, 'Backend is not working as intended or the supplied information was malformed.')
+
+        response = jsonify({
+            'status': 'success'
+        })
+
+        return response
