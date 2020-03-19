@@ -107,6 +107,9 @@ class PureRegister extends React.Component<{}, IState> {
         } else if (/^[0-9/s]+$/.test(this.state.password)) {
             this.setError('Password must contain at least one letter');
             this.setState({ passerror: true });
+        } else if (!/^[a-zA-Z0-9/s]+$/.test(this.state.password)) {
+            this.setError('Password can only contain letters, numbers and spaces');
+            this.setState({ passerror: true });
         } else {
             this.checkRegister();
         }
