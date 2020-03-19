@@ -37,26 +37,30 @@ class PureRegister extends React.Component<{}, IState> {
     }
 
     checkRegister() {
-        fetch("/auth/signup", {
+        fetch("http://localhost:5000/auth/signup", {
             method: 'POST',
             body: JSON.stringify({
+                name: this.state.name,
                 username: this.state.username,
                 password: this.state.password,
-                name: this.state.name,
                 registration_key: this.state.key,
             }),
             headers: {
                 'Content-Type': 'application/json',
                 'Connection': 'keep-alive'
             }
-        }).then((msg) => {
-            //alert(msg.status);
-            if (msg.status === 200) {
+        })
+        .then(res => {
+            var temp = this;
+            if (res.status === 200){
                 alert('You have signed up successfully, please try to log in');
                 localStorage.setItem('username', "");
                 localStorage.setItem('staff', 'false');
+                history.push('/');
             } else {
-                alert(msg.statusText);
+                res.json().then(function(object){
+                    temp.setError(object.message);
+                });
             }
         }).catch((status) => {
             console.log(status);

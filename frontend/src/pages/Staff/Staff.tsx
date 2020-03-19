@@ -43,8 +43,9 @@ const styles = (theme: Theme) =>
         },
         menubutton: {
             marginRight: theme.spacing(1),
-            width: '100%',
-            height: '18vh',
+            paddingRight: '10px',
+            //width: '100%',
+            //height: '18vh',
         },
         root: {
             display: 'flex',
@@ -67,6 +68,9 @@ const styles = (theme: Theme) =>
             //bottom: theme.spacing(2),
             //alignItems: 'stretch',
 
+        },
+        appbar: {
+            background: 'black',
         }
 
     });
@@ -81,15 +85,32 @@ class StaffPage extends React.Component<IProps, {currPage: string}>{
         }
     }
 
+    staffType = "kitchen"
+
     displayCont(){
         const { classes } = this.props;
         if (this.state.currPage === "Orders") {
-            return (
+            if (this.staffType === "wait"){
+                return (
                 <Box className={classes.staffContainer}>
                     <ListContainer name="To Be Served"/>
                     <ListContainer name="Served"/>
                 </Box>
-            );
+                );
+            } else if (this.staffType === "kitchen"){
+                return(
+                    <Box className={classes.staffContainer}>
+                        <ListContainer name="Queue" />
+                        <ListContainer name="Cooking" />
+                        <ListContainer name="Ready" />
+                    </Box>
+                );
+            } else {
+                return(
+                    <h1>something went wrong...</h1>
+                );
+            }
+            
         } else if (this.state.currPage === "Assistance"){
             return (
                 <Box className={classes.staffContainer}>
@@ -129,13 +150,66 @@ class StaffPage extends React.Component<IProps, {currPage: string}>{
         }
     }
 
+    displayNav(){
+        if (this.staffType === "wait"){
+            return(
+                <div className={this.props.classes.root}>
+                    <Paper className={this.props.classes.menubutton}>
+                        <MenuList >
+                            <MenuItem onClick={() => { this.setState({ currPage: "Menu" }) }}>Menu</MenuItem>
+                            <MenuItem onClick={() => { this.setState({ currPage: "Orders" }) }}>Orders
+                            <ListItemIcon>
+                                    <PriorityHighIcon fontSize="small" />
+                                </ListItemIcon>
+                            </MenuItem>
+                            <MenuItem onClick={() => { this.setState({ currPage: "Assistance" }) }}>Tables
+                            <ListItemIcon>
+                                    <PriorityHighIcon fontSize="small" />
+                                </ListItemIcon>
+                            </MenuItem>
+                        </MenuList>
+                    </Paper>
+                </div>
+            );
+         
+        } else if (this.staffType === "kitchen"){
+            return (
+                <div className={this.props.classes.root}>
+                    <Paper className={this.props.classes.menubutton}>
+                        <MenuList >
+                            <MenuItem onClick={() => { this.setState({ currPage: "Menu" }) }}>Menu</MenuItem>
+                            <MenuItem onClick={() => { this.setState({ currPage: "Orders" }) }}>Orders
+                            <ListItemIcon>
+                                    <PriorityHighIcon fontSize="small" />
+                                </ListItemIcon>
+                            </MenuItem>
+                        </MenuList>
+                    </Paper>
+                </div>
+            );
+        } else if (this.staffType === "manage"){
+            return (
+                <div className={this.props.classes.root}>
+                    <Paper className={this.props.classes.menubutton}>
+                        <MenuList >
+                            <MenuItem onClick={() => { this.setState({ currPage: "Menu" }) }}>Menu</MenuItem>    
+                        </MenuList>
+                    </Paper>
+                </div>
+            );
+        } else {
+            alert('You are not a valid staff');
+            history.push('/');
+        }
+    }
+
     render() {
         const { classes } = this.props;
         
         return (
             <div className={classes.wrapper}>
                 {this.isStaff()}
-                <AppBar position="static">
+                <AppBar position="static" className={classes.appbar}>
                     <Toolbar>
                         <Typography variant="h6" className={classes.title}>
                             Staff: {localStorage.getItem('username')}
@@ -145,25 +219,10 @@ class StaffPage extends React.Component<IProps, {currPage: string}>{
                 </AppBar>
                 <br></br>
                 <div className={classes.container}>
-                    <div className={classes.root}>
-                        <Paper className={classes.menubutton}>
-                            <MenuList >
-                                <MenuItem onClick={() => {this.setState({currPage: "Menu"})}}>Menu</MenuItem>
-                                <MenuItem onClick={() => { this.setState({ currPage: "Orders" }) }}>Orders
-                            <ListItemIcon>
-                                        <PriorityHighIcon fontSize="small" />
-                                    </ListItemIcon>
-                                </MenuItem>
-                                <MenuItem onClick={() => { this.setState({ currPage: "Assistance" }) }}>Tables
-                            <ListItemIcon>
-                                        <PriorityHighIcon fontSize="small" />
-                                    </ListItemIcon>
-                                </MenuItem>
-                            </MenuList>
-                        </Paper>
-                    </div>
+                    {this.displayNav()}
                     {this.displayCont()}
                 </div>
+
             </div>
         );
     }

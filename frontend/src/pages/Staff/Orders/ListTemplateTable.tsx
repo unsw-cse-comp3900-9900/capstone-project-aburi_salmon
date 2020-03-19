@@ -27,38 +27,45 @@ const styles = (theme: Theme) =>
             height: '50px',
             border: '2px solid green',
             //backgroundColor: 'rgb(0, 204, 51)',  
-            backgroundColor: 'rgb(0, 204, 0)',
+            //backgroundColor: 'rgb(0, 204, 0)',
+            background: 'radial-gradient(circle, rgba(148, 233, 152, 1) 0%, rgba(56, 171, 87, 1) 73%)',
         },
 
         headingToBeServed: {
             height: '50px',
             border: '2px solid green',
-            //backgroundColor: 'rgb(0, 204, 51)',  
-            backgroundColor: 'rgb(255, 255, 0)',
+            background: 'radial-gradient(circle, rgba(250, 255, 161, 1) 0%, rgba(255, 254, 92, 1) 73%)',
+        },
+
+        headingQueue: {
+            height: '50px',
+            border: '2px solid green',
+            background: 'radial-gradient(circle, rgba(161, 237, 255, 1) 0%, rgba(126, 141, 255, 1) 73%)',
         },
 
         boxServed: {
-            //backgroundColor: 'lightgreen',
             verticalAlign: 'top',
             flexGrow: 1,
             width: '100%',
-            //border: '1px solid darkgreen',
             padding: '20px 5px 5px 5px',
-            //background: 'linear-gradient(0deg, rgba(97, 203, 120, 1) 0%, rgba(255, 255, 255, 1) 100%)',
             background: 'linear-gradient(0deg, rgba(160, 235, 176, 1) 0%, rgba(255, 255, 255, 1) 100%)',
-            //backgroundImage: "linear-gradient(0deg, rgba(255, 255, 255, 1) 0%, rgba(98, 204, 73, 1) 100%)",
         },
 
         boxToBeServed: {
-            //backgroundColor: 'lightgreen',
             verticalAlign: 'top',
             flexGrow: 1,
             width: '100%',
-            //border: '1px solid darkgreen',
             padding: '20px 5px 5px 5px',
-            //background: 'linear-gradient(0deg, rgba(97, 203, 120, 1) 0%, rgba(255, 255, 255, 1) 100%)',
-            background: 'linear-gradient(0deg, rgba(255, 253, 181, 1) 0%, rgba(255, 255, 255, 1) 100%)',
-            //backgroundImage: "linear-gradient(0deg, rgba(255, 255, 255, 1) 0%, rgba(98, 204, 73, 1) 100%)",
+            background: 'linear-gradient(0deg, rgba(255, 254, 218, 1) 0%, rgba(255, 255, 255, 1) 100%)',
+
+        },
+
+        boxQueue: {
+            verticalAlign: 'top',
+            flexGrow: 1,
+            width: '100%',
+            padding: '20px 5px 5px 5px',
+            background: 'linear-gradient(0deg, rgba(133, 160, 255, 1) 0%, rgba(255, 255, 255, 1) 100%)',
         },
 
         scroll: {
@@ -89,7 +96,7 @@ class ListContainer extends React.Component<IProps, {}>{
     }
 
     getHeading(){
-        if (this.props.name === 'Served'){
+        if (this.props.name === 'Served' || this.props.name === 'Ready'){
             return(
                 <tr className={this.props.classes.headingServed}>
                     <th className={this.props.classes.headingServed}>
@@ -97,10 +104,18 @@ class ListContainer extends React.Component<IProps, {}>{
                     </th>
                 </tr>
             );
-        } else {
+        } else if (this.props.name === 'To Be Served' || this.props.name === 'Cooking') {
             return (
                 <tr className={this.props.classes.headingToBeServed}>
                     <th className={this.props.classes.headingToBeServed}>
+                        {this.props.name}
+                    </th>
+                </tr>
+            );
+        } else {
+            return (
+                <tr className={this.props.classes.headingQueue}>
+                    <th className={this.props.classes.headingQueue}>
                         {this.props.name}
                     </th>
                 </tr>
@@ -109,15 +124,21 @@ class ListContainer extends React.Component<IProps, {}>{
     }
 
     getBox(){
-        if (this.props.name === 'Served') {
+        if (this.props.name === 'Served' || this.props.name === 'Ready') {
             return (
                 <td className={this.props.classes.boxServed}>
                     <ItemCont />
                 </td>
             );
-        } else {
+        } else if (this.props.name === 'To Be Served' || this.props.name === 'Cooking') {
             return (
                 <td className={this.props.classes.boxToBeServed}>
+                    <ItemCont />
+                </td>
+            );
+        } else {
+            return (
+                <td className={this.props.classes.boxQueue}>
                     <ItemCont />
                 </td>
             );
