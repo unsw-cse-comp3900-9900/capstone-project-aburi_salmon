@@ -144,3 +144,102 @@ class DB:
 
     def update_ordered_item_status(self, id, status):
         return self.__update("UPDATE item_order SET status_id = %s WHERE id = %s", [status, id])
+
+
+    def get_category(self, test):
+        rows = self.__query('SELECT * FROM category WHERE position > %s', [test,])
+
+        if (not rows):
+            return None
+
+        category = [{
+            'id': row[0],
+            'name': row[1]
+            } for row in rows]
+        return category
+    
+    def get_item(self, test):
+        rows = self.__query('SELECT * FROM item WHERE price > %s', [test,])
+
+        if (not rows):
+            return None
+
+        category = [{
+            'id': row[0],
+            'name': row[1],
+            'description': row[2],
+            'price': row[3]
+            } for row in rows]
+        return category
+    
+    def get_ingredient(self, test):
+        rows = self.__query('SELECT * FROM ingredient WHERE id > %s', [test,])
+
+        if (not rows):
+            return None
+
+        category = [{
+            'id': row[0],
+            'name': row[1]
+            } for row in rows]
+        return category
+
+
+    def get_ingredient_from_item(self, test):
+        rows = self.__query('SELECT ing.name FROM item_ingredient ii, ingredient ing, item i WHERE ii.ingredient_id = ing.id AND i.name = %s AND ii.item_id = i.id GROUP BY ing.id', [test,])
+
+        if (not rows):
+            return None
+
+        ingredient = []
+        for row in rows:
+            ingredient.append(row[0])
+        return ingredient
+
+
+    def get_item_from_category(self, test):
+        rows = self.__query('SELECT i.id, i.name, i.description FROM category_item ci, category c, item i WHERE ci.category_id = c.id AND c.name = %s AND ci.item_id = i.id GROUP BY i.id', [test,])
+
+        if (not rows):
+            return None
+
+        #ing = get_ingredient_from_item()
+
+        item = [{
+            'id': row[0],
+            'name': row[1],
+            'description': row[2],
+            'ingredient': DB.get_ingredient_from_item(self, row[1])
+            } for row in rows]
+        return item
+
+
+    def get_ordered_items_customer(self):
+        rows = self.__query('SELECT io.order_id, i.name, io.quantity, s.status_name FROM item_order io, item i, status s WHERE s.id = io.status_id AND i.id = io.item_id AND s.id > %s', [0])
+
+        if (not rows):
+            return None
+
+        orders = [{
+            'order_id': row[0],
+            'item': row[1],
+            'quantity': row[2],
+            'status_id': row[3]
+            } for row in rows]
+        return orders
+
+    def get_ordered_items_status(self, item_name):
+        status = self.__query('SELECT s.status_name FROM item_order io, item i, status s WHERE s.id = io.status_id AND i.id = io.item_id AND i.name = %s', item_name)
+
+        if (not rows):
+            return None
+
+        return status
+        
+    #    orders = [{
+    #        'order_id': row[0],
+    #        'item': row[1],
+    #        'quantity': row[2],
+    #        'status_id': row[3]
+    #        } for row in rows]
+    #    return orders
