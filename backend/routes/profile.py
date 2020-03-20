@@ -1,4 +1,5 @@
 import pdb
+import re
 
 from flask import request, jsonify
 from flask_restx import Resource, abort, reqparse, fields
@@ -52,6 +53,11 @@ class GetProfile(Resource):
             name = curr_name
         else:
             name = new_name
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
+        if(regex.search(name) != None): 
+            abort(400, 'Malformed request, name cannot have special characters')
 
         if new_registration_key is None:
             staff_type_id = curr_staff_type_id

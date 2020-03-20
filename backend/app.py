@@ -43,6 +43,8 @@ def run_app(host, port):
     import routes.session
     import routes.profile
     import routes.kitchen
+    import routes.menu
+    import routes.order
 
 
     ## When SocketIO is enabled, comment this
