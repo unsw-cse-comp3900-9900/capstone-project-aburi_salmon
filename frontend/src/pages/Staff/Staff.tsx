@@ -85,7 +85,7 @@ class StaffPage extends React.Component<IProps, {currPage: string}>{
         }
     }
 
-    staffType = "kitchen"
+    staffType = "wait"
 
     displayCont(){
         const { classes } = this.props;
