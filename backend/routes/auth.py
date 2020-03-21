@@ -1,9 +1,10 @@
 import pdb
 import re
 
+from uuid import uuid4
 from flask import request, jsonify
 from flask_restx import Resource, abort, reqparse, fields
-from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies
+from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies, jwt_required
 
 import config
 from app import api, db
@@ -122,7 +123,8 @@ class Signup(Resource):
 
         return
 
-@auth.route("/registration", strict_slashes=False):
+@auth.route("/registration", strict_slashes=False)
+class Registration(Resource):
     @jwt_required
     @auth.response(200, 'Success')
     @auth.response(400, 'Invalid request')
