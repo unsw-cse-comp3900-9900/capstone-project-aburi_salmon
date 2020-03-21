@@ -38,13 +38,12 @@ def run_app(host, port):
     import routes.example
     import routes.auth
     import routes.manager
-    # import routes.kitchenstaff
-    # import routes.waitstaff
     import routes.session
     import routes.profile
     import routes.kitchen
     import routes.menu
     import routes.order
+    import routes.table
 
 
     ## When SocketIO is enabled, comment this
