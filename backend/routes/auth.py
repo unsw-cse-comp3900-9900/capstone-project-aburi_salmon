@@ -125,13 +125,10 @@ class Signup(Resource):
 class Registration(Resource):
     @jwt_required
     @auth.response(200, 'Success')
-    @auth.response(401, 'User is not a manager')
+    @auth.response(500, 'User is not a manager')
     def get(self):
         # Get a list of all registration keys
         keys = db.get_registration_keys(None)
-        if (not keys):
-            abort(500, 'Something went wrong.')
-
         return jsonify({ 'registration_keys': keys })
 
 
@@ -154,3 +151,14 @@ class Registration(Resource):
             abort(500, 'Something went wrong.')
 
         return jsonify({ 'status': 'success' })
+
+@auth.route("/registration/<int:id>", strict_slashes=False)
+@auth.param('id', 'staff_type identifier')
+class RegistrationList(Resource):
+    @jwt_required
+    @auth.response(200, 'Success')
+    @auth.response(500, 'User is not a manager')
+    def get(self, id):
+        # Get a list of all registration keys of type 'id'
+        keys = db.get_registration_keys(id)
+        return jsonify({ 'registration_keys': keys })

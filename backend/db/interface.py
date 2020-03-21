@@ -102,8 +102,8 @@ class DB:
         else:
            keys = self.__query('SELECT * FROM staff_registration', [])
 
-        if not keys:
-            return None
+        if keys is None:
+            return []
 
         return [
             {
