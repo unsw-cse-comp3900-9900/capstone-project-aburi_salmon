@@ -9,9 +9,18 @@ export const styles = (theme: Theme) =>
       margin: '10px',
       fontSize: '20px',
       background: fade(theme.palette.common.black, 0.4),
+      height: '100%',
     },
-    button: {
+    tablebutton: {
       margin: '20px',
       fontSize: '30px',
+    },
+    gobackbutton: {
+      margin: '10px',
+      fontSize: '25px',
+    },
+    gotonextpagebutton: {
+      margin: '10px',
+      fontSize: '25px',
     }
   });

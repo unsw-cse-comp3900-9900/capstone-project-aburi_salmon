@@ -6,14 +6,14 @@ import { LeftBox, RightBar } from '../../components';
 
 import { styles } from './styles';
 import { Client } from '../../api/client';
-import { Tables } from '../../api/models';
+import { Tables as TableModel } from '../../api/models';
 
 interface IProps extends WithStyles<typeof styles> { }
 
 interface IState {
   value: string;
   allowed: boolean;
-  tables: Tables | null;
+  tables: TableModel | null;
 }
 
 class TablePage extends React.Component<IProps, IState> {
@@ -41,9 +41,10 @@ class TablePage extends React.Component<IProps, IState> {
     history.push('/menu');
   }
 
+  // Component did mount gets called before render
   async componentDidMount() {
     const client = new Client()
-    const t: Tables | null = await client.getTables();
+    const t: TableModel | null = await client.getTables();
     this.setState({ tables: t });
   }
 
@@ -58,27 +59,26 @@ class TablePage extends React.Component<IProps, IState> {
             </div>
           }
           second={
-            this.state.tables?.tables.map(tbl => (
-              <Button
-                variant="contained"
-                color="primary"
-                className={classes.button}
-                onClick={() => this.setTableNumber(tbl.table_id.toString())} disabled={tbl.occupied}
-              >
-                {tbl.table_id}
-              </Button>
-            ))
-            // <div>
-            //   <Button variant="contained" color="primary" onClick={() => this.setTableNumber("1")}>1</Button>
-            //   <Button variant="contained" color="primary" onClick={() => this.setTableNumber("2")}>2</Button>
-            //   <Button variant="contained" color="primary" onClick={() => this.setTableNumber("3")}>3</Button>
-            // </div>
+            <div>
+              {
+                this.state.tables?.tables.map(tbl => (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    className={classes.tablebutton}
+                    onClick={() => this.setTableNumber(tbl.table_id.toString())} disabled={tbl.occupied}
+                  >
+                    {tbl.table_id}
+                  </Button>
+                ))
+              }
+            </div>
           }
         />
 
         <RightBar
           first={
-            <Button variant="contained" color="secondary" onClick={() => this.goToMain()}>Go back</Button>
+            <Button className={classes.gobackbutton} variant="contained" color="secondary" onClick={() => this.goToMain()}>Go back</Button>
           }
           second={
             <TextField
@@ -92,7 +92,7 @@ class TablePage extends React.Component<IProps, IState> {
             />
           }
           third={
-            <Button variant="contained" disabled={!this.state.allowed} onClick={() => this.goToOrder()}>
+            <Button className={classes.gotonextpagebutton} variant="contained" disabled={!this.state.allowed} onClick={() => this.goToOrder()}>
               Go to next page
           </Button>
           }
