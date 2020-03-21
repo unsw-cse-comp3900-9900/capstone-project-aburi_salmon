@@ -30,15 +30,17 @@ class MenuPage extends React.Component<IProps, IState> {
       menu: null,
       value: "Sushi",
     }
+    // To bind the tab change
+    this.handleTabChange = this.handleTabChange.bind(this);
   }
 
   generateItemsInCategory(items: Array<ItemModel>, categoryName: string){
     const { classes } = this.props;
     return (
-      <div hidden={this.state.value !== categoryName} id={`tabpanel-${categoryName}`} aria-labelledby={`tab-${categoryName}`}>
+      <div hidden={this.state.value !== categoryName} id={`tabpanel-${categoryName}`} key={categoryName} aria-labelledby={`tab-${categoryName}`}>
         {
           items.map(item => (
-            <Card className={classes.itemcard}>
+            <Card className={classes.itemcard} key={item.id}>
               <CardContent>
                 <Typography variant="h5">
                   {item.name}
@@ -101,7 +103,7 @@ class MenuPage extends React.Component<IProps, IState> {
                 >
                   {
                     this.state.menu?.menu.map(category => (
-                      <Tab label={category.cat} {...this.tabProps(category.cat)}/>
+                      <Tab label={category.cat} key={category.cat} {...this.tabProps(category.cat)}/>
                     ))
                   }
                 </Tabs>
