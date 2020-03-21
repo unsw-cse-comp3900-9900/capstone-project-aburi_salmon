@@ -1,0 +1,102 @@
+COMP3900 Diary
+Date    Day         Plan                                    Doing
+---------------------------------------------------------------------------------------------------------------------
+18/2    Tuesday     - Form a team and choose a project      - Formed team of 3: Sharon, Kevin and I
+                                                            - Decided on Project 6: Waiter
+                                                            - Decided on the language/software we will be using for
+                                                            frontend: React, NodeJS, Typescript
+---------------------------------------------------------------------------------------------------------------------
+19/2    Wednesday   - Learn React, NodeJS, and Typescript   - Attempted ReactJS tutorial
+                                                            - Watched a Typescript tutorial video
+                                                            - Downloaded necessary packages (NodeJS)
+                                                            - Installed new code editor: Visual Studio Code
+                                                            - Studied the template Kevin put up on Github
+---------------------------------------------------------------------------------------------------------------------
+20/2    Thursday    - Work on week 3 deviverables           - Worked on week 3 deliverables: User stories and problem
+                                                            statement
+                                                            - Signed up to Jira
+---------------------------------------------------------------------------------------------------------------------
+21/2    Friday      - Try to design some UI using ReactJS   - Tried Jira and worked out how it works. You can create
+                    and typescript.                         Epics, and for each epic you can create tasks for it. You
+                    - Continue week 3 deliverables.         can assign people to each task, and the task has 3 states:
+                    - Figure out how Jira works.            to do, doing and completed.
+                                                            - Proof read what we have so far on week 3 deliverables,
+                                                            need to search up how to do system flow diagrams
+---------------------------------------------------------------------------------------------------------------------
+22/2    Saturday    - Busy                                  - Nothing
+---------------------------------------------------------------------------------------------------------------------                    
+23/2    Sunday      - Design wireframes                     - Finished menu designs
+---------------------------------------------------------------------------------------------------------------------
+24/2    Monday      - Design wireframes                     - Finished first rough draft of wireframes
+                                                            - Worked on project proposal
+---------------------------------------------------------------------------------------------------------------------
+25/2    Tuesday     - Team meeting, what to do about        - Kav and Noah joined our team
+                    sprints, task allocation                - We clarified what our epic stories should be
+                    - Learn and try to make homepage and a  - Extras: recommendations
+                    basic form using reactjs and typescript - Debated about redundancy of id being int
+                                                            - Takeout option
+                                                            - Meeting on Friday
+                                                            - Using python and flask
+---------------------------------------------------------------------------------------------------------------------                                                
+26/2    Wednesday   - Review Epic stories                   - Worked on background research the entire Day
+                    - Work on designing webpage             - Finished first draft of design
+                    - Watched videos on typescript and React
+---------------------------------------------------------------------------------------------------------------------
+27/2    Thursday    - Finalise wireframes                   - Finalised wireframes, worked around with colors
+---------------------------------------------------------------------------------------------------------------------
+28/2    Friday      - Meeting: see how it goes              - We went through and discussed the Epics
+                                                            - Worked on modifying the format
+---------------------------------------------------------------------------------------------------------------------
+29/2    Saturday    - Busy                                  - Nothing
+1/3     Sunday      - Busy                                  - Nothing
+---------------------------------------------------------------------------------------------------------------------
+2/3     Monday      - Work on project proposal              - Tried to work on colour scheme
+                                                            - An utter headache
+---------------------------------------------------------------------------------------------------------------------
+3/3     Tuesday     - Meeting                               - Standup meeting: everyone working on project proposal
+                                                            - Discussed overall system flow
+                                                            - Confirmed working on first sprints
+---------------------------------------------------------------------------------------------------------------------
+4/3     Wednesday   - Research how to start frontend webapp - Worked on html/css for login, home and table page
+---------------------------------------------------------------------------------------------------------------------
+5/3     Thursday    - Attempt html/css                      - Same as yesterday
+---------------------------------------------------------------------------------------------------------------------
+6/3     Friday      - Finalise report                       - Finalise report
+---------------------------------------------------------------------------------------------------------------------
+7/3     Saturday    - Busy                                  - Nothing
+---------------------------------------------------------------------------------------------------------------------
+8/3     Sunday      - Start coding using ReactJS            - Worked on making React app from scratch
+---------------------------------------------------------------------------------------------------------------------
+9/3     Monday      - Make login page                       - Worked on Login page
+---------------------------------------------------------------------------------------------------------------------
+10/3    Tuesday     - Meeting                               - Clarified how the system will be like
+                                                            - Backend is working hard
+                                                            - I showed my limited working login page
+---------------------------------------------------------------------------------------------------------------------
+11/3    Wednesday   - Research authentication on React      - Nothing
+---------------------------------------------------------------------------------------------------------------------
+12/3    Thursday    - Work on login                         - Nothing (probably heavy procrastination)
+---------------------------------------------------------------------------------------------------------------------
+13/3    Friday      - Meeting                               - Kevin is merging backend and frontend, getting logiin 
+                                                            work
+                                                            - I'm now working on staff page
+----------------------------------------------------------------------------------------------------------------------
+14/3    Saturday    - Busy                                  - Nothing
+----------------------------------------------------------------------------------------------------------------------
+15/3    Sunday      - Work on Staff page                    - Finished the framework for staff page, need to add JS                           
+----------------------------------------------------------------------------------------------------------------------
+16/3    Monday      - Work on US1 (login/register)          - Get registration and login working
+                                                            - Made sure staff pages are restricted
+----------------------------------------------------------------------------------------------------------------------
+17/3    Tuesday     - Meeting                               - We got Jira sorted
+                                                            - Got frontend and backend working
+----------------------------------------------------------------------------------------------------------------------
+18/3    Wednesday   - Get Nav bar working                   - Got nav working
+                    - Display items and orders              - Can print tables dynamically
+                                                            - Attempted to style orders and tables
+----------------------------------------------------------------------------------------------------------------------
+19/3    Thursday    - Improve UI                            - Improved UI
+                    - Get it showing different components   - Different staff see different things
+                    for different staff                     - Fixed register form/now works perfectly
+                    - Make items clickable                  - Put diary on Github
+                    - Put diary on Github                   - Made table info page

@@ -261,3 +261,23 @@ class DB:
         
         return True
 
+    def get_tables(self):
+        return [
+            {
+                "table_id": 1,
+                "occupied": False
+            },
+            {
+                "table_id": 2,
+                "occupied": True
+            },
+            {
+                "table_id": 3,
+                "occupied": True
+            },
+            {
+                "table_id": 4,
+                "occupied": False
+            }
+        ]
+
