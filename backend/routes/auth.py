@@ -8,7 +8,7 @@ from flask_jwt_extended import create_access_token, set_access_cookies, unset_jw
 
 import config
 from app import api, db
-from model.request_model import login_model, signup_model
+from model.request_model import login_model, signup_model, registration_model
 from util.hasher import hash_password
 from util.user import User
 
@@ -71,7 +71,6 @@ class Signup(Resource):
         username = creds.get('username')
         payload_password = creds.get('password')
         registration_key = creds.get('registration_key')
-        # staff_type_id = creds.get('staff_type_id')
 
         # Name only allows a-z, A-Z, and space
         regex_name = re.compile('[^a-zA-Z\s]')
@@ -104,12 +103,11 @@ class Signup(Resource):
         elif registration_key == "staff3":
             staff_type_id = 3
         else:
-            abort(403, 'Wrong registration key')
+            staff_type_id = db.validate_key(registration_key)
+            if (not staff_type_id):
+                abort(403, 'Invalid registration key')
 
-        #if db.validate_key(registration_key):
-        #    abort(403, 'Registration key mismatch')
-
-        #db_password = hash_password(payload_password)
+        # db_password = hash_password(payload_password)
         db_password = payload_password
 
         reg = db.register(username, db_password, name, staff_type_id)
@@ -126,19 +124,20 @@ class Signup(Resource):
 @auth.route("/registration", strict_slashes=False)
 class Registration(Resource):
     @jwt_required
+    @auth.expect(registration_model)
     @auth.response(200, 'Success')
     @auth.response(400, 'Invalid request')
-    @auth.response(401, 'User is not a manager')
+    @auth.response(500, 'Something went wrong')
     def post(self):
-        role_claim = get_jwt_claims().get('role')
+        body = request.get_json()
+        staff_type = body.get('type')
 
-        registration_key = uuid.uuid4().hex
+        if (not staff_type):
+            abort(400, 'Invalid request')
 
-        try:
-            db.add_registration_key(registration_key)
-        except Exception as e:
-            print('Something went wrong')
-            print(e)
+        registration_key = uuid4().hex
+
+        if (db.add_registration_key(registration_key, staff_type) is None):
             abort(500, 'Something went wrong.')
 
         return jsonify({ 'status': 'success' })
