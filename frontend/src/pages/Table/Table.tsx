@@ -5,12 +5,15 @@ import history from '../../history';
 import { LeftBox, RightBar } from '../../components';
 
 import { styles } from './styles';
+import { Client } from '../../api/client';
+import { Tables } from '../../api/models';
 
 interface IProps extends WithStyles<typeof styles> { }
 
 interface IState {
   value: string;
   allowed: boolean;
+  tables: Tables | null;
 }
 
 class TablePage extends React.Component<IProps, IState> {
@@ -18,7 +21,8 @@ class TablePage extends React.Component<IProps, IState> {
     super(props);
     this.state = {
       value: 'Select your table number',
-      allowed: false
+      allowed: false,
+      tables: null
     }
   }
 
@@ -37,6 +41,12 @@ class TablePage extends React.Component<IProps, IState> {
     history.push('/menu');
   }
 
+  async componentDidMount() {
+    const client = new Client()
+    const t: Tables | null = await client.getTables();
+    this.setState({ tables: t });
+  }
+
   render() {
     const { classes } = this.props;
     return (
@@ -48,11 +58,21 @@ class TablePage extends React.Component<IProps, IState> {
             </div>
           }
           second={
-            <div>
-              <Button variant="contained" color="primary" onClick={() => this.setTableNumber("1")}>1</Button>
-              <Button variant="contained" color="primary" onClick={() => this.setTableNumber("2")}>2</Button>
-              <Button variant="contained" color="primary" onClick={() => this.setTableNumber("3")}>3</Button>
-            </div>
+            this.state.tables?.tables.map(tbl => (
+              <Button
+                variant="contained"
+                color="primary"
+                className={classes.button}
+                onClick={() => this.setTableNumber(tbl.table_id.toString())} disabled={tbl.occupied}
+              >
+                {tbl.table_id}
+              </Button>
+            ))
+            // <div>
+            //   <Button variant="contained" color="primary" onClick={() => this.setTableNumber("1")}>1</Button>
+            //   <Button variant="contained" color="primary" onClick={() => this.setTableNumber("2")}>2</Button>
+            //   <Button variant="contained" color="primary" onClick={() => this.setTableNumber("3")}>3</Button>
+            // </div>
           }
         />
 
