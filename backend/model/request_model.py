@@ -36,7 +36,12 @@ edit_order_item_status_model = api.model('edit_order_item_status', {
     "status": fields.Integer(description="status_id")
 })
 
-add_order_item_model = api.model('add_order_item_model', {
-    "item_name": fields.String(description='item_name'),
+new_order_model = api.model('new_order_model', {
+    "item_id": fields.Integer(description="item_id"),
     "quantity": fields.Integer(description="quantity")
 })
+
+#reduce_order_item_model = api.model('reduce_order_item_model', {
+#    "item_name": fields.String(description='item_name'),
+#    "quantity": fields.Integer(description="quantity")
+#})

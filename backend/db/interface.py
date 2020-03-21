@@ -215,18 +215,32 @@ class DB:
 
 
     def get_ordered_items_customer(self):
-        rows = self.__query('SELECT io.order_id, i.name, io.quantity, s.status_name FROM item_order io, item i, status s WHERE s.id = io.status_id AND i.id = io.item_id AND s.id > %s', [0])
+        rows = self.__query('SELECT io.order_id, i.name, i.id, io.quantity, i.price, s.status_name FROM item_order io, item i, status s WHERE s.id = io.status_id AND i.id = io.item_id AND s.id > %s', [0])
 
         if (not rows):
             return None
 
-        orders = [{
-            'order_id': row[0],
-            'item': row[1],
-            'quantity': row[2],
-            'status_id': row[3]
-            } for row in rows]
-        return orders
+
+        item_order = []
+        total = 0
+        for row in rows:
+            myDict = {
+                'order_id': row[0],
+                'item': row[1],
+                'item_id': row[2],
+                'quantity': row[3],
+                'price': row[4],
+                'status_id': row[5]
+            }
+            item_order.append(myDict)
+            total = total + (row[3]*row[4])
+        myDict2 = {
+            'Total Bill': total
+        }
+        item_order.append(myDict2)
+        return item_order
+
+
 
     def get_ordered_items_status(self, item_name):
         status = self.__query('SELECT s.status_name FROM item_order io, item i, status s WHERE s.id = io.status_id AND i.id = io.item_id AND i.name = %s', item_name)
@@ -235,11 +249,15 @@ class DB:
             return None
 
         return status
+
+    def new_order(self, table_id, item_id, quantity):
+        self.__insert('INSERT INTO "order" (table_id) VALUES (%s);', [table_id,])
+
+        order_id_row = self.__query('SELECT id FROM "order" ORDER BY id DESC LIMIT %s', [1,])
+        order_id = order_id_row[0]
+
+        self.__insert("INSERT INTO item_order (item_id, order_id, quantity, status_id) VALUES (%s, %s, %s, %s);",
+                      [item_id, order_id, quantity, 1])
         
-    #    orders = [{
-    #        'order_id': row[0],
-    #        'item': row[1],
-    #        'quantity': row[2],
-    #        'status_id': row[3]
-    #        } for row in rows]
-    #    return orders
+        return True
+
