@@ -6,17 +6,25 @@ export const styles = (theme: Theme) =>
       height: '97vh'
     },
     title: {
-      margin: '10px',
-      fontSize: '20px',
-      background: fade(theme.palette.common.black, 0.4),
+      margin: '30px',
+      fontSize: '40px',
+      // background: fade(theme.palette.common.black, 0.4),
       height: '100%'
     },
     assistancebutton: {
-      margin: '10px',
-      fontSize: '12px',
+      marginTop: '12px',
+      margin: '5px',
+      fontSize: '18px',
     },
     gobackbutton: {
-      margin: '10px',
-      fontSize: '24px',
+      marginTop: '12px',
+      margin: '5px',
+      fontSize: '18px',
     },
+    itemcard: {
+      minWidth: 275,
+    },
+    itemname: {
+      fontSize: 14,
+    }
   });
