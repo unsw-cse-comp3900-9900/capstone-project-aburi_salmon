@@ -121,3 +121,29 @@ class Signup(Resource):
         })
 
         return
+
+@auth.route("/registration", strict_slashes=False):
+    @jwt_required
+    @auth.response(200, 'Success')
+    @auth.response(400, 'Invalid request')
+    @auth.response(401, 'User is not a manager')
+    def post(self):
+        role_claim = get_jwt_claims().get('role')
+
+        registration_key = uuid.uuid4().hex
+
+        try:
+            db.add_registration_key(registration_key)
+        except Exception as e:
+            print('Something went wrong')
+            print(e)
+            abort(500, 'Something went wrong.')
+
+        return jsonify({ 'status': 'success' })
+        
+
+    @jwt_required
+    @auth.response(200, 'Success')
+    @auth.response(401, 'User is not a manager')
+    def get(self):
+        pass
