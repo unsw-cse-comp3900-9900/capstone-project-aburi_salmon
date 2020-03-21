@@ -87,8 +87,31 @@ class DB:
         return rows[0][1]
         
     def add_registration_key(self, registration_key, staff_type):
-        self.__insert("INSERT INTO staff_registration (registration_key, staff_type, used) VALUES (%s, %s, %s);", [registration_key, staff_type, False])
+        self.__insert(
+            'INSERT INTO staff_registration (registration_key, staff_type, used) VALUES (%s, %s, %s);',
+            [registration_key, staff_type, False]
+        )
         return True
+
+    def get_registration_keys(self, staff_type):
+        if (staff_type):
+            keys = self.__query(
+                'SELECT * FROM staff_registration WHERE staff_type = %s',
+                [staff_type]
+            )
+        else:
+           keys = self.__query('SELECT * FROM staff_registration', [])
+
+        if not keys:
+            return None
+
+        return [
+            {
+                'key': key[0],
+                'active': key[2],
+                'staff_type': key[1]
+            } for key in keys
+        ]
 
     def register(self, username, password, name, staff_type_id):
         self.__insert("INSERT INTO staff (username, password, name, staff_type_id) VALUES (%s, %s, %s, %s);",
