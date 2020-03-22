@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { withStyles, WithStyles } from '@material-ui/core';
 
 import { styles } from './styles';
 // import './../RightBar/RightBar.css';
 
-interface IProps extends WithStyles<typeof styles> { }
+interface IProps extends WithStyles<typeof styles> {
+  first: ReactNode,
+  second: ReactNode,
+  third: ReactNode
+}
 
 class RightBarClass extends React.Component<IProps, {}> {
   doNothing() {
@@ -15,13 +19,15 @@ class RightBarClass extends React.Component<IProps, {}> {
     const { classes } = this.props;
     return (
       <div className={classes.rightbar}>
-        right bar
-        {/* I want this component to have 3 children */}
-
-        { this.props.children }
-        {/* { this.props.children[0] }
-        { this.props.children[1] }
-        { this.props.children[2] }  */}
+        <div className={classes.firstColumn}>
+          { this.props.first }
+        </div>
+        <div className={classes.secondColumn}>
+          { this.props.second }
+        </div>
+        <div className={classes.thirdColumn}>
+          { this.props.third }
+        </div>
       </div>
     );
   }

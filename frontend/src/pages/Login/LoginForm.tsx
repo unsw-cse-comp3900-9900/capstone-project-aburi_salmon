@@ -5,6 +5,7 @@ import './../Login/LoginRegister.css';
 import restlogo from './../../assets/Hojiak.png';
 import history from '../../history';
 import { Alert } from '@material-ui/lab';
+import { Client } from '../../api/client';
 
 
 // const styles = (theme: Theme) =>
@@ -42,32 +43,23 @@ class PureLogin extends React.Component<{}, IState> {
     }
 
     checkLogin() {
-        fetch("http://localhost:5000/auth/login", {
-            method: 'POST',
-            body: JSON.stringify({
-                username: this.state.username,
-                password: this.state.password
-            }),
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
-            mode: 'cors'
-        }).then((msg) => {
-            //alert(msg.status);
-            if (msg.status === 200) {
+        const client = new Client();
+        client.login(this.state.username, this.state.password)
+            .then((msg) => {
+                //alert(msg.status);
+                if (msg.status === 200) {
 
-                alert('you have successfully logged on');
-                localStorage.setItem('username', this.state.username);
-                localStorage.setItem('staff', 'true');
-                this.loginSuccess();
-                history.push('/staff');
-            } else {
-                this.setError(msg.statusText);
-            }
-        }).catch((status) => {
-            console.log(status);
-        });
+                    alert('you have successfully logged on');
+                    localStorage.setItem('username', this.state.username);
+                    localStorage.setItem('staff', 'true');
+                    this.loginSuccess();
+                    history.push('/staff');
+                } else {
+                    this.setError(msg.statusText);
+                }
+            }).catch((status) => {
+                console.log(status);
+            });
     }
 
     loginSuccess() {
