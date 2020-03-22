@@ -291,6 +291,46 @@ class DB:
         
         return True
 
+    def get_tables(self, test):
+        rows = self.__query('SELECT id, state FROM public.table WHERE id > %s ORDER BY id', [test,])
+
+        if (not rows):
+            return None
+
+        tables = [{
+            'table_id': row[0],
+            'occupied': row[1]
+        } for row in rows]
+
+        return tables
+
+    def beginCooking(self, id):
+        return self.__update("UPDATE item_order SET status_id = 1 WHERE id = %s", [id])
+
+    def finishCooking(self, id):
+        return self.__update("UPDATE item_order SET status_id = 2 WHERE id = %s", [id])
+
+
+    def isTableAvailable(self, table_id):
+        rows = self.__query("SELECT state FROM public.table WHERE id = %s;", [table_id])
+
+        # 1 means the table is unavailable 
+        if (rows != 0):
+            return False
+        else:
+            return True
+
+    def selectTable(self, table_id):
+        rows = self.__query("SELECT state FROM public.table WHERE id = %s;", [table_id])
+
+        # 1 means the table is unavailable 
+        if (rows == True):
+            print('table is taken!')
+            return False
+        else:
+            self.__update("UPDATE public.table SET state = True WHERE id = %s", [id])
+            return True
+
     def get_tables(self):
         return [
             {
@@ -345,4 +385,5 @@ class DB:
 
     def delete_order(self, order_id, item_id):
         return self.__delete("DELETE FROM item_order WHERE order_id = %s AND item_id = %s", [order_id, item_id])
+
 
