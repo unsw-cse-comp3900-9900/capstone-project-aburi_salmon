@@ -56,6 +56,21 @@ class DB:
         c.close()
         self.__conn.commit()
 
+    def __delete(self, delete, params):
+        c = self.__conn.cursor()
+        try:
+            c.execute(delete, params)
+        except Exception as e:
+            c.execute("ROLLBACK")
+            self.__conn.commit()
+            print(e)
+            c.close()
+            return False
+
+        c.close()
+        self.__conn.commit()
+        return True
+
 
     def return_number(self, number):
         rows = self.__query("SELECT %s AS example;", [number])
@@ -183,7 +198,12 @@ class DB:
             'name': row[1]
             } for row in rows]
         return category
+    
+    def get_quantity(self, item_id, order_id):
+        quantity = self.__query('SELECT quantity FROM item_order WHERE item_id = %s AND order_id = %s', [item_id, order_id])
 
+        return quantity[0][0]
+    
 
     def get_ingredient_from_item(self, test):
         rows = self.__query('SELECT ing.name FROM item_ingredient ii, ingredient ing, item i WHERE ii.ingredient_id = ing.id AND i.name = %s AND ii.item_id = i.id GROUP BY ing.id', [test,])
@@ -214,8 +234,8 @@ class DB:
         return item
 
 
-    def get_ordered_items_customer(self):
-        rows = self.__query('SELECT io.order_id, i.name, i.id, io.quantity, i.price, s.status_name FROM item_order io, item i, status s WHERE s.id = io.status_id AND i.id = io.item_id AND s.id > %s', [0])
+    def get_ordered_items_customer(self, table_id):
+        rows = self.__query('SELECT io.order_id, i.name, i.id, io.quantity, i.price, s.status_name FROM item_order io, item i, status s, "order" o WHERE s.id = io.status_id AND i.id = io.item_id AND io.order_id = o.id AND o.table_id = %s', [table_id])
 
         if (not rows):
             return None
@@ -245,7 +265,7 @@ class DB:
     def get_ordered_items_status(self, item_name):
         status = self.__query('SELECT s.status_name FROM item_order io, item i, status s WHERE s.id = io.status_id AND i.id = io.item_id AND i.name = %s', item_name)
 
-        if (not rows):
+        if (not status):
             return None
 
         return status
@@ -280,4 +300,41 @@ class DB:
                 "occupied": False
             }
         ]
+
+    def get_order_id(self, table_id):
+        order_id = self.__query('SELECT id FROM "order" WHERE table_id = %s', [table_id,])
+
+        if (not order_id):
+            return None
+
+        return order_id[0][0]
+
+    def get_order_status(self, order_id, item_id):
+        status = self.__query('SELECT status_id FROM item_order WHERE order_id = %s AND item_id = %s', [order_id, item_id])
+
+        if (not status):
+            return None
+
+        return status[0][0]
+
+    def add_order(self, order_id, item_id, quantity):
+        order_id_row = self.__query('SELECT * FROM item_order WHERE order_id = %s AND item_id = %s', [order_id, item_id,])
+        
+        if (not order_id_row):
+            return None
+
+        new_quantity = order_id_row[0][3] + quantity
+
+        return self.__update("UPDATE item_order SET quantity = %s WHERE id = %s", [new_quantity, order_id_row[0][0]])
+
+    def reduce_order(self, order_id, item_id, quantity):
+        new_quantity = DB.get_quantity(self, item_id, order_id) - quantity
+
+        if new_quantity < 1:
+            return 5
+
+        return self.__update("UPDATE item_order SET quantity = %s WHERE order_id = %s AND item_id = %s", [new_quantity, order_id, item_id])
+
+    def delete_order(self, order_id, item_id):
+        return self.__delete("DELETE FROM item_order WHERE order_id = %s AND item_id = %s", [order_id, item_id])
 
