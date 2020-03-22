@@ -159,18 +159,6 @@ class DB:
         return self.__update("UPDATE item_order SET status_id = %s WHERE id = %s", [status, id])
 
 
-
-    def isTableAvailable(self, table_id):
-        rows = self.__query("SELECT id FROM public.table WHERE id = %s;", [table_id])
-
-        # 1 means the table is unavailable 
-        if (rows != 0):
-            return False
-        else:
-            return True
-
-
-
     def get_category(self, test):
         rows = self.__query('SELECT * FROM category WHERE position > %s', [test,])
 
@@ -269,30 +257,44 @@ class DB:
     #        } for row in rows]
     #    return orders
 
-    def get_tables(self):
-        return [
-            {
-                "table_id": 1,
-                "occupied": False
-            },
-            {
-                "table_id": 2,
-                "occupied": True
-            },
-            {
-                "table_id": 3,
-                "occupied": True
-            },
-            {
-                "table_id": 4,
-                "occupied": False
-            }
-        ]
+    def get_tables(self, test):
+        rows = self.__query('SELECT id, state FROM public.table WHERE id > %s ORDER BY id', [test,])
 
+        if (not rows):
+            return None
+
+        tables = [{
+            'table_id': row[0],
+            'occupied': row[1]
+        } for row in rows]
+
+        return tables
 
     def beginCooking(self, id):
         return self.__update("UPDATE item_order SET status_id = 1 WHERE id = %s", [id])
 
     def finishCooking(self, id):
         return self.__update("UPDATE item_order SET status_id = 2 WHERE id = %s", [id])
+
+
+    def isTableAvailable(self, table_id):
+        rows = self.__query("SELECT state FROM public.table WHERE id = %s;", [table_id])
+
+        # 1 means the table is unavailable 
+        if (rows != 0):
+            return False
+        else:
+            return True
+
+    def selectTable(self, table_id):
+        rows = self.__query("SELECT state FROM public.table WHERE id = %s;", [table_id])
+
+        # 1 means the table is unavailable 
+        if (rows == True):
+            print('table is taken!')
+            return False
+        else:
+            self.__update("UPDATE public.table SET state = True WHERE id = %s", [id])
+            return True
+
 
