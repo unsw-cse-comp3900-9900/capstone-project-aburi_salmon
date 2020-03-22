@@ -317,6 +317,7 @@ class DB:
 
         return status[0][0]
 
+#
     def add_order(self, order_id, item_id, quantity):
         order_id_row = self.__query('SELECT * FROM item_order WHERE order_id = %s AND item_id = %s', [order_id, item_id,])
         
@@ -334,6 +335,18 @@ class DB:
             return 5
 
         return self.__update("UPDATE item_order SET quantity = %s WHERE order_id = %s AND item_id = %s", [new_quantity, order_id, item_id])
+
+#
+
+    def modify_order(self, order_id, item_id, quantity):
+        new_quantity = DB.get_quantity(self, item_id, order_id) + quantity
+
+        if new_quantity < 1:
+            return 5
+
+        return self.__update("UPDATE item_order SET quantity = %s, status_id = 1 WHERE order_id = %s AND item_id = %s", [new_quantity, order_id, item_id])
+
+
 
     def delete_order(self, order_id, item_id):
         return self.__delete("DELETE FROM item_order WHERE order_id = %s AND item_id = %s", [order_id, item_id])
