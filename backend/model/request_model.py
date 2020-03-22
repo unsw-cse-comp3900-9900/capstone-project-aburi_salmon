@@ -11,11 +11,6 @@ login_model = api.model('login', {
     "password": fields.String(description='Password')
 })
 
-class StaffType(enum.Enum):
-    WAIT = 1
-    KITCHEN = 2
-    MANAGER = 3
-
 signup_model = api.model('signup', {
     "name": fields.String(description='Name'),
     "username": fields.String(description='Username'),
@@ -34,4 +29,13 @@ edit_profile_model = api.model('edit_profile', {
 edit_order_item_status_model = api.model('edit_order_item_status', {
     "id": fields.Integer(description="id"),
     "status": fields.Integer(description="status_id")
+})
+
+add_order_item_model = api.model('add_order_item_model', {
+    "item_name": fields.String(description='item_name'),
+    "quantity": fields.Integer(description="quantity")
+})
+
+registration_model = api.model('registration_model', {
+    "type": fields.Integer(description='staff_type id')
 })

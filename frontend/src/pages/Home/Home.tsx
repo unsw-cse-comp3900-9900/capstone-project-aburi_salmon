@@ -19,12 +19,12 @@ class PureHome extends React.Component {
     localStorage.setItem('username', "");
     localStorage.setItem('staff', 'false');
     fetch("/auth/logout", {
-      method: 'POST',
+      method: 'OPTIONS',
     }).then((msg) => {
       if (msg.status === 200) {
         alert('you have successfully logged out');
       } else {
-        alert('msg.status');
+        alert(msg.status);
       }
     }).catch((status) => {
       console.log(status);
@@ -52,14 +52,14 @@ class PureHome extends React.Component {
 const isLoggedIn = () => {
   if (localStorage.getItem('staff') !== 'true') {
     return (
-      <Link to='/login'>
+      <Link to='/login' className="stafflogin">
         Log In
       </Link>
     );
   }
   else {
     return (
-      <Link to='/table'>
+      <Link to='/table' className="stafflogin">
         Log Out
       </Link>
     );

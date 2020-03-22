@@ -50,7 +50,6 @@ class DB:
             self.__conn.commit()
             print(e)
             c.close()
-            #return None
             raise e
 
         c.close()
@@ -77,28 +76,42 @@ class DB:
         return result
 
     def validate_key(self, key):
-        rows = self.__query("SELECT id FROM staff_registration WHERE registration_key = %s;", [key])
+        # Check if valid key
+        rows = self.__query("SELECT registration_key, staff_type FROM staff_registration WHERE registration_key = %s AND not used;", [key])
         if (rows == None):
             return False
 
-        return rows[0][0]
-        
-    def add_registration_key(self, registration_key):
-        c = self.__conn.cursor()
-        print(registration_key)
-        try:
-            c.execute("INSERT INTO staff_registration (registration_key) VALUES (%s);", (registration_key,))
-        except Exception as e:
-            c.execute("ROLLBACK")
-            self.__conn.commit()
-            print(e)
-            c.close()
-            #return None
-            raise e
+        # Set used to true
+        self.__update("UPDATE staff_registration SET used = %s WHERE registration_key = %s", [True, key])
 
-        c.close()
-        self.__conn.commit()
+        return rows[0][1]
+        
+    def add_registration_key(self, registration_key, staff_type):
+        self.__insert(
+            'INSERT INTO staff_registration (registration_key, staff_type, used) VALUES (%s, %s, %s);',
+            [registration_key, staff_type, False]
+        )
         return True
+
+    def get_registration_keys(self, staff_type):
+        if (staff_type):
+            keys = self.__query(
+                'SELECT * FROM staff_registration WHERE staff_type = %s',
+                [staff_type]
+            )
+        else:
+           keys = self.__query('SELECT * FROM staff_registration', [])
+
+        if keys is None:
+            return []
+
+        return [
+            {
+                'key': key[0],
+                'active': key[2],
+                'staff_type': key[1]
+            } for key in keys
+        ]
 
     def register(self, username, password, name, staff_type_id):
         self.__insert("INSERT INTO staff (username, password, name, staff_type_id) VALUES (%s, %s, %s, %s);",
@@ -146,6 +159,7 @@ class DB:
         return self.__update("UPDATE item_order SET status_id = %s WHERE id = %s", [status, id])
 
 
+
     def isTableAvailable(self, table_id):
         rows = self.__query("SELECT id FROM public.table WHERE id = %s;", [table_id])
 
@@ -161,4 +175,123 @@ class DB:
     def finishCooking(self, id):
         return self.__update("UPDATE item_order SET status_id = 2 WHERE id = %s", [id])
 
+
+
+    def get_category(self, test):
+        rows = self.__query('SELECT * FROM category WHERE position > %s', [test,])
+
+        if (not rows):
+            return None
+
+        category = [{
+            'id': row[0],
+            'name': row[1]
+            } for row in rows]
+        return category
+    
+    def get_item(self, test):
+        rows = self.__query('SELECT * FROM item WHERE price > %s', [test,])
+
+        if (not rows):
+            return None
+
+        category = [{
+            'id': row[0],
+            'name': row[1],
+            'description': row[2],
+            'price': row[3]
+            } for row in rows]
+        return category
+    
+    def get_ingredient(self, test):
+        rows = self.__query('SELECT * FROM ingredient WHERE id > %s', [test,])
+
+        if (not rows):
+            return None
+
+        category = [{
+            'id': row[0],
+            'name': row[1]
+            } for row in rows]
+        return category
+
+
+    def get_ingredient_from_item(self, test):
+        rows = self.__query('SELECT ing.name FROM item_ingredient ii, ingredient ing, item i WHERE ii.ingredient_id = ing.id AND i.name = %s AND ii.item_id = i.id GROUP BY ing.id', [test,])
+
+        if (not rows):
+            return None
+
+        ingredient = []
+        for row in rows:
+            ingredient.append(row[0])
+        return ingredient
+
+
+    def get_item_from_category(self, test):
+        rows = self.__query('SELECT i.id, i.name, i.description FROM category_item ci, category c, item i WHERE ci.category_id = c.id AND c.name = %s AND ci.item_id = i.id GROUP BY i.id', [test,])
+
+        if (not rows):
+            return None
+
+        #ing = get_ingredient_from_item()
+
+        item = [{
+            'id': row[0],
+            'name': row[1],
+            'description': row[2],
+            'ingredient': DB.get_ingredient_from_item(self, row[1])
+            } for row in rows]
+        return item
+
+
+    def get_ordered_items_customer(self):
+        rows = self.__query('SELECT io.order_id, i.name, io.quantity, s.status_name FROM item_order io, item i, status s WHERE s.id = io.status_id AND i.id = io.item_id AND s.id > %s', [0])
+
+        if (not rows):
+            return None
+
+        orders = [{
+            'order_id': row[0],
+            'item': row[1],
+            'quantity': row[2],
+            'status_id': row[3]
+            } for row in rows]
+        return orders
+
+    def get_ordered_items_status(self, item_name):
+        status = self.__query('SELECT s.status_name FROM item_order io, item i, status s WHERE s.id = io.status_id AND i.id = io.item_id AND i.name = %s', item_name)
+
+        if (not rows):
+            return None
+
+        return status
+        
+    #    orders = [{
+    #        'order_id': row[0],
+    #        'item': row[1],
+    #        'quantity': row[2],
+    #        'status_id': row[3]
+    #        } for row in rows]
+    #    return orders
+
+    def get_tables(self):
+        return [
+            {
+                "table_id": 1,
+                "occupied": False
+            },
+            {
+                "table_id": 2,
+                "occupied": True
+            },
+            {
+                "table_id": 3,
+                "occupied": True
+            },
+            {
+                "table_id": 4,
+                "occupied": False
+            }
+        ]
 
