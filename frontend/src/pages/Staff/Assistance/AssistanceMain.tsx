@@ -35,12 +35,27 @@ const styles = (theme: Theme) =>
             //border: '1px solid grey',
             height: '100%',
             width: '100%',
+            overflow: 'auto',
         },
         wrapper: {
             width: '100%',
             //paddingLeft: '2%',
             //paddingRight: '2%',
             textAlign: 'left',
+
+        },
+        key: {
+            position: 'relative',
+            bottom:'-25%',
+            //border: '1px solid black'
+        },
+        red: {
+            color: 'red',
+            backgroundColor: 'white',
+        },
+        green:{
+            color: 'green',
+            backgroundColor: 'white',
         },
 
     });
@@ -129,12 +144,22 @@ class Assistance extends React.Component<IProps, {
         this.setState({ main: true });
     }
 
+    tableKey(){
+        return(
+            <div className={this.props.classes.key}>
+                <mark className={this.props.classes.red}>Red = Occupied</mark>, 
+                <mark className={this.props.classes.green}> Green = Paid </mark>, Grey = Empty
+            </div>
+        );
+    }
+
     render() {
         if (this.state.main) {
             return (
                 <div className={this.props.classes.container}>
                     <h1>Tables</h1>
                     {this.createTables()}
+                    {this.tableKey()}
                 </div>
             );
         } else {

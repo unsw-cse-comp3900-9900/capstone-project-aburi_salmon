@@ -9,23 +9,6 @@ import Assistance from './../Staff/Assistance/AssistanceMain';
 //https://material-ui.com/components/menus/#menus
 //https://stackoverflow.com/questions/58630490/how-to-convert-functional-componenet-to-class-component-in-react-in-material
 
-/*
-Files:
-Staff.tsx
-    - deals with navigation
-    - needs to know the staff to know which tabs to display
-    - will display name and staff type
-
-ItemTemplate.tsx
-    - the template for listing information about an item
-    - will be displayed with float in ListTemplate
-
-ListTemplate.tsx
-    - template for storing items
-*/
-
-
-// How to use withStyles in TS
 const styles = (theme: Theme) =>
     createStyles({
         title: {
@@ -54,9 +37,7 @@ const styles = (theme: Theme) =>
             backgroundColor: 'white',
             border: '2px solid darkblue',
             padding: theme.spacing(2),
-            //marginLeft: theme.spacing(2),
             //position: 'static',    
-            //borderRadius: '10px',
             flexGrow: 1,
             display: 'flex',
             top: theme.spacing(2),
@@ -67,7 +48,6 @@ const styles = (theme: Theme) =>
             marginBottom: theme.spacing(2),
             //bottom: theme.spacing(2),
             //alignItems: 'stretch',
-
         },
         appbar: {
             background: 'black',
@@ -76,33 +56,39 @@ const styles = (theme: Theme) =>
     });
 export interface IProps extends WithStyles<typeof styles> { }
 
-class StaffPage extends React.Component<IProps, {currPage: string}>{
+class StaffPage extends React.Component<IProps, {currPage: string, staffType: string, itemNum: number, listName: string}>{
 
     constructor(props: any){
         super(props);
         this.state = {
             currPage: "Assistance",
+            staffType: "wait",
+            itemNum: -1,
+            listName: "none",
         }
+        this.updateCont = this.updateCont.bind(this);
     }
 
-    staffType = "wait"
+    //function where if clicked, returns queue and itemid
+
+
 
     displayCont(){
         const { classes } = this.props;
         if (this.state.currPage === "Orders") {
-            if (this.staffType === "wait"){
+            if (this.state.staffType === "wait"){
                 return (
-                <Box className={classes.staffContainer}>
-                    <ListContainer name="To Be Served"/>
-                    <ListContainer name="Served"/>
-                </Box>
+                    <Box className={classes.staffContainer}>
+                        <ListContainer name="To Be Served" update={this.updateCont}/>
+                        <ListContainer name="Served" update={this.updateCont}/>
+                    </Box>
                 );
-            } else if (this.staffType === "kitchen"){
+            } else if (this.state.staffType === "kitchen"){
                 return(
                     <Box className={classes.staffContainer}>
-                        <ListContainer name="Queue" />
-                        <ListContainer name="Cooking" />
-                        <ListContainer name="Ready" />
+                        <ListContainer name="Queue" update={this.updateCont}/>
+                        <ListContainer name="Cooking" update={this.updateCont}/>
+                        <ListContainer name="Ready" update={this.updateCont}/>
                     </Box>
                 );
             } else {
@@ -151,7 +137,7 @@ class StaffPage extends React.Component<IProps, {currPage: string}>{
     }
 
     displayNav(){
-        if (this.staffType === "wait"){
+        if (this.state.staffType === "wait"){
             return(
                 <div className={this.props.classes.root}>
                     <Paper className={this.props.classes.menubutton}>
@@ -172,7 +158,7 @@ class StaffPage extends React.Component<IProps, {currPage: string}>{
                 </div>
             );
          
-        } else if (this.staffType === "kitchen"){
+        } else if (this.state.staffType === "kitchen"){
             return (
                 <div className={this.props.classes.root}>
                     <Paper className={this.props.classes.menubutton}>
@@ -187,7 +173,7 @@ class StaffPage extends React.Component<IProps, {currPage: string}>{
                     </Paper>
                 </div>
             );
-        } else if (this.staffType === "manage"){
+        } else if (this.state.staffType === "manage"){
             return (
                 <div className={this.props.classes.root}>
                     <Paper className={this.props.classes.menubutton}>
@@ -203,18 +189,25 @@ class StaffPage extends React.Component<IProps, {currPage: string}>{
         }
     }
 
+    updateCont(itemId: number, listName: string): void{
+        console.log(itemId)
+        console.log(listName)
+        this.setState({itemNum: itemId, listName: listName});
+    }
+
     render() {
         const { classes } = this.props;
-        
         return (
             <div className={classes.wrapper}>
                 {this.isStaff()}
                 <AppBar position="static" className={classes.appbar}>
                     <Toolbar>
                         <Typography variant="h6" className={classes.title}>
-                            Staff: {localStorage.getItem('username')}
+                        {/*Staff: {localStorage.getItem('username')}*/}
+                        Stafftype: {this.state.staffType} List: {this.state.listName} and Amount: {this.state.itemNum}
                     </Typography>
                         <Button color="inherit" onClick={() => this.logOut()}>Logout</Button>
+                        {/*<Button color="inherit">{this.state.listName}</Button>*/}
                     </Toolbar>
                 </AppBar>
                 <br></br>
