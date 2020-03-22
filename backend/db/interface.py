@@ -199,11 +199,10 @@ class DB:
             } for row in rows]
         return category
     
-    def get_quantity(self, item_id, order_id):
-        quantity = self.__query('SELECT quantity FROM item_order WHERE item_id = %s AND order_id = %s', [item_id, order_id])
+    def get_quantity(self, item_order_id):
+        quantity = self.__query('SELECT quantity FROM item_order WHERE id = %s', [item_order_id])
 
-        return quantity[0][0]
-    
+        return quantity[0][0]  
 
     def get_ingredient_from_item(self, test):
         rows = self.__query('SELECT ing.name FROM item_ingredient ii, ingredient ing, item i WHERE ii.ingredient_id = ing.id AND i.name = %s AND ii.item_id = i.id GROUP BY ing.id', [test,])
@@ -222,8 +221,6 @@ class DB:
 
         if (not rows):
             return None
-
-        #ing = get_ingredient_from_item()
 
         item = [{
             'id': row[0],
@@ -309,44 +306,29 @@ class DB:
 
         return order_id[0][0]
 
-    def get_order_status(self, order_id, item_id):
-        status = self.__query('SELECT status_id FROM item_order WHERE order_id = %s AND item_id = %s', [order_id, item_id])
+    def get_item_order_id(self, table_id, item_id):
+        res = self.__query('SELECT io.id FROM item_order io, "order" o WHERE io.item_id = %s AND o.table_id = %s AND o.id = io.order_id', [item_id, table_id])
+
+        if (not res):
+            return None
+  
+        return res
+
+    def get_order_status(self, item_order_id):
+        status = self.__query('SELECT status_id FROM item_order WHERE id = %s', [item_order_id,])
 
         if (not status):
             return None
 
         return status[0][0]
 
-#
-    def add_order(self, order_id, item_id, quantity):
-        order_id_row = self.__query('SELECT * FROM item_order WHERE order_id = %s AND item_id = %s', [order_id, item_id,])
-        
-        if (not order_id_row):
-            return None
-
-        new_quantity = order_id_row[0][3] + quantity
-
-        return self.__update("UPDATE item_order SET quantity = %s WHERE id = %s", [new_quantity, order_id_row[0][0]])
-
-    def reduce_order(self, order_id, item_id, quantity):
-        new_quantity = DB.get_quantity(self, item_id, order_id) - quantity
+    def modify_order(self, item_order_id, quantity):
+        new_quantity = DB.get_quantity(self, item_order_id) + quantity
 
         if new_quantity < 1:
             return 5
 
-        return self.__update("UPDATE item_order SET quantity = %s WHERE order_id = %s AND item_id = %s", [new_quantity, order_id, item_id])
-
-#
-
-    def modify_order(self, order_id, item_id, quantity):
-        new_quantity = DB.get_quantity(self, item_id, order_id) + quantity
-
-        if new_quantity < 1:
-            return 5
-
-        return self.__update("UPDATE item_order SET quantity = %s, status_id = 1 WHERE order_id = %s AND item_id = %s", [new_quantity, order_id, item_id])
-
-
+        return self.__update("UPDATE item_order SET quantity = %s, status_id = 1 WHERE id = %s", [new_quantity, item_order_id])
 
     def delete_order(self, order_id, item_id):
         return self.__delete("DELETE FROM item_order WHERE order_id = %s AND item_id = %s", [order_id, item_id])

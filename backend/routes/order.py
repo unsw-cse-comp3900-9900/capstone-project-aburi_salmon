@@ -52,21 +52,28 @@ class Item(Resource):
         quantity = modify_order.get('quantity')
 
         table_id = 3 #assuming table id is 3 for now
-        order_id = db.get_order_id(table_id)
-        if order_id is None:
-            abort(400, 'Table has not order anything yet.')
+        item_order_id = db.get_item_order_id(table_id, item_id)
 
-        order_status = db.get_order_status(order_id, item_id)
-        if order_status is None:
+        if item_order_id is None:
             abort(400, 'No existing order with that item, please make a new order instead.')
-        elif order_status != 1:
-            abort(400, 'Cannot modify order since order has left the QUEUE status.')
+        
+        check = 0
+        for row in item_order_id:
+            order_status = db.get_order_status(row)
+            if order_status != 1:
+                #abort(400, 'Cannot modify order since order has left the QUEUE status.')
+                continue
+            else:
+                new = db.modify_order(row, quantity)
+                if new != 5:
+                    check = 1
+                    break
+                else:
+                    continue
 
-        new = db.modify_order(order_id, item_id, quantity)
-
-        if new == 5:
-            abort(400, 'New quantity has to be 1 or more.')
-
+        if check == 0:
+            abort(400, 'New quantity has to be >= 1 OR order has left the QUEUE status, please make a NEW order instead.')
+        
         response = jsonify({
             'status': 'success'
         })
