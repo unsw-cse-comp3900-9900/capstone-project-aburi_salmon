@@ -66,10 +66,11 @@ CREATE TABLE "staff_type" (
 );
 
 CREATE TABLE "staff_registration" (
-  "id" SERIAL PRIMARY KEY,
-  "staff_type_id" int NOT NULL,
   "registration_key" varchar NOT NULL,
-  "used" boolean NOT NULL
+  "staff_type" int NOT NULL,
+  "used" boolean NOT NULL,
+  PRIMARY KEY ("registration_key"),
+  FOREIGN KEY ("staff_type") REFERENCES staff_type("id")
 );
 
 ALTER TABLE "order" ADD FOREIGN KEY ("table_id") REFERENCES "table" ("id");

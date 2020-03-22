@@ -1,13 +1,14 @@
 import pdb
 import re
 
+from uuid import uuid4
 from flask import request, jsonify
 from flask_restx import Resource, abort, reqparse, fields
-from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies
+from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies, jwt_required
 
 import config
 from app import api, db
-from model.request_model import login_model, signup_model
+from model.request_model import login_model, signup_model, registration_model
 from util.hasher import hash_password
 from util.user import User
 
@@ -70,7 +71,6 @@ class Signup(Resource):
         username = creds.get('username')
         payload_password = creds.get('password')
         registration_key = creds.get('registration_key')
-        # staff_type_id = creds.get('staff_type_id')
 
         # Name only allows a-z, A-Z, and space
         regex_name = re.compile('[^a-zA-Z\s]')
@@ -103,12 +103,11 @@ class Signup(Resource):
         elif registration_key == "staff3":
             staff_type_id = 3
         else:
-            abort(403, 'Wrong registration key')
+            staff_type_id = db.validate_key(registration_key)
+            if (not staff_type_id):
+                abort(403, 'Invalid registration key')
 
-        #if db.validate_key(registration_key):
-        #    abort(403, 'Registration key mismatch')
-
-        #db_password = hash_password(payload_password)
+        # db_password = hash_password(payload_password)
         db_password = payload_password
 
         reg = db.register(username, db_password, name, staff_type_id)
@@ -121,3 +120,45 @@ class Signup(Resource):
         })
 
         return
+
+@auth.route("/registration", strict_slashes=False)
+class Registration(Resource):
+    @jwt_required
+    @auth.response(200, 'Success')
+    @auth.response(500, 'User is not a manager')
+    def get(self):
+        # Get a list of all registration keys
+        keys = db.get_registration_keys(None)
+        return jsonify({ 'registration_keys': keys })
+
+
+    @jwt_required
+    @auth.expect(registration_model)
+    @auth.response(200, 'Success')
+    @auth.response(400, 'Invalid request')
+    @auth.response(500, 'Something went wrong')
+    def post(self):
+        # Create a new registration key for a given type of staff
+        body = request.get_json()
+        staff_type = body.get('type')
+
+        if (not staff_type):
+            abort(400, 'Invalid request')
+
+        registration_key = uuid4().hex
+
+        if (db.add_registration_key(registration_key, staff_type) is None):
+            abort(500, 'Something went wrong.')
+
+        return jsonify({ 'status': 'success' })
+
+@auth.route("/registration/<int:id>", strict_slashes=False)
+@auth.param('id', 'staff_type identifier')
+class RegistrationList(Resource):
+    @jwt_required
+    @auth.response(200, 'Success')
+    @auth.response(500, 'User is not a manager')
+    def get(self, id):
+        # Get a list of all registration keys of type 'id'
+        keys = db.get_registration_keys(id)
+        return jsonify({ 'registration_keys': keys })

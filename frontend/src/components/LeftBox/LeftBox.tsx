@@ -1,21 +1,27 @@
 
 
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { withStyles, WithStyles } from '@material-ui/core';
 
 import { styles } from './styles';
 // import './../LeftBox/LeftBox.css';
 
-interface IProps extends WithStyles<typeof styles> { }
+interface IProps extends WithStyles<typeof styles> { 
+  first: ReactNode,
+  second: ReactNode
+}
 
 class LeftBoxClass extends React.Component<IProps, {}> {
   render() {
     const { classes } = this.props;
     return (
       <div className={classes.leftbox}>
-        left box
-        {/* I want this component to have 2 children */}
-        {this.props.children}
+        <div className={classes.firstColumn}>
+          { this.props.first }
+        </div>
+        <div className={classes.secondColumn}>
+          { this.props.second }
+        </div>
       </div>
     );
   }

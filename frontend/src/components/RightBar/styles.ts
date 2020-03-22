@@ -6,8 +6,17 @@ export const styles = (theme: Theme) =>
     rightbar: {
       float: 'right',
       width: '30%',
-      // height: '100%',
+      height: '100%',
       background: fade('#0000ff', 0.45),
 
+    },
+    firstColumn: {
+      height: '10%'
+    },
+    secondColumn: {
+      height: '75%'
+    },
+    thirdColumn: {
+      height: '15%'
     }
   });

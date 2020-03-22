@@ -5,7 +5,13 @@ export const styles = (theme: Theme) =>
     leftbox: {
       float: 'left',
       width: '70%',
-      // height: '100%',
+      height: '100%',
       backgroundColor: fade(theme.palette.common.white, 0.15)
+    },
+    firstColumn: {
+      height: '10%'
+    },
+    secondColumn: {
+      height: '90%'
     }
   });

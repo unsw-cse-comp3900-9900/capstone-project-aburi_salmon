@@ -11,11 +11,6 @@ login_model = api.model('login', {
     "password": fields.String(description='Password')
 })
 
-class StaffType(enum.Enum):
-    WAIT = 1
-    KITCHEN = 2
-    MANAGER = 3
-
 signup_model = api.model('signup', {
     "name": fields.String(description='Name'),
     "username": fields.String(description='Username'),
@@ -41,6 +36,7 @@ new_order_model = api.model('new_order_model', {
     "quantity": fields.Integer(description="quantity")
 })
 
+
 modify_order_model = api.model('modify_order_model', {
     "item_id": fields.Integer(description="item_id"),
     "quantity": fields.Integer(description="quantity")
@@ -48,4 +44,8 @@ modify_order_model = api.model('modify_order_model', {
 
 delete_order_model = api.model('delete_order_model', {
     "item_id": fields.Integer(description="item_id")
+})
+
+registration_model = api.model('registration_model', {
+    "type": fields.Integer(description='staff_type id')
 })
