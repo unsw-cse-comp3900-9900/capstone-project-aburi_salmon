@@ -144,3 +144,21 @@ class DB:
 
     def update_ordered_item_status(self, id, status):
         return self.__update("UPDATE item_order SET status_id = %s WHERE id = %s", [status, id])
+
+
+    def isTableAvailable(self, table_id):
+        rows = self.__query("SELECT id FROM public.table WHERE id = %s;", [table_id])
+
+        # 1 means the table is unavailable 
+        if (rows != 0):
+            return False
+        else:
+            return True
+
+    def beginCooking(self, id):
+        return self.__update("UPDATE item_order SET status_id = 1 WHERE id = %s", [id])
+
+    def finishCooking(self, id):
+        return self.__update("UPDATE item_order SET status_id = 2 WHERE id = %s", [id])
+
+
