@@ -31,10 +31,10 @@ class Kitchen(Resource):
         
         return 500, 'Something went wrong'
 
-    beginCooking(self, item_id):
+    def beginCooking(self, item_id):
         db.beginCooking(item_id)
     
-    finishCooking(self, item_id):
+    def finishCooking(self, item_id):
         db.beginCooking(item_id)
     
-        
+

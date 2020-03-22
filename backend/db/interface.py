@@ -169,12 +169,6 @@ class DB:
         else:
             return True
 
-    def beginCooking(self, id):
-        return self.__update("UPDATE item_order SET status_id = 1 WHERE id = %s", [id])
-
-    def finishCooking(self, id):
-        return self.__update("UPDATE item_order SET status_id = 2 WHERE id = %s", [id])
-
 
 
     def get_category(self, test):
@@ -294,4 +288,11 @@ class DB:
                 "occupied": False
             }
         ]
+
+
+    def beginCooking(self, id):
+        return self.__update("UPDATE item_order SET status_id = 1 WHERE id = %s", [id])
+
+    def finishCooking(self, id):
+        return self.__update("UPDATE item_order SET status_id = 2 WHERE id = %s", [id])
 
