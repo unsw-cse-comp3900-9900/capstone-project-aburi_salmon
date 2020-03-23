@@ -330,7 +330,7 @@ class DB:
 
         if new_quantity < 1:
             return 5
-
+ 
         return self.__update("UPDATE item_order SET quantity = %s, status_id = 1 WHERE id = %s", [new_quantity, item_order_id])
 
     def delete_order(self, item_order_id):
