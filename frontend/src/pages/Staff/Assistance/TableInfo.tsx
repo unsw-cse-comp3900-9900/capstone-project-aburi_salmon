@@ -1,49 +1,139 @@
 import React from 'react';
-import { createStyles, WithStyles, Theme, withStyles } from '@material-ui/core';
+import { createStyles, WithStyles, Theme, withStyles, Button } from '@material-ui/core';
 
 
 const styles = (theme: Theme) =>
     createStyles({
-        itemContainer: {
-            //backgroundColor: 'lightblue',
-            border: '1px solid grey',
-            position: 'static',
-            borderRadius: '10px',
-            width: '94%',
-            flexGrow: 1,
-            marginLeft: '3%',
-            marginRight: '3%',
-            height: '50px',
-            overflow: 'auto',
-            padding: '4px 0px 0px 0px',
-            //background: 'radial-gradient(circle, rgba(255, 253, 238, 1) 0%, rgba(233, 233, 209, 1) 100%)',
-            background: 'radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(200, 231, 250, 1) 100%)',
-            boxShadow: "0px 6px 8px 0 rgba(0, 0, 0, 0.2)",
-        },
         line:{
             width: '100%',
         },
         wrapper: {
             width: '100%',
             paddingLeft: '2%',
+            height: '95%',
             paddingRight: '2%',
+            //border: '2px solid black',
+            overflow: 'auto',
+            //display: 'block',
         },
         text: {
-            float: 'left',
+            //float: 'left',
+            //position: 'static',
+        },
+        paidBut: {
+            //position: 'relative',
+            float: 'right',
+            //backgroundColor: 'lightgreen',
+        },
+        itemTable: {
+            width: '100%',
+            
         }
+
     });
 export interface IProps extends WithStyles<typeof styles> {
     tableNumber: number
 }
 
-class TableInfo extends React.Component<IProps, {}>{
+
+interface Item
+{
+    name: string,
+    amount: number,
+    cost: number,
+}
+
+
+class TableInfo extends React.Component<IProps, {items: Item[], total: number}>{
+
+    constructor(props: IProps){
+        super(props);
+        //Replace below with fetch backend function
+        //---------------------------------------
+        const item1: Item = {
+            name: 'Burger',
+            amount: 2,
+            cost: 15,
+        };
+        const item2: Item = {
+            name: 'Pizza',
+            amount: 1,
+            cost: 20,
+        };
+        const item3: Item = {
+            name: 'Coffee',
+            amount: 3,
+            cost: 4,
+        };
+        const item4: Item = {
+            name: 'Pasta',
+            amount: 3,
+            cost: 22,
+        };
+        const item5: Item = {
+            name: 'Ice Cream',
+            amount: 1,
+            cost: 10,
+        };
+        var newArray = [];
+        newArray.push(item1);
+        newArray.push(item2);
+        newArray.push(item3);
+        newArray.push(item4);
+        newArray.push(item5);
+        this.state = {
+            items: newArray,
+            total: 1000.20,
+        };
+        //------------------------------------------------
+    }
+
+    printItems(){
+        let children = [];
+        let ret = [];
+        for (let j = 0; j < this.state.items.length; j++) {
+            children.push(
+                <tr>
+                    <td>{this.state.items[j].name}</td>
+                    <td>{this.state.items[j].amount}</td>
+                    <td>{this.state.items[j].cost}</td>
+                </tr>
+            )
+        };
+        ret.push(
+            <table className={this.props.classes.itemTable}>
+                <tr>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Cost (per item)</th>
+                </tr>
+                {children}
+                <tr>
+        <td>Item name: {this.state.items.length}</td>
+                    <td>Amount</td>
+                    <td>$###</td>
+                </tr>
+            </table>
+        );
+        return ret;
+    }
+
+
     render() {
         const { classes } = this.props;
+        //this.grabTableInfo();
         return (
             <div className={classes.wrapper}>
                 <h1 className = {classes.text}>Table {this.props.tableNumber}</h1>
                 <hr className={classes.line}></hr>
-                <p className={classes.text}>Nothing yet</p>
+              
+                {this.printItems()}
+                <hr className={classes.line}></hr>
+                <br></br>
+                Total: ${this.state.total}
+                <Button color='primary' variant="contained" className={classes.paidBut}
+                >paid</Button>
+            
             </div>
         );
     }
