@@ -367,3 +367,18 @@ class DB:
         return self.__delete("DELETE FROM item_order WHERE order_id = %s AND item_id = %s", [order_id, item_id])
 
 
+    def get_ordered_items_customer(self, status):
+
+        rows = self.__query('SELECT item.name, io.quantity, item.price FROM item_order io JOIN item ON io.id = item.id WHERE io.status_id == %s', [status])
+
+        if (not rows):
+            return None
+
+        orders = [{
+            'itemName': row[0],
+            'quantity': row[1],
+            'price': row[2],
+            } for row in rows]
+        return orders
+
+
