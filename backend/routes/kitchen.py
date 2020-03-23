@@ -12,15 +12,27 @@ class Kitchen(Resource):
     @jwt_required
     @kitchen.response(200, 'Success')
     @kitchen.response(400, 'Invalid request')
+    #def get(self):
+    #    orders = db.get_ordered_items()
+    #    return { 'orders': orders }
     def get(self):
-        orders = db.get_ordered_items()
-        return { 'orders': orders }
+        #order_update = request.get_json()
+        #status = order_update.get('status')
+        itemlist = db.get_order_list(1)
+        return {'itemList': itemlist}
+
+
 
     @jwt_required
     @kitchen.expect(edit_order_item_status_model)
     @kitchen.response(200, 'Success')
     @kitchen.response(400, 'Invalid request')
     @kitchen.response(500, 'Something went wrong')
+    #def post(self):
+    #    order_update = request.get_json()
+    #    status = order_update.get('status')
+    #    itemlist = db.get_order_list(status)
+    #    return {'itemList' : itemlist}
     def put(self):
         order_update = request.get_json()
         id = order_update.get('id')
@@ -31,10 +43,12 @@ class Kitchen(Resource):
         
         return 500, 'Something went wrong'
 
-    def beginCooking(self, item_id):
-        db.beginCooking(item_id)
+    #def beginCooking(self, item_id):
+    #    db.beginCooking(item_id)
     
-    def finishCooking(self, item_id):
-        db.beginCooking(item_id)
+    #def finishCooking(self, item_id):
+    #    db.beginCooking(item_id)
     
 
+    #def get_order_list(self, status): 
+    #    db.get_order_list(status)

@@ -56,17 +56,23 @@ export class Client {
   async getListItem(listStatus: number){
     try {
       const r: Response = await fetch(apiUrl + '/kitchen', {
-        method: 'PUT',
+        method: 'GET',
         credentials: 'include',
         mode: 'cors',
-        body: JSON.stringify({
-          status: listStatus,
-        }),
+        //headers: {
+        //  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+        //  'Content-Type': 'application/json',
+        //  'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,OPTIONS',
+        //  'Access-Control-Allow-Credentials': 'true',
+
+       // },
+        //body: JSON.stringify({
+        //  status: listStatus,
+        //}),
       });
 
       const j: ItemList = await r.json();
       return j;
-
 
     } catch (e) {
       console.error(e);

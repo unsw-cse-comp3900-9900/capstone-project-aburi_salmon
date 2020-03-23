@@ -95,15 +95,16 @@ class ListContainer extends React.Component<IProps, {itemList: ItemListModel | n
         this.state = {
             itemList: null,
         }
+
     }
 
     async componentDidMount() {
         const client = new Client();
-        const m: ItemListModel | null = await client.getListItem(0);
+        const m: ItemListModel | null = await client.getListItem(1);
         this.setState({
             itemList: m,
         });
-        console.log('hey1');
+        console.log('Not working');
         console.log(m);
     }
 
@@ -179,31 +180,17 @@ class ListContainer extends React.Component<IProps, {itemList: ItemListModel | n
         } else {
             return (
            
-                    <td className={this.props.classes.boxQueue}>
-                        
-                    </td>
+                <td className={this.props.classes.boxQueue}>
+                    {this.state.itemList?.list.map(item => (
+                        <ItemCont listName="Queue" itemName={item.itemName} amount={item.quantity} 
+                                table={item.item_id} time="sometime" update={this.props.update} />
+                        ))}
+                </td>
            
             );
         }
     }
-    /*
-    printItems() {
-        let children = [];
-        let ret = [];
-        
-        for (let j = 0; this.state.itemList[j] !== null; j++) {
-            children.push(
-                <ItemCont listName="Queue" itemName="Chips" amount={1} table={2} time="some time" update={this.props.update} />
-            )
-        };
-        ret.push(
-            <td className={this.props.classes.boxQueue}>
-                {children}
-            </td>
-        );
-        return ret;
 
-    }*/
 
     render() {
         const { classes } = this.props;
