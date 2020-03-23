@@ -18,24 +18,52 @@ import { Menu as MenuModel, Item as ItemModel } from '../../api/models';
 
 interface IProps extends WithStyles<typeof styles> { }
 
+interface ModalState {
+  modal_id: number;
+  modal_name: string;
+  modal_description: string;
+  modal_ingredient: Array<string> | null
+}
+
+interface OrderItemState {
+  id: number;
+  quantity: number;
+}
+
+interface OrderState {
+  items: Array<OrderItemState>;
+}
+
 interface IState {
   menu: MenuModel | null;
   value: string;
   openModal: boolean;
+
+  // For modal inside this component
+  modal: ModalState | null;
+
+  // For list of items that user wants to order
+  orders: Array<OrderItemState>;
 }
 
 class MenuPage extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
+      // If menu is null, then nothing will be generated
       menu: null,
-      value: "Sushi",
+      // Even if initial value is an empty string, componentDidMount will fill in according to the first item on cats array
+      value: "",
       openModal: false,
+      modal: null,
+      orders: new Array<OrderItemState>(),
     }
     // To bind the tab change
     this.handleTabChange = this.handleTabChange.bind(this);
-    this.handleOpenModal = this.handleOpenModal.bind(this);
+
+    // To bind with modal change
     this.handleCloseModal = this.handleCloseModal.bind(this);
+    this.openModal = this.openModal.bind(this);
   }
 
   generateItemsInCategory(items: Array<ItemModel>, categoryName: string){
@@ -54,7 +82,7 @@ class MenuPage extends React.Component<IProps, IState> {
                 </Typography>
               </CardContent>
               <CardActions>
-                <Button size="small">Add item</Button>
+                <Button size="small" onClick={() => this.openModal(item.id, item.name, item.description, item.ingredient)}>Add item</Button>
               </CardActions>
             </Card>
           ))
@@ -73,12 +101,30 @@ class MenuPage extends React.Component<IProps, IState> {
     });
   }
 
-  handleOpenModal(event: React.ChangeEvent<{}>) {
+  openModal(id: number, name: string, description: string, ingredient: Array<string>) {
+    const m: ModalState = {
+      modal_id: id,
+      modal_name: name,
+      modal_description: description,
+      modal_ingredient: ingredient,
+    };
+
+    this.setState({
+      openModal: true,
+
+      // Note: always pass in the whole ModalState object when setting new state on open modal. It will break if you're not passing the whole object
+      // Read https://stackoverflow.com/questions/49348996/react-change-a-json-object-in-setstate
+      modal: m,
+    });
+
+    
 
   }
 
   handleCloseModal(event: React.ChangeEvent<{}>) {
-
+    this.setState({
+      openModal: false,
+    })
   }
 
   tabProps(index: string) {
@@ -131,9 +177,11 @@ class MenuPage extends React.Component<IProps, IState> {
                 aria-describedby=""
                 open={this.state.openModal}
                 onClose={this.handleCloseModal}
+                className={classes.itemmodal}
               >
-                <div>
-                  
+                <div className={classes.divmodal}>
+                  <h2>{this.state.modal?.modal_name}</h2>
+                  <p>{this.state.modal?.modal_description}</p>
                 </div>
               </Modal>
             </div>
