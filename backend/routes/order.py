@@ -90,6 +90,33 @@ class Item(Resource):
         item_id = delete_order.get('item_id')
 
         table_id = 3 #assuming table id is 3 for now
+
+        item_order_id = db.get_item_order_id(table_id, item_id)
+        print("item_order_id")
+        print(item_order_id)
+
+        if item_order_id is None:
+            abort(400, 'No existing order with that item, please make a new order instead.')
+        
+        for row in item_order_id:
+            print("row")
+            print(row)
+            order_status = db.get_order_status(row)
+            print("order_status")
+            print(order_status)
+            if order_status != 1:
+                #abort(400, 'Cannot modify order since order has left the QUEUE status.')
+                continue
+            else:
+                new = db.delete_order(row)
+                break
+
+            response = jsonify({
+            'status': 'success'
+            })
+
+##############################################
+
         order_id = db.get_order_id(table_id)
         if order_id is None:
             abort(400, 'Table has not order anything yet.')
