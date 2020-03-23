@@ -13,7 +13,7 @@ class Table(Resource):
     @table.response(200, 'Success', model=tables_model)
     @table.response(400, 'Invalid request')
     def get(self):
-        tables = db.get_tables()
+        tables = db.get_tables(0)
         return jsonify({ 'tables': tables })
 
 
