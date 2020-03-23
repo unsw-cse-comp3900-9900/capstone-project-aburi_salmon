@@ -61,3 +61,22 @@ menu_items_model = api.schema_model('items',  {
         }
     }
 })
+
+category_model = api.schema_model('category', {
+    'type': 'object',
+    'required': ['categories'],
+    'properties': {
+        'categories': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'required': ['id', 'name', 'position'],
+                'properties': {
+                    'id': { 'type': 'integer' },
+                    'name': { 'type': 'string' },
+                    'position': { 'type': 'integer' }
+                }
+            }
+        }
+    }
+})

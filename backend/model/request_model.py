@@ -50,9 +50,22 @@ registration_model = api.model('registration_model', {
     "type": fields.Integer(description='staff_type id')
 })
 
-new_menu_item_model = api.model('menu_item_model', {
+menu_item_model = api.model('menu_item_model', {
     'name': fields.String(description='name of new menu item'),
     'description': fields.String(description='description of new menu item'),
     'price': fields.Float(description='price of the new item'),
     'visible': fields.Boolean(description='is the item visible on the menu')
+})
+
+category_model = api.model('category_model', {
+    'name': fields.String(description='category name'),
+    'position': fields.Integer(description='position to show the category')
+})
+
+add_item_to_category_model = api.model('add_item_to_category_model', {
+    'position': fields.Integer(description='position to show the item in the category')
+})
+
+ingredient_model = api.model('ingredient_model', {
+    'name': fields.String(description='ingredient name')
 })

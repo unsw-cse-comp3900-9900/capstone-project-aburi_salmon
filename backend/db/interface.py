@@ -174,16 +174,18 @@ class DB:
         return self.__update("UPDATE item_order SET status_id = %s WHERE id = %s", [status, id])
 
 
-    def get_category(self, test):
-        rows = self.__query('SELECT * FROM category WHERE position > %s', [test,])
+    def get_category(self, id):
+        rows = self.__query('SELECT * FROM category WHERE id = %s', [id])
 
-        if (not rows):
-            return None
+        if (not rows or not rows[0]):
+            return
+        
+        category = {
+            'id': id,
+            'name': rows[0][1],
+            'position': rows[0][2]
+        }
 
-        category = [{
-            'id': row[0],
-            'name': row[1]
-            } for row in rows]
         return category
     
     def create_item(self, item):
@@ -222,11 +224,83 @@ class DB:
             'visible': itemRow[4]
         }
 
+    def get_items_by_category(self, category_id):
+        rows = self.__query(
+            'SELECT * FROM item i JOIN category_item ci on (i.id = ci.item_id) WHERE ci.category_id = %s ORDER BY ci.position',
+            [category_id]
+        )
+
+        if (not rows):
+            return []
+        
+        return [{
+            'id': row[0],
+            'name': row[1],
+            'description': row[2],
+            'price': row[3],
+            'visible': row[4]
+        } for row in rows]
+
     def edit_item(self, editStatement, editArr):
         return self.__update(editStatement, editArr)
 
     def delete_item(self, id):
         return self.__delete("DELETE FROM item WHERE id = %s", [id])
+
+    def create_category(self, category):
+        self.__insert(
+            'INSERT INTO category (name, position) VALUES (%s, %s)',
+            [category.get('name'), category.get('position')]
+        )
+        return True
+
+    def get_categories(self):
+        rows = self.__query('SELECT * FROM category ORDER BY position')
+        if (not rows):
+            return None
+        
+        return [{
+            'id': row[0],
+            'name': row[1],
+            'position': row[2]
+        } for row in rows]
+
+    def edit_category(self, editStatement, editArr):
+        return self.__update(editStatement, editArr)
+
+    def delete_category(self, id):
+        pass
+
+    def add_item_to_category(self, category_id, item_id, position):
+        self.__insert(
+            'INSERT INTO category_item (item_id, category_id, position) VALUES (%s, %s, %s)',
+            [item_id, category_id, position]
+        )
+        return True
+
+    def remove_item_from_category(self, category_id, item_id):
+        return self.__delete(
+            'DELETE FROM category_item WHERE category_id = %s AND item_id = %s',
+            [category_id, item_id]
+        )
+
+    def get_all_ingredients(self):
+        rows = self.__query('SELECT * FROM ingredient')
+        if (not rows):
+            return []
+        
+        return [{
+            'id': row[0],
+            'name': row[1]
+        } for row in rows]
+
+    def create_ingredient(self, name):
+        self.__insert(
+            'INSERT INTO ingredient (name) VALUES (%s)',
+            [name]
+        )
+        return True
+
 
     def get_item(self, test):
         rows = self.__query('SELECT * FROM item WHERE price > %s', [test,])
