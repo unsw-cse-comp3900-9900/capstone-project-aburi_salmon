@@ -36,3 +36,78 @@ tables_model = api.schema_model('tables', {
         }
     }
 })
+
+menu_item_model = api.schema_model('item', {
+    'type': 'object',
+    'required': ['id', 'name', 'description', 'price', 'visible'],
+    'properties': {
+        'id': { 'type': 'integer' },
+        'name': { 'type': 'string' },
+        'description': { 'type': 'string' },
+        'price': { 'type': 'float' },
+        'visible': { 'type': 'boolean' },
+        'ingredient': { 
+            'type': 'array',
+            'items': {
+                '$ref': '#/definitions/ingredient' 
+            }
+        }
+    }
+})
+
+menu_items_model = api.schema_model('items',  {
+    'type': 'object',
+    'required': ['items'],
+    'properties': {
+        'items': {
+            'type': 'array',
+            'items': {
+                '$ref': '#/definitions/item'
+            }
+        }
+    }
+})
+
+category_model = api.schema_model('category', {
+    'type': 'object',
+    'required': ['categories'],
+    'properties': {
+        'categories': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'required': ['id', 'name', 'position'],
+                'properties': {
+                    'id': { 'type': 'integer' },
+                    'name': { 'type': 'string' },
+                    'position': { 'type': 'integer' }
+                }
+            }
+        }
+    }
+})
+
+ingredient_model = api.schema_model('ingredient', {
+    'type': 'object',
+    'required': ['id', 'name'],
+    'properties': {
+        'id': { 'type': 'integer' },
+        'name': { 'type': 'string' }
+    }
+})
+
+specific_category_model = api.schema_model('specific category', {
+    'type': 'object',
+    'required': ['id', 'name', 'position', 'items'],
+    'properties': {
+        'id': { 'type': 'integer' },
+        'name': { 'type': 'string' },
+        'position': { 'type': 'integer' },
+        'items': {
+            'type': 'array',
+            'items': {
+                '$ref': '#/definitions/item'
+            }
+        }
+    }
+})
