@@ -31,11 +31,23 @@ edit_order_item_status_model = api.model('edit_order_item_status', {
     "status": fields.Integer(description="status_id")
 })
 
-new_order_model = api.model('new_order_model', {
-    "item_id": fields.Integer(description="item_id"),
-    "quantity": fields.Integer(description="quantity")
+new_order_model = api.schema_model('new_order_model', {
+    'type': 'object',
+    'required': ['new_orders'],
+    'properties': {
+        'new_orders': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'required': ['item_id', 'quantity'],
+                'properties': {
+                    'item_id': { 'type': 'integer' },
+                    'quantity': { 'type': 'integer' }
+                }
+            }
+        }
+    }
 })
-
 
 modify_order_model = api.model('modify_order_model', {
     "item_id": fields.Integer(description="item_id"),

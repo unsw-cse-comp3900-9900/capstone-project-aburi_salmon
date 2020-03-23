@@ -417,18 +417,17 @@ class DB:
             return None
 
         return status
-
-    def new_order(self, table_id, item_id, quantity):
+      
+    def insert_order(self, table_id):
         self.__insert('INSERT INTO "order" (table_id) VALUES (%s);', [table_id,])
-
-        order_id_row = self.__query('SELECT id FROM "order" ORDER BY id DESC LIMIT %s', [1,])
-        order_id = order_id_row[0]
-
-        self.__insert("INSERT INTO item_order (item_id, order_id, quantity, status_id) VALUES (%s, %s, %s, %s);",
-                      [item_id, order_id, quantity, 1])
+        order_id = self.__query('SELECT id FROM "order" ORDER BY id DESC LIMIT %s', [1,])[0][0]
         
+        return order_id  
+      
+    def insert_item_order(self, order_id, item_id, quantity):
+        self.__insert("INSERT INTO item_order (item_id, order_id, quantity, status_id) VALUES (%s, %s, %s, %s);", [item_id, order_id, quantity, 1])
         return True
-
+        
     def get_tables(self, test):
         rows = self.__query('SELECT id, state FROM public.table WHERE id > %s ORDER BY id', [test,])
 
@@ -501,8 +500,8 @@ class DB:
 
         return self.__update("UPDATE item_order SET quantity = %s, status_id = 1 WHERE id = %s", [new_quantity, item_order_id])
 
-    def delete_order(self, order_id, item_id):
-        return self.__delete("DELETE FROM item_order WHERE order_id = %s AND item_id = %s", [order_id, item_id])
+    def delete_order(self, item_order_id):
+        return self.__delete("DELETE FROM item_order WHERE id = %s", [item_order_id,])
 
 
     def get_order_list(self, status):
@@ -520,5 +519,3 @@ class DB:
 
             } for row in rows]
         return orders
-
-
