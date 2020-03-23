@@ -151,7 +151,7 @@ class MenuPage extends React.Component<IProps, IState> {
     const m: MenuModel | null = await client.getMenu();
     this.setState({
       menu: m,
-      value: m?.menu[0].cat ? m?.menu[0].cat : "",
+      value: m?.menu[0].name ? m?.menu[0].name : "",
     });
   }
 
@@ -174,13 +174,13 @@ class MenuPage extends React.Component<IProps, IState> {
                 >
                   {
                     this.state.menu?.menu.map(category => (
-                      <Tab label={category.cat} key={category.cat} {...this.tabProps(category.cat)} />
+                      <Tab label={category.name} key={category.name} {...this.tabProps(category.name)} />
                     ))
                   }
                 </Tabs>
               </AppBar>
               {
-                this.state.menu?.menu.map(category => this.generateItemsInCategory(category.item, category.cat))
+                this.state.menu?.menu.map(category => this.generateItemsInCategory(category.items, category.name))
               }
               <Modal
                 aria-labelledby=""
@@ -207,7 +207,7 @@ class MenuPage extends React.Component<IProps, IState> {
                       <FormControl>
                         <FormGroup>
                           {
-                            this.state.modal?.ingredient.map(ingredient => (<FormControlLabel
+                            this.state.modal?.ingredients.map(ingredient => (<FormControlLabel
                               control={<Checkbox checked={true} />}
                               disabled
                               label={ingredient}
