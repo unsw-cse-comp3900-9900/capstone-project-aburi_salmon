@@ -1,4 +1,4 @@
-import { Tables, Menu } from "./models";
+import { Tables, Menu, ItemList } from "./models";
 
 const apiUrl = "http://localhost:5000";
 
@@ -41,7 +41,7 @@ export class Client {
       const r: Response = await fetch(apiUrl + '/menu', {
         method: 'GET',
         credentials: 'include',
-        mode: 'cors'
+        mode: 'cors',
       });
 
       const j: Menu = await r.json();
@@ -52,4 +52,27 @@ export class Client {
       return null;
     }
   }
+
+  async getListItem(listStatus: number){
+    try {
+      const r: Response = await fetch(apiUrl + '/kitchen', {
+        method: 'PUT',
+        credentials: 'include',
+        mode: 'cors',
+        body: JSON.stringify({
+          status: listStatus,
+        }),
+      });
+
+      const j: ItemList = await r.json();
+      return j;
+
+
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+
+  }
+
 }
