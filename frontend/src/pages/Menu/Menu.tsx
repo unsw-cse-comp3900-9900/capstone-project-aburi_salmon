@@ -17,7 +17,7 @@ import { LeftBox, RightBar } from '../../components';
 
 import { styles } from './styles';
 import { Client } from '../../api/client';
-import { Menu as MenuModel, Item as ItemModel } from '../../api/models';
+import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel } from '../../api/models';
 
 interface IProps extends WithStyles<typeof styles> { }
 
@@ -66,13 +66,15 @@ class MenuPage extends React.Component<IProps, IState> {
     // To bind with quantity
   }
 
-  generateItemsInCategory(items: Array<ItemModel>, categoryName: string) {
+  generateItemsInCategory(category: CategoriesModel) {
     const { classes } = this.props;
+    const categoryName = category.name;
     return (
-      <div hidden={this.state.value !== categoryName} id={`tabpanel-${categoryName}`} key={categoryName} aria-labelledby={`tab-${categoryName}`}>
+      <div hidden={this.state.value !== categoryName} id={`tabpanel-${category.id}`} key={category.id} aria-labelledby={`tab-${category.id}`}>
         {
-          items.map(item => (
-            <Card className={classes.itemcard} key={item.id}>
+          category.items.map(item => (
+            // If there is an item with multiple categories, this will break.
+            <Card className={classes.itemcard} key={`${category.id}-${item.id}`}>
               <CardContent>
                 <Typography variant="h5">
                   {item.name}
@@ -174,13 +176,13 @@ class MenuPage extends React.Component<IProps, IState> {
                 >
                   {
                     this.state.menu?.menu.map(category => (
-                      <Tab label={category.name} key={category.name} {...this.tabProps(category.name)} />
+                      <Tab label={category.name} key={category.id} {...this.tabProps(category.name)} />
                     ))
                   }
                 </Tabs>
               </AppBar>
               {
-                this.state.menu?.menu.map(category => this.generateItemsInCategory(category.items, category.name))
+                this.state.menu?.menu.map(category => this.generateItemsInCategory(category))
               }
               <Modal
                 aria-labelledby=""
