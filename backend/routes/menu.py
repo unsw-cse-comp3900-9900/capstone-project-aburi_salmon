@@ -13,6 +13,7 @@ class Menu(Resource):
     @menu.response(200, 'Success')
     @menu.response(400, 'Invalid request')
     def get(self):
+        # Return the entire menu
 
         categories = db.get_category(0)
         lists = []
@@ -33,7 +34,151 @@ class Menu(Resource):
         return { 'menu': lists }
 
 
-        
+@menu.route('/item')
+class CreateMenuItem(Resource):
+    @jwt_required
+    @menu.response(200, 'Success')
+    @menu.response(400, 'Invalid Request')
+    def post(self):
+        # Create a new menu item
+        pass
 
-    
-        
+    def get(self):
+        # Get all menu items
+        pass
+
+@menu.route('/item/<int:id>')
+class MenuItem(Resource):
+    @jwt_required
+    @menu.response(200, 'Success')
+    @menu.response(400, 'Invalid Request')
+    def put(self, id):
+        # Modify a menu item
+        pass
+
+    @jwt_required
+    @menu.response(200, 'Success')
+    @menu.response(400, 'Invalid Request')
+    def get(self, id):
+        # Get a specific menu item
+        pass
+
+    @jwt_required
+    @menu.response(200, 'Success')
+    @menu.response(400, 'Invalid Request')
+    def delete(self, id):
+        # Delete a specific menu item
+        pass
+
+
+@menu.route('/category')
+class CreateMenuCategory(Resource):
+    @jwt_required
+    @menu.response(200, 'Success')
+    @menu.response(400, 'Invalid Request')
+    def post(self):
+        # Create a new category
+        pass
+
+    @jwt_required
+    @menu.response(200, 'Success')
+    @menu.response(400, 'Invalid Request')
+    def get(self):
+        # Get all the categories
+        pass
+
+
+@menu.route('/category/<int:id>')
+class MenuCategory(Resource):
+    @jwt_required
+    @menu.response(200, 'Success')
+    @menu.response(400, 'Invalid Request')
+    def put(self, id):
+        # Modify a category
+        pass
+
+    @jwt_required
+    @menu.response(200, 'Success')
+    @menu.response(400, 'Invalid Request')
+    def get(self, id):
+        # Get all the items in a category
+        pass
+
+    @jwt_required
+    @menu.response(200, 'Success')
+    @menu.response(400, 'Invalid Request')
+    def delete(self, id):
+        # Delete a category only if empty
+
+
+@menu.route('/category/<int:category_id>/item/<int:item_id>')
+class MenuCategoryItem(Resource):
+    @jwt_required
+    @menu.response(200, 'Success')
+    @menu.response(400, 'Invalid Request')
+    def post(self, category_id, item_id):
+        # Add an item to a category
+        pass
+
+    @jwt_required
+    @menu.response(200, 'Success')
+    @menu.response(400, 'Invalid Request')
+    def delete(self, category_id, item_id):
+        # Remove an item from a category
+        pass
+
+
+@menu.route('/ingredient')
+class CreateMenuIngredient(Resource):
+    @jwt_required
+    @menu.response(200, 'Success')
+    @menu.response(400, 'Invalid Request')
+    def get(self):
+        # Return all ingredients
+        pass
+
+    @jwt_required
+    @menu.response(200, 'Success')
+    @menu.response(400, 'Invalid Request')
+    def post(self):
+        # Create a new ingredient
+
+@menu.route('/ingredient/<int:id>'):
+class MenuIngredient(Resource):
+    @jwt_required
+    @menu.response(200, 'Success')
+    @menu.response(400, 'Invalid Request')
+    def get(self, id):
+        # Return a specific ingredient
+        pass
+
+    @jwt_required
+    @menu.response(200, 'Success')
+    @menu.response(400, 'Invalid Request')
+    def put(self, id):
+        # Modify a specific ingredient
+        pass
+
+    @jwt_required
+    @menu.response(200, 'Success')
+    @menu.response(400, 'Invalid Request')
+    def delete(self, id):
+        # Delete a specific ingredient
+        # Only if not used
+        pass
+
+@menu.route('/item/<int:item_id>/ingredient/<int:ingredient_id>'):
+class MenuItemIngredient(Resource):
+    @jwt_required
+    @menu.response(200, 'Success')
+    @menu.response(400, 'Invalid Request')
+    def post(self, item_id, ingredient_id):
+        # Add an ingredient to an item
+        pass
+
+    @jwt_required
+    @menu.response(200, 'Success')
+    @menu.response(400, 'Invalid Request')
+    def delete(self, item_id, ingredient_id):
+        # Remove ingredient from an item
+        pass
