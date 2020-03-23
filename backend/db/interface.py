@@ -298,3 +298,17 @@ class DB:
             return True
 
 
+    def get_ordered_items_customer(self, status):
+
+        rows = self.__query('SELECT item.name, io.quantity, item.price FROM item_order io JOIN item ON io.id = item.id WHERE io.status_id == %s', [status])
+
+        if (not rows):
+            return None
+
+        orders = [{
+            'itemName': row[0],
+            'quantity': row[1],
+            'price': row[2],
+            } for row in rows]
+        return orders
+
