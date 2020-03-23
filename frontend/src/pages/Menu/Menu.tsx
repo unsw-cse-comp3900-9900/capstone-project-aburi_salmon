@@ -24,6 +24,8 @@ interface IProps extends WithStyles<typeof styles> { }
 interface OrderItemState {
   id: number;
   quantity: number;
+  price: number;
+  name: string;
 }
 
 interface OrderState {
@@ -64,6 +66,7 @@ class MenuPage extends React.Component<IProps, IState> {
     this.openModal = this.openModal.bind(this);
 
     // To bind with quantity
+    this.addToOrder = this.addToOrder.bind(this);
   }
 
   generateItemsInCategory(category: CategoriesModel) {
@@ -139,6 +142,22 @@ class MenuPage extends React.Component<IProps, IState> {
     })
   }
 
+  addToOrder(event: React.ChangeEvent<{}>) {
+    const r: OrderItemState = {
+      id: this.state.modal?.id!,
+      name: this.state.modal?.name!,
+      price: this.state.modal?.price!,
+      quantity: this.state.modalQuantity,
+    }
+
+    let orders = this.state.orders;
+    orders.push(r);
+    this.setState({
+      openModal: false,
+      orders: orders,
+    })
+  }
+
   tabProps(index: string) {
     return {
       id: `tab-${index}`,
@@ -155,6 +174,11 @@ class MenuPage extends React.Component<IProps, IState> {
       menu: m,
       value: m?.menu[0].name ? m?.menu[0].name : "",
     });
+  }
+
+  // This will be called when there is a state change
+  componentDidUpdate() {
+
   }
 
   render() {
@@ -184,87 +208,105 @@ class MenuPage extends React.Component<IProps, IState> {
               {
                 this.state.menu?.menu.map(category => this.generateItemsInCategory(category))
               }
-              <Modal
-                aria-labelledby=""
-                aria-describedby=""
-                open={this.state.openModal}
-                onClose={this.handleCloseModal}
-                className={classes.itemmodal}
-              >
-                <div className={classes.divmodal}>
-                  <Grid container spacing={2}>
-                    {/* First col */}
-                    <Grid item xs={11}>
-                      <Typography variant="h4">{this.state.modal?.name}</Typography>
-                    </Grid>
-                    <Grid item xs={4}>
-                      <Typography variant="h6">Ingredients</Typography>
-                    </Grid>
-
-                    {/* Second col */}
-                    <Grid item xs={11}>
-                      insert image here
-                    </Grid>
-                    <Grid item xs={4}>
-                      <FormControl>
-                        <FormGroup>
-                          {
-                            this.state.modal?.ingredients.map(ingredient => (<FormControlLabel
-                              control={<Checkbox checked={true} />}
-                              disabled
-                              label={ingredient}
-                            />))
-                          }
-                        </FormGroup>
-                      </FormControl>
-                    </Grid>
-
-                    {/* Third col */}
-                    <Grid item xs={11}>
-                      <Typography variant="subtitle1">{this.state.modal?.description}</Typography>
-                    </Grid>
-                    <Grid item xs={4}>
-                      <Typography variant="subtitle1">$ {this.state.modal?.price.toString()}</Typography>
-                      <Typography variant="subtitle1">Quantity</Typography>
-                      <IconButton aria-label="remove" disabled={this.state.modalQuantity <= 0} onClick={() => this.removeModalQuantity()}>
-                        <Icon>remove_circle</Icon>
-                      </IconButton>
-                      {this.state.modalQuantity}
-                      <IconButton aria-label="add" onClick={() => this.addModalQuantity()}>
-                        <Icon>add_circle</Icon>
-                      </IconButton>
-                    </Grid>
-
-                    {/* Last col */}
-                      <Grid item xs={9}>
-                        {/* nothing here */}
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Button onClick={this.handleCloseModal}>Cancel</Button>
-                        <Button disabled={this.state.modalQuantity < 1}>Add to Order</Button>
-                      </Grid>
-                    </Grid>
-                </div>
-              </Modal>
             </div>
           }
         />
 
         <RightBar
-                first={
-                  <div>
-                    <Button className={classes.assistancebutton} variant="contained" color="primary">Help</Button>
-                    <Button className={classes.gobackbutton} variant="contained" color="secondary" onClick={() => this.goToTable()}>Go back</Button>
-                  </div>
-                }
-                second={
-                  <div></div>
-                }
-                third={
-                  <div></div>
-                }
-              />
-            </div >
+          first={
+            <div>
+              <Button className={classes.assistancebutton} variant="contained" color="primary">Help</Button>
+              <Button className={classes.gobackbutton} variant="contained" color="secondary" onClick={() => this.goToTable()}>Go back</Button>
+            </div>
+          }
+          second={
+            <div>
+              {
+                this.state.orders.map(order => {
+                  return (
+                    <Card className={classes.itemcard}>
+                      <CardContent>
+                        <Typography variant="h5">
+                          {order.name}
+                        </Typography>
+                        <Typography variant="body2" component="p">
+                          ${order.price} x {order.quantity} = ${order.price * order.quantity}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  );
+                })
+              }
+            </div>
+          }
+          third={
+            <div></div>
+          }
+        />
+
+        <Modal
+          aria-labelledby=""
+          aria-describedby=""
+          open={this.state.openModal}
+          onClose={this.handleCloseModal}
+          className={classes.itemmodal}
+        >
+          <div className={classes.divmodal}>
+            <Grid container spacing={2}>
+              {/* First col */}
+              <Grid item xs={11}>
+                <Typography variant="h4">{this.state.modal?.name}</Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography variant="h6">Ingredients</Typography>
+              </Grid>
+
+              {/* Second col */}
+              <Grid item xs={11}>
+                insert image here
+                    </Grid>
+              <Grid item xs={4}>
+                <FormControl>
+                  <FormGroup>
+                    {
+                      this.state.modal?.ingredients.map(ingredient => (<FormControlLabel
+                        control={<Checkbox checked={true} />}
+                        disabled
+                        label={ingredient.name}
+                      />))
+                    }
+                  </FormGroup>
+                </FormControl>
+              </Grid>
+
+              {/* Third col */}
+              <Grid item xs={11}>
+                <Typography variant="subtitle1">{this.state.modal?.description}</Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography variant="subtitle1">$ {this.state.modal?.price.toString()}</Typography>
+                <Typography variant="subtitle1">Quantity</Typography>
+                <IconButton aria-label="remove" disabled={this.state.modalQuantity <= 0} onClick={() => this.removeModalQuantity()}>
+                  <Icon>remove_circle</Icon>
+                </IconButton>
+                {this.state.modalQuantity}
+                <IconButton aria-label="add" onClick={() => this.addModalQuantity()}>
+                  <Icon>add_circle</Icon>
+                </IconButton>
+              </Grid>
+
+              {/* Last col */}
+              <Grid item xs={9}>
+                {/* nothing here */}
+              </Grid>
+              <Grid item xs={6}>
+                <Button onClick={this.handleCloseModal}>Cancel</Button>
+                <Button disabled={this.state.modalQuantity < 1} onClick={this.addToOrder}>Add to Order</Button>
+              </Grid>
+            </Grid>
+          </div>
+        </Modal>
+      </div >
     );
   }
 }
