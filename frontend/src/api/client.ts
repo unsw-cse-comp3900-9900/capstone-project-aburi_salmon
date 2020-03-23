@@ -19,6 +19,20 @@ export class Client {
     });
   }
 
+  async selectTable(table: number) {
+    return fetch(apiUrl + '/auth/customer', {
+      method: 'POST',
+      body: JSON.stringify({
+        table
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include',
+      mode: 'cors'
+    });
+  }
+
   async getTables() {
     try {
       const r: Response = await fetch(apiUrl + '/table', {

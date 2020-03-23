@@ -9,7 +9,6 @@ table = api.namespace('table', description='Order Route')
 
 @table.route('/')
 class Table(Resource):
-    @jwt_required
     @table.response(200, 'Success', model=tables_model)
     @table.response(400, 'Invalid request')
     def get(self):

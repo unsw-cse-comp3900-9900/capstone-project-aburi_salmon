@@ -81,3 +81,7 @@ add_item_to_category_model = api.model('add_item_to_category_model', {
 ingredient_model = api.model('ingredient_model', {
     'name': fields.String(description='ingredient name')
 })
+
+customer_session_model = api.model('customer_session_mode', {
+    'table': fields.Integer(description='Table number of new order')
+})
