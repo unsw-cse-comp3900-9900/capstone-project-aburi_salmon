@@ -28,7 +28,11 @@ class Order(Resource):
         num_of_orders = len(new_order.get('new_orders'))
 
         table_id = 3 #assuming table id is 3 for now
-        order_id = db.insert_order(table_id)
+
+        #check if there's anexisting order_id
+        order_id = db.get_order_id(table_id)
+        if(order_id is None):
+            order_id = db.insert_order(table_id)
 
         for i in range(0, num_of_orders):
             item_id = new_order.get('new_orders')[i].get('item_id')
@@ -100,19 +104,13 @@ class Item(Resource):
         
         check = 0
         for row in item_order_id:
-            print("row")
-            print(row[0])
             order_status = db.get_order_status(row[0])
-            print("order_status")
-            print(order_status)
             if order_status != 1:
                 #abort(400, 'Cannot modify order since order has left the QUEUE status.')
                 continue
             else:
                 new = db.delete_order(row)
                 check = 1
-                print("NEW")
-                print(new)
                 break
 
         if check == 0:
