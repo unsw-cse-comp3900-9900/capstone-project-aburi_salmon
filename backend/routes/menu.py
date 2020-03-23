@@ -43,6 +43,9 @@ class CreateMenuItem(Resource):
         # Create a new menu item
         pass
 
+    @jwt_required
+    @menu.response(200, 'Success')
+    @menu.response(400, 'Invalid Request')
     def get(self):
         # Get all menu items
         pass
@@ -109,6 +112,7 @@ class MenuCategory(Resource):
     @menu.response(400, 'Invalid Request')
     def delete(self, id):
         # Delete a category only if empty
+        pass
 
 
 @menu.route('/category/<int:category_id>/item/<int:item_id>')
@@ -142,8 +146,10 @@ class CreateMenuIngredient(Resource):
     @menu.response(400, 'Invalid Request')
     def post(self):
         # Create a new ingredient
+        pass
 
-@menu.route('/ingredient/<int:id>'):
+
+@menu.route('/ingredient/<int:id>')
 class MenuIngredient(Resource):
     @jwt_required
     @menu.response(200, 'Success')
@@ -167,7 +173,7 @@ class MenuIngredient(Resource):
         # Only if not used
         pass
 
-@menu.route('/item/<int:item_id>/ingredient/<int:ingredient_id>'):
+@menu.route('/item/<int:item_id>/ingredient/<int:ingredient_id>')
 class MenuItemIngredient(Resource):
     @jwt_required
     @menu.response(200, 'Success')
