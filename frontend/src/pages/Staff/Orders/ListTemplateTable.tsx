@@ -91,27 +91,33 @@ class ListContainer extends React.Component<IProps, {}>{
     getHeading(){
         if (this.props.name === 'Served' || this.props.name === 'Ready'){
             return(
+             
                 <tr className={this.props.classes.headingServed}>
                     <th className={this.props.classes.headingServed}>
                         {this.props.name}
                     </th>
                 </tr>
+             
             );
         } else if (this.props.name === 'To Be Served' || this.props.name === 'Cooking') {
             return (
+             
                 <tr className={this.props.classes.headingToBeServed}>
                     <th className={this.props.classes.headingToBeServed}>
                         {this.props.name}
                     </th>
                 </tr>
+           
             );
         } else {
             return (
-                <tr className={this.props.classes.headingQueue}>
-                    <th className={this.props.classes.headingQueue}>
-                        {this.props.name}
-                    </th>
-                </tr>
+              
+                    <tr className={this.props.classes.headingQueue}>
+                        <th className={this.props.classes.headingQueue}>
+                            {this.props.name}
+                        </th>
+                    </tr>
+         
             );
         }
     }
@@ -119,36 +125,46 @@ class ListContainer extends React.Component<IProps, {}>{
     getBox(){
         if (this.props.name === 'Ready') {
             return (
-                <td className={this.props.classes.boxServed}>
-                    <ItemCont listName="Ready" itemName="Burger" amount={2} table={1} time="some time" update={this.props.update}/>
-                    <ItemCont listName="Ready" itemName="Salad" amount={3} table={7} time="some time" update={this.props.update}/>
-                </td>
+             
+                    <td className={this.props.classes.boxServed}>
+                        <ItemCont listName="Ready" itemName="Burger" amount={2} table={1} time="some time" update={this.props.update}/>
+                        <ItemCont listName="Ready" itemName="Salad" amount={3} table={7} time="some time" update={this.props.update}/>
+                    </td>
+               
             );
         } else if (this.props.name === 'Served') {
             return (
-                <td className={this.props.classes.boxServed}>
-                    {this.getItems()} 
-                    <ItemCont listName="Served" itemName="Burger" amount={2} table={1} time="some time" update={this.props.update} />
-                    <ItemCont listName="Served" itemName="Salad" amount={3} table={7} time="some time" update={this.props.update} />
-                </td>
+               
+                    <td className={this.props.classes.boxServed}>
+                        {this.getItems()} 
+                        <ItemCont listName="Served" itemName="Burger" amount={2} table={1} time="some time" update={this.props.update} />
+                        <ItemCont listName="Served" itemName="Salad" amount={3} table={7} time="some time" update={this.props.update} />
+                    </td>
+           
             );
         } else if (this.props.name === 'To Be Served') {
             return (
-                <td className={this.props.classes.boxToBeServed}>
-                    <ItemCont listName="To Be Served" itemName="Pizza" amount={5} table={3} time="some time" update={this.props.update}/>
-                </td>
+               
+                    <td className={this.props.classes.boxToBeServed}>
+                        <ItemCont listName="To Be Served" itemName="Pizza" amount={5} table={3} time="some time" update={this.props.update}/>
+                    </td>
+            
             );
         } else if (this.props.name === 'Cooking') {
             return (
-                <td className={this.props.classes.boxToBeServed}>
-                    <ItemCont listName="Cooking" itemName="Pizza" amount={5} table={3} time="some time" update={this.props.update} />
-                </td>
+              
+                    <td className={this.props.classes.boxToBeServed}>
+                        <ItemCont listName="Cooking" itemName="Pizza" amount={5} table={3} time="some time" update={this.props.update} />
+                    </td>
+               
             );
         } else {
             return (
-                <td className={this.props.classes.boxQueue}>
-                    <ItemCont listName="Queue" itemName="Chips" amount={1} table={2} time="some time" update={this.props.update}/>
-                </td>
+           
+                    <td className={this.props.classes.boxQueue}>
+                        <ItemCont listName="Queue" itemName="Chips" amount={1} table={2} time="some time" update={this.props.update}/>
+                    </td>
+           
             );
         }
     }

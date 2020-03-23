@@ -1,8 +1,7 @@
 import React from 'react';
-import {  createStyles, withStyles, WithStyles, Theme, Link, ListItemIcon } from '@material-ui/core';
+import {  createStyles, withStyles, WithStyles, Theme, Link} from '@material-ui/core';
 import './../Assistance/Assistance.css';
 import TableInfo from './../Assistance/TableInfo';
-import PriorityHighIcon from '@material-ui/icons/PriorityHigh';
 //https://material-ui.com/components/menus/#menus
 //https://stackoverflow.com/questions/58630490/how-to-convert-functional-componenet-to-class-component-in-react-in-material
 
@@ -93,7 +92,7 @@ class Assistance extends React.Component<IProps, {
                 const tableNum = i*5 + j + 1;
                 if (this.state.occupiedTables.includes(tableNum)){
                     children.push(
-                        <div className="column" onClick={()=>this.handleClick(tableNum)}>
+                        <div className="column" key={tableNum} onClick={()=>this.handleClick(tableNum)}>
                             <div className="redcard">! {tableNum} !
                             </div>
                             
@@ -101,13 +100,13 @@ class Assistance extends React.Component<IProps, {
                     )
                 } else if (this.state.paidTables.includes(tableNum)){
                     children.push(
-                        <div className="column" onClick={() => this.handleClick(tableNum)}>
+                        <div className="column" key={tableNum} onClick={() => this.handleClick(tableNum)}>
                             <div className="greencard">{tableNum}</div>
                         </div>
                     )
                 } else {
                     children.push(
-                        <div className="column" onClick={() => this.handleClick(tableNum)}>
+                        <div className="column" key={tableNum} onClick={() => this.handleClick(tableNum)}>
                             <div className="card">{tableNum}</div>
                         </div>
                     )
@@ -115,7 +114,7 @@ class Assistance extends React.Component<IProps, {
             }
 
             table.push(
-                <div className="row">{children}</div>
+                <div className="row" key={i}>{children}</div>
             )
         }
         return table;

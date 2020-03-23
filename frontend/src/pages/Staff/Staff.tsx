@@ -131,7 +131,7 @@ class StaffPage extends React.Component<IProps, {currPage: string, staffType: st
 
     isStaff() {
         if (localStorage.getItem('staff') !== 'true') {
-           // alert('You must log in to enter this page');
+            //alert('You must log in to enter this page');
             //history.push('/');
         }
     }
