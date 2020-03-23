@@ -22,7 +22,8 @@ flask_app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False
 # Persistent
 flask_app.config['JWT_SESSION_COOKIE'] = False
 # Enable CORS
-flask_app.config['JWT_COOKIE_CSRF_PROTECT'] = False
+# flask_app.config['JWT_COOKIE_CSRF_PROTECT'] = False
+CORS(flask_app, supports_credentials=True)
 # With secret on JWT_SECRET_KEY
 flask_app.config['JWT_SECRET_KEY'] = config.JWT_SECRET_KEY
 
@@ -36,12 +37,12 @@ def run_app(host, port):
     ## Example routes
     import routes.example
     import routes.auth
-    import routes.manager
-    # import routes.kitchenstaff
-    # import routes.waitstaff
     import routes.session
     import routes.profile
     import routes.kitchen
+    import routes.menu
+    import routes.order
+    import routes.table
 
 
     ## When SocketIO is enabled, comment this

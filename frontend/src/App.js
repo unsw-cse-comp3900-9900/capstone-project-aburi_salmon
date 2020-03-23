@@ -4,11 +4,12 @@ import './App.css';
 import { MuiThemeProvider } from "@material-ui/core/styles";
 
 import history from './history';
-import { Home, Login, Staff, Table } from "./pages";
+import { Home, Login, Staff, Table, Menu } from "./pages";
 import { theme } from './theme/theme';
 
 class App extends React.Component {
   render() {
+    // I couldn't put MuiThemeProvider if this file is moved to a .tsx file
     return (
       <MuiThemeProvider theme={theme}>
         <Router history={history} >
@@ -17,6 +18,7 @@ class App extends React.Component {
             <Route path="/login" component={Login} />
             <Route path="/staff" component={Staff} />
             <Route path="/table" component={Table} />
+            <Route path="/menu" component={Menu} />
           </Switch>
         </Router>
       </MuiThemeProvider>
