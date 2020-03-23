@@ -1,8 +1,7 @@
 import React from 'react';
-import { TextField, Button, Snackbar, WithStyles, Theme, createStyles } from '@material-ui/core';
+import { TextField, Button, Snackbar } from '@material-ui/core';
 import { Color } from '@material-ui/lab';
 import './../Login/LoginRegister.css';
-import restlogo from './../../assets/Hojiak.png';
 import history from '../../history';
 import { Alert } from '@material-ui/lab';
 import { Client } from '../../api/client';

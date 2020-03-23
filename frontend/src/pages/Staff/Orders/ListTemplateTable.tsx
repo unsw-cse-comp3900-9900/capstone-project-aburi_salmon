@@ -1,9 +1,9 @@
 import React from 'react';
-import { createStyles, WithStyles, Theme, withStyles } from '@material-ui/core';
+import { createStyles, WithStyles, withStyles } from '@material-ui/core';
 import ItemCont from './../Orders/ItemTemplate';
 
 
-const styles = (theme: Theme) =>
+const styles = () =>
     createStyles({
         table: {
             border: '2px solid darkgreen',
@@ -18,16 +18,10 @@ const styles = (theme: Theme) =>
             flexGrow: 1,
             width: '100%',
             boxShadow: "2px 7px 12px 0 rgba(0, 0, 0, 0.4)",
-            
-            //backgroundColor: 'lightgreen',  
-            //display: 'block',
-            //backgroundColor: 'lightgreen'
         },
         headingServed: {
             height: '50px',
             border: '2px solid green',
-            //backgroundColor: 'rgb(0, 204, 51)',  
-            //backgroundColor: 'rgb(0, 204, 0)',
             background: 'radial-gradient(circle, rgba(148, 233, 152, 1) 0%, rgba(56, 171, 87, 1) 73%)',
         },
 
@@ -47,7 +41,7 @@ const styles = (theme: Theme) =>
             verticalAlign: 'top',
             flexGrow: 1,
             width: '100%',
-            padding: '20px 5px 5px 5px',
+            padding: '10px 5px 5px 10px',
             background: 'linear-gradient(0deg, rgba(160, 235, 176, 1) 0%, rgba(255, 255, 255, 1) 100%)',
         },
 
@@ -55,7 +49,7 @@ const styles = (theme: Theme) =>
             verticalAlign: 'top',
             flexGrow: 1,
             width: '100%',
-            padding: '20px 5px 5px 5px',
+            padding: '10px 5px 5px 10px',
             background: 'linear-gradient(0deg, rgba(255, 254, 218, 1) 0%, rgba(255, 255, 255, 1) 100%)',
 
         },
@@ -64,8 +58,9 @@ const styles = (theme: Theme) =>
             verticalAlign: 'top',
             flexGrow: 1,
             width: '100%',
-            padding: '20px 5px 5px 5px',
-            background: 'linear-gradient(0deg, rgba(133, 160, 255, 1) 0%, rgba(255, 255, 255, 1) 100%)',
+            padding: '10px 5px 5px 10px',
+            background: 'linear-gradient(0deg, rgba(177, 194, 255, 1) 0%, rgba(255, 255, 255, 1) 100%)',
+            //background: 'linear-gradient(0deg, rgba(133, 160, 255, 1) 0%, rgba(255, 255, 255, 1) 100%)',
         },
 
         scroll: {
@@ -75,7 +70,6 @@ const styles = (theme: Theme) =>
             flexGrow: 1,
         },
         table2: {
-            //border: '1px solid darkgreen',
             height: '100%',
             position: 'static',
             float: 'left',
@@ -86,66 +80,98 @@ const styles = (theme: Theme) =>
         
     });
 export interface IProps extends WithStyles<typeof styles> {
-    name: string;
+    name: string; //= {'Served', 'Ready', 'To Be Served', 'Cooking'}
+    //update: () => void
+    //array[items]
+    update: any;
  }
 
 class ListContainer extends React.Component<IProps, {}>{
-
-    constructor(props: any){
-        super(props);
-    }
-
+    //Get items depending on name
     getHeading(){
         if (this.props.name === 'Served' || this.props.name === 'Ready'){
             return(
+             
                 <tr className={this.props.classes.headingServed}>
                     <th className={this.props.classes.headingServed}>
                         {this.props.name}
                     </th>
                 </tr>
+             
             );
         } else if (this.props.name === 'To Be Served' || this.props.name === 'Cooking') {
             return (
+             
                 <tr className={this.props.classes.headingToBeServed}>
                     <th className={this.props.classes.headingToBeServed}>
                         {this.props.name}
                     </th>
                 </tr>
+           
             );
         } else {
             return (
-                <tr className={this.props.classes.headingQueue}>
-                    <th className={this.props.classes.headingQueue}>
-                        {this.props.name}
-                    </th>
-                </tr>
+              
+                    <tr className={this.props.classes.headingQueue}>
+                        <th className={this.props.classes.headingQueue}>
+                            {this.props.name}
+                        </th>
+                    </tr>
+         
             );
         }
     }
 
     getBox(){
-        if (this.props.name === 'Served' || this.props.name === 'Ready') {
+        if (this.props.name === 'Ready') {
             return (
-                <td className={this.props.classes.boxServed}>
-                    <ItemCont />
-                </td>
+             
+                    <td className={this.props.classes.boxServed}>
+                        <ItemCont listName="Ready" itemName="Burger" amount={2} table={1} time="some time" update={this.props.update}/>
+                        <ItemCont listName="Ready" itemName="Salad" amount={3} table={7} time="some time" update={this.props.update}/>
+                    </td>
+               
             );
-        } else if (this.props.name === 'To Be Served' || this.props.name === 'Cooking') {
+        } else if (this.props.name === 'Served') {
             return (
-                <td className={this.props.classes.boxToBeServed}>
-                    <ItemCont />
-                </td>
+               
+                    <td className={this.props.classes.boxServed}>
+                        {this.getItems()} 
+                        <ItemCont listName="Served" itemName="Burger" amount={2} table={1} time="some time" update={this.props.update} />
+                        <ItemCont listName="Served" itemName="Salad" amount={3} table={7} time="some time" update={this.props.update} />
+                    </td>
+           
+            );
+        } else if (this.props.name === 'To Be Served') {
+            return (
+               
+                    <td className={this.props.classes.boxToBeServed}>
+                        <ItemCont listName="To Be Served" itemName="Pizza" amount={5} table={3} time="some time" update={this.props.update}/>
+                    </td>
+            
+            );
+        } else if (this.props.name === 'Cooking') {
+            return (
+              
+                    <td className={this.props.classes.boxToBeServed}>
+                        <ItemCont listName="Cooking" itemName="Pizza" amount={5} table={3} time="some time" update={this.props.update} />
+                    </td>
+               
             );
         } else {
             return (
-                <td className={this.props.classes.boxQueue}>
-                    <ItemCont />
-                </td>
+           
+                    <td className={this.props.classes.boxQueue}>
+                        <ItemCont listName="Queue" itemName="Chips" amount={1} table={2} time="some time" update={this.props.update}/>
+                    </td>
+           
             );
         }
     }
 
+    getItems(){
 
+    }
 
     render() {
         const { classes } = this.props;
@@ -156,9 +182,8 @@ class ListContainer extends React.Component<IProps, {}>{
                     <div className={classes.scroll}>
                         <table className={classes.table2}>
                         <tr>
-                            {this.getBox()}
+                            {this.getBox()}     
                         </tr>
-                        
                         </table>
                     </div>
                 </table>

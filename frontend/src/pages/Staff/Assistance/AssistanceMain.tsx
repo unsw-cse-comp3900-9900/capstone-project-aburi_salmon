@@ -1,8 +1,7 @@
 import React from 'react';
-import {  createStyles, withStyles, WithStyles, Theme, Link } from '@material-ui/core';
+import {  createStyles, withStyles, WithStyles, Theme, Link} from '@material-ui/core';
 import './../Assistance/Assistance.css';
 import TableInfo from './../Assistance/TableInfo';
-
 //https://material-ui.com/components/menus/#menus
 //https://stackoverflow.com/questions/58630490/how-to-convert-functional-componenet-to-class-component-in-react-in-material
 
@@ -35,20 +34,32 @@ const styles = (theme: Theme) =>
             //border: '1px solid grey',
             height: '100%',
             width: '100%',
+            overflow: 'auto',
         },
         wrapper: {
             width: '100%',
             //paddingLeft: '2%',
             //paddingRight: '2%',
             textAlign: 'left',
+
+        },
+        key: {
+            position: 'relative',
+            bottom:'-25%',
+            //border: '1px solid black'
+        },
+        red: {
+            color: 'red',
+            backgroundColor: 'white',
+        },
+        green:{
+            color: 'green',
+            backgroundColor: 'white',
         },
 
     });
-export interface IProps extends WithStyles<typeof styles> {
-    //numTables: number,
-    //occupiedTables: Array<number>,
-    //paidTables: Array<number>,
-} 
+export interface IProps extends WithStyles<typeof styles> {} 
+
 
 class Assistance extends React.Component<IProps, {
     numTables: number,
@@ -75,26 +86,27 @@ class Assistance extends React.Component<IProps, {
     
     createTables = () => {
         let table = []
-
         for (let i = 0; i < 3; i++){
             let children = []
             for (let j = 0; j < 5; j++){
                 const tableNum = i*5 + j + 1;
                 if (this.state.occupiedTables.includes(tableNum)){
                     children.push(
-                        <div className="column" onClick={()=>this.handleClick(tableNum)}>
-                            <div className="redcard">{tableNum}</div>
+                        <div className="column" key={tableNum} onClick={()=>this.handleClick(tableNum)}>
+                            <div className="redcard">! {tableNum} !
+                            </div>
+                            
                         </div>
                     )
                 } else if (this.state.paidTables.includes(tableNum)){
                     children.push(
-                        <div className="column" onClick={() => this.handleClick(tableNum)}>
+                        <div className="column" key={tableNum} onClick={() => this.handleClick(tableNum)}>
                             <div className="greencard">{tableNum}</div>
                         </div>
                     )
                 } else {
                     children.push(
-                        <div className="column" onClick={() => this.handleClick(tableNum)}>
+                        <div className="column" key={tableNum} onClick={() => this.handleClick(tableNum)}>
                             <div className="card">{tableNum}</div>
                         </div>
                     )
@@ -102,7 +114,7 @@ class Assistance extends React.Component<IProps, {
             }
 
             table.push(
-                <div className="row">{children}</div>
+                <div className="row" key={i}>{children}</div>
             )
         }
         return table;
@@ -129,12 +141,22 @@ class Assistance extends React.Component<IProps, {
         this.setState({ main: true });
     }
 
+    tableKey(){
+        return(
+            <div className={this.props.classes.key}>
+                <mark className={this.props.classes.red}>Red = Occupied</mark>, 
+                <mark className={this.props.classes.green}> Green = Paid </mark>, Grey = Empty
+            </div>
+        );
+    }
+
     render() {
         if (this.state.main) {
             return (
                 <div className={this.props.classes.container}>
-                    <h1>Tables</h1>
+                    <h1>~~ Tables ~~</h1>
                     {this.createTables()}
+                    {this.tableKey()}
                 </div>
             );
         } else {

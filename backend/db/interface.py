@@ -373,26 +373,6 @@ class DB:
             self.__update("UPDATE public.table SET state = True WHERE id = %s", [id])
             return True
 
-    def get_tables(self):
-        return [
-            {
-                "table_id": 1,
-                "occupied": False
-            },
-            {
-                "table_id": 2,
-                "occupied": True
-            },
-            {
-                "table_id": 3,
-                "occupied": True
-            },
-            {
-                "table_id": 4,
-                "occupied": False
-            }
-        ]
-
     def get_order_id(self, table_id):
         order_id = self.__query('SELECT id FROM "order" WHERE table_id = %s', [table_id,])
 
