@@ -11,7 +11,8 @@ export type Item = {
   id: number,
   name: string,
   description: string,
-  ingredient: Array<string>
+  ingredient: Array<string>,
+  price: number,
 }
 
 export type Categories = {
