@@ -45,7 +45,13 @@ menu_item_model = api.schema_model('item', {
         'name': { 'type': 'string' },
         'description': { 'type': 'string' },
         'price': { 'type': 'float' },
-        'visible': { 'type': 'boolean' }
+        'visible': { 'type': 'boolean' },
+        'ingredient': { 
+            'type': 'array',
+            'items': {
+                '$ref': '#/definitions/ingredient' 
+            }
+        }
     }
 })
 
@@ -76,6 +82,31 @@ category_model = api.schema_model('category', {
                     'name': { 'type': 'string' },
                     'position': { 'type': 'integer' }
                 }
+            }
+        }
+    }
+})
+
+ingredient_model = api.schema_model('ingredient', {
+    'type': 'object',
+    'required': ['id', 'name'],
+    'properties': {
+        'id': { 'type': 'integer' },
+        'name': { 'type': 'string' }
+    }
+})
+
+specific_category_model = api.schema_model('specific category', {
+    'type': 'object',
+    'required': ['id', 'name', 'position', 'items'],
+    'properties': {
+        'id': { 'type': 'integer' },
+        'name': { 'type': 'string' },
+        'position': { 'type': 'integer' },
+        'items': {
+            'type': 'array',
+            'items': {
+                '$ref': '#/definitions/item'
             }
         }
     }

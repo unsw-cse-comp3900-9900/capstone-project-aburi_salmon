@@ -183,11 +183,12 @@ class DB:
         category = {
             'id': id,
             'name': rows[0][1],
-            'position': rows[0][2]
+            'position': rows[0][2],
+            'items': self.get_items_by_category(id)
         }
 
         return category
-    
+        
     def create_item(self, item):
         self.__insert(
             'INSERT INTO item (name, description, price, visible) VALUES (%s, %s, %s, %s)',
@@ -207,7 +208,8 @@ class DB:
             'name': row[1],
             'description': row[2],
             'price': row[3],
-            'visible': row[4]
+            'visible': row[4],
+            'ingredients': self.get_item_ingredients(row[0])
         } for row in rows]
 
     def get_item_by_id(self, id):
@@ -221,7 +223,8 @@ class DB:
             'name': itemRow[1],
             'description': itemRow[2],
             'price': itemRow[3],
-            'visible': itemRow[4]
+            'visible': itemRow[4],
+            'ingredients': self.get_item_ingredients(id)
         }
 
     def get_items_by_category(self, category_id):
@@ -238,7 +241,8 @@ class DB:
             'name': row[1],
             'description': row[2],
             'price': row[3],
-            'visible': row[4]
+            'visible': row[4],
+            'ingredients': self.get_item_ingredients(row[0])
         } for row in rows]
 
     def edit_item(self, editStatement, editArr):
@@ -269,6 +273,7 @@ class DB:
         return self.__update(editStatement, editArr)
 
     def delete_category(self, id):
+        # Implement this later
         pass
 
     def add_item_to_category(self, category_id, item_id, position):
@@ -301,39 +306,72 @@ class DB:
         )
         return True
 
+    def get_ingredient_by_id(self, id):
+        rows = self.__query(
+            'SELECT * FROM ingredient WHERE id = %s',
+            [id]
+        )
 
-    def get_item(self, test):
-        rows = self.__query('SELECT * FROM item WHERE price > %s', [test,])
-
-        if (not rows):
+        if (not rows or not rows[0]):
             return None
 
-        category = [{
-            'id': row[0],
-            'name': row[1],
-            'description': row[2],
-            'price': row[3]
-            } for row in rows]
-        return category
-    
-    def get_ingredient(self, test):
-        rows = self.__query('SELECT * FROM ingredient WHERE id > %s', [test,])
+        ingredient = rows[0]
+        return {
+            'id': ingredient[0],
+            'name': ingredient[1]
+        }
 
+    def get_item_ingredients(self, id):
+        rows = self.__query(
+            'SELECT * FROM ingredient i JOIN item_ingredient ii on (i.id = ii.ingredient_id) WHERE ii.item_id = %s',
+            [id]
+        )
+        
         if (not rows):
-            return None
+            return []
 
-        category = [{
+        return [{
             'id': row[0],
             'name': row[1]
-            } for row in rows]
-        return category
-    
+        } for row in rows]
+
+    def edit_ingredient(self, editStatement, editArr):
+        self.__update(editStatement, editArr)
+        return True
+
+    def delete_ingredient(self, id):
+        rows = self.__query(
+            'SELECT count(item_id) FROM item_ingredient WHERE ingredient_id = %s',
+            [id]
+        )
+
+        if (rows[0][0]):
+            return False
+        
+        return self.__delete(
+            'DELETE FROM ingredient WHERE id = %s',
+            [id]
+        )
+
+    def add_ingredient_to_item(self, item_id, ingredient_id):
+        self.__update(
+            'INSERT INTO item_ingredient (item_id, ingredient_id) VALUES (%s, %s)',
+            [item_id, ingredient_id]
+        )
+
+        return True
+
+    def remove_ingredient_from_item(self, item_id, ingredient_id):
+        return self.__delete(
+            'DELETE FROM item_ingredient WHERE item_id = %s AND ingredient_id = %s',
+            [item_id, ingredient_id]
+        )
+
     def get_quantity(self, item_order_id):
         quantity = self.__query('SELECT quantity FROM item_order WHERE id = %s', [item_order_id])
 
         return quantity[0][0]  
 
-    def get_ingredient_from_item(self, test):
         rows = self.__query('SELECT ing.name FROM item_ingredient ii, ingredient ing, item i WHERE ii.ingredient_id = ing.id AND i.name = %s AND ii.item_id = i.id GROUP BY ing.id', [test,])
 
         if (not rows):
@@ -343,21 +381,6 @@ class DB:
         for row in rows:
             ingredient.append(row[0])
         return ingredient
-
-
-    def get_item_from_category(self, test):
-        rows = self.__query('SELECT i.id, i.name, i.description FROM category_item ci, category c, item i WHERE ci.category_id = c.id AND c.name = %s AND ci.item_id = i.id GROUP BY i.id', [test,])
-
-        if (not rows):
-            return None
-
-        item = [{
-            'id': row[0],
-            'name': row[1],
-            'description': row[2],
-            'ingredient': DB.get_ingredient_from_item(self, row[1])
-            } for row in rows]
-        return item
 
 
     def get_ordered_items_customer(self, table_id):
@@ -385,7 +408,6 @@ class DB:
         }
         item_order.append(myDict2)
         return item_order
-
 
 
     def get_ordered_items_status(self, item_name):

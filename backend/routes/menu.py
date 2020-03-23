@@ -17,23 +17,14 @@ class Menu(Resource):
     def get(self):
         # Return the entire menu
 
-        categories = db.get_category(0)
-        lists = []
+        categories = db.get_categories()
 
-        for index in range(len(categories)):
-           for key in categories[index]:
-                if(key == 'name'): 
-                    cat = categories[index][key]
-                    item = db.get_item_from_category(cat)
-                    myDict = {}
-                    myDict['cat'] = cat
-                    myDict['item'] = item
-                    #print(myDict)
-                    lists.append(myDict)
-        
-        #print(lists)
+        menu = []
 
-        return { 'menu': lists }
+        for category in categories:
+            menu.append(db.get_category(category['id']))
+    
+        return { 'menu': menu }
 
 
 @menu.route('/item')
@@ -162,15 +153,12 @@ class MenuCategory(Resource):
         return jsonify({ 'status': 'success' })
 
     @jwt_required
-    @menu.response(200, 'Success')
+    @menu.response(200, 'Success', model=response_model.specific_category_model)
     @menu.response(400, 'Invalid Request')
     def get(self, id):
         category = db.get_category(id)
         if (not category):
             abort(400, 'Invalid request')
-
-        items = db.get_items_by_category(id)
-        category['items'] = items
 
         return jsonify(category)
 
@@ -237,7 +225,7 @@ class CreateMenuIngredient(Resource):
         name = request.get_json().get('name')
         if (not name):
             abort(400, 'Missing ingredient name')
-        
+
         if (not db.create_ingredient(name)):
             abort(400, 'Something went wrong')
 
@@ -246,18 +234,33 @@ class CreateMenuIngredient(Resource):
 @menu.route('/ingredient/<int:id>')
 class MenuIngredient(Resource):
     @jwt_required
-    @menu.response(200, 'Success')
+    @menu.response(200, 'Success', model=response_model.ingredient_model)
     @menu.response(400, 'Invalid Request')
     def get(self, id):
         # Return a specific ingredient
-        pass
+        ingredient = db.get_ingredient_by_id(id)
+        if (not ingredient):
+            abort(400, 'Invalid request, ingredient not found')
+        
+        return jsonify(ingredient)
 
     @jwt_required
     @menu.response(200, 'Success')
     @menu.response(400, 'Invalid Request')
+    @menu.expect(request_model.ingredient_model)
     def put(self, id):
         # Modify a specific ingredient
-        pass
+        name = request.get_json().get('name')
+        if (not name):
+            abort(400, 'Invalid request')
+        
+        editStatement = 'UPDATE ingredient SET name = %s WHERE id = %s'
+        editArr = [name, id]
+
+        if (not db.edit_ingredient(editStatement, editArr)):
+            abort(400, 'Something went wrong')
+
+        return jsonify({ 'status': 'success' })
 
     @jwt_required
     @menu.response(200, 'Success')
@@ -265,7 +268,11 @@ class MenuIngredient(Resource):
     def delete(self, id):
         # Delete a specific ingredient
         # Only if not used
-        pass
+
+        if (not db.delete_ingredient(id)):
+            abort(400, 'Ingredient still in use')
+
+        return jsonify({ 'status': 'success' })
 
 @menu.route('/item/<int:item_id>/ingredient/<int:ingredient_id>')
 class MenuItemIngredient(Resource):
@@ -274,11 +281,17 @@ class MenuItemIngredient(Resource):
     @menu.response(400, 'Invalid Request')
     def post(self, item_id, ingredient_id):
         # Add an ingredient to an item
-        pass
+        if (not db.add_ingredient_to_item(item_id, ingredient_id)):
+            abort(400, 'Something went wrong')
+
+        return jsonify({ 'status': 'success' })
 
     @jwt_required
     @menu.response(200, 'Success')
     @menu.response(400, 'Invalid Request')
     def delete(self, item_id, ingredient_id):
         # Remove ingredient from an item
-        pass
+        if (not db.remove_ingredient_from_item(item_id, ingredient_id)):
+            abort(400, 'Something went wrong')
+
+        return jsonify({ 'status': 'success' })
