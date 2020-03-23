@@ -50,6 +50,7 @@ class DB:
             self.__conn.commit()
             print(e)
             c.close()
+            #return None
             raise e
 
         c.close()
@@ -91,42 +92,28 @@ class DB:
         return result
 
     def validate_key(self, key):
-        # Check if valid key
-        rows = self.__query("SELECT registration_key, staff_type FROM staff_registration WHERE registration_key = %s AND not used;", [key])
+        rows = self.__query("SELECT id FROM staff_registration WHERE registration_key = %s;", [key])
         if (rows == None):
             return False
 
-        # Set used to true
-        self.__update("UPDATE staff_registration SET used = %s WHERE registration_key = %s", [True, key])
-
-        return rows[0][1]
+        return rows[0][0]
         
-    def add_registration_key(self, registration_key, staff_type):
-        self.__insert(
-            'INSERT INTO staff_registration (registration_key, staff_type, used) VALUES (%s, %s, %s);',
-            [registration_key, staff_type, False]
-        )
+    def add_registration_key(self, registration_key):
+        c = self.__conn.cursor()
+        print(registration_key)
+        try:
+            c.execute("INSERT INTO staff_registration (registration_key) VALUES (%s);", (registration_key,))
+        except Exception as e:
+            c.execute("ROLLBACK")
+            self.__conn.commit()
+            print(e)
+            c.close()
+            #return None
+            raise e
+
+        c.close()
+        self.__conn.commit()
         return True
-
-    def get_registration_keys(self, staff_type):
-        if (staff_type):
-            keys = self.__query(
-                'SELECT * FROM staff_registration WHERE staff_type = %s',
-                [staff_type]
-            )
-        else:
-           keys = self.__query('SELECT * FROM staff_registration', [])
-
-        if keys is None:
-            return []
-
-        return [
-            {
-                'key': key[0],
-                'active': key[2],
-                'staff_type': key[1]
-            } for key in keys
-        ]
 
     def register(self, username, password, name, staff_type_id):
         self.__insert("INSERT INTO staff (username, password, name, staff_type_id) VALUES (%s, %s, %s, %s);",
@@ -280,56 +267,39 @@ class DB:
 
         return status
 
-    def new_order(self, table_id, item_id, quantity):
+    def insert_order(self, table_id):
         self.__insert('INSERT INTO "order" (table_id) VALUES (%s);', [table_id,])
 
-        order_id_row = self.__query('SELECT id FROM "order" ORDER BY id DESC LIMIT %s', [1,])
-        order_id = order_id_row[0]
+        order_id = self.__query('SELECT id FROM "order" ORDER BY id DESC LIMIT %s', [1,])[0][0]
 
+        return order_id
+
+    def insert_item_order(self, order_id, item_id, quantity):
         self.__insert("INSERT INTO item_order (item_id, order_id, quantity, status_id) VALUES (%s, %s, %s, %s);",
                       [item_id, order_id, quantity, 1])
-        
+
         return True
+    
 
-    def get_tables(self, test):
-        rows = self.__query('SELECT id, state FROM public.table WHERE id > %s ORDER BY id', [test,])
-
-        if (not rows):
-            return None
-
-        tables = [{
-            'table_id': row[0],
-            'occupied': row[1]
-        } for row in rows]
-
-        return tables
-
-    def beginCooking(self, id):
-        return self.__update("UPDATE item_order SET status_id = 1 WHERE id = %s", [id])
-
-    def finishCooking(self, id):
-        return self.__update("UPDATE item_order SET status_id = 2 WHERE id = %s", [id])
-
-
-    def isTableAvailable(self, table_id):
-        rows = self.__query("SELECT state FROM public.table WHERE id = %s;", [table_id])
-
-        # 1 means the table is unavailable 
-        if (rows != 0):
-            return False
-        else:
-            return True
-
-    def selectTable(self, table_id):
-        rows = self.__query("SELECT state FROM public.table WHERE id = %s;", [table_id])
-
-        # 1 means the table is unavailable 
-        if (rows == True):
-            print('table is taken!')
-            return False
-        else:
-            self.__update("UPDATE public.table SET state = True WHERE id = %s", [id])
-            return True
+    def get_tables(self):
+        return [
+            {
+                "table_id": 1,
+                "occupied": False
+            },
+            {
+                "table_id": 2,
+                "occupied": True
+            },
+            {
+                "table_id": 3,
+                "occupied": True
+            },
+            {
+                "table_id": 4,
+                "occupied": False
+            }
+        ]
 
     def get_order_id(self, table_id):
         order_id = self.__query('SELECT id FROM "order" WHERE table_id = %s', [table_id,])
@@ -365,5 +335,4 @@ class DB:
 
     def delete_order(self, order_id, item_id):
         return self.__delete("DELETE FROM item_order WHERE order_id = %s AND item_id = %s", [order_id, item_id])
-
 

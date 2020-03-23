@@ -25,19 +25,21 @@ class Order(Resource):
     def put(self):
 
         new_order = request.get_json()
-        item_id = new_order.get('item_id')
-        quantity = new_order.get('quantity')
+        num_of_orders = len(new_order.get('new_orders'))
 
         table_id = 3 #assuming table id is 3 for now
-        new = db.new_order(table_id, item_id, quantity)
+        order_id = db.insert_order(table_id)
 
-        if new is None:
-            abort(400, 'Backend is not working as intended or the supplied information was malformed. Make sure that your username is unique.')
+        for i in range(0, num_of_orders):
+            item_id = new_order.get('new_orders')[i].get('item_id')
+            quantity = new_order.get('new_orders')[i].get('quantity')
+            new = db.insert_item_order(order_id, item_id, quantity)
+            if new is None:
+                abort(400, 'Backend is not working as intended or the supplied information was malformed. Make sure that your username is unique.')
 
         response = jsonify({
             'status': 'success'
         })
-
 
 @order.route('/edit')
 class Item(Resource):
