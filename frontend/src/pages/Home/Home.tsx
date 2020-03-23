@@ -15,22 +15,6 @@ class PureHome extends React.Component {
   }
 
 
-  logOut() {
-    localStorage.setItem('username', "");
-    localStorage.setItem('staff', 'false');
-    fetch("/auth/logout", {
-      method: 'OPTIONS',
-    }).then((msg) => {
-      if (msg.status === 200) {
-        alert('you have successfully logged out');
-      } else {
-        alert(msg.status);
-      }
-    }).catch((status) => {
-      console.log(status);
-    });
-    history.push('/');
-  }
 
   
 
@@ -49,6 +33,25 @@ class PureHome extends React.Component {
   }
 }
 
+const  logOut = () => {
+  localStorage.setItem('username', "");
+  localStorage.setItem('staff', 'false');
+  fetch("/auth/logout", {
+    method: 'OPTIONS',
+  }).then((msg) => {
+    if (msg.status === 200) {
+      alert('you have successfully logged out');
+    } else {
+      alert(msg.status);
+    }
+  }).catch((status) => {
+    console.log(status);
+  });
+  history.push('/');
+}
+
+
+
 const isLoggedIn = () => {
   if (localStorage.getItem('staff') !== 'true') {
     return (
@@ -59,7 +62,7 @@ const isLoggedIn = () => {
   }
   else {
     return (
-      <Link to='/table' className="stafflogin">
+      <Link to='/table' className="stafflogin" onClick={() => logOut()}>
         Log Out
       </Link>
     );

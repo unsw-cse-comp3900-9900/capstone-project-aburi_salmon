@@ -61,8 +61,8 @@ class StaffPage extends React.Component<IProps, {currPage: string, staffType: st
     constructor(props: any){
         super(props);
         this.state = {
-            currPage: "Assistance",
-            staffType: "wait",
+            currPage: "Orders",
+            staffType: "kitchen",
             itemNum: -1,
             listName: "none",
         }
@@ -203,8 +203,8 @@ class StaffPage extends React.Component<IProps, {currPage: string, staffType: st
                 <AppBar position="static" className={classes.appbar}>
                     <Toolbar>
                         <Typography variant="h6" className={classes.title}>
-                        {/*Staff: {localStorage.getItem('username')}*/}
-                        Stafftype: {this.state.staffType} List: {this.state.listName} and Amount: {this.state.itemNum}
+                        Staff: {localStorage.getItem('username')}
+                        {/*Stafftype: {this.state.staffType} List: {this.state.listName} and Amount: {this.state.itemNum}*/}
                     </Typography>
                         <Button color="inherit" onClick={() => this.logOut()}>Logout</Button>
                         {/*<Button color="inherit">{this.state.listName}</Button>*/}
