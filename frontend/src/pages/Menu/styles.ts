@@ -21,8 +21,13 @@ export const styles = (theme: Theme) =>
       margin: '5px',
       fontSize: '18px',
     },
+    itemlists: {
+      width: '100%',
+    },
     itemcard: {
       minWidth: 275,
+      maxWidth: '100%',
+      margin: '10px',
     },
     itemname: {
       fontSize: 14,

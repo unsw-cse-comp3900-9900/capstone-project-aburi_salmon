@@ -166,6 +166,14 @@ class MenuPage extends React.Component<IProps, IState> {
     };
   }
 
+  calculateTotalPrice() {
+    let p = 0;
+    this.state.orders.forEach(it => {
+      p += (it.price * it.quantity);
+    });
+    return p;
+  }
+
   // Component did mount gets called before render
   async componentDidMount() {
     const client = new Client();
@@ -220,7 +228,7 @@ class MenuPage extends React.Component<IProps, IState> {
             </div>
           }
           second={
-            <div>
+            <div className={classes.itemlists}>
               {
                 this.state.orders.map(order => {
                   return (
@@ -240,7 +248,9 @@ class MenuPage extends React.Component<IProps, IState> {
             </div>
           }
           third={
-            <div></div>
+            <div>
+              <Typography variant="h6">Total price: ${this.calculateTotalPrice()}</Typography>
+            </div>
           }
         />
 
