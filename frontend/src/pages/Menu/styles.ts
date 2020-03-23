@@ -33,7 +33,9 @@ export const styles = (theme: Theme) =>
     },
     divmodal: {
       position: 'absolute',
-      width: 400,
+      flexGrow: 1,
+      width: '60vw',
+      height: '45vw',
       backgroundColor: theme.palette.background.paper,
       border: '2px solid #000',
       boxShadow: theme.shadows[5],
