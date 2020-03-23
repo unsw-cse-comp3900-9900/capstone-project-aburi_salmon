@@ -49,3 +49,10 @@ delete_order_model = api.model('delete_order_model', {
 registration_model = api.model('registration_model', {
     "type": fields.Integer(description='staff_type id')
 })
+
+new_menu_item_model = api.model('menu_item_model', {
+    'name': fields.String(description='name of new menu item'),
+    'description': fields.String(description='description of new menu item'),
+    'price': fields.Float(description='price of the new item'),
+    'visible': fields.Boolean(description='is the item visible on the menu')
+})

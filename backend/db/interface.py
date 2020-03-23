@@ -8,7 +8,7 @@ class DB:
     def __init__(self, dbConfig=DbConfig):
         self.__conn = psycopg2.connect(dbConfig.config())
 
-    def __query(self, query, params):
+    def __query(self, query, params=[]):
         c = self.__conn.cursor()
         try:
             c.execute(query, params)
@@ -186,6 +186,28 @@ class DB:
             } for row in rows]
         return category
     
+    def create_item(self, item):
+        self.__insert(
+            'INSERT INTO item (name, description, price, visible) VALUES (%s, %s, %s, %s)',
+            [item.get('name'), item.get('description'), item.get('price'), item.get('visible')]
+        )
+        return True
+
+    def get_all_menu_items(self):
+        rows = self.__query(
+            'SELECT * FROM item'
+        )
+        if (not rows):
+            return []
+
+        return [{
+            'id': row[0],
+            'name': row[1],
+            'description': row[2],
+            'price': row[3],
+            'visible': row[4]
+        } for row in rows]
+
     def get_item(self, test):
         rows = self.__query('SELECT * FROM item WHERE price > %s', [test,])
 
@@ -385,5 +407,4 @@ class DB:
 
     def delete_order(self, order_id, item_id):
         return self.__delete("DELETE FROM item_order WHERE order_id = %s AND item_id = %s", [order_id, item_id])
-
 

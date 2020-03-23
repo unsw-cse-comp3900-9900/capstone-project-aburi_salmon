@@ -36,3 +36,24 @@ tables_model = api.schema_model('tables', {
         }
     }
 })
+
+menu_items_model = api.schema_model('items',  {
+    'type': 'object',
+    'required': ['items'],
+    'properties': {
+        'items': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'required': ['id', 'name', 'description', 'price', 'visible'],
+                'properties': {
+                    'id': { 'type': 'integer' },
+                    'name': { 'type': 'string' },
+                    'description': { 'type': 'string' },
+                    'price': { 'type': 'float' },
+                    'visible': { 'type': 'boolean' }
+                }
+            }
+        }
+    }
+})

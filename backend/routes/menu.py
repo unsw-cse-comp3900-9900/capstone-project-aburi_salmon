@@ -3,7 +3,8 @@ from flask_restx import Resource, abort, reqparse, fields
 from flask_jwt_extended import get_jwt_claims, jwt_required
 
 from app import api, db
-from model.request_model import *
+from model.request_model import new_menu_item_model
+from model.response_model import menu_items_model
 
 menu = api.namespace('menu', description='Menu Route')
 
@@ -39,16 +40,22 @@ class CreateMenuItem(Resource):
     @jwt_required
     @menu.response(200, 'Success')
     @menu.response(400, 'Invalid Request')
+    @menu.expect(new_menu_item_model)
     def post(self):
         # Create a new menu item
-        pass
+        item = request.get_json()
+        if (not db.create_item(item)):
+            abort(400, 'Invalid request')
+        
+        return jsonify({ 'status': 'success' })
 
     @jwt_required
-    @menu.response(200, 'Success')
+    @menu.response(200, 'Success', model=menu_items_model)
     @menu.response(400, 'Invalid Request')
     def get(self):
         # Get all menu items
-        pass
+        items = db.get_all_menu_items()
+        return jsonify({ 'items': items })
 
 @menu.route('/item/<int:id>')
 class MenuItem(Resource):
