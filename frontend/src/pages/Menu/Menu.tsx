@@ -1,5 +1,5 @@
 import React from 'react';
-import { withStyles, TextField, WithStyles, createStyles } from '@material-ui/core';
+import { withStyles, TextField, WithStyles, createStyles, Modal } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -21,6 +21,7 @@ interface IProps extends WithStyles<typeof styles> { }
 interface IState {
   menu: MenuModel | null;
   value: string;
+  openModal: boolean;
 }
 
 class MenuPage extends React.Component<IProps, IState> {
@@ -29,9 +30,12 @@ class MenuPage extends React.Component<IProps, IState> {
     this.state = {
       menu: null,
       value: "Sushi",
+      openModal: false,
     }
     // To bind the tab change
     this.handleTabChange = this.handleTabChange.bind(this);
+    this.handleOpenModal = this.handleOpenModal.bind(this);
+    this.handleCloseModal = this.handleCloseModal.bind(this);
   }
 
   generateItemsInCategory(items: Array<ItemModel>, categoryName: string){
@@ -69,6 +73,14 @@ class MenuPage extends React.Component<IProps, IState> {
     });
   }
 
+  handleOpenModal(event: React.ChangeEvent<{}>) {
+
+  }
+
+  handleCloseModal(event: React.ChangeEvent<{}>) {
+
+  }
+
   tabProps(index: string) {
     return {
       id: `tab-${index}`,
@@ -81,7 +93,10 @@ class MenuPage extends React.Component<IProps, IState> {
   async componentDidMount() {
     const client = new Client();
     const m: MenuModel | null = await client.getMenu();
-    this.setState({ menu: m });
+    this.setState({ 
+      menu: m, 
+      value: m?.menu[0].cat ? m?.menu[0].cat : "",
+    });
   }
 
   render() {
@@ -111,6 +126,16 @@ class MenuPage extends React.Component<IProps, IState> {
               {
                 this.state.menu?.menu.map(category => this.generateItemsInCategory(category.item, category.cat))
               }
+              <Modal
+                aria-labelledby=""
+                aria-describedby=""
+                open={this.state.openModal}
+                onClose={this.handleCloseModal}
+              >
+                <div>
+                  
+                </div>
+              </Modal>
             </div>
           }
         />

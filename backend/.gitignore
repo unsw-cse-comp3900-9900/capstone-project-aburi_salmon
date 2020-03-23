@@ -113,3 +113,5 @@ testdb.py
 
 config.py
 .idea/
+
+.DS_Store
