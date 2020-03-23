@@ -9,7 +9,7 @@ order = api.namespace('order', description='Order Route')
 
 @order.route('/order')
 class Order(Resource):
-    @jwt_required
+    #@jwt_required
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
     def get(self):
@@ -98,10 +98,11 @@ class Item(Resource):
         if item_order_id is None:
             abort(400, 'No existing order with that item, please make a new order instead.')
         
+        check = 0
         for row in item_order_id:
             print("row")
-            print(row)
-            order_status = db.get_order_status(row)
+            print(row[0])
+            order_status = db.get_order_status(row[0])
             print("order_status")
             print(order_status)
             if order_status != 1:
@@ -109,28 +110,16 @@ class Item(Resource):
                 continue
             else:
                 new = db.delete_order(row)
+                check = 1
+                print("NEW")
+                print(new)
                 break
 
-            response = jsonify({
-            'status': 'success'
-            })
-
-##############################################
-
-        order_id = db.get_order_id(table_id)
-        if order_id is None:
-            abort(400, 'Table has not order anything yet.')
-
-        order_status = db.get_order_status(order_id, item_id)
-
-        if order_status is None:
-            abort(400, 'No existing order with that item, please make a new order instead.')
-        elif order_status != 1:
+        if check == 0:
             abort(400, 'Cannot delete order since order has left the QUEUE status.')
-
-        new = db.delete_order(order_id, item_id)
-
+        
         response = jsonify({
             'status': 'success'
         })
+
 

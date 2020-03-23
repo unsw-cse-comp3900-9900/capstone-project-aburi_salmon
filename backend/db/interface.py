@@ -334,5 +334,6 @@ class DB:
         return self.__update("UPDATE item_order SET quantity = %s, status_id = 1 WHERE id = %s", [new_quantity, item_order_id])
 
     def delete_order(self, item_order_id):
+        print("masuk")
         return self.__delete("DELETE FROM item_order WHERE id = %s", [item_order_id,])
 
