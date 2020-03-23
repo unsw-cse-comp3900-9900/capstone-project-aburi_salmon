@@ -1,4 +1,4 @@
-import { Tables, Menu } from "./models";
+import { Tables, Menu, ItemList } from "./models";
 
 const apiUrl = "http://localhost:5000";
 
@@ -38,58 +38,41 @@ export class Client {
 
   async getMenu() {
     try {
-      // const r: Response = await fetch(apiUrl + '/menu', {
-      //   method: 'GET',
-      //   credentials: 'include',
-      //   mode: 'cors'
-      // });
+      const r: Response = await fetch(apiUrl + '/menu', {
+        method: 'GET',
+        credentials: 'include',
+        mode: 'cors',
+      });
 
-      // const j: Menu = await r.json();
+      const j: Menu = await r.json();
 
-      // return j;
-      return {
-        "menu": [
-          {
-            "cat": "Sushi",
-            "item": [
-              {
-                "id": 1,
-                "name": "Aburi Salmon",
-                "description": "Nigiri sushi with flame seared salmon",
-                "ingredient": [
-                  "Salmon"
-                ],
-                "price": 4.5
-              },
-              {
-                "id": 2,
-                "name": "Dragon Roll",
-                "description": "California roll topped with eel",
-                "ingredient": [
-                  "Avocado",
-                  "Eel"
-                ],
-                "price": 2.5
-              }
-            ]
-          },
-          {
-            "cat": "Dessert",
-            "item": [
-              {
-                "id": 3,
-                "name": "Matcha Mochi",
-                "description": "Perfectly chewy with a hint of sweetness, Matcha Mochi is timeless Japanese sweet enjoyed by all ages.",
-                "ingredient": [],
-                "price": 3.5
-              }
-            ]
-          }
-        ]
-      };
+      return j;
     } catch (e) {
       console.error(e);
       return null;
     }
   }
+
+  async getListItem(listStatus: number){
+    try {
+      const r: Response = await fetch(apiUrl + '/kitchen', {
+        method: 'PUT',
+        credentials: 'include',
+        mode: 'cors',
+        body: JSON.stringify({
+          status: listStatus,
+        }),
+      });
+
+      const j: ItemList = await r.json();
+      return j;
+
+
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+
+  }
+
 }

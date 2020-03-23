@@ -1,7 +1,8 @@
 import React from 'react';
 import { createStyles, WithStyles, withStyles } from '@material-ui/core';
 import ItemCont from './../Orders/ItemTemplate';
-
+import { ItemList as ItemListModel} from '../../../api/models';
+import { Client } from '../../../api/client';
 
 const styles = () =>
     createStyles({
@@ -86,7 +87,26 @@ export interface IProps extends WithStyles<typeof styles> {
     update: any;
  }
 
-class ListContainer extends React.Component<IProps, {}>{
+
+class ListContainer extends React.Component<IProps, {itemList: ItemListModel | null}>{
+
+    constructor(props: IProps){
+        super(props);
+        this.state = {
+            itemList: null,
+        }
+    }
+
+    async componentDidMount() {
+        const client = new Client();
+        const m: ItemListModel | null = await client.getListItem(0);
+        this.setState({
+            itemList: m,
+        });
+        console.log('hey1');
+        console.log(m);
+    }
+
     //Get items depending on name
     getHeading(){
         if (this.props.name === 'Served' || this.props.name === 'Ready'){
@@ -125,18 +145,15 @@ class ListContainer extends React.Component<IProps, {}>{
     getBox(){
         if (this.props.name === 'Ready') {
             return (
-             
-                    <td className={this.props.classes.boxServed}>
-                        <ItemCont listName="Ready" itemName="Burger" amount={2} table={1} time="some time" update={this.props.update}/>
-                        <ItemCont listName="Ready" itemName="Salad" amount={3} table={7} time="some time" update={this.props.update}/>
-                    </td>
-               
+                <td className={this.props.classes.boxServed}>
+                    <ItemCont listName="Ready" itemName="Burger" amount={2} table={1} time="some time" update={this.props.update}/>
+                    <ItemCont listName="Ready" itemName="Salad" amount={3} table={7} time="some time" update={this.props.update}/>
+                </td>
             );
         } else if (this.props.name === 'Served') {
             return (
                
                     <td className={this.props.classes.boxServed}>
-                        {this.getItems()} 
                         <ItemCont listName="Served" itemName="Burger" amount={2} table={1} time="some time" update={this.props.update} />
                         <ItemCont listName="Served" itemName="Salad" amount={3} table={7} time="some time" update={this.props.update} />
                     </td>
@@ -155,6 +172,7 @@ class ListContainer extends React.Component<IProps, {}>{
               
                     <td className={this.props.classes.boxToBeServed}>
                         <ItemCont listName="Cooking" itemName="Pizza" amount={5} table={3} time="some time" update={this.props.update} />
+                        <ItemCont listName="Queue" itemName="Chips" amount={1} table={2} time="some time" update={this.props.update}/>
                     </td>
                
             );
@@ -162,16 +180,30 @@ class ListContainer extends React.Component<IProps, {}>{
             return (
            
                     <td className={this.props.classes.boxQueue}>
-                        <ItemCont listName="Queue" itemName="Chips" amount={1} table={2} time="some time" update={this.props.update}/>
+                        
                     </td>
            
             );
         }
     }
+    /*
+    printItems() {
+        let children = [];
+        let ret = [];
+        
+        for (let j = 0; this.state.itemList[j] !== null; j++) {
+            children.push(
+                <ItemCont listName="Queue" itemName="Chips" amount={1} table={2} time="some time" update={this.props.update} />
+            )
+        };
+        ret.push(
+            <td className={this.props.classes.boxQueue}>
+                {children}
+            </td>
+        );
+        return ret;
 
-    getItems(){
-
-    }
+    }*/
 
     render() {
         const { classes } = this.props;

@@ -9,7 +9,7 @@ order = api.namespace('order', description='Order Route')
 
 @order.route('/order')
 class Order(Resource):
-    @jwt_required
+    #@jwt_required
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
     def get(self):
@@ -25,19 +25,25 @@ class Order(Resource):
     def put(self):
 
         new_order = request.get_json()
-        item_id = new_order.get('item_id')
-        quantity = new_order.get('quantity')
+        num_of_orders = len(new_order.get('new_orders'))
 
         table_id = 3 #assuming table id is 3 for now
-        new = db.new_order(table_id, item_id, quantity)
 
-        if new is None:
-            abort(400, 'Backend is not working as intended or the supplied information was malformed. Make sure that your username is unique.')
+        #check if there's anexisting order_id
+        order_id = db.get_order_id(table_id)
+        if(order_id is None):
+            order_id = db.insert_order(table_id)
+
+        for i in range(0, num_of_orders):
+            item_id = new_order.get('new_orders')[i].get('item_id')
+            quantity = new_order.get('new_orders')[i].get('quantity')
+            new = db.insert_item_order(order_id, item_id, quantity)
+            if new is None:
+                abort(400, 'Backend is not working as intended or the supplied information was malformed. Make sure that your username is unique.')
 
         response = jsonify({
             'status': 'success'
         })
-
 
 @order.route('/edit')
 class Item(Resource):
@@ -88,20 +94,30 @@ class Item(Resource):
         item_id = delete_order.get('item_id')
 
         table_id = 3 #assuming table id is 3 for now
-        order_id = db.get_order_id(table_id)
-        if order_id is None:
-            abort(400, 'Table has not order anything yet.')
 
-        order_status = db.get_order_status(order_id, item_id)
+        item_order_id = db.get_item_order_id(table_id, item_id)
+        print("item_order_id")
+        print(item_order_id)
 
-        if order_status is None:
+        if item_order_id is None:
             abort(400, 'No existing order with that item, please make a new order instead.')
-        elif order_status != 1:
+        
+        check = 0
+        for row in item_order_id:
+            order_status = db.get_order_status(row[0])
+            if order_status != 1:
+                #abort(400, 'Cannot modify order since order has left the QUEUE status.')
+                continue
+            else:
+                new = db.delete_order(row)
+                check = 1
+                break
+
+        if check == 0:
             abort(400, 'Cannot delete order since order has left the QUEUE status.')
-
-        new = db.delete_order(order_id, item_id)
-
+        
         response = jsonify({
             'status': 'success'
         })
+
 

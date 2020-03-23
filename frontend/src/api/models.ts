@@ -23,3 +23,13 @@ export type Categories = {
 export type Menu = {
   menu: Array<Categories>
 }
+
+export type ListItem = {
+  itemName: string,
+  quantity: number,
+  price: number,
+}
+
+export type ItemList = {
+  list: Array<ListItem>
+}
