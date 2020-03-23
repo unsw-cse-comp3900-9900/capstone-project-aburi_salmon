@@ -208,6 +208,26 @@ class DB:
             'visible': row[4]
         } for row in rows]
 
+    def get_item_by_id(self, id):
+        rows = self.__query('SELECT * FROM item WHERE id = %s', [id])
+        if (not rows):
+            return None
+        
+        itemRow = rows[0]
+        return {
+            'id': itemRow[0],
+            'name': itemRow[1],
+            'description': itemRow[2],
+            'price': itemRow[3],
+            'visible': itemRow[4]
+        }
+
+    def edit_item(self, editStatement, editArr):
+        return self.__update(editStatement, editArr)
+
+    def delete_item(self, id):
+        return self.__delete("DELETE FROM item WHERE id = %s", [id])
+
     def get_item(self, test):
         rows = self.__query('SELECT * FROM item WHERE price > %s', [test,])
 

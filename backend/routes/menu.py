@@ -4,7 +4,7 @@ from flask_jwt_extended import get_jwt_claims, jwt_required
 
 from app import api, db
 from model.request_model import new_menu_item_model
-from model.response_model import menu_items_model
+from model.response_model import menu_items_model, menu_item_model
 
 menu = api.namespace('menu', description='Menu Route')
 
@@ -62,23 +62,53 @@ class MenuItem(Resource):
     @jwt_required
     @menu.response(200, 'Success')
     @menu.response(400, 'Invalid Request')
+    @menu.expect(new_menu_item_model)
     def put(self, id):
         # Modify a menu item
-        pass
+        edit = request.get_json()
+        editArr = []
+        editStatement = 'UPDATE item SET '
+        if (edit.get('name')):
+            editStatement += "name = %s, "
+            editArr.append(edit.get('name'))
+        if (edit.get('description')):
+            editStatement += "description = %s, "
+            editArr.append(edit.get('description'))
+        if (edit.get('price')):
+            editStatement += "price = %s, "
+            editArr.append(edit.get('price'))
+        if (edit.get('visible')):
+            editStatement += "visible = %s, "
+            editArr.append(edit.get('visible'))
+
+        editStatement = editStatement.strip(', ') + ' WHERE id = %s'
+        editArr.append(id)
+        if (not db.edit_item(editStatement, editArr)):
+            abort(400, 'Something went wrong')
+
+        return jsonify({ 'status': 'success' })
+
 
     @jwt_required
-    @menu.response(200, 'Success')
+    @menu.response(200, 'Success', model=menu_item_model)
     @menu.response(400, 'Invalid Request')
     def get(self, id):
         # Get a specific menu item
-        pass
+        item = db.get_item_by_id(id)
+        if (not item):
+            abort(400, 'Invalid request')
+        
+        return jsonify(item)
 
     @jwt_required
     @menu.response(200, 'Success')
     @menu.response(400, 'Invalid Request')
     def delete(self, id):
         # Delete a specific menu item
-        pass
+        if (not db.delete_item(id)):
+            abort(400, 'Invalid request')
+
+        return jsonify({ 'status': 'success' })
 
 
 @menu.route('/category')

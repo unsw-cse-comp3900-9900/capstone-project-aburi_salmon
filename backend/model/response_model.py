@@ -37,6 +37,18 @@ tables_model = api.schema_model('tables', {
     }
 })
 
+menu_item_model = api.schema_model('item', {
+    'type': 'object',
+    'required': ['id', 'name', 'description', 'price', 'visible'],
+    'properties': {
+        'id': { 'type': 'integer' },
+        'name': { 'type': 'string' },
+        'description': { 'type': 'string' },
+        'price': { 'type': 'float' },
+        'visible': { 'type': 'boolean' }
+    }
+})
+
 menu_items_model = api.schema_model('items',  {
     'type': 'object',
     'required': ['items'],
@@ -44,15 +56,7 @@ menu_items_model = api.schema_model('items',  {
         'items': {
             'type': 'array',
             'items': {
-                'type': 'object',
-                'required': ['id', 'name', 'description', 'price', 'visible'],
-                'properties': {
-                    'id': { 'type': 'integer' },
-                    'name': { 'type': 'string' },
-                    'description': { 'type': 'string' },
-                    'price': { 'type': 'float' },
-                    'visible': { 'type': 'boolean' }
-                }
+                '$ref': '#/definitions/item'
             }
         }
     }
