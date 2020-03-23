@@ -1,8 +1,8 @@
 import React from 'react';
-import {  createStyles, withStyles, WithStyles, Theme, Link } from '@material-ui/core';
+import {  createStyles, withStyles, WithStyles, Theme, Link, ListItemIcon } from '@material-ui/core';
 import './../Assistance/Assistance.css';
 import TableInfo from './../Assistance/TableInfo';
-
+import PriorityHighIcon from '@material-ui/icons/PriorityHigh';
 //https://material-ui.com/components/menus/#menus
 //https://stackoverflow.com/questions/58630490/how-to-convert-functional-componenet-to-class-component-in-react-in-material
 
@@ -59,11 +59,8 @@ const styles = (theme: Theme) =>
         },
 
     });
-export interface IProps extends WithStyles<typeof styles> {
-    //numTables: number,
-    //occupiedTables: Array<number>,
-    //paidTables: Array<number>,
-} 
+export interface IProps extends WithStyles<typeof styles> {} 
+
 
 class Assistance extends React.Component<IProps, {
     numTables: number,
@@ -90,7 +87,6 @@ class Assistance extends React.Component<IProps, {
     
     createTables = () => {
         let table = []
-
         for (let i = 0; i < 3; i++){
             let children = []
             for (let j = 0; j < 5; j++){
@@ -98,7 +94,9 @@ class Assistance extends React.Component<IProps, {
                 if (this.state.occupiedTables.includes(tableNum)){
                     children.push(
                         <div className="column" onClick={()=>this.handleClick(tableNum)}>
-                            <div className="redcard">{tableNum}</div>
+                            <div className="redcard">! {tableNum} !
+                            </div>
+                            
                         </div>
                     )
                 } else if (this.state.paidTables.includes(tableNum)){
@@ -157,7 +155,7 @@ class Assistance extends React.Component<IProps, {
         if (this.state.main) {
             return (
                 <div className={this.props.classes.container}>
-                    <h1>Tables</h1>
+                    <h1>~~ Tables ~~</h1>
                     {this.createTables()}
                     {this.tableKey()}
                 </div>

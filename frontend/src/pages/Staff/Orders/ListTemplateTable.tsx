@@ -59,7 +59,8 @@ const styles = () =>
             flexGrow: 1,
             width: '100%',
             padding: '10px 5px 5px 10px',
-            background: 'linear-gradient(0deg, rgba(133, 160, 255, 1) 0%, rgba(255, 255, 255, 1) 100%)',
+            background: 'linear-gradient(0deg, rgba(177, 194, 255, 1) 0%, rgba(255, 255, 255, 1) 100%)',
+            //background: 'linear-gradient(0deg, rgba(133, 160, 255, 1) 0%, rgba(255, 255, 255, 1) 100%)',
         },
 
         scroll: {
@@ -86,9 +87,7 @@ export interface IProps extends WithStyles<typeof styles> {
  }
 
 class ListContainer extends React.Component<IProps, {}>{
-
     //Get items depending on name
-
     getHeading(){
         if (this.props.name === 'Served' || this.props.name === 'Ready'){
             return(
@@ -123,15 +122,14 @@ class ListContainer extends React.Component<IProps, {}>{
                 <td className={this.props.classes.boxServed}>
                     <ItemCont listName="Ready" itemName="Burger" amount={2} table={1} time="some time" update={this.props.update}/>
                     <ItemCont listName="Ready" itemName="Salad" amount={3} table={7} time="some time" update={this.props.update}/>
-
                 </td>
             );
         } else if (this.props.name === 'Served') {
             return (
                 <td className={this.props.classes.boxServed}>
+                    {this.getItems()} 
                     <ItemCont listName="Served" itemName="Burger" amount={2} table={1} time="some time" update={this.props.update} />
                     <ItemCont listName="Served" itemName="Salad" amount={3} table={7} time="some time" update={this.props.update} />
-
                 </td>
             );
         } else if (this.props.name === 'To Be Served') {
@@ -153,6 +151,10 @@ class ListContainer extends React.Component<IProps, {}>{
                 </td>
             );
         }
+    }
+
+    getItems(){
+
     }
 
     render() {
