@@ -15,9 +15,9 @@ class Session(Resource):
     @jwt_required
     def get(self):
         role_claim = get_jwt_claims().get('role')
-        table_claim = get_jwt_claims().get('table')
+        order_claim = get_jwt_claims().get('order')
 
-        if role_claim is None and table_claim is None:
+        if role_claim is None and order_claim is None:
             abort(401, 'User is not attached to any session')
         if role_claim is not None:
             return jsonify({
@@ -28,7 +28,7 @@ class Session(Resource):
         return jsonify(
             {
                 'user_type': 'TABLE',
-                'identifier': table_claim
+                'identifier': order_claim
             }
         )
 

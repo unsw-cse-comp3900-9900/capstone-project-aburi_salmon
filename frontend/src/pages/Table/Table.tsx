@@ -8,6 +8,8 @@ import { styles } from './styles';
 import { Client } from '../../api/client';
 import { Tables as TableModel } from '../../api/models';
 
+const client = new Client();
+
 interface IProps extends WithStyles<typeof styles> { }
 
 interface IState {
@@ -37,13 +39,13 @@ class TablePage extends React.Component<IProps, IState> {
     });
   }
 
-  goToOrder() {
+  async goToOrder(table_id: number) {
+    await client.selectTable(table_id)
     history.push('/menu');
   }
 
   // Component did mount gets called before render
   async componentDidMount() {
-    const client = new Client()
     const t: TableModel | null = await client.getTables();
     this.setState({ tables: t });
   }
@@ -92,7 +94,7 @@ class TablePage extends React.Component<IProps, IState> {
             />
           }
           third={
-            <Button className={classes.gotonextpagebutton} variant="contained" disabled={!this.state.allowed} onClick={() => this.goToOrder()}>
+            <Button className={classes.gotonextpagebutton} variant="contained" disabled={!this.state.allowed} onClick={() => this.goToOrder(parseInt(this.state.value))}>
               Go to next page
           </Button>
           }

@@ -458,14 +458,18 @@ class DB:
             return True
 
     def selectTable(self, table_id):
-        rows = self.__query("SELECT state FROM public.table WHERE id = %s;", [table_id])
+        rows = self.__query('SELECT state FROM "table" WHERE id = %s;', [table_id])
+
+        if (not rows):
+            print('Something went wrong')
+            return False
 
         # 1 means the table is unavailable 
-        if (rows == True):
+        if (rows[0][0]):
             print('table is taken!')
             return False
         else:
-            self.__update("UPDATE public.table SET state = True WHERE id = %s", [id])
+            self.__update('UPDATE "table" SET state = %s WHERE id = %s', [True, table_id])
             return True
 
     def get_order_id(self, table_id):
