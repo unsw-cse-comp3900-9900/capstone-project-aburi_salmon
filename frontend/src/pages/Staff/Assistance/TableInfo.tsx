@@ -1,5 +1,5 @@
 import React from 'react';
-import { createStyles, WithStyles, Theme, withStyles, Button } from '@material-ui/core';
+import { createStyles, WithStyles, Theme, withStyles, Button, Box } from '@material-ui/core';
 
 
 const styles = (theme: Theme) =>
@@ -12,7 +12,6 @@ const styles = (theme: Theme) =>
             paddingLeft: '2%',
             height: '95%',
             paddingRight: '2%',
-            //border: '2px solid black',
             overflow: 'auto',
             display: 'block',
         },
@@ -43,8 +42,14 @@ interface Item
     cost: number,
 }
 
+interface IState {
+    items: Item[],
+    total: number,
+    hide: string,
+}
 
-class TableInfo extends React.Component<IProps, {items: Item[], total: number, hide: string}>{
+
+class TableInfo extends React.Component<IProps, IState>{
 
     constructor(props: IProps){
         super(props);
@@ -84,7 +89,7 @@ class TableInfo extends React.Component<IProps, {items: Item[], total: number, h
         this.state = {
             items: newArray,
             total: 1000.20,
-            hide: 'none',
+            hide: 'block',
         };
         //------------------------------------------------
     }
@@ -94,7 +99,7 @@ class TableInfo extends React.Component<IProps, {items: Item[], total: number, h
         let ret = [];
         for (let j = 0; j < this.state.items.length; j++) {
             children.push(
-                <tr>
+                <tr key={j}>
                     <td>{this.state.items[j].name}</td>
                     <td>{this.state.items[j].amount}</td>
                     <td>{this.state.items[j].cost}</td>
@@ -110,7 +115,7 @@ class TableInfo extends React.Component<IProps, {items: Item[], total: number, h
                 </tr>
                 {children}
                 <tr>
-        <td>Item name: {this.state.items.length}</td>
+                    <td>Item name: {this.state.items.length}</td>
                     <td>Amount</td>
                     <td>$###</td>
                 </tr>
@@ -126,9 +131,11 @@ class TableInfo extends React.Component<IProps, {items: Item[], total: number, h
         return (
             <div className={classes.wrapper}>
                 <h1 className = {classes.text}>Table {this.props.tableNumber}</h1>
-                <Button color='secondary' variant="contained" className={classes.paidBut} 
-              
-                                >Resolved</Button>
+                <Box display={this.state.hide} displayPrint="none">
+                    <Button color='secondary' variant="contained" className={classes.paidBut}
+                        onClick={() => this.setState({hide: "none"})}
+                                    >Resolved</Button>
+                </Box>                
                 <hr className={classes.line}></hr>
               
                 {this.printItems()}

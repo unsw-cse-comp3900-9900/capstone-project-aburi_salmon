@@ -82,8 +82,6 @@ const styles = () =>
     });
 export interface IProps extends WithStyles<typeof styles> {
     name: string; //= {'Served', 'Ready', 'To Be Served', 'Cooking'}
-    //update: () => void
-    //array[items]
     update: any;
  }
 
@@ -175,9 +173,10 @@ class ListContainer extends React.Component<IProps, {itemList: ItemList | null}>
                 return (
 
                     <td className={this.props.classes.boxServed}>
-                        {this.state.itemList?.itemList.map(item => (
+                        {this.state.itemList?.itemList.map((item, index) => (
                             <ItemCont listName="Queue" itemName={item.itemName} amount={item.quantity}
-                                table={item.item_id} time="sometime" update={this.props.update} />
+                                table={item.item_id} time="sometime" itemId ={index}
+                                update={this.props.update} />
                         ))}
                     </td>
                 );
@@ -192,9 +191,10 @@ class ListContainer extends React.Component<IProps, {itemList: ItemList | null}>
                 return (
 
                     <td className={this.props.classes.boxServed}>
-                        {this.state.itemList?.itemList.map(item => (
+                        {this.state.itemList?.itemList.map((item, index) => (
                             <ItemCont listName="Queue" itemName={item.itemName} amount={item.quantity}
-                                table={item.item_id} time="sometime" update={this.props.update} />
+                                table={item.item_id} key={item.item_id} time="sometime" itemId={index}
+                                update={this.props.update} />
                         ))}
                     </td>
                 );
@@ -208,9 +208,10 @@ class ListContainer extends React.Component<IProps, {itemList: ItemList | null}>
             if (this.state.itemList?.itemList !== null) {
                 return (
                     <td className={this.props.classes.boxToBeServed}>
-                        {this.state.itemList?.itemList.map(item => (
+                        {this.state.itemList?.itemList.map((item, index) => (
                             <ItemCont listName="Queue" itemName={item.itemName} amount={item.quantity}
-                                table={item.item_id} time="sometime" update={this.props.update} />
+                                table={item.item_id} key={item.item_id} time="sometime" itemId={index}
+                                update={this.props.update} />
                         ))}
                     </td>
                 );
@@ -225,9 +226,10 @@ class ListContainer extends React.Component<IProps, {itemList: ItemList | null}>
                 return (
 
                     <td className={this.props.classes.boxToBeServed}>
-                        {this.state.itemList?.itemList.map(item => (
+                        {this.state.itemList?.itemList.map((item, index) => (
                             <ItemCont listName="Queue" itemName={item.itemName} amount={item.quantity}
-                                table={item.item_id} time="sometime" update={this.props.update} />
+                                table={item.item_id} time="sometime" itemId={index}
+                                update={this.props.update} />
                         ))}
                     </td>
                 );
@@ -243,9 +245,10 @@ class ListContainer extends React.Component<IProps, {itemList: ItemList | null}>
                 return (
                     
                     <td className={this.props.classes.boxQueue}>
-                    {this.state.itemList?.itemList.map(item => (
+                    {this.state.itemList?.itemList.map((item, index) => (
                         <ItemCont listName="Queue" itemName={item.itemName} amount={item.quantity} 
-                                table={item.item_id} time="sometime" update={this.props.update} />
+                                table={item.item_id} time="sometime" itemId={index}
+                                update={this.props.update} />
                         ))}
                     </td>
                 );

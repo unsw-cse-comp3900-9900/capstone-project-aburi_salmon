@@ -7,25 +7,6 @@ import { Client } from './../../../api/client';
 //https://material-ui.com/components/menus/#menus
 //https://stackoverflow.com/questions/58630490/how-to-convert-functional-componenet-to-class-component-in-react-in-material
 
-/*
-Files:
-Staff.tsx
-    - deals with navigation
-    - needs to know the staff to know which tabs to display
-    - will display name and staff type
-
-StaffContainer.tsx
-    - is the container that will display the elements
-
-ItemTemplate.tsx
-    - the template for listing information about an item
-    - will be displayed with float in ListTemplate
-
-ListTemplate.tsx
-    - template for storing items
-*/
-
-
 // How to use withStyles in TS
 const styles = (theme: Theme) =>
     createStyles({
@@ -62,13 +43,14 @@ const styles = (theme: Theme) =>
     });
 export interface IProps extends WithStyles<typeof styles> {} 
 
-
-class Assistance extends React.Component<IProps, {
+interface IState{
     numTables: number,
     selectedTable: number,
     main: boolean,
     tables: TableModel | null,
-}>{
+}
+
+class Assistance extends React.Component<IProps, IState>{
     constructor(props: IProps){
         super(props);
         this.state = {
@@ -94,26 +76,33 @@ class Assistance extends React.Component<IProps, {
     
     createTables = () => {
         let table = [];
-        for (let i = 0; i < 3; i++){
-            let children = [];
-            for (let j = 0; j < 5; j++){
-                const tableNum = i*5 + j;
-                if (this.state.tables?.tables[tableNum].occupied){
-                    children.push(
-                        <div className="column" key={tableNum + 1} onClick={() => this.handleClick(tableNum + 1)}>
-                            <div className="card">{tableNum + 1}
+        let i = 0;
+        let j = 0;
+        let children = [];
+        if(this.state.tables !== null){
+            while(i*5 + j < this.state.tables?.tables.length){
+                while (i * 5 + j < this.state.tables?.tables.length && j < 5){
+                    const tableNum = i*5 + j;
+                    if (this.state.tables !== null && this.state.tables?.tables[tableNum].occupied){
+                        children.push(
+                            <div className="column" key={tableNum + 1} onClick={() => this.handleClick(tableNum + 1)}>
+                                <div className="card">{tableNum + 1}
+                                </div>
                             </div>
-                        </div>
-                    )
-                } else {
-                    children.push(
-                        <div className="column" key={tableNum + 1} onClick={() => this.handleClick(tableNum + 1)}>
-                            <div className="greencard">{tableNum + 1}</div>
-                        </div>
-                    )
-                }
-            }
+                        )
 
+                    } else {
+                        children.push(
+                            <div className="column" key={tableNum + 1} onClick={() => this.handleClick(tableNum + 1)}>
+                                <div className="greencard">{tableNum + 1}</div>
+                            </div>
+                        )
+                    }
+                    j = j + 1;
+                }
+                j = 0;
+                i = i + 1;
+            }
             table.push(
                 <div className="row" key={i}>{children}</div>
             )
