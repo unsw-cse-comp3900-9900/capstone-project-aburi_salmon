@@ -7,16 +7,25 @@ export type Tables = {
   tables: Array<Table>
 }
 
+export type Ingredient = {
+  id: number,
+  name: string,
+}
+
 export type Item = {
   id: number,
   name: string,
   description: string,
-  ingredient: Array<string>
+  ingredients: Array<Ingredient>,
+  price: number,
+  visible: boolean,
 }
 
 export type Categories = {
-  cat: string,
-  item: Array<Item>
+  id: number,
+  name: string,
+  position: number,
+  items: Array<Item>
 }
 
 export type Menu = {

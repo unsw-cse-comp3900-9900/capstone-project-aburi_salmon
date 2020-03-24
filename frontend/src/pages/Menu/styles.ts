@@ -21,10 +21,29 @@ export const styles = (theme: Theme) =>
       margin: '5px',
       fontSize: '18px',
     },
+    itemlists: {
+      width: '100%',
+    },
     itemcard: {
       minWidth: 275,
+      maxWidth: '100%',
+      margin: '10px',
     },
     itemname: {
       fontSize: 14,
+    },
+    itemmodal: {
+      top: '50%',
+      left: '50%',
+    },
+    divmodal: {
+      position: 'absolute',
+      flexGrow: 1,
+      width: '60vw',
+      height: '45vw',
+      backgroundColor: theme.palette.background.paper,
+      border: '2px solid #000',
+      boxShadow: theme.shadows[5],
+      padding: theme.spacing(2, 4, 3),
     }
   });
