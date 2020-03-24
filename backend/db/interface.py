@@ -458,14 +458,18 @@ class DB:
             return True
 
     def selectTable(self, table_id):
-        rows = self.__query("SELECT state FROM public.table WHERE id = %s;", [table_id])
+        rows = self.__query('SELECT state FROM "table" WHERE id = %s;', [table_id])
+
+        if (not rows):
+            print('Something went wrong')
+            return False
 
         # 1 means the table is unavailable 
-        if (rows == True):
+        if (rows[0][0]):
             print('table is taken!')
             return False
         else:
-            self.__update("UPDATE public.table SET state = True WHERE id = %s", [id])
+            self.__update('UPDATE "table" SET state = %s WHERE id = %s', [True, table_id])
             return True
 
     def get_order_id(self, table_id):
@@ -504,13 +508,10 @@ class DB:
         return self.__delete("DELETE FROM item_order WHERE id = %s", [item_order_id,])
 
 
-    def get_order_list(self, status):
-
-        rows = self.__query('SELECT item.name, io.quantity, item.price, item.id FROM item_order io JOIN item ON io.id = item.id WHERE io.status_id == %s', [status])
+   
 
     def get_order_list(self, status):
-
-        rows = self.__query('SELECT item.name, io.quantity, item.price, item.id FROM item_order io JOIN item ON io.id = item.id WHERE io.status_id = %s', [status])
+        rows = self.__query('SELECT item.name, io.quantity, item.price, item.id FROM item_order io JOIN item ON io.item_id = item.id WHERE io.status_id = %s', [status])
 
         if (not rows):
             return None
@@ -523,5 +524,4 @@ class DB:
 
             } for row in rows]
         return orders
-
 

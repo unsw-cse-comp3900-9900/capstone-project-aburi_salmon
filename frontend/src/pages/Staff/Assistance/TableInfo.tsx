@@ -14,10 +14,10 @@ const styles = (theme: Theme) =>
             paddingRight: '2%',
             //border: '2px solid black',
             overflow: 'auto',
-            //display: 'block',
+            display: 'block',
         },
         text: {
-            //float: 'left',
+            float: 'left',
             //position: 'static',
         },
         paidBut: {
@@ -44,7 +44,7 @@ interface Item
 }
 
 
-class TableInfo extends React.Component<IProps, {items: Item[], total: number}>{
+class TableInfo extends React.Component<IProps, {items: Item[], total: number, hide: string}>{
 
     constructor(props: IProps){
         super(props);
@@ -84,6 +84,7 @@ class TableInfo extends React.Component<IProps, {items: Item[], total: number}>{
         this.state = {
             items: newArray,
             total: 1000.20,
+            hide: 'none',
         };
         //------------------------------------------------
     }
@@ -125,6 +126,9 @@ class TableInfo extends React.Component<IProps, {items: Item[], total: number}>{
         return (
             <div className={classes.wrapper}>
                 <h1 className = {classes.text}>Table {this.props.tableNumber}</h1>
+                <Button color='secondary' variant="contained" className={classes.paidBut} 
+              
+                                >Resolved</Button>
                 <hr className={classes.line}></hr>
               
                 {this.printItems()}

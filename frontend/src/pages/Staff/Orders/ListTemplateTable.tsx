@@ -207,7 +207,6 @@ class ListContainer extends React.Component<IProps, {itemList: ItemList | null}>
         } else if (this.props.name === 'To Be Served') {
             if (this.state.itemList?.itemList !== null) {
                 return (
-
                     <td className={this.props.classes.boxToBeServed}>
                         {this.state.itemList?.itemList.map(item => (
                             <ItemCont listName="Queue" itemName={item.itemName} amount={item.quantity}
@@ -238,7 +237,7 @@ class ListContainer extends React.Component<IProps, {itemList: ItemList | null}>
                     </td>
                 );
             }
-        } else {
+        } else if (this.props.name === 'Queue'){
             
             if (this.state.itemList?.itemList !== null){
                 return (
