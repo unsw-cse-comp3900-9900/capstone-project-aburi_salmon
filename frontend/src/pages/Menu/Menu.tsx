@@ -258,11 +258,11 @@ class MenuPage extends React.Component<IProps, IState> {
               {
                 this.state.orders.map((order: OrderItemState) => {
                   return (
-                    <Card className={classes.itemcard}>
-                      <ButtonBase
-                        className={classes.cardaction}
-                        onClick={() => this.openModal(order.item)}
-                      >
+                    <ButtonBase
+                      className={classes.cardaction}
+                      onClick={() => this.openModal(order.item)}
+                    >
+                      <Card className={classes.itemcard}>
                         <CardContent>
                           <Typography variant="h5">
                             {order.item.name}
@@ -271,8 +271,8 @@ class MenuPage extends React.Component<IProps, IState> {
                             ${order.item.price} x {order.quantity} = <b>${order.item.price * order.quantity}</b>
                           </Typography>
                         </CardContent>
-                      </ButtonBase>
-                    </Card>
+                      </Card>
+                    </ButtonBase>
                   );
                 })
               }
@@ -281,7 +281,7 @@ class MenuPage extends React.Component<IProps, IState> {
           third={
             <div>
               <Typography variant="h6">Total price: ${this.calculateTotalPrice()}</Typography>
-              <Button variant="contained" color="primary">
+              <Button variant="contained" color="primary" disabled={this.state.orders.length === 0}>
                 Confirm order
               </Button>
             </div>
