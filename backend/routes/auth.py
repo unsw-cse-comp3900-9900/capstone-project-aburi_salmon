@@ -165,6 +165,8 @@ class RegistrationList(Resource):
 
 @auth.route("/customer", strict_slashes=False)
 class CustomerSession(Resource):
+    # Note: To remove the customer order session, just use the logout route
+    # Create a session cookie for a customer
     @auth.response('200', 'Success')
     @auth.response('400', 'Invalid Request')
     @auth.expect(customer_session_model)
@@ -174,11 +176,17 @@ class CustomerSession(Resource):
         if (not table):
             abort(400, 'Table number not provided')
         
+        print('Creating order item')
         order_id = db.insert_order(table)
-        if (not db.selectTable(table)):
-            abort(400, 'Table is taken')
+        print('Order id = ' + str(order_id))
 
-        identity = User('Customer', None, table)
+        print('Select table ' + str(table))
+        if (not db.selectTable(table)):
+            print('Table ' + str(table) + ' is taken')
+            abort(400, 'Table is taken')
+        print('Table selected')
+
+        identity = User('Customer', None, order_id)
         access_token = create_access_token(identity=identity)
 
         response = jsonify({
