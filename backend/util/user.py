@@ -10,7 +10,7 @@ class User:
 def add_claims_to_access_token(user):
     return {
         'role': user.role,
-        'table': user.table
+        'order': user.order
     }
 
 @jwt.user_identity_loader
