@@ -22,21 +22,10 @@ flask_app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False
 # Persistent
 flask_app.config['JWT_SESSION_COOKIE'] = False
 # Enable CORS
-#flask_app.config['JWT_COOKIE_CSRF_PROTECT'] = False
+flask_app.config['JWT_COOKIE_CSRF_PROTECT'] = False
 CORS(flask_app, supports_credentials=True)
 # With secret on JWT_SECRET_KEY
 flask_app.config['JWT_SECRET_KEY'] = config.JWT_SECRET_KEY
-
-
-#@flask_app.after_request
-#def after_request(response):
-  #response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
-#  response.headers.add('Access-Control-Allow-Headers',
-#                       'Content-Type,Authorization')
-#  response.headers.add('Access-Control-Allow-Methods',
-#                       'GET,PUT,POST,DELETE,OPTIONS')
-#  response.headers.add('Access-Control-Allow-Credentials', 'true')
-#  return response
 
 
 ## Exported variables to routes

@@ -28,10 +28,13 @@ class Kitchen(Resource):
     @kitchen.response(200, 'Success')
     @kitchen.response(400, 'Invalid request')
     @kitchen.response(500, 'Something went wrong')
-    def put(self):
+    def post(self):
         order_update = request.get_json()
         status = order_update.get('status')
         itemlist = db.get_order_list(status)
+        #response = jsonify({
+        #    'status': 'success'
+        #})
         return {'itemList' : itemlist}
     #def put(self):
         #order_update = request.get_json()

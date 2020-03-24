@@ -62,7 +62,7 @@ class StaffPage extends React.Component<IProps, {currPage: string, staffType: st
         super(props);
         this.state = {
             currPage: "Orders",
-            staffType: "kitchen",
+            staffType: "wait",
             itemNum: -1,
             listName: "none",
         }

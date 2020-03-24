@@ -55,17 +55,17 @@ export class Client {
 
   async getListItem(listStatus: number){
     try {
-      const r: Response = await fetch(apiUrl + '/kitchen', {
-        method: 'GET',
+      const r: Response = await fetch(apiUrl + '/kitchen/', {
+        method: 'POST',
         credentials: 'include',
         mode: 'cors',
-        //headers: {
-        //  'Content-Type': 'application/json'
-        //},
-        //body: JSON.stringify({
-        //  status: 1,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          status: listStatus,
         //  id: 1,
-        //}),
+        }),
       });
 
       const j: ItemList = await r.json();
