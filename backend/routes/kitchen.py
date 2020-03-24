@@ -57,3 +57,15 @@ class Kitchen(Resource):
     #def get_order_list(self, status): 
     #    db.get_order_list(status)
 
+@kitchen.route('/<int:id>')
+class KitchenId(Resource):
+    @jwt_required
+    @kitchen.response(200, 'Success')
+    @kitchen.response(400, 'Invalid Request')
+    def get(self, id):
+        itemlist = db.get_order_list(id)
+        if (not itemlist):
+            abort(400, 'Invalid request')
+
+        return {'itemList' : itemlist}
+
