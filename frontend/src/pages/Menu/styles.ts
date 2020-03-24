@@ -25,9 +25,9 @@ export const styles = (theme: Theme) =>
       width: '100%',
     },
     itemcard: {
-      minWidth: 275,
+      minWidth: 250,
       maxWidth: '100%',
-      margin: '10px',
+      margin: '13px',
     },
     itemname: {
       fontSize: 14,
@@ -35,6 +35,10 @@ export const styles = (theme: Theme) =>
     itemmodal: {
       top: '50%',
       left: '50%',
+    },
+    cardaction: {
+      display: 'block',
+      textAlign: 'initial',
     },
     divmodal: {
       position: 'absolute',

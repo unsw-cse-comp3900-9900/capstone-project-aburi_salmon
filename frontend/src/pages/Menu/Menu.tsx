@@ -1,5 +1,5 @@
 import React from 'react';
-import { withStyles, TextField, WithStyles, createStyles, Modal, Grid, FormControl, FormControlLabel, FormGroup } from '@material-ui/core';
+import { withStyles, TextField, WithStyles, createStyles, Modal, Grid, FormControl, FormControlLabel, FormGroup, ButtonBase } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -38,9 +38,14 @@ interface IState {
   // For modal inside this component
   modal: ItemModel | null;
   modalQuantity: number;
+  modalOriginalQuantity: number;
 
   // For list of items that user wants to order
   orders: Array<OrderItemState>;
+
+  // For second button of the order
+  modalSecondButton: string;
+  modalSecondButtonDisable: boolean;
 }
 
 class MenuPage extends React.Component<IProps, IState> {
@@ -54,7 +59,10 @@ class MenuPage extends React.Component<IProps, IState> {
       openModal: false,
       modal: null,
       modalQuantity: 0,
+      modalOriginalQuantity: 0,
       orders: new Array<OrderItemState>(),
+      modalSecondButton: "Add to order",
+      modalSecondButtonDisable: true,
     }
     // To bind the tab change
     this.handleTabChange = this.handleTabChange.bind(this);
@@ -105,6 +113,14 @@ class MenuPage extends React.Component<IProps, IState> {
   }
 
   openModal(item: ItemModel) {
+    let quantity = 0;
+
+    this.state.orders.forEach((it: OrderItemState) => {
+      if (it.item.id === item.id) {
+        quantity = it.quantity;
+      }
+    })
+
     this.setState({
       openModal: true,
 
@@ -113,24 +129,32 @@ class MenuPage extends React.Component<IProps, IState> {
       modal: item,
 
       // Set quantity to 0 for new item. Might need to change this if entry exists
-      modalQuantity: 0,
+      modalQuantity: quantity,
+      modalOriginalQuantity: quantity,
+
+      // Set second button to modify order if quantity is not 0
+      modalSecondButton: quantity === 0 ? "Add to order" : "Modify order",
+      modalSecondButtonDisable: true,
     });
   }
 
   removeModalQuantity() {
     this.setState(prevState => {
       let pq = prevState.modalQuantity;
+      const prevOrgQ = prevState.modalOriginalQuantity;
       if (pq <= 1) pq = 0;
       else pq--;
       return {
         modalQuantity: pq,
+        modalSecondButtonDisable: prevOrgQ < 1 || pq > 0,
       }
     });
   }
 
   addModalQuantity() {
     this.setState({
-      modalQuantity: this.state.modalQuantity + 1
+      modalQuantity: this.state.modalQuantity + 1,
+      modalSecondButtonDisable: false,
     })
   }
 
@@ -141,13 +165,19 @@ class MenuPage extends React.Component<IProps, IState> {
   }
 
   addToOrder(event: React.ChangeEvent<{}>) {
+    const item = this.state.modal!;
+    const quantity = this.state.modalQuantity;
+    console.log(quantity);
     const r: OrderItemState = {
-      item: this.state.modal!,
-      quantity: this.state.modalQuantity,
+      item: item,
+      quantity: quantity,
     }
 
     let orders = this.state.orders;
-    orders.push(r);
+    orders = orders.filter(x => x.item.id !== item.id);
+    if (quantity !== 0) {
+      orders.push(r);
+    }
     this.setState({
       openModal: false,
       orders: orders,
@@ -226,17 +256,22 @@ class MenuPage extends React.Component<IProps, IState> {
           second={
             <div className={classes.itemlists}>
               {
-                this.state.orders.map(order => {
+                this.state.orders.map((order: OrderItemState) => {
                   return (
                     <Card className={classes.itemcard}>
-                      <CardContent>
-                        <Typography variant="h5">
-                          {order.item.name}
-                        </Typography>
-                        <Typography variant="body2" component="p">
-                          ${order.item.price} x {order.quantity} = ${order.item.price * order.quantity}
-                        </Typography>
-                      </CardContent>
+                      <ButtonBase
+                        className={classes.cardaction}
+                        onClick={() => this.openModal(order.item)}
+                      >
+                        <CardContent>
+                          <Typography variant="h5">
+                            {order.item.name}
+                          </Typography>
+                          <Typography variant="body2" component="p">
+                            ${order.item.price} x {order.quantity} = <b>${order.item.price * order.quantity}</b>
+                          </Typography>
+                        </CardContent>
+                      </ButtonBase>
                     </Card>
                   );
                 })
@@ -246,6 +281,9 @@ class MenuPage extends React.Component<IProps, IState> {
           third={
             <div>
               <Typography variant="h6">Total price: ${this.calculateTotalPrice()}</Typography>
+              <Button variant="contained" color="primary">
+                Confirm order
+              </Button>
             </div>
           }
         />
@@ -307,7 +345,7 @@ class MenuPage extends React.Component<IProps, IState> {
               </Grid>
               <Grid item xs={6}>
                 <Button onClick={this.handleCloseModal}>Cancel</Button>
-                <Button disabled={this.state.modalQuantity < 1} onClick={this.addToOrder}>Add to Order</Button>
+                <Button disabled={this.state.modalSecondButtonDisable} onClick={this.addToOrder}>{this.state.modalSecondButton}</Button>
               </Grid>
             </Grid>
           </div>
