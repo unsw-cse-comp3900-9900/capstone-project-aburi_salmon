@@ -22,10 +22,8 @@ import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel } f
 interface IProps extends WithStyles<typeof styles> { }
 
 interface OrderItemState {
-  id: number;
+  item: ItemModel;
   quantity: number;
-  price: number;
-  name: string;
 }
 
 interface OrderState {
@@ -144,9 +142,7 @@ class MenuPage extends React.Component<IProps, IState> {
 
   addToOrder(event: React.ChangeEvent<{}>) {
     const r: OrderItemState = {
-      id: this.state.modal?.id!,
-      name: this.state.modal?.name!,
-      price: this.state.modal?.price!,
+      item: this.state.modal!,
       quantity: this.state.modalQuantity,
     }
 
@@ -169,7 +165,7 @@ class MenuPage extends React.Component<IProps, IState> {
   calculateTotalPrice() {
     let p = 0;
     this.state.orders.forEach(it => {
-      p += (it.price * it.quantity);
+      p += (it.item.price * it.quantity);
     });
     return p;
   }
@@ -235,10 +231,10 @@ class MenuPage extends React.Component<IProps, IState> {
                     <Card className={classes.itemcard}>
                       <CardContent>
                         <Typography variant="h5">
-                          {order.name}
+                          {order.item.name}
                         </Typography>
                         <Typography variant="body2" component="p">
-                          ${order.price} x {order.quantity} = ${order.price * order.quantity}
+                          ${order.item.price} x {order.quantity} = ${order.item.price * order.quantity}
                         </Typography>
                       </CardContent>
                     </Card>
