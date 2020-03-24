@@ -101,14 +101,14 @@ class Assistance extends React.Component<IProps, {
                 if (this.state.tables?.tables[tableNum].occupied){
                     children.push(
                         <div className="column" key={tableNum + 1} onClick={() => this.handleClick(tableNum + 1)}>
-                            <div className="greencard">{tableNum + 1}
+                            <div className="card">{tableNum + 1}
                             </div>
                         </div>
                     )
                 } else {
                     children.push(
                         <div className="column" key={tableNum + 1} onClick={() => this.handleClick(tableNum + 1)}>
-                            <div className="card">{tableNum + 1}</div>
+                            <div className="greencard">{tableNum + 1}</div>
                         </div>
                     )
                 }
@@ -145,8 +145,8 @@ class Assistance extends React.Component<IProps, {
     tableKey(){
         return(
             <div className={this.props.classes.key}>
-                <mark className={this.props.classes.red}>Red = Occupied</mark>, 
-                <mark className={this.props.classes.green}> Green = Paid </mark>, Grey = Empty
+                <mark className={this.props.classes.red}>Red = Assistance Required</mark>, 
+                <mark className={this.props.classes.green}> Green = Empty </mark>, Grey = Occupied
             </div>
         );
     }
