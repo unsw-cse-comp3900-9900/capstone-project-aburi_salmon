@@ -238,7 +238,7 @@ class ListContainer extends React.Component<IProps, {itemList: ItemList | null}>
                     </td>
                 );
             }
-        } else {
+        } else if (this.props.name === 'Queue'){
             
             if (this.state.itemList?.itemList !== null){
                 return (

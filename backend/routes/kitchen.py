@@ -12,14 +12,14 @@ class Kitchen(Resource):
     @jwt_required
     @kitchen.response(200, 'Success')
     @kitchen.response(400, 'Invalid request')
-    #def get(self):
-    #    orders = db.get_ordered_items()
-    #    return { 'orders': orders }
     def get(self):
+        orders = db.get_ordered_items()
+        return { 'orders': orders }
+    #def get(self):
         #order_update = request.get_json()
         #status = order_update.get('status')
-        itemlist = db.get_order_list(1)
-        return {'itemList': itemlist}
+    #    itemlist = db.get_order_list(1)
+    #    return {'itemList': itemlist}
 
 
 
