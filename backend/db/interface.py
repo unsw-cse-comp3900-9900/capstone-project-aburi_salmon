@@ -363,9 +363,11 @@ class DB:
 
         return self.__update("UPDATE item_order SET quantity = %s, status_id = 1 WHERE id = %s", [new_quantity, item_order_id])
 
-    def delete_order(self, order_id, item_id):
-        return self.__delete("DELETE FROM item_order WHERE order_id = %s AND item_id = %s", [order_id, item_id])
+    def delete_order(self, item_order_id):
+        return self.__delete("DELETE FROM item_order WHERE id = %s", [item_order_id,])
 
+
+   
 
     def get_order_list(self, status):
 
