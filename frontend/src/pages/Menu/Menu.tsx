@@ -200,6 +200,10 @@ class MenuPage extends React.Component<IProps, IState> {
     return p;
   }
 
+  submitOrder() {
+    
+  }
+
   // Component did mount gets called before render
   async componentDidMount() {
     const client = new Client();
@@ -281,7 +285,7 @@ class MenuPage extends React.Component<IProps, IState> {
           third={
             <div>
               <Typography variant="h6">Total price: ${this.calculateTotalPrice()}</Typography>
-              <Button variant="contained" color="primary" disabled={this.state.orders.length === 0}>
+              <Button variant="contained" color="primary" disabled={this.state.orders.length === 0} onClick={()=>this.submitOrder()}>
                 Confirm order
               </Button>
             </div>
