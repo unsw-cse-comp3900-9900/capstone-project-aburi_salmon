@@ -31,11 +31,23 @@ edit_order_item_status_model = api.model('edit_order_item_status', {
     "status": fields.Integer(description="status_id")
 })
 
-new_order_model = api.model('new_order_model', {
-    "item_id": fields.Integer(description="item_id"),
-    "quantity": fields.Integer(description="quantity")
+new_order_model = api.schema_model('new_order_model', {
+    'type': 'object',
+    'required': ['new_orders'],
+    'properties': {
+        'new_orders': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'required': ['item_id', 'quantity'],
+                'properties': {
+                    'item_id': { 'type': 'integer' },
+                    'quantity': { 'type': 'integer' }
+                }
+            }
+        }
+    }
 })
-
 
 modify_order_model = api.model('modify_order_model', {
     "item_id": fields.Integer(description="item_id"),
@@ -48,4 +60,24 @@ delete_order_model = api.model('delete_order_model', {
 
 registration_model = api.model('registration_model', {
     "type": fields.Integer(description='staff_type id')
+})
+
+menu_item_model = api.model('menu_item_model', {
+    'name': fields.String(description='name of new menu item'),
+    'description': fields.String(description='description of new menu item'),
+    'price': fields.Float(description='price of the new item'),
+    'visible': fields.Boolean(description='is the item visible on the menu')
+})
+
+category_model = api.model('category_model', {
+    'name': fields.String(description='category name'),
+    'position': fields.Integer(description='position to show the category')
+})
+
+add_item_to_category_model = api.model('add_item_to_category_model', {
+    'position': fields.Integer(description='position to show the item in the category')
+})
+
+ingredient_model = api.model('ingredient_model', {
+    'name': fields.String(description='ingredient name')
 })

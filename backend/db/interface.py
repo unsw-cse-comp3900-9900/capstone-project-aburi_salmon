@@ -8,7 +8,7 @@ class DB:
     def __init__(self, dbConfig=DbConfig):
         self.__conn = psycopg2.connect(dbConfig.config())
 
-    def __query(self, query, params):
+    def __query(self, query, params=[]):
         c = self.__conn.cursor()
         try:
             c.execute(query, params)
@@ -174,50 +174,204 @@ class DB:
         return self.__update("UPDATE item_order SET status_id = %s WHERE id = %s", [status, id])
 
 
-    def get_category(self, test):
-        rows = self.__query('SELECT * FROM category WHERE position > %s', [test,])
+    def get_category(self, id):
+        rows = self.__query('SELECT * FROM category WHERE id = %s', [id])
 
-        if (not rows):
-            return None
+        if (not rows or not rows[0]):
+            return
+        
+        category = {
+            'id': id,
+            'name': rows[0][1],
+            'position': rows[0][2],
+            'items': self.get_items_by_category(id)
+        }
 
-        category = [{
-            'id': row[0],
-            'name': row[1]
-            } for row in rows]
         return category
-    
-    def get_item(self, test):
-        rows = self.__query('SELECT * FROM item WHERE price > %s', [test,])
+        
+    def create_item(self, item):
+        self.__insert(
+            'INSERT INTO item (name, description, price, visible) VALUES (%s, %s, %s, %s)',
+            [item.get('name'), item.get('description'), item.get('price'), item.get('visible')]
+        )
+        return True
 
+    def get_all_menu_items(self):
+        rows = self.__query(
+            'SELECT * FROM item'
+        )
         if (not rows):
-            return None
+            return []
 
-        category = [{
+        return [{
             'id': row[0],
             'name': row[1],
             'description': row[2],
-            'price': row[3]
-            } for row in rows]
-        return category
-    
-    def get_ingredient(self, test):
-        rows = self.__query('SELECT * FROM ingredient WHERE id > %s', [test,])
+            'price': row[3],
+            'visible': row[4],
+            'ingredients': self.get_item_ingredients(row[0])
+        } for row in rows]
 
+    def get_item_by_id(self, id):
+        rows = self.__query('SELECT * FROM item WHERE id = %s', [id])
         if (not rows):
             return None
+        
+        itemRow = rows[0]
+        return {
+            'id': itemRow[0],
+            'name': itemRow[1],
+            'description': itemRow[2],
+            'price': itemRow[3],
+            'visible': itemRow[4],
+            'ingredients': self.get_item_ingredients(id)
+        }
 
-        category = [{
+    def get_items_by_category(self, category_id):
+        rows = self.__query(
+            'SELECT * FROM item i JOIN category_item ci on (i.id = ci.item_id) WHERE ci.category_id = %s ORDER BY ci.position',
+            [category_id]
+        )
+
+        if (not rows):
+            return []
+        
+        return [{
+            'id': row[0],
+            'name': row[1],
+            'description': row[2],
+            'price': row[3],
+            'visible': row[4],
+            'ingredients': self.get_item_ingredients(row[0])
+        } for row in rows]
+
+    def edit_item(self, editStatement, editArr):
+        return self.__update(editStatement, editArr)
+
+    def delete_item(self, id):
+        return self.__delete("DELETE FROM item WHERE id = %s", [id])
+
+    def create_category(self, category):
+        self.__insert(
+            'INSERT INTO category (name, position) VALUES (%s, %s)',
+            [category.get('name'), category.get('position')]
+        )
+        return True
+
+    def get_categories(self):
+        rows = self.__query('SELECT * FROM category ORDER BY position')
+        if (not rows):
+            return None
+        
+        return [{
+            'id': row[0],
+            'name': row[1],
+            'position': row[2]
+        } for row in rows]
+
+    def edit_category(self, editStatement, editArr):
+        return self.__update(editStatement, editArr)
+
+    def delete_category(self, id):
+        # Implement this later
+        pass
+
+    def add_item_to_category(self, category_id, item_id, position):
+        self.__insert(
+            'INSERT INTO category_item (item_id, category_id, position) VALUES (%s, %s, %s)',
+            [item_id, category_id, position]
+        )
+        return True
+
+    def remove_item_from_category(self, category_id, item_id):
+        return self.__delete(
+            'DELETE FROM category_item WHERE category_id = %s AND item_id = %s',
+            [category_id, item_id]
+        )
+
+    def get_all_ingredients(self):
+        rows = self.__query('SELECT * FROM ingredient')
+        if (not rows):
+            return []
+        
+        return [{
             'id': row[0],
             'name': row[1]
-            } for row in rows]
-        return category
-    
+        } for row in rows]
+
+    def create_ingredient(self, name):
+        self.__insert(
+            'INSERT INTO ingredient (name) VALUES (%s)',
+            [name]
+        )
+        return True
+
+    def get_ingredient_by_id(self, id):
+        rows = self.__query(
+            'SELECT * FROM ingredient WHERE id = %s',
+            [id]
+        )
+
+        if (not rows or not rows[0]):
+            return None
+
+        ingredient = rows[0]
+        return {
+            'id': ingredient[0],
+            'name': ingredient[1]
+        }
+
+    def get_item_ingredients(self, id):
+        rows = self.__query(
+            'SELECT * FROM ingredient i JOIN item_ingredient ii on (i.id = ii.ingredient_id) WHERE ii.item_id = %s',
+            [id]
+        )
+        
+        if (not rows):
+            return []
+
+        return [{
+            'id': row[0],
+            'name': row[1]
+        } for row in rows]
+
+    def edit_ingredient(self, editStatement, editArr):
+        self.__update(editStatement, editArr)
+        return True
+
+    def delete_ingredient(self, id):
+        rows = self.__query(
+            'SELECT count(item_id) FROM item_ingredient WHERE ingredient_id = %s',
+            [id]
+        )
+
+        if (rows[0][0]):
+            return False
+        
+        return self.__delete(
+            'DELETE FROM ingredient WHERE id = %s',
+            [id]
+        )
+
+    def add_ingredient_to_item(self, item_id, ingredient_id):
+        self.__update(
+            'INSERT INTO item_ingredient (item_id, ingredient_id) VALUES (%s, %s)',
+            [item_id, ingredient_id]
+        )
+
+        return True
+
+    def remove_ingredient_from_item(self, item_id, ingredient_id):
+        return self.__delete(
+            'DELETE FROM item_ingredient WHERE item_id = %s AND ingredient_id = %s',
+            [item_id, ingredient_id]
+        )
+
     def get_quantity(self, item_order_id):
         quantity = self.__query('SELECT quantity FROM item_order WHERE id = %s', [item_order_id])
 
         return quantity[0][0]  
 
-    def get_ingredient_from_item(self, test):
         rows = self.__query('SELECT ing.name FROM item_ingredient ii, ingredient ing, item i WHERE ii.ingredient_id = ing.id AND i.name = %s AND ii.item_id = i.id GROUP BY ing.id', [test,])
 
         if (not rows):
@@ -227,21 +381,6 @@ class DB:
         for row in rows:
             ingredient.append(row[0])
         return ingredient
-
-
-    def get_item_from_category(self, test):
-        rows = self.__query('SELECT i.id, i.name, i.description FROM category_item ci, category c, item i WHERE ci.category_id = c.id AND c.name = %s AND ci.item_id = i.id GROUP BY i.id', [test,])
-
-        if (not rows):
-            return None
-
-        item = [{
-            'id': row[0],
-            'name': row[1],
-            'description': row[2],
-            'ingredient': DB.get_ingredient_from_item(self, row[1])
-            } for row in rows]
-        return item
 
 
     def get_ordered_items_customer(self, table_id):
@@ -271,7 +410,6 @@ class DB:
         return item_order
 
 
-
     def get_ordered_items_status(self, item_name):
         status = self.__query('SELECT s.status_name FROM item_order io, item i, status s WHERE s.id = io.status_id AND i.id = io.item_id AND i.name = %s', item_name)
 
@@ -279,18 +417,17 @@ class DB:
             return None
 
         return status
-
-    def new_order(self, table_id, item_id, quantity):
+      
+    def insert_order(self, table_id):
         self.__insert('INSERT INTO "order" (table_id) VALUES (%s);', [table_id,])
-
-        order_id_row = self.__query('SELECT id FROM "order" ORDER BY id DESC LIMIT %s', [1,])
-        order_id = order_id_row[0]
-
-        self.__insert("INSERT INTO item_order (item_id, order_id, quantity, status_id) VALUES (%s, %s, %s, %s);",
-                      [item_id, order_id, quantity, 1])
+        order_id = self.__query('SELECT id FROM "order" ORDER BY id DESC LIMIT %s', [1,])[0][0]
         
+        return order_id  
+      
+    def insert_item_order(self, order_id, item_id, quantity):
+        self.__insert("INSERT INTO item_order (item_id, order_id, quantity, status_id) VALUES (%s, %s, %s, %s);", [item_id, order_id, quantity, 1])
         return True
-
+        
     def get_tables(self, test):
         rows = self.__query('SELECT id, state FROM public.table WHERE id > %s ORDER BY id', [test,])
 
@@ -384,5 +521,4 @@ class DB:
 
             } for row in rows]
         return orders
-
 
