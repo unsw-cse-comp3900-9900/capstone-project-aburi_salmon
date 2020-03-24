@@ -69,18 +69,21 @@ export class Client {
 
   async getListItem(listStatus: number){
     try {
-      const r: Response = await fetch(apiUrl + '/kitchen', {
-        method: 'PUT',
+      const r: Response = await fetch(apiUrl + '/kitchen/' + listStatus, {
+        method: 'GET',
         credentials: 'include',
         mode: 'cors',
-        body: JSON.stringify({
-          status: listStatus,
-        }),
+        //headers: {
+        //  'Content-Type': 'application/json'
+        //},
+        //body: JSON.stringify({
+        //  status: listStatus,
+        //  id: 1,
+        //}),
       });
 
       const j: ItemList = await r.json();
       return j;
-
 
     } catch (e) {
       console.error(e);

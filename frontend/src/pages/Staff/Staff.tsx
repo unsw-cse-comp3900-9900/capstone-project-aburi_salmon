@@ -62,7 +62,7 @@ class StaffPage extends React.Component<IProps, {currPage: string, staffType: st
         super(props);
         this.state = {
             currPage: "Orders",
-            staffType: "kitchen",
+            staffType: "wait",
             itemNum: -1,
             listName: "none",
         }
@@ -192,6 +192,7 @@ class StaffPage extends React.Component<IProps, {currPage: string, staffType: st
     updateCont(itemId: number, listName: string): void{
         console.log(itemId)
         console.log(listName)
+        
         this.setState({itemNum: itemId, listName: listName});
     }
 

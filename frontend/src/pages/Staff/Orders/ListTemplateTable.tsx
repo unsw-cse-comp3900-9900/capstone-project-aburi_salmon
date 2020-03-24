@@ -1,7 +1,7 @@
 import React from 'react';
 import { createStyles, WithStyles, withStyles } from '@material-ui/core';
 import ItemCont from './../Orders/ItemTemplate';
-import { ItemList as ItemListModel} from '../../../api/models';
+import { ItemList} from '../../../api/models';
 import { Client } from '../../../api/client';
 
 const styles = () =>
@@ -88,136 +88,193 @@ export interface IProps extends WithStyles<typeof styles> {
  }
 
 
-class ListContainer extends React.Component<IProps, {itemList: ItemListModel | null}>{
+class ListContainer extends React.Component<IProps, {itemList: ItemList | null}>{
 
     constructor(props: IProps){
         super(props);
         this.state = {
             itemList: null,
         }
+
     }
 
     async componentDidMount() {
         const client = new Client();
-        const m: ItemListModel | null = await client.getListItem(0);
-        this.setState({
-            itemList: m,
-        });
-        console.log('hey1');
-        console.log(m);
+        if (this.props.name === 'Queue'){
+            const m: ItemList | null = await client.getListItem(1);
+            this.setState({
+                itemList: m
+            });
+            console.log(m);
+        } else if (this.props.name === 'Cooking') {
+            const m: ItemList | null = await client.getListItem(2);
+            this.setState({
+                itemList: m
+            });
+            console.log(m);
+        } else if (this.props.name === 'To Be Served') {
+            const m: ItemList | null = await client.getListItem(3);
+            this.setState({
+                itemList: m
+            });
+            console.log(m);
+        } else if (this.props.name === 'Ready') {
+            const m: ItemList | null = await client.getListItem(3);
+            this.setState({
+                itemList: m
+            });
+            console.log(m);
+        } else if (this.props.name === 'Served') {
+            const m: ItemList | null = await client.getListItem(4);
+            this.setState({
+                itemList: m
+            });
+            console.log(m);
+        }
     }
 
     //Get items depending on name
     getHeading(){
         if (this.props.name === 'Served' || this.props.name === 'Ready'){
             return(
-             
-                <tr className={this.props.classes.headingServed}>
-                    <th className={this.props.classes.headingServed}>
-                        {this.props.name}
-                    </th>
-                </tr>
+                <thead>
+                    <tr className={this.props.classes.headingServed}>
+                        <th className={this.props.classes.headingServed}>
+                            {this.props.name}
+                        </th>
+                    </tr>
+                </thead>
              
             );
         } else if (this.props.name === 'To Be Served' || this.props.name === 'Cooking') {
             return (
-             
-                <tr className={this.props.classes.headingToBeServed}>
-                    <th className={this.props.classes.headingToBeServed}>
-                        {this.props.name}
-                    </th>
-                </tr>
-           
+                <thead>
+                    <tr className={this.props.classes.headingToBeServed}>
+                        <th className={this.props.classes.headingToBeServed}>
+                            {this.props.name}
+                        </th>
+                    </tr>
+                </thead>
             );
         } else {
             return (
-              
+                <thead>
                     <tr className={this.props.classes.headingQueue}>
                         <th className={this.props.classes.headingQueue}>
                             {this.props.name}
                         </th>
                     </tr>
-         
+                </thead>
             );
         }
     }
 
     getBox(){
         if (this.props.name === 'Ready') {
-            return (
-                <td className={this.props.classes.boxServed}>
-                    <ItemCont listName="Ready" itemName="Burger" amount={2} table={1} time="some time" update={this.props.update}/>
-                    <ItemCont listName="Ready" itemName="Salad" amount={3} table={7} time="some time" update={this.props.update}/>
-                </td>
-            );
-        } else if (this.props.name === 'Served') {
-            return (
-               
+            if (this.state.itemList?.itemList !== null) {
+                return (
+
                     <td className={this.props.classes.boxServed}>
-                        <ItemCont listName="Served" itemName="Burger" amount={2} table={1} time="some time" update={this.props.update} />
-                        <ItemCont listName="Served" itemName="Salad" amount={3} table={7} time="some time" update={this.props.update} />
+                        {this.state.itemList?.itemList.map(item => (
+                            <ItemCont listName="Queue" itemName={item.itemName} amount={item.quantity}
+                                table={item.item_id} time="sometime" update={this.props.update} />
+                        ))}
                     </td>
-           
-            );
+                );
+            } else {
+                return (
+                    <td className={this.props.classes.boxServed}>
+                    </td>
+                );
+            }
+        } else if (this.props.name === 'Served') {
+            if (this.state.itemList?.itemList !== null) {
+                return (
+
+                    <td className={this.props.classes.boxServed}>
+                        {this.state.itemList?.itemList.map(item => (
+                            <ItemCont listName="Queue" itemName={item.itemName} amount={item.quantity}
+                                table={item.item_id} time="sometime" update={this.props.update} />
+                        ))}
+                    </td>
+                );
+            } else {
+                return (
+                    <td className={this.props.classes.boxServed}>
+                    </td>
+                );
+            }
         } else if (this.props.name === 'To Be Served') {
-            return (
-               
+            if (this.state.itemList?.itemList !== null) {
+                return (
                     <td className={this.props.classes.boxToBeServed}>
-                        <ItemCont listName="To Be Served" itemName="Pizza" amount={5} table={3} time="some time" update={this.props.update}/>
+                        {this.state.itemList?.itemList.map(item => (
+                            <ItemCont listName="Queue" itemName={item.itemName} amount={item.quantity}
+                                table={item.item_id} time="sometime" update={this.props.update} />
+                        ))}
                     </td>
-            
-            );
+                );
+            } else {
+                return (
+                    <td className={this.props.classes.boxToBeServed}>
+                    </td>
+                );
+            }
         } else if (this.props.name === 'Cooking') {
-            return (
-              
+            if (this.state.itemList?.itemList !== null) {
+                return (
+
                     <td className={this.props.classes.boxToBeServed}>
-                        <ItemCont listName="Cooking" itemName="Pizza" amount={5} table={3} time="some time" update={this.props.update} />
-                        <ItemCont listName="Queue" itemName="Chips" amount={1} table={2} time="some time" update={this.props.update}/>
+                        {this.state.itemList?.itemList.map(item => (
+                            <ItemCont listName="Queue" itemName={item.itemName} amount={item.quantity}
+                                table={item.item_id} time="sometime" update={this.props.update} />
+                        ))}
                     </td>
-               
-            );
-        } else {
-            return (
-           
+                );
+            } else {
+                return (
+                    <td className={this.props.classes.boxToBeServed}>
+                    </td>
+                );
+            }
+        } else if (this.props.name === 'Queue'){
+            
+            if (this.state.itemList?.itemList !== null){
+                return (
+                    
                     <td className={this.props.classes.boxQueue}>
-                        
+                    {this.state.itemList?.itemList.map(item => (
+                        <ItemCont listName="Queue" itemName={item.itemName} amount={item.quantity} 
+                                table={item.item_id} time="sometime" update={this.props.update} />
+                        ))}
                     </td>
-           
-            );
+                );
+            } else {
+                return(
+                    <td className={this.props.classes.boxQueue}>
+                    </td>
+                );
+            }
         }
     }
-    /*
-    printItems() {
-        let children = [];
-        let ret = [];
-        
-        for (let j = 0; this.state.itemList[j] !== null; j++) {
-            children.push(
-                <ItemCont listName="Queue" itemName="Chips" amount={1} table={2} time="some time" update={this.props.update} />
-            )
-        };
-        ret.push(
-            <td className={this.props.classes.boxQueue}>
-                {children}
-            </td>
-        );
-        return ret;
-
-    }*/
-
     render() {
         const { classes } = this.props;
         return (
-            
                 <table className={classes.table}>
                     {this.getHeading()}
-                    <div className={classes.scroll}>
+                    <tbody>
+                    <tr >
+                       <td className={classes.scroll}>
                         <table className={classes.table2}>
-                        <tr>
-                            {this.getBox()}     
-                        </tr>
+                            <tbody>
+                                <tr>
+                                    {this.getBox()}     
+                                </tr>
+                            </tbody>
                         </table>
-                    </div>
+                       </td>
+                    </tr>
+                    </tbody>
                 </table>
         );
     }

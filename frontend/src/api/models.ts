@@ -36,8 +36,9 @@ export type ListItem = {
   itemName: string,
   quantity: number,
   price: number,
+  item_id: number,
 }
 
 export type ItemList = {
-  list: Array<ListItem>
+  itemList: Array<ListItem>
 }

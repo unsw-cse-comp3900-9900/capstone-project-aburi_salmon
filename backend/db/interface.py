@@ -508,9 +508,10 @@ class DB:
         return self.__delete("DELETE FROM item_order WHERE id = %s", [item_order_id,])
 
 
-    def get_order_list(self, status):
+   
 
-        rows = self.__query('SELECT item.name, io.quantity, item.price, item.id FROM item_order io JOIN item ON io.id = item.id WHERE io.status_id == %s', [status])
+    def get_order_list(self, status):
+        rows = self.__query('SELECT item.name, io.quantity, item.price, item.id FROM item_order io JOIN item ON io.item_id = item.id WHERE io.status_id = %s', [status])
 
         if (not rows):
             return None
@@ -523,3 +524,4 @@ class DB:
 
             } for row in rows]
         return orders
+
