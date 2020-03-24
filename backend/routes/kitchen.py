@@ -28,20 +28,20 @@ class Kitchen(Resource):
     @kitchen.response(200, 'Success')
     @kitchen.response(400, 'Invalid request')
     @kitchen.response(500, 'Something went wrong')
-    #def post(self):
-    #    order_update = request.get_json()
-    #    status = order_update.get('status')
-    #    itemlist = db.get_order_list(status)
-    #    return {'itemList' : itemlist}
     def put(self):
         order_update = request.get_json()
-        id = order_update.get('id')
         status = order_update.get('status')
+        itemlist = db.get_order_list(status)
+        return {'itemList' : itemlist}
+    #def put(self):
+        #order_update = request.get_json()
+        #id = order_update.get('id')
+        #status = order_update.get('status')
 
-        if (db.update_ordered_item_status(id, status)):
-            return 'Success'
+        #if (db.update_ordered_item_status(id, status)):
+        #    return 'Success'
         
-        return 500, 'Something went wrong'
+        #return 500, 'Something went wrong'
 
     #def beginCooking(self, item_id):
     #    db.beginCooking(item_id)

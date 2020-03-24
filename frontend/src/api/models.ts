@@ -31,5 +31,5 @@ export type ListItem = {
 }
 
 export type ItemList = {
-  list: Array<ListItem>
+  listOfItems: Array<ListItem>
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { createStyles, WithStyles, withStyles } from '@material-ui/core';
 import ItemCont from './../Orders/ItemTemplate';
-import { ItemList as ItemListModel} from '../../../api/models';
+import { ItemList, ListItem} from '../../../api/models';
 import { Client } from '../../../api/client';
 
 const styles = () =>
@@ -88,7 +88,7 @@ export interface IProps extends WithStyles<typeof styles> {
  }
 
 
-class ListContainer extends React.Component<IProps, {itemList: ItemListModel | null}>{
+class ListContainer extends React.Component<IProps, {itemList: Array<ListItem> | null}>{
 
     constructor(props: IProps){
         super(props);
@@ -100,12 +100,14 @@ class ListContainer extends React.Component<IProps, {itemList: ItemListModel | n
 
     async componentDidMount() {
         const client = new Client();
-        const m: ItemListModel | null = await client.getListItem(1);
-        this.setState({
-            itemList: m,
-        });
-        console.log('Not working');
+        const m: ItemList | null = await client.getListItem(1);
+        //this.setState({
+        //    itemList: m?.list
+        //});
+        //console.log(m?.list.length);
+        //console.log('Not working');
         console.log(m);
+        console.log(m?.listOfItems);
     }
 
     //Get items depending on name
@@ -178,16 +180,23 @@ class ListContainer extends React.Component<IProps, {itemList: ItemListModel | n
                
             );
         } else {
-            return (
-           
-                <td className={this.props.classes.boxQueue}>
-                    {this.state.itemList?.list.map(item => (
+            /*
+            if (this.state.itemList !== null){
+                return (
+                    
+                    <td className={this.props.classes.boxQueue}>
+                    {this.state.itemList.list.map(item => (
                         <ItemCont listName="Queue" itemName={item.itemName} amount={item.quantity} 
                                 table={item.item_id} time="sometime" update={this.props.update} />
                         ))}
-                </td>
-           
-            );
+                    </td>
+                );
+            } else {*/
+                return(
+                    <td className={this.props.classes.boxQueue}>
+                    </td>
+                );
+            //}
         }
     }
 

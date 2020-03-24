@@ -60,14 +60,11 @@ export class Client {
         credentials: 'include',
         mode: 'cors',
         //headers: {
-        //  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-        //  'Content-Type': 'application/json',
-        //  'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,OPTIONS',
-        //  'Access-Control-Allow-Credentials': 'true',
-
-       // },
+        //  'Content-Type': 'application/json'
+        //},
         //body: JSON.stringify({
-        //  status: listStatus,
+        //  status: 1,
+        //  id: 1,
         //}),
       });
 
