@@ -1,9 +1,12 @@
 import React from 'react';
 import { createStyles,  withStyles, WithStyles, Theme, MenuList, Paper, MenuItem, ListItemIcon, Box } from '@material-ui/core';
 import PriorityHighIcon from '@material-ui/icons/PriorityHigh';
-import ListContainer from './../../Staff/Orders/ListTemplateTable';
 import Assistance from './../../Staff/Assistance/AssistanceMain';
-
+import ToServe from './../Orders/ToServeList';
+import Served from './../Orders/ServedList';
+import { ListItem } from './../../../api/models';
+import { ItemList } from './../../../api/models';
+import { Client } from './../../../api/client';
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -38,7 +41,8 @@ export interface IProps extends WithStyles<typeof styles> { }
 
 interface IState{
     currPage: string,
-    itemNum: number,
+    toServeList: ItemList | null,
+    servedList: ItemList | null,
     listName: string,
 }
 
@@ -48,10 +52,24 @@ class Wait extends React.Component<IProps, IState>{
         super(props);
         this.state = {
             currPage: "Orders",
-            itemNum: -1,
             listName: "none",
+            toServeList: null,
+            servedList: null
         }
-        this.updateCont = this.updateCont.bind(this);
+        this.moveToServed = this.moveToServed.bind(this);
+        this.moveToToServe = this.moveToToServe.bind(this);
+    }
+
+    async componentDidMount() {
+        const client = new Client();
+        const toServe: ItemList | null = await client.getListItem(3);
+        const served: ItemList | null = await client.getListItem(4);
+        this.setState({
+            toServeList: toServe,
+            servedList: served,
+        });
+        console.log('toServeList: ' + toServe);
+        console.log('ServedList: ' + served);
     }
 
     displayCont(){
@@ -59,8 +77,8 @@ class Wait extends React.Component<IProps, IState>{
         if (this.state.currPage === "Orders") {
             return (
                 <Box className={classes.staffContainer}>
-                    <ListContainer name="To Be Served" update={this.updateCont}/>
-                    <ListContainer name="Served" update={this.updateCont}/>
+                    <ToServe update={this.moveToServed} someList={this.state.toServeList}/>
+                    <Served update={this.moveToToServe} someList={this.state.servedList}/>
                 </Box>
             );
         } else if (this.state.currPage === "Assistance"){
@@ -75,6 +93,48 @@ class Wait extends React.Component<IProps, IState>{
                     <h1> Menu should be here</h1>
                 </Box>
             );
+        }
+    }
+
+    moveToServed(itemId: number, item: ListItem): void {
+        var tempList = this.state.servedList;
+        if (tempList !== null) {
+            const tempArray = tempList?.itemList.concat(item);
+            var ret: ItemList = {
+                itemList: tempArray,
+            }
+            this.setState({ servedList: ret });
+            console.log(ret);
+        }
+        console.log(item);
+        this.removeItem(itemId, 1);
+    }
+
+    moveToToServe(itemId: number, item: ListItem): void {
+        var tempList = this.state.toServeList;
+        if (tempList !== null) {
+            const tempArray = tempList?.itemList.concat(item);
+            var ret: ItemList = {
+                itemList: tempArray,
+            }
+            this.setState({ toServeList: ret });
+            console.log(ret);
+        }
+        console.log(item);
+        this.removeItem(itemId, 2);
+    }
+
+    removeItem(itemKey: number, listType: number): void {
+        if (listType === 1) {
+            var array1 = this.state.toServeList;
+            array1?.itemList.splice(itemKey, 1);
+            this.setState({ toServeList: array1 });
+            console.log(this.state.toServeList);
+        } else if (listType === 2) {
+            var array2 = this.state.servedList;
+            array2?.itemList.splice(itemKey, 1);
+            this.setState({ servedList: array2 });
+            console.log(this.state.servedList);
         }
     }
 
@@ -98,12 +158,6 @@ class Wait extends React.Component<IProps, IState>{
                 </Paper>
             </div>
         );
-    }
-
-    updateCont(itemId: number, listName: string): void{
-        console.log(itemId);
-        console.log(listName);
-        this.setState({itemNum: itemId, listName: listName});
     }
 
     render() {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { createStyles, withStyles, WithStyles, Theme, MenuList, Paper, MenuItem, Box } from '@material-ui/core';
+import { createStyles, withStyles, WithStyles, Theme, MenuList, Paper, MenuItem, Box, Menu } from '@material-ui/core';
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -67,6 +67,10 @@ class Manage extends React.Component<IProps, IState>{
                 <Paper className={this.props.classes.menubutton}>
                     <MenuList >
                         <MenuItem onClick={() => { this.setState({ currPage: "Menu" }) }}>Menu</MenuItem>
+                        <MenuItem>Orders</MenuItem>
+                        <MenuItem>Tables</MenuItem>
+                        <MenuItem>Staff     </MenuItem>
+                        <MenuItem>Analytics</MenuItem>
                     </MenuList>
                 </Paper>
             </div>

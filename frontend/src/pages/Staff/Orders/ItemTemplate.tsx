@@ -1,5 +1,6 @@
 import React from 'react';
 import { createStyles, WithStyles, Theme, withStyles } from '@material-ui/core';
+import {ListItem} from '../../../api/models';
 //Personal note:
 //Props is what is passed in {declare in interface}
 //state is what you store {decalre in react component}
@@ -24,13 +25,9 @@ const styles = (theme: Theme) =>
     });
 
 export interface IProps extends WithStyles<typeof styles> {
-    listName: string,
-    itemName: string,
-    amount: number,
-    table: number,
-    time: string,
-    update: any,
+    item: ListItem,
     itemId: number,
+    update: any,
 }
 
 class ItemCont extends React.Component<IProps, {}>{
@@ -38,11 +35,11 @@ class ItemCont extends React.Component<IProps, {}>{
     render() {
         const { classes } = this.props;
         return (
-            <button className={classes.itemContainer} onClick={() => this.props.update(this.props.itemId, this.props.listName)}>
-                <b>Item Name:</b> {this.props.itemName} <br></br>
-                <b>Amount:</b> {this.props.amount} <br></br>
-                <b>ItemID:</b> {this.props.table} <br></br>
-                <b>Time:</b> {this.props.time}
+            <button className={classes.itemContainer} onClick={() => this.props.update(this.props.itemId, this.props.item)}>
+                <b>Item Name:</b> {this.props.item.itemName} <br></br>
+                <b>Amount:</b> {this.props.item.quantity} <br></br>
+                <b>ItemID:</b> {this.props.itemId} <br></br>
+                <b>Price:</b> {this.props.item.price}
             </button>
         );
     }

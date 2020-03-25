@@ -160,14 +160,14 @@ class Kitchen extends React.Component<IProps, IState>{
             this.setState({ queueList: array1 });
             console.log(this.state.queueList);
         } else if (listType === 2){
-            var array1 = this.state.cookingList;
-            array1?.itemList.splice(itemKey, 1);
-            this.setState({ cookingList: array1 });
+            var array2 = this.state.cookingList;
+            array2?.itemList.splice(itemKey, 1);
+            this.setState({ cookingList: array2 });
             console.log(this.state.cookingList);
         } else if (listType === 3){
-            var array1 = this.state.readyList;
-            array1?.itemList.splice(itemKey, 1);
-            this.setState({ readyList: array1 });
+            var array3 = this.state.readyList;
+            array3?.itemList.splice(itemKey, 1);
+            this.setState({ readyList: array3 });
             console.log(this.state.readyList);
         }
     }

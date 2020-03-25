@@ -1,10 +1,12 @@
 import React from 'react';
-import { AppBar, Toolbar,  Typography, createStyles, Button, withStyles, WithStyles, Theme} from '@material-ui/core';
+import { AppBar, Toolbar,  Typography, createStyles, Button, withStyles, WithStyles, Theme, MenuItem, Menu} from '@material-ui/core';
 import background from './../../assets/FoodBackground.jpg';
 import history from '../../history';
 import { KitchenStaff } from './../Staff/StaffType/Kitchen';
 import { WaitStaff } from './../Staff/StaffType/Wait';
 import { ManageStaff } from './../Staff/StaffType/Manage';
+import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
+//import { PopupState } from 'material-ui-popup-state/core';
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -87,11 +89,31 @@ class StaffPage extends React.Component<IProps, IState>{
         }
     }
 
+    changeStaffType(popupState: any, staffType: string){
+        this.setState({staffType: staffType});
+        //popupState.close;
+    }
+
     render() {
         const { classes } = this.props;
         return (
             <div className={classes.wrapper}>
                 {this.isStaff()}
+                For Testing Purposes:
+                <PopupState variant="popover" popupId="demo-popup-menu">
+                    {popupState => (
+                        <React.Fragment>
+                            <Button variant="contained" color="primary" {...bindTrigger(popupState)}>
+                                StaffType
+                            </Button>
+                            <Menu {...bindMenu(popupState)}>
+                                <MenuItem onClick={() => this.changeStaffType(popupState, "kitchen")}>Kitchen</MenuItem>
+                                <MenuItem onClick={() => this.changeStaffType(popupState,"wait")}>Wait</MenuItem>
+                                <MenuItem onClick={() => this.changeStaffType(popupState,"manage")}>Manage</MenuItem>
+                            </Menu>
+                        </React.Fragment>
+                    )}
+                </PopupState>
                 <AppBar position="static" className={classes.appbar}>
                     <Toolbar>
                         <Typography variant="h6" className={classes.title}>
@@ -102,6 +124,7 @@ class StaffPage extends React.Component<IProps, IState>{
                 </AppBar>
                 <br></br>
                 {this.displayStaff()}
+                
             </div>
         );
     }
