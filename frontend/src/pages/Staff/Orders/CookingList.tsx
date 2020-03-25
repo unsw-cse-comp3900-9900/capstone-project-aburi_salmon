@@ -1,6 +1,6 @@
 import React from 'react';
 import { createStyles, WithStyles, withStyles } from '@material-ui/core';
-import ItemCont from './../Orders/ItemTemplate';
+import ItemCont from './../Orders/ItemTemplate2';
 import { ItemList} from '../../../api/models';
 import { Client } from '../../../api/client';
 
@@ -53,31 +53,10 @@ const styles = () =>
     });
 export interface IProps extends WithStyles<typeof styles> {
     update: any;
+    someList: ItemList | null;
  }
 
-interface IState{
-    itemList: ItemList | null
-}
-
-class Cooking extends React.Component<IProps, IState>{
-
-    constructor(props: IProps){
-        super(props);
-        this.state = {
-            itemList: null,
-        }
-
-    }
-
-    async componentDidMount() {
-        const client = new Client();
-        const m: ItemList | null = await client.getListItem(2);
-        this.setState({
-            itemList: m
-        });
-        console.log(m);
-    
-    }
+class Cooking extends React.Component<IProps, {}>{
 
     //Get items depending on name
     getHeading(){
@@ -93,16 +72,22 @@ class Cooking extends React.Component<IProps, IState>{
     }
 
     getBox(){
-        return (
-            <td className={this.props.classes.boxToBeServed}>
-                {this.state.itemList?.itemList.map((item, index) => (
-                    <ItemCont listName="Queue" itemName={item.itemName} amount={item.quantity}
-                        table={item.item_id} time="sometime" key={index} itemId={index}
-                        update={this.props.update} />
-                ))}
-            </td>
-        );
+        if (this.props.someList !== null){
+            return (
+                <td className={this.props.classes.boxToBeServed}>
+                    {this.props.someList?.itemList.map((item, index) => (
+                        <ItemCont key={index} itemId={index} item={item}
+                            update={this.props.update} />
+                    ))}
+                </td>
+            );
+        } else {
+            return(
+                <td className={this.props.classes.boxToBeServed}></td >
+            );
+        }
     }
+
     render() {
         const { classes } = this.props;
         return (

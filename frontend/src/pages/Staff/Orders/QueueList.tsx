@@ -1,6 +1,6 @@
 import React from 'react';
 import { createStyles, WithStyles, withStyles } from '@material-ui/core';
-import ItemCont from './../Orders/ItemTemplate';
+import ItemCont from './../Orders/ItemTemplate2';
 import { ItemList} from '../../../api/models';
 import { Client } from '../../../api/client';
 
@@ -50,29 +50,11 @@ const styles = () =>
     });
 export interface IProps extends WithStyles<typeof styles> {
     update: any;
+    someList: ItemList | null;
  }
-interface IState {
-    itemList: ItemList | null,
-}
 
-class Queue extends React.Component<IProps, IState>{
 
-    constructor(props: IProps){
-        super(props);
-        this.state = {
-            itemList: null,
-        }
-        this.removeItem = this.removeItem.bind(this);
-    }
-
-    async componentDidMount() {
-        const client = new Client();
-        const m: ItemList | null = await client.getListItem(1);
-        this.setState({
-            itemList: m
-        });
-        console.log(m);
-    }
+class Queue extends React.Component<IProps, {}>{
 
     //Get items depending on name
     getHeading(){
@@ -86,25 +68,13 @@ class Queue extends React.Component<IProps, IState>{
             </thead>
         );
     }
-
-    removeItem(itemKey: number, temp:string){
-        
-        if(itemKey > -1){
-            var array1 = this.state.itemList;
-            array1?.itemList.splice(itemKey,1);
-            this.setState({itemList: array1});
-            console.log(this.state.itemList);
-        }
-    }
-
     getBox(){
-        if (this.state.itemList?.itemList !== null){
+        if (this.props.someList !== null){
             return (
                 <td className={this.props.classes.boxQueue}>
-                {this.state.itemList?.itemList.map((item, index) => (
-                    <ItemCont listName="Queue" itemName={item.itemName} amount={item.quantity} 
-                            table={item.item_id} key={index} time="sometime" itemId={index}
-                            update={this.removeItem} />
+                {this.props.someList?.itemList.map((item, index) => (
+                    <ItemCont item={item} key={index} itemId={index}
+                            update={this.props.update} />
                     ))}
                 </td>
             );

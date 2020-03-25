@@ -5,6 +5,8 @@ import Queue from './../../Staff/Orders/QueueList';
 import Cooking from './../../Staff/Orders/CookingList';
 import Ready from './../../Staff/Orders/ReadyList';
 import {ListItem} from './../../../api/models';
+import { ItemList } from './../../../api/models';
+import { Client } from './../../../api/client';
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -38,8 +40,10 @@ export interface IProps extends WithStyles<typeof styles> { }
 
 interface IState {
     currPage: string,
-    itemNum: number,
-    listName: string,
+    queueList: ItemList | null,
+    cookingList: ItemList | null,
+    readyList: ItemList | null,
+    listName: string
 }
 
 class Kitchen extends React.Component<IProps, IState>{
@@ -48,20 +52,39 @@ class Kitchen extends React.Component<IProps, IState>{
         super(props);
         this.state = {
             currPage: "Orders",
-            itemNum: -1,
             listName: "none",
+            queueList: null, //listType === 1
+            cookingList: null, //listType === 2
+            readyList: null, //listType === 3
         }
-        this.updateCont = this.updateCont.bind(this);
+        this.moveToCooking = this.moveToCooking.bind(this);
+        this.moveToReady = this.moveToReady.bind(this);
+        this.moveToQueue = this.moveToQueue.bind(this);
     }
 
-    displayCont() {
+    async componentDidMount() {
+        const client = new Client();
+        const queue: ItemList | null = await client.getListItem(1);
+        const cooking: ItemList | null = await client.getListItem(2);
+        const ready: ItemList | null = await client.getListItem(3);
+        this.setState({
+            queueList: queue,
+            cookingList: cooking,
+            readyList: ready,
+        });
+        console.log('queuelist: ' + queue);
+        console.log('cookinglist: ' + cooking);
+        console.log('readylist: ' + ready);
+    }
+
+   displayCont() {
         const { classes } = this.props;
         if (this.state.currPage === "Orders") {
             return (
                 <Box className={classes.staffContainer}>
-                    <Queue update={this.updateCont} />
-                    <Cooking update={this.updateCont} />
-                    <Ready update={this.updateCont} />
+                    <Queue update={this.moveToCooking} someList={this.state.queueList}/>
+                    <Cooking update={this.moveToReady} someList={this.state.cookingList} />
+                    <Ready update={this.moveToQueue} someList={this.state.readyList} />
                 </Box>
             );
         } else {
@@ -80,7 +103,7 @@ class Kitchen extends React.Component<IProps, IState>{
                     <MenuList >
                         <MenuItem onClick={() => { this.setState({ currPage: "Menu" }) }}>Menu</MenuItem>
                         <MenuItem onClick={() => { this.setState({ currPage: "Orders" }) }}>Orders
-                        <ListItemIcon>
+                            <ListItemIcon>
                                 <PriorityHighIcon fontSize="small" />
                             </ListItemIcon>
                         </MenuItem>
@@ -90,16 +113,63 @@ class Kitchen extends React.Component<IProps, IState>{
         );
     }
 
-    moveToCooking(item:ListItem, temp: string):void{
-
+    moveToCooking(itemId:number, item: ListItem):void{
+        var tempList = this.state.cookingList;
+        if (tempList !== null) {
+            const tempArray = tempList?.itemList.concat(item);
+            var ret: ItemList = {
+                itemList: tempArray,
+            }
+            this.setState({ cookingList: ret });
+            console.log(ret);
+        }   
+        console.log(item);
+        this.removeItem(itemId, 1);
     }
 
+    moveToReady(itemId: number, item: ListItem): void {
+        var tempList = this.state.readyList;
+        if (tempList !== null){
+            const tempArray= tempList?.itemList.concat(item);
+            var ret: ItemList = {
+                itemList: tempArray,
+            }
+            this.setState({readyList: ret});
+        }  
+        console.log(item);
+        this.removeItem(itemId, 2);
+    }
 
-    updateCont(itemId: number, listName: string): void {
-        console.log(itemId)
-        console.log(listName)
+    moveToQueue(itemId: number, item: ListItem): void {
+        var tempList = this.state.queueList;
+        if (tempList !== null) {
+            const tempArray = tempList?.itemList.concat(item);
+            var ret: ItemList = {
+                itemList: tempArray,
+            }
+            this.setState({ queueList: ret });
+        }   
+        console.log(item);
+        this.removeItem(itemId, 3);
+    }
 
-        this.setState({ itemNum: itemId, listName: listName });
+    removeItem(itemKey: number, listType: number): void {
+        if (listType === 1){
+            var array1 = this.state.queueList;
+            array1?.itemList.splice(itemKey, 1);
+            this.setState({ queueList: array1 });
+            console.log(this.state.queueList);
+        } else if (listType === 2){
+            var array1 = this.state.cookingList;
+            array1?.itemList.splice(itemKey, 1);
+            this.setState({ cookingList: array1 });
+            console.log(this.state.cookingList);
+        } else if (listType === 3){
+            var array1 = this.state.readyList;
+            array1?.itemList.splice(itemKey, 1);
+            this.setState({ readyList: array1 });
+            console.log(this.state.readyList);
+        }
     }
 
     render() {
