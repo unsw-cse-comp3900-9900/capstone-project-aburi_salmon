@@ -38,6 +38,10 @@ const styles = (theme: Theme) =>
             marginRight: theme.spacing(2),
             marginBottom: theme.spacing(2),
         },
+        minsize: {
+            width: theme.spacing(17),
+            
+        }
 
     });
 export interface IProps extends WithStyles<typeof styles> { }
@@ -54,7 +58,7 @@ class Manage extends React.Component<IProps, IState>{
     constructor(props: any) {
         super(props);
         this.state = {
-            currPage: "Orders",
+            currPage: "Staff",
             queueList: null, //listType === 1
             cookingList: null, //listType === 2
             readyList: null, //listType === 3
@@ -120,7 +124,7 @@ class Manage extends React.Component<IProps, IState>{
         return (
             <div className={this.props.classes.root}>
                 <Paper className={this.props.classes.menubutton}>
-                    <MenuList >
+                    <MenuList className={this.props.classes.minsize}>
                         <MenuItem onClick={() => { this.setState({ currPage: "Menu" }) }}>Menu</MenuItem>
                         <MenuItem onClick={() => {this.setState({ currPage: "Orders"})}}>Orders</MenuItem>
                         <MenuItem onClick={() => { this.setState({ currPage: "Tables" }) }}>Tables</MenuItem>

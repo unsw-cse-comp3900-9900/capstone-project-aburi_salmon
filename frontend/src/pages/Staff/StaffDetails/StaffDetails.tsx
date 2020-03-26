@@ -1,18 +1,26 @@
 import React from 'react';
 import { createStyles, WithStyles, Theme, withStyles, Button, Box, TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper } from '@material-ui/core';
-
+import DeleteIcon from '@material-ui/icons/Delete';
 //mostly copied from https://codesandbox.io/s/v2eib &
 //https://material-ui.com/components/tables/
+//https://codesandbox.io/s/u0yv3
+//https://material-ui.com/components/buttons/
 
 const styles = (theme: Theme) =>
     createStyles({
         table: {
-            minWidth: 500,
+            minWidth: 550,
         },
         wrapper: {
             height: '100%',
             width: '100%',
             overflow: 'auto',
+        },
+        button: {
+            margin: theme.spacing(1),
+        },
+        rows: {
+            paddingLeft: theme.spacing(2),
         }
     });
 export interface IProps extends WithStyles<typeof styles> {
@@ -54,7 +62,7 @@ class StaffDetails extends React.Component<IProps, {}>{
         const { classes } = this.props;
         return (
             <TableContainer component={Paper}>
-                <Table className={classes.table} aria-label="customized table">
+                <Table className={classes.table} aria-label="customized table" >
                     <TableHead>
                         <TableRow>
                             <StyledTableCell>Staff Name</StyledTableCell>
@@ -65,17 +73,31 @@ class StaffDetails extends React.Component<IProps, {}>{
                             <StyledTableCell>Delete User</StyledTableCell>
                         </TableRow>
                     </TableHead>
-                    <TableBody>
+                    <TableBody >
                         {rows.map(row => (
                             <StyledTableRow key={row.staffName}>
-                                <StyledTableCell component="th" scope="row">
+                                <StyledTableCell component="th" scope="row" padding={'none'} className={classes.rows}>
                                     {row.staffName}
                                 </StyledTableCell>
-                                <StyledTableCell >{row.staffUsername}</StyledTableCell>
-                                <StyledTableCell >{row.staffType}</StyledTableCell>
-                                <StyledTableCell >{row.lastOnline}</StyledTableCell>
-                                <StyledTableCell >{row.changePassword}</StyledTableCell>
-                                <StyledTableCell >{row.deleteU}</StyledTableCell>
+                                <StyledTableCell padding={'none'} className={classes.rows}>{row.staffUsername}</StyledTableCell>
+                                <StyledTableCell padding={'none'} className={classes.rows}>{row.staffType}</StyledTableCell>
+                                <StyledTableCell padding={'none'} className={classes.rows}>{row.lastOnline}</StyledTableCell>
+                                <StyledTableCell padding={'none'} className={classes.rows}>
+                                    <Button variant="contained" color="primary">
+                                        Reset Password
+                                    </Button>
+                                </StyledTableCell>
+
+                                <StyledTableCell padding={'none'} className={classes.rows}>
+                                    <Button
+                                        variant="contained"
+                                        color="secondary"
+                                        className={classes.button}
+                                        startIcon={<DeleteIcon />}>
+                                        Delete
+                                    </Button>
+                                    
+                                </StyledTableCell>
                             </StyledTableRow>
                         ))}
                     </TableBody>
@@ -88,6 +110,8 @@ class StaffDetails extends React.Component<IProps, {}>{
         return (
             <div className={this.props.classes.wrapper}>
                 {this.printTable()}
+                <br></br>
+                <Button color="primary">Change Registration Key</Button>
             </div>
         );
     }
