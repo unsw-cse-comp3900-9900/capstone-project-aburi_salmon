@@ -88,7 +88,7 @@ function createFeedback(feedback: string, stars: number){
 }
 
 const dummyFeedback = [
-    createFeedback('This user interface is terrible', 2),
+    //createFeedback('This user interface is terrible', 2),
     createFeedback('I suggest you have a help button to show people how to use this system', 2),
     createFeedback('The food was good', 4),
     createFeedback('The pages are too white',3),
