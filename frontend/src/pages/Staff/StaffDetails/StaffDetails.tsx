@@ -1,10 +1,13 @@
 import React from 'react';
-import { createStyles, WithStyles, Theme, withStyles, Button, Box, TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper } from '@material-ui/core';
+import { createStyles, WithStyles, Theme, withStyles, Button, Box, TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper, Dialog, DialogContent, DialogContentText, DialogActions, DialogTitle, TextField } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 //mostly copied from https://codesandbox.io/s/v2eib &
 //https://material-ui.com/components/tables/
 //https://codesandbox.io/s/u0yv3
 //https://material-ui.com/components/buttons/
+
+//https://codesandbox.io/s/6r757
+//https://material-ui.com/components/dialogs/
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -57,11 +60,82 @@ const rows = [
 ];
 
 
-class StaffDetails extends React.Component<IProps, {}>{
+class StaffDetails extends React.Component<IProps, {deleteOpen: boolean, resetOpen: boolean}>{
+
+    constructor(props: IProps){
+        super(props);
+        this.state = {
+            deleteOpen: false,
+            resetOpen: false,
+        }
+    }
+
+    deleteDialog(){
+        return (
+            <div>
+                <Dialog
+                    open={this.state.deleteOpen}
+                    onClose={() => this.setState({deleteOpen: false})}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">{"Are You Sure?"}</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            Are you sure you want to delete this staff? There will be no going back.
+          </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => this.setState({deleteOpen: false})} color="primary">
+                            Nevermind
+                        </Button>
+                        <Button onClick={() => this.setState({ deleteOpen: false })} color="primary" autoFocus>
+                            Yes, I'm sure
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </div>
+        );
+    }
+
+
+    resetDialog() {
+        return (
+            <div>
+                <Dialog open={this.state.resetOpen} onClose={() => this.setState({resetOpen: false})} aria-labelledby="form-dialog-title">
+                    <DialogTitle id="form-dialog-title">Reset Password</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            Please enter new password
+                        </DialogContentText>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="name"
+                            label="New Password"
+                            type="email"
+                            fullWidth
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => this.setState({resetOpen: false})} color="primary">
+                            Cancel
+                        </Button>
+                        <Button onClick={() => this.setState({resetOpen: false})} color="primary">
+                            Reset
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </div>
+        );
+    }
+
     printTable(){
         const { classes } = this.props;
         return (
             <TableContainer component={Paper}>
+                {this.deleteDialog()}
+                {this.resetDialog()}
                 <Table className={classes.table} aria-label="customized table" >
                     <TableHead>
                         <TableRow>
@@ -83,7 +157,7 @@ class StaffDetails extends React.Component<IProps, {}>{
                                 <StyledTableCell padding={'none'} className={classes.rows}>{row.staffType}</StyledTableCell>
                                 <StyledTableCell padding={'none'} className={classes.rows}>{row.lastOnline}</StyledTableCell>
                                 <StyledTableCell padding={'none'} className={classes.rows}>
-                                    <Button variant="contained" color="primary">
+                                    <Button variant="contained" color="primary" onClick={() => this.setState({ resetOpen: true })}>
                                         Reset Password
                                     </Button>
                                 </StyledTableCell>
@@ -93,6 +167,7 @@ class StaffDetails extends React.Component<IProps, {}>{
                                         variant="contained"
                                         color="secondary"
                                         className={classes.button}
+                                        onClick={() => this.setState({ deleteOpen: true })} 
                                         startIcon={<DeleteIcon />}>
                                         Delete
                                     </Button>
@@ -111,7 +186,7 @@ class StaffDetails extends React.Component<IProps, {}>{
             <div className={this.props.classes.wrapper}>
                 {this.printTable()}
                 <br></br>
-                <Button color="primary">Change Registration Key</Button>
+                <Button color="primary" onClick={() => this.setState({ resetOpen: true })}>Change Registration Key</Button>
             </div>
         );
     }

@@ -202,9 +202,6 @@ class Analytics extends React.Component<IProps, {data: any}>{
     render() {
         return (
             <div className={this.props.classes.wrapper}>
-                <h1>In process of designing this page</h1>
-                Proposed Design below
-                <p>-----------------------------------------------------------------------------------------------</p>
                 <div className={this.props.classes.profits}>
                     {this.getGraph()}
                 </div>
