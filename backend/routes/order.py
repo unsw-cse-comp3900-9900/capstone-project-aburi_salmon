@@ -54,30 +54,14 @@ class Item(Resource):
     def patch(self):
 
         modify_order = request.get_json()
-        item_id = modify_order.get('item_id')
+        item_order_id = modify_order.get('item_order_id')
         quantity = modify_order.get('quantity')
-
-        table_id = 3 #assuming table id is 3 for now
-        item_order_id = db.get_item_order_id(table_id, item_id)
 
         if item_order_id is None:
             abort(400, 'No existing order with that item, please make a new order instead.')
         
-        check = 0
-        for row in item_order_id:
-            order_status = db.get_order_status(row)
-            if order_status != 1:
-                #abort(400, 'Cannot modify order since order has left the QUEUE status.')
-                continue
-            else:
-                new = db.modify_order(row, quantity)
-                if new != 5:
-                    check = 1
-                    break
-                else:
-                    continue
-
-        if check == 0:
+        new = db.modify_order(row, quantity)
+        if new == 5:
             abort(400, 'New quantity has to be >= 1 OR order has left the QUEUE status, please make a NEW order instead.')
         
         response = jsonify({
@@ -91,31 +75,17 @@ class Item(Resource):
     def delete(self):
 
         delete_order = request.get_json()
-        item_id = delete_order.get('item_id')
-
-        table_id = 3 #assuming table id is 3 for now
-
-        item_order_id = db.get_item_order_id(table_id, item_id)
-        print("item_order_id")
-        print(item_order_id)
+        item_order_id = delete_order.get('item_order_id')
 
         if item_order_id is None:
             abort(400, 'No existing order with that item, please make a new order instead.')
         
-        check = 0
-        for row in item_order_id:
-            order_status = db.get_order_status(row[0])
-            if order_status != 1:
-                #abort(400, 'Cannot modify order since order has left the QUEUE status.')
-                continue
-            else:
-                new = db.delete_order(row)
-                check = 1
-                break
+        order_status = db.get_order_status(item_order_id)
+        if order_status != 1:
+            abort(400, 'Cannot modify order since order has left the QUEUE status.')
+        else:
+            new = db.delete_order(row)
 
-        if check == 0:
-            abort(400, 'Cannot delete order since order has left the QUEUE status.')
-        
         response = jsonify({
             'status': 'success'
         })
