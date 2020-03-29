@@ -144,7 +144,7 @@ class MenuPage extends React.Component<IProps, IState> {
   }
 
   openConfirmModal() {
-    this.setState({openConfirmModal: true});
+    this.setState({ openConfirmModal: true });
   }
 
   removeModalQuantity() {
@@ -218,7 +218,7 @@ class MenuPage extends React.Component<IProps, IState> {
   }
 
   async submitOrder() {
-    
+
   }
 
   // Component did mount gets called before render
@@ -254,6 +254,7 @@ class MenuPage extends React.Component<IProps, IState> {
                   onChange={this.handleTabChange}
                 >
                   {
+                    this.state.menu && this.state.menu?.menu &&
                     this.state.menu?.menu.map(category => (
                       <Tab label={category.name} key={category.id} {...this.tabProps(category.name)} />
                     ))
@@ -261,6 +262,7 @@ class MenuPage extends React.Component<IProps, IState> {
                 </Tabs>
               </AppBar>
               {
+                this.state.menu && this.state.menu?.menu &&
                 this.state.menu?.menu.map(category => this.generateItemsInCategory(category))
               }
             </div>
@@ -338,6 +340,7 @@ class MenuPage extends React.Component<IProps, IState> {
                 <FormControl>
                   <FormGroup>
                     {
+                      this.state.modal && this.state.modal?.ingredients &&
                       this.state.modal?.ingredients.map(ingredient => (<FormControlLabel
                         control={<Checkbox checked={true} />}
                         disabled
@@ -396,35 +399,36 @@ class MenuPage extends React.Component<IProps, IState> {
               </Grid>
 
               <Grid item xs={12}>
-              <TableContainer component={Paper}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Name</TableCell>
-                      <TableCell>Quantity x Price</TableCell>
-                      <TableCell>Price</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {
-                      this.state.orders?.map((it: OrderItemState) => {
-                        return (
-                          <TableRow>
-                            <TableCell>{it.item.name}</TableCell>
-                            <TableCell>{it.item.price} x {it.quantity}</TableCell>
-                            <TableCell>{it.quantity * it.item.price}</TableCell>
-                          </TableRow>
-                        )
-                      })
-                    }
-                    <TableRow>
-                      <TableCell />
-                      <TableCell><b>Total Price</b></TableCell>
-                      <TableCell><b>${this.calculateTotalPrice()}</b></TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                <TableContainer component={Paper}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Name</TableCell>
+                        <TableCell>Quantity x Price</TableCell>
+                        <TableCell>Price</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {
+                        this.state.orders &&
+                        this.state.orders?.map((it: OrderItemState) => {
+                          return (
+                            <TableRow>
+                              <TableCell>{it.item.name}</TableCell>
+                              <TableCell>{it.item.price} x {it.quantity}</TableCell>
+                              <TableCell>{it.quantity * it.item.price}</TableCell>
+                            </TableRow>
+                          )
+                        })
+                      }
+                      <TableRow>
+                        <TableCell />
+                        <TableCell><b>Total Price</b></TableCell>
+                        <TableCell><b>${this.calculateTotalPrice()}</b></TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               </Grid>
 
               <Grid item xs={6} />
@@ -432,7 +436,7 @@ class MenuPage extends React.Component<IProps, IState> {
                 <Button variant="contained" onClick={this.handleCloseConfirmModal}>Cancel</Button>
               </Grid>
               <Grid item xs={3}>
-                <Button variant="contained" color="primary" onClick={()=>this.submitOrder()}>Submit Order</Button> 
+                <Button variant="contained" color="primary" onClick={() => this.submitOrder()}>Submit Order</Button>
               </Grid>
             </Grid>
           </div>

@@ -151,7 +151,7 @@ class WaitingPage extends React.Component<IProps, IState> {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {
+                    { this.state.order && this.state.order?.item_order && 
                       this.state.order?.item_order.map((it) => {
                         return (
                           <TableRow>
@@ -220,6 +220,7 @@ class WaitingPage extends React.Component<IProps, IState> {
                 <FormControl>
                   <FormGroup>
                     {
+                      this.state.modal && this.state.modal?.ingredients &&
                       this.state.modal?.ingredients.map(ingredient => (<FormControlLabel
                         control={<Checkbox checked={true} />}
                         disabled
