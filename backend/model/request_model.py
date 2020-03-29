@@ -85,3 +85,11 @@ ingredient_model = api.model('ingredient_model', {
 customer_session_model = api.model('customer_session_mode', {
     'table': fields.Integer(description='Table number of new order')
 })
+
+table_model = api.model('table_model', {
+    'table': fields.Integer(description='New table number')
+})
+
+table_assistance_model = api.model('table_assistance_model', {
+    'assistance': fields.Boolean(description='The assistance status of a table session')
+})

@@ -111,3 +111,25 @@ specific_category_model = api.schema_model('specific category', {
         }
     }
 })
+
+table_order_model = api.schema_model('table order model', {
+    'type': 'object',
+    'required': ['table', 'order_id', 'items', 'total_cost'],
+    'properties': {
+        'table': { 'type': 'integer' },
+        'order_id': {'type': 'integer' },
+        'items': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'required': ['name', 'quantity', 'price'],
+                'properties': {
+                    'name': {'type': 'string'},
+                    'quantity': {'type': 'integer'},
+                    'price': {'type': 'number'}
+                }
+            },
+        },
+        'total_cost': {'type': 'number'}
+    }
+})
