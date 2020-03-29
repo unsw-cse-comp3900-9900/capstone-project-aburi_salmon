@@ -60,6 +60,17 @@ export const styles = (theme: Theme) =>
       transform: `translate(-50%,-50%)`,
     },
     confirmmodal: {
-
+      top: '50%',
+      left: '50%',
+      position: 'fixed',
+      flexGrow: 1,
+      minWidth: '60%',
+      width: 'auto',
+      height: 'auto',
+      backgroundColor: theme.palette.background.paper,
+      border: '2px solid #000',
+      boxShadow: theme.shadows[5],
+      padding: theme.spacing(2, 4, 3),
+      transform: `translate(-50%,-50%)`,
     }
   });
