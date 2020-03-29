@@ -12,7 +12,7 @@ import { styles } from './styles';
 import { LeftBox, RightBar } from "../../components";
 import { Order as OrderModel, ItemOrder as ItemOrderModel, Item } from "../../api/models";
 import { Client } from "../../api/client";
-import { Item as ItemModel } from '../../api/models';
+import { Item as ItemModel, ItemQuantityOrderPair as ItemQuantityOrderPairModel, AddItemToOrderResponseMessage } from '../../api/models';
 
 interface IProps extends WithStyles<typeof styles> { }
 
@@ -49,7 +49,7 @@ class WaitingPage extends React.Component<IProps, IState> {
     switch (it.status.id) {
       case 1:
         return (<Button color="primary" onClick={() => this.openModal(it)}>Modify order</Button>);
-      case 3:
+      case 4:
         return (<Button color="primary" onClick={() => this.openModal(it)}>Add more</Button>)
       default:
         return (<Button disabled color="primary">Modify order</Button>);
@@ -107,10 +107,21 @@ class WaitingPage extends React.Component<IProps, IState> {
   }
 
   async addToOrder(event: React.ChangeEvent<{}>) {
+    const client = new Client();
+    const t: ItemQuantityOrderPairModel = {
+      item_id: this.state.modal!.id,
+      quantity: this.state.modalQuantity,
+    }
+    console.log(t);
+    await client.addItemToOrder(t);
 
+    const o: OrderModel | null = await client.getCurrentOrder();
+
+    // Doesn't matter if null
     this.setState({
       openModal: false,
-    })
+      order: o
+    });
   }
 
   async componentDidMount() {

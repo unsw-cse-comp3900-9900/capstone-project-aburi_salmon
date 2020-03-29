@@ -2,6 +2,10 @@ export type ResponseMessage = {
   status: string,
 }
 
+export interface AddItemToOrderResponseMessage extends ResponseMessage {
+  id: number; 
+}
+
 export type Table = {
   occupied: boolean,
   table_id: number

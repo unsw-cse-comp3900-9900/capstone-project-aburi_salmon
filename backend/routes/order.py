@@ -3,7 +3,7 @@ from flask_restx import Resource, abort, reqparse, fields
 from flask_jwt_extended import get_jwt_claims, jwt_required
 
 from app import api, db
-from model.request_model import new_order_model, modify_order_model, delete_order_model
+from model.request_model import new_order_model, modify_order_model, delete_order_model, add_order_model
 
 order = api.namespace('order', description='Order Route')
 
@@ -53,12 +53,39 @@ class Order(Resource):
             if new is None:
                 abort(400, 'Backend is not working as intended or the supplied information was malformed. Make sure that your username is unique.')
 
-        response = jsonify({
+        return {
             'status': 'success'
-        })
+        } 
 
 @order.route('/item')
 class Item(Resource):
+    @order.expect(add_order_model)
+    @order.response(200, 'Success')
+    @order.response(400, 'Invalid request')
+    def put(self):
+        add_order = request.get_json()
+        item_id = add_order.get('item_id')
+        quantity = add_order.get('quantity')
+
+        order_id = 41   # Dummy order id. Use the cookie to create order
+
+        if order_id is None:
+            abort(400, 'No existing order with that item, please make a new order instead.')
+        
+        if quantity is None or quantity == 0 or item_id is None:
+            abort(400, 'Quantity or item_id missing')
+        
+        new = db.add_order(order_id, item_id, quantity)
+
+        if new is None:
+            abort(400, 'Could not create entry')
+        
+        return {
+            'status': 'success',
+            'id': new
+        }
+        
+
     #@jwt_required
     @order.expect(modify_order_model)
     @order.response(200, 'Success')
