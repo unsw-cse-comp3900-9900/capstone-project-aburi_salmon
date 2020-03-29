@@ -13,7 +13,7 @@ class Order(Resource):
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
     def get(self):
-        table_id = 2 #assuming table id is 1 for now
+        table_id = 1 #assuming table id is 1 for now
         item_order = db.get_ordered_items_customer(table_id)
 
         total = 0

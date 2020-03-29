@@ -48,8 +48,8 @@ class TablePage extends React.Component<IProps, IState> {
   async componentDidMount() {
     const t: TableModel | null = await client.getTables();
 
-    // If falsy, don't set state
-    if (!t) this.setState({ tables: t });
+    // Doesn't matter if null
+    this.setState({ tables: t });
   }
 
   render() {
