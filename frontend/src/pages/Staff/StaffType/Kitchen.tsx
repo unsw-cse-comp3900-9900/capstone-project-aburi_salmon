@@ -43,7 +43,6 @@ interface IState {
     queueList: ItemList | null,
     cookingList: ItemList | null,
     readyList: ItemList | null,
-    listName: string
 }
 
 class Kitchen extends React.Component<IProps, IState>{
@@ -52,7 +51,6 @@ class Kitchen extends React.Component<IProps, IState>{
         super(props);
         this.state = {
             currPage: "Orders",
-            listName: "none",
             queueList: null, //listType === 1
             cookingList: null, //listType === 2
             readyList: null, //listType === 3

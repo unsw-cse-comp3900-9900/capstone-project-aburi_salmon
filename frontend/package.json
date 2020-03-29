@@ -6,6 +6,9 @@
     "react-scripts": "^3.0.1"
   },
   "dependencies": {
+    "@devexpress/dx-react-chart": "^2.5.1",
+    "@devexpress/dx-react-chart-material-ui": "^2.5.1",
+    "@devexpress/dx-react-core": "^2.5.1",
     "@fortawesome/fontawesome-svg-core": "^1.2.25",
     "@fortawesome/free-regular-svg-icons": "^5.11.2",
     "@fortawesome/free-solid-svg-icons": "^5.11.2",

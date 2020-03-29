@@ -55,7 +55,7 @@ class DB:
         c.close()
         self.__conn.commit()
 
-    def __delete(self, delete, params):
+    def __delete(self, delete, params=[]):
         c = self.__conn.cursor()
         try:
             c.execute(delete, params)
@@ -408,6 +408,21 @@ class DB:
 
         return item_order
 
+    def get_ordered_items_info(self, order_id):
+        rows = self.__query(
+            'SELECT i.name, io.quantity, i.price FROM "order" o JOIN item_order io on (o.id = io.order_id) JOIN item i on (i.id = io.item_id) WHERE o.id = %s',
+            [order_id]
+        )
+
+        if (not rows):
+            return []
+
+        orders = [{
+            'name': row[0],
+            'quantity': row[1],
+            'price': row[2]
+        } for row in rows]
+        return orders
 
     def get_ordered_items_status(self, item_name):
         status = self.__query('SELECT s.status_name FROM item_order io, item i, status s WHERE s.id = io.status_id AND i.id = io.item_id AND i.name = %s', item_name)
@@ -439,6 +454,35 @@ class DB:
         } for row in rows]
 
         return tables
+
+    def create_table(self, id):
+        self.__insert(
+            'INSERT INTO "table" (id, state) VALUES (%s, %s)',
+            [id, False]
+        )
+        return True
+
+    def delete_table(self):
+        return self.__delete('DELETE FROM "table" WHERE id = (SELECT max(id) FROM "table")')
+
+    def set_table_free(self, id):
+        return self.__update('UPDATE "table" SET state = %s WHERE id = %s', [False, id])
+
+    def set_assistance(self, id, assistance):
+        return self.__update('UPDATE "order" SET assistance = %s WHERE id = %s', [assistance, id])
+
+    def get_assistance_tables(self):
+        rows = self.__query(
+            'SELECT t.* FROM "table" t JOIN "order" o on (t.id = o.table_id) WHERE o.assistance'
+        )
+
+        if (not rows or not rows[0]):
+            return []
+
+        return [{
+            'table_id': row[0],
+            'occupied': row[1]
+        } for row in rows]
 
     def beginCooking(self, id):
         return self.__update("UPDATE item_order SET status_id = 1 WHERE id = %s", [id])
@@ -472,12 +516,15 @@ class DB:
             return True
 
     def get_order_id(self, table_id):
-        order_id = self.__query('SELECT id FROM "order" WHERE table_id = %s', [table_id,])
+        rows = self.__query(
+            'SELECT max(o.id) FROM "order" o JOIN "table" t on (o.table_id = t.id) WHERE o.table_id = %s AND t.state = %s',
+            [table_id, True]
+        )
 
-        if (not order_id):
+        if (not rows or not rows[0]):
             return None
 
-        return order_id[0][0]
+        return rows[0][0]
 
     def get_item_order_id(self, table_id, item_id):
         res = self.__query('SELECT io.id FROM item_order io, "order" o WHERE io.item_id = %s AND o.table_id = %s AND o.id = io.order_id', [item_id, table_id])

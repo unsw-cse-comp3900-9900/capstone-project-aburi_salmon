@@ -1,0 +1,195 @@
+import React from 'react';
+import { createStyles, WithStyles, Theme, withStyles, Button, Box, TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper, Dialog, DialogContent, DialogContentText, DialogActions, DialogTitle, TextField } from '@material-ui/core';
+import DeleteIcon from '@material-ui/icons/Delete';
+//mostly copied from https://codesandbox.io/s/v2eib &
+//https://material-ui.com/components/tables/
+//https://codesandbox.io/s/u0yv3
+//https://material-ui.com/components/buttons/
+
+//https://codesandbox.io/s/6r757
+//https://material-ui.com/components/dialogs/
+
+const styles = (theme: Theme) =>
+    createStyles({
+        table: {
+            minWidth: 550,
+        },
+        wrapper: {
+            height: '100%',
+            width: '100%',
+            overflow: 'auto',
+        },
+        button: {
+            margin: theme.spacing(1),
+        },
+        rows: {
+            paddingLeft: theme.spacing(2),
+        }
+    });
+export interface IProps extends WithStyles<typeof styles> {
+}
+const StyledTableCell = withStyles(theme => ({
+    head: {
+        backgroundColor: theme.palette.common.black,
+        color: theme.palette.common.white,
+    },
+    body: {
+        fontSize: 14,
+    },
+}))(TableCell);
+
+const StyledTableRow = withStyles(theme => ({
+    root: {
+        '&:nth-of-type(odd)': {
+            backgroundColor: theme.palette.background.default,
+        },
+    },
+}))(TableRow);
+
+function tempData(staffName: string, staffUsername: string, staffType: string, lastOnline: string, changePassword: string, deleteU: string){
+    return {staffName, staffUsername, staffType, lastOnline, changePassword, deleteU} ; 
+}
+
+const rows = [
+    tempData('Yennefer', 'admin', 'manager','now','<button>','<button>'),
+    tempData('Cirilla', 'yemi', 'wait', 'Sometime', '<button>','<button>'),
+    tempData('Geralt', 'james', 'kitchen', 'yesterday', '<button>','<button>'),
+    tempData('Triss', 'polly', 'wait', 'tomorrow', '<button>', '<button>'),
+    tempData('Jaskier', 'tom', 'wait', '21/3', '<button>', '<button>'),
+    tempData('Calanthe', 'queen', 'kitchen', '8/12', '<button>', '<button>'),
+];
+
+
+class StaffDetails extends React.Component<IProps, {deleteOpen: boolean, resetOpen: boolean}>{
+
+    constructor(props: IProps){
+        super(props);
+        this.state = {
+            deleteOpen: false,
+            resetOpen: false,
+        }
+    }
+
+    deleteDialog(){
+        return (
+            <div>
+                <Dialog
+                    open={this.state.deleteOpen}
+                    onClose={() => this.setState({deleteOpen: false})}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">{"Are You Sure?"}</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            Are you sure you want to delete this staff? There will be no going back.
+          </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => this.setState({deleteOpen: false})} color="primary">
+                            Nevermind
+                        </Button>
+                        <Button onClick={() => this.setState({ deleteOpen: false })} color="primary" autoFocus>
+                            Yes, I'm sure
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </div>
+        );
+    }
+
+
+    resetDialog() {
+        return (
+            <div>
+                <Dialog open={this.state.resetOpen} onClose={() => this.setState({resetOpen: false})} aria-labelledby="form-dialog-title">
+                    <DialogTitle id="form-dialog-title">Reset Password</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            Please enter new password
+                        </DialogContentText>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="name"
+                            label="New Password"
+                            type="email"
+                            fullWidth
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => this.setState({resetOpen: false})} color="primary">
+                            Cancel
+                        </Button>
+                        <Button onClick={() => this.setState({resetOpen: false})} color="primary">
+                            Reset
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </div>
+        );
+    }
+
+    printTable(){
+        const { classes } = this.props;
+        return (
+            <TableContainer component={Paper}>
+                {this.deleteDialog()}
+                {this.resetDialog()}
+                <Table className={classes.table} aria-label="customized table" >
+                    <TableHead>
+                        <TableRow>
+                            <StyledTableCell>Staff Name</StyledTableCell>
+                            <StyledTableCell>Username</StyledTableCell>
+                            <StyledTableCell>Staff Type</StyledTableCell>
+                            <StyledTableCell>Last Online</StyledTableCell>
+                            <StyledTableCell>Change Password</StyledTableCell>
+                            <StyledTableCell>Delete User</StyledTableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody >
+                        {rows.map(row => (
+                            <StyledTableRow key={row.staffName}>
+                                <StyledTableCell component="th" scope="row" padding={'none'} className={classes.rows}>
+                                    {row.staffName}
+                                </StyledTableCell>
+                                <StyledTableCell padding={'none'} className={classes.rows}>{row.staffUsername}</StyledTableCell>
+                                <StyledTableCell padding={'none'} className={classes.rows}>{row.staffType}</StyledTableCell>
+                                <StyledTableCell padding={'none'} className={classes.rows}>{row.lastOnline}</StyledTableCell>
+                                <StyledTableCell padding={'none'} className={classes.rows}>
+                                    <Button variant="contained" color="primary" onClick={() => this.setState({ resetOpen: true })}>
+                                        Reset Password
+                                    </Button>
+                                </StyledTableCell>
+
+                                <StyledTableCell padding={'none'} className={classes.rows}>
+                                    <Button
+                                        variant="contained"
+                                        color="secondary"
+                                        className={classes.button}
+                                        onClick={() => this.setState({ deleteOpen: true })} 
+                                        startIcon={<DeleteIcon />}>
+                                        Delete
+                                    </Button>
+                                    
+                                </StyledTableCell>
+                            </StyledTableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        );
+    }
+
+    render() {
+        return (
+            <div className={this.props.classes.wrapper}>
+                {this.printTable()}
+                <br></br>
+                <Button color="primary" onClick={() => this.setState({ resetOpen: true })}>Change Registration Key</Button>
+            </div>
+        );
+    }
+}
+
+export default withStyles(styles)(StaffDetails);

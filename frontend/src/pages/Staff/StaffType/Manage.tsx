@@ -1,5 +1,15 @@
 import React from 'react';
 import { createStyles, withStyles, WithStyles, Theme, MenuList, Paper, MenuItem, Box, Menu } from '@material-ui/core';
+import { ListItem } from './../../../api/models';
+import { ItemList } from './../../../api/models';
+import { Client } from './../../../api/client';
+import Queue from './../../Staff/Orders/QueueList';
+import Cooking from './../../Staff/Orders/CookingList';
+import Ready from './../../Staff/Orders/ReadyList';
+import Assistance from './../../Staff/Assistance/AssistanceMain';
+import StaffDetails from './../StaffDetails/StaffDetails';
+import Analytics from './../Analytics/Analytics';
+
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -28,14 +38,19 @@ const styles = (theme: Theme) =>
             marginRight: theme.spacing(2),
             marginBottom: theme.spacing(2),
         },
+        minsize: {
+            width: theme.spacing(17),
+            
+        }
 
     });
 export interface IProps extends WithStyles<typeof styles> { }
 
 interface IState {
     currPage: string,
-    itemNum: number,
-    listName: string,
+    queueList: ItemList | null,
+    cookingList: ItemList | null,
+    readyList: ItemList | null,
 }
 
 class Manage extends React.Component<IProps, IState>{
@@ -43,21 +58,65 @@ class Manage extends React.Component<IProps, IState>{
     constructor(props: any) {
         super(props);
         this.state = {
-            currPage: "Orders",
-            itemNum: -1,
-            listName: "none",
+            currPage: "Staff",
+            queueList: null, //listType === 1
+            cookingList: null, //listType === 2
+            readyList: null, //listType === 3
         }
-        this.updateCont = this.updateCont.bind(this);
     }
 
+    async componentDidMount() {
+        const client = new Client();
+        const queue: ItemList | null = await client.getListItem(1);
+        const cooking: ItemList | null = await client.getListItem(2);
+        const ready: ItemList | null = await client.getListItem(3);
+        this.setState({
+            queueList: queue,
+            cookingList: cooking,
+            readyList: ready,
+        });
+        console.log('queuelist: ' + queue);
+        console.log('cookinglist: ' + cooking);
+        console.log('readylist: ' + ready);
+    }
 
     displayCont() {
         const { classes } = this.props;
-        return (
-            <Box className={classes.staffContainer}>
-                <h1> Menu should be here</h1>
-            </Box>
-        );
+        if (this.state.currPage === "Orders"){
+            return (
+                <Box className={classes.staffContainer}>
+                    <Queue update={this.emptyFunction} someList={this.state.queueList} />
+                    <Cooking update={this.emptyFunction} someList={this.state.cookingList} />
+                    <Ready update={this.emptyFunction} someList={this.state.readyList} />
+                </Box>
+            );
+        } else if (this.state.currPage === "Tables") {
+            return (
+                <Box className={classes.staffContainer}>
+                    <Assistance />
+                </Box>
+            );
+        } else if (this.state.currPage === "Staff"){
+            return(
+                <Box className={classes.staffContainer}>
+                    <StaffDetails />
+                </Box>
+            );
+        } else if (this.state.currPage === "Analytics") {
+            return(
+                <Box className={classes.staffContainer}>
+                    <Analytics />
+                </Box>
+            );
+        }
+        else {
+            return (
+                <Box className={classes.staffContainer}>
+                    <h1> Menu should be here</h1>
+                </Box>
+            );
+        }
+        
         
     }
 
@@ -65,22 +124,20 @@ class Manage extends React.Component<IProps, IState>{
         return (
             <div className={this.props.classes.root}>
                 <Paper className={this.props.classes.menubutton}>
-                    <MenuList >
+                    <MenuList className={this.props.classes.minsize}>
                         <MenuItem onClick={() => { this.setState({ currPage: "Menu" }) }}>Menu</MenuItem>
-                        <MenuItem>Orders</MenuItem>
-                        <MenuItem>Tables</MenuItem>
-                        <MenuItem>Staff     </MenuItem>
-                        <MenuItem>Analytics</MenuItem>
+                        <MenuItem onClick={() => {this.setState({ currPage: "Orders"})}}>Orders</MenuItem>
+                        <MenuItem onClick={() => { this.setState({ currPage: "Tables" }) }}>Tables</MenuItem>
+                        <MenuItem onClick={() => { this.setState({ currPage: "Staff" }) }}>Staff</MenuItem>
+                        <MenuItem onClick={() => { this.setState({ currPage: "Analytics" }) }}>Analytics</MenuItem>
                     </MenuList>
                 </Paper>
             </div>
         );
     }
 
-    updateCont(itemId: number, listName: string): void {
-        console.log(itemId)
-        console.log(listName)
-        this.setState({ itemNum: itemId, listName: listName });
+    emptyFunction(itemId: number, item: ListItem): void{
+        //does nothing
     }
 
     render() {
