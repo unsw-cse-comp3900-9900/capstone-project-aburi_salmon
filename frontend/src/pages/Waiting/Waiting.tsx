@@ -24,6 +24,7 @@ interface IState {
   modalOriginalQuantity: number;
   modalSecondButton: string;
   modalSecondButtonDisable: boolean;
+  disableBill: boolean;
 }
 
 class WaitingPage extends React.Component<IProps, IState> {
@@ -37,6 +38,7 @@ class WaitingPage extends React.Component<IProps, IState> {
       modalOriginalQuantity: 0,
       modalSecondButton: "Add to order",
       modalSecondButtonDisable: true,
+      disableBill: true,
     }
     this.openModal = this.openModal.bind(this);
     this.handleCloseModal = this.handleCloseModal.bind(this);
@@ -173,17 +175,16 @@ class WaitingPage extends React.Component<IProps, IState> {
           first={
             <div className={classes.rightdiv}>
               <Button variant="contained" color="primary">Request assistance</Button>
-              <Button variant="contained" color="primary">Add item to order</Button>
             </div>
           }
           second={
             <div className={classes.rightdiv}>
-
+              <Button variant="contained" color="primary">Add item to order</Button>
             </div>
           }
           third={
             <div className={classes.rightdiv}>
-              <Button variant="contained" color="primary" disabled>Bill Unpaid</Button>
+              <Button variant="contained" color="primary" disabled={this.state.disableBill}>Pay bill</Button>
             </div>
           }
         />
