@@ -518,7 +518,7 @@ class DB:
 
     def get_order_id(self, table_id):
         rows = self.__query(
-            'SELECT o.id FROM "order" o JOIN "table" t on (o.table_id = t.id) WHERE o.table_id = %s AND t.state = %s',
+            'SELECT max(o.id) FROM "order" o JOIN "table" t on (o.table_id = t.id) WHERE o.table_id = %s AND t.state = %s',
             [table_id, True]
         )
 
