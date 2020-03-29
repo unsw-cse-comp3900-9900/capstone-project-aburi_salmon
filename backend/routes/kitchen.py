@@ -49,7 +49,6 @@ class Kitchen(Resource):
     #def beginCooking(self, item_id):
     #    db.beginCooking(item_id)
     
-
     #def finishCooking(self, item_id):
     #    db.beginCooking(item_id)
     
