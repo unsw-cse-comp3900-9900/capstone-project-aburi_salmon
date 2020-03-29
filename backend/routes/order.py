@@ -15,7 +15,15 @@ class Order(Resource):
     def get(self):
         table_id = 2 #assuming table id is 3 for now
         item_order = db.get_ordered_items_customer(table_id)
-        return { 'item_order': item_order }
+
+        total = 0
+        for k in item_order:
+            total = total + k.get('price')
+
+        return { 
+            'item_order': item_order,
+            'total_bill': total
+        }
 
     #@jwt_required
     @order.expect(new_order_model)

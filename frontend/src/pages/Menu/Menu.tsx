@@ -46,6 +46,8 @@ interface IState {
   // For second button of the order
   modalSecondButton: string;
   modalSecondButtonDisable: boolean;
+
+  openConfirmModal: boolean;
 }
 
 class MenuPage extends React.Component<IProps, IState> {
@@ -63,6 +65,7 @@ class MenuPage extends React.Component<IProps, IState> {
       orders: new Array<OrderItemState>(),
       modalSecondButton: "Add to order",
       modalSecondButtonDisable: true,
+      openConfirmModal: false,
     }
     // To bind the tab change
     this.handleTabChange = this.handleTabChange.bind(this);
@@ -73,6 +76,8 @@ class MenuPage extends React.Component<IProps, IState> {
 
     // To bind with quantity
     this.addToOrder = this.addToOrder.bind(this);
+
+    this.handleCloseConfirmModal = this.handleCloseConfirmModal.bind(this);
   }
 
   generateItemsInCategory(category: CategoriesModel) {
@@ -162,6 +167,10 @@ class MenuPage extends React.Component<IProps, IState> {
     this.setState({
       openModal: false,
     })
+  }
+
+  handleCloseConfirmModal(event: React.ChangeEvent<{}>) {
+
   }
 
   addToOrder(event: React.ChangeEvent<{}>) {
@@ -285,24 +294,33 @@ class MenuPage extends React.Component<IProps, IState> {
           third={
             <div>
               <Typography variant="h6">Total price: ${this.calculateTotalPrice()}</Typography>
-              <Button variant="contained" color="primary" disabled={this.state.orders.length === 0} onClick={()=>this.submitOrder()}>
+              <Button variant="contained" color="primary" disabled={this.state.orders.length === 0} onClick={() => this.submitOrder()}>
                 Confirm order
               </Button>
             </div>
           }
         />
 
+        {/* First modal for items */}
         <Modal
           aria-labelledby=""
           aria-describedby=""
           open={this.state.openModal}
           onClose={this.handleCloseModal}
-          className={classes.itemmodal}
+          className={classes.modal}
         >
-          <div className={classes.divmodal}>
+          <div className={classes.itemmodal}>
             <Grid container spacing={2}>
-              {/* First col */}
               <Grid item xs={11}>
+                {/* Nothing */}
+              </Grid>
+              <Grid item xs={1}>
+                <IconButton aria-label="add" onClick={this.handleCloseModal}>
+                  <Icon>close</Icon>
+                </IconButton>
+              </Grid>
+              {/* First col */}
+              <Grid item xs={8}>
                 <Typography variant="h4">{this.state.modal?.name}</Typography>
               </Grid>
               <Grid item xs={4}>
@@ -310,7 +328,7 @@ class MenuPage extends React.Component<IProps, IState> {
               </Grid>
 
               {/* Second col */}
-              <Grid item xs={11}>
+              <Grid item xs={8}>
                 insert image here
                     </Grid>
               <Grid item xs={4}>
@@ -328,7 +346,7 @@ class MenuPage extends React.Component<IProps, IState> {
               </Grid>
 
               {/* Third col */}
-              <Grid item xs={11}>
+              <Grid item xs={8}>
                 <Typography variant="subtitle1">{this.state.modal?.description}</Typography>
               </Grid>
               <Grid item xs={4}>
@@ -344,14 +362,27 @@ class MenuPage extends React.Component<IProps, IState> {
               </Grid>
 
               {/* Last col */}
-              <Grid item xs={9}>
+              <Grid item xs={7}>
                 {/* nothing here */}
               </Grid>
-              <Grid item xs={6}>
-                <Button onClick={this.handleCloseModal}>Cancel</Button>
-                <Button disabled={this.state.modalSecondButtonDisable} onClick={this.addToOrder}>{this.state.modalSecondButton}</Button>
+              <Grid item xs={5}>
+                <Button variant="contained" onClick={this.handleCloseModal}>Cancel</Button>
+                <Button variant="contained" color="primary" disabled={this.state.modalSecondButtonDisable} onClick={this.addToOrder}>{this.state.modalSecondButton}</Button>
               </Grid>
             </Grid>
+          </div>
+        </Modal>
+
+        {/* Second modal for confirmation */}
+        <Modal
+          aria-labelledby=""
+          aria-describedby=""
+          open={this.state.openConfirmModal}
+          onClose={this.handleCloseConfirmModal}
+          className={classes.modal}
+        >
+          <div>
+
           </div>
         </Modal>
       </div >

@@ -42,3 +42,23 @@ export type ListItem = {
 export type ItemList = {
   itemList: Array<ListItem>
 }
+
+export type Status = {
+  id: number,
+  name: string
+}
+
+export type ItemOrder = {
+  id: number,
+  order_id: number,
+  item: string,
+  item_id: number,
+  quantity: number,
+  price: number,
+  status: Status
+}
+
+export type Order = {
+  item_order: Array<ItemOrder>,
+  total_bill: number
+}

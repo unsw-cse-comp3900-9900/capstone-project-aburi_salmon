@@ -4,7 +4,7 @@ import './App.css';
 import { MuiThemeProvider } from "@material-ui/core/styles";
 
 import history from './history';
-import { Home, Login, Staff, Table, Menu } from "./pages";
+import { Home, Login, Staff, Table, Menu, Waiting } from "./pages";
 import { theme } from './theme/theme';
 
 class App extends React.Component {
@@ -19,6 +19,7 @@ class App extends React.Component {
             <Route path="/staff" component={Staff} />
             <Route path="/table" component={Table} />
             <Route path="/menu" component={Menu} />
+            <Route path="/waiting" component={Waiting} />
           </Switch>
         </Router>
       </MuiThemeProvider>
