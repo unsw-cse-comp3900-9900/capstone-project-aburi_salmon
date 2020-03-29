@@ -35,7 +35,7 @@ new_order_model = api.schema_model('new_order_model', {
     'type': 'object',
     'required': ['new_orders'],
     'properties': {
-        'new_orders': {
+        'order': {
             'type': 'array',
             'items': {
                 'type': 'object',
@@ -50,12 +50,12 @@ new_order_model = api.schema_model('new_order_model', {
 })
 
 modify_order_model = api.model('modify_order_model', {
-    "item_order_id": fields.Integer(description="item_order_id"),
+    "id": fields.Integer(description="item_order_id"),
     "quantity": fields.Integer(description="quantity")
 })
 
 delete_order_model = api.model('delete_order_model', {
-    "item_order_id": fields.Integer(description="item_order_id")
+    "id": fields.Integer(description="item_order_id")
 })
 
 registration_model = api.model('registration_model', {

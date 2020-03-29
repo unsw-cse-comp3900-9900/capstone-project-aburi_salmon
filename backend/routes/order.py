@@ -7,7 +7,7 @@ from model.request_model import new_order_model, modify_order_model, delete_orde
 
 order = api.namespace('order', description='Order Route')
 
-@order.route('/order')
+@order.route('')
 class Order(Resource):
     #@jwt_required
     @order.response(200, 'Success')
@@ -33,7 +33,7 @@ class Order(Resource):
     def put(self):
 
         new_order = request.get_json()
-        num_of_orders = len(new_order.get('new_orders'))
+        num_of_orders = len(new_order.get('order'))
 
         table_id = 3 #assuming table id is 3 for now
 
@@ -53,7 +53,7 @@ class Order(Resource):
             'status': 'success'
         })
 
-@order.route('/edit')
+@order.route('/item')
 class Item(Resource):
     #@jwt_required
     @order.expect(modify_order_model)
@@ -62,13 +62,13 @@ class Item(Resource):
     def patch(self):
 
         modify_order = request.get_json()
-        item_order_id = modify_order.get('item_order_id')
+        item_order_id = modify_order.get('id')
         quantity = modify_order.get('quantity')
 
         if item_order_id is None:
             abort(400, 'No existing order with that item, please make a new order instead.')
         
-        new = db.modify_order(row, quantity)
+        new = db.modify_order(item_order_id, quantity)
         if new == 5:
             abort(400, 'New quantity has to be >= 1 OR order has left the QUEUE status, please make a NEW order instead.')
         
@@ -83,7 +83,7 @@ class Item(Resource):
     def delete(self):
 
         delete_order = request.get_json()
-        item_order_id = delete_order.get('item_order_id')
+        item_order_id = delete_order.get('id')
 
         if item_order_id is None:
             abort(400, 'No existing order with that item, please make a new order instead.')
@@ -92,7 +92,7 @@ class Item(Resource):
         if order_status != 1:
             abort(400, 'Cannot modify order since order has left the QUEUE status.')
         else:
-            new = db.delete_order(row)
+            new = db.delete_order(item_order_id)
 
         response = jsonify({
             'status': 'success'
