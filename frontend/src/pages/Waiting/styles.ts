@@ -9,5 +9,29 @@ export const styles = (theme: Theme) =>
       margin: '30px',
       fontSize: '40px',
       height: '100%'
-    }
+    },
+    rightdiv: {
+      width: '100%',
+    },
+    modal: {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      background: fade('#000000', 0.6),
+    },
+    itemmodal: {
+      top: '50%',
+      left: '50%',
+      position: 'fixed',
+      flexGrow: 1,
+      width: '80%',
+      height: 'auto',
+      backgroundColor: theme.palette.background.paper,
+      border: '2px solid #000',
+      boxShadow: theme.shadows[5],
+      padding: theme.spacing(2, 4, 3),
+      transform: `translate(-50%,-50%)`,
+    },
   });

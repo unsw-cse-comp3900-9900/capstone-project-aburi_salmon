@@ -3,7 +3,8 @@ import { createStyles, Theme, fade } from "@material-ui/core";
 export const styles = (theme: Theme) =>
   createStyles({
     menupage: {
-      height: '97vh'
+      height: '97vh',
+      width: '100%',
     },
     title: {
       margin: '30px',
@@ -26,28 +27,39 @@ export const styles = (theme: Theme) =>
     },
     itemcard: {
       minWidth: 250,
-      maxWidth: '100%',
+      width: 'auto',
       margin: '13px',
     },
     itemname: {
       fontSize: 14,
     },
-    itemmodal: {
-      top: '50%',
-      left: '50%',
-    },
     cardaction: {
       display: 'block',
       textAlign: 'initial',
     },
-    divmodal: {
-      position: 'absolute',
+    modal: {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      background: fade('#000000', 0.6),
+    },
+    itemmodal: {
+      top: '50%',
+      left: '50%',
+      position: 'fixed',
       flexGrow: 1,
-      width: '60vw',
-      height: '45vw',
+      minWidth: '60%',
+      width: 'auto',
+      height: 'auto',
       backgroundColor: theme.palette.background.paper,
       border: '2px solid #000',
       boxShadow: theme.shadows[5],
       padding: theme.spacing(2, 4, 3),
+      transform: `translate(-50%,-50%)`,
+    },
+    confirmmodal: {
+
     }
   });
