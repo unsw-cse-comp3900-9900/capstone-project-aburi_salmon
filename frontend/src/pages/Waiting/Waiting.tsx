@@ -114,9 +114,13 @@ class WaitingPage extends React.Component<IProps, IState> {
   async componentDidMount() {
     const client = new Client();
     const o: OrderModel | null = await client.getCurrentOrder();
-    this.setState({
-      order: o
-    });
+
+    // If falsy, don't set state
+    if (!o) {
+      this.setState({
+        order: o
+      });
+    }
   }
 
   // This will be called when there is a state change
