@@ -45,7 +45,7 @@ class Table(Resource):
 @table.route('/orders/<int:table>')
 class TableOrders(Resource):
     @jwt_required
-    @table.response(200, 'Success')
+    @table.response(200, 'Success', model=response_model.table_order_model)
     @table.response(400, 'Invalid request')
     def get(self, table):
         order_id = db.get_order_id(table)
