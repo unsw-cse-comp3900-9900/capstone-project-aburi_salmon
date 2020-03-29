@@ -1,5 +1,5 @@
 import React from 'react';
-import { createStyles,  withStyles, WithStyles, Theme, MenuList, Paper, MenuItem, ListItemIcon, Box } from '@material-ui/core';
+import { createStyles,  withStyles, WithStyles, Theme, MenuList, Paper, MenuItem, ListItemIcon, Box, Snackbar, Button } from '@material-ui/core';
 import PriorityHighIcon from '@material-ui/icons/PriorityHigh';
 import Assistance from './../../Staff/Assistance/AssistanceMain';
 import ToServe from './../Orders/ToServeList';
@@ -7,6 +7,7 @@ import Served from './../Orders/ServedList';
 import { ListItem } from './../../../api/models';
 import { ItemList } from './../../../api/models';
 import { Client } from './../../../api/client';
+import { Alert } from '@material-ui/lab';
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -44,6 +45,7 @@ interface IState{
     toServeList: ItemList | null,
     servedList: ItemList | null,
     listName: string,
+    isOpen: boolean
 }
 
 class Wait extends React.Component<IProps, IState>{
@@ -54,7 +56,8 @@ class Wait extends React.Component<IProps, IState>{
             currPage: "Orders",
             listName: "none",
             toServeList: null,
-            servedList: null
+            servedList: null,
+            isOpen: true,
         }
         this.moveToServed = this.moveToServed.bind(this);
         this.moveToToServe = this.moveToToServe.bind(this);
@@ -138,9 +141,28 @@ class Wait extends React.Component<IProps, IState>{
         }
     }
 
+    showAlert(){
+        return(
+            <Snackbar
+                open={this.state.isOpen}
+                anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+            >
+                <Alert
+                    severity="error"
+                    action={
+                        <Button color="inherit" size="small" onClick={() => this.setState({ isOpen: false })}>
+                            OK
+                            </Button>
+                    }
+                >Assistance Required!!!</Alert>
+            </Snackbar>
+        );
+    }
+
     displayNav(){
         return(
             <div className={this.props.classes.root}>
+                {this.showAlert()}
                 <Paper className={this.props.classes.menubutton}>
                     <MenuList >
                         <MenuItem onClick={() => { this.setState({ currPage: "Menu" }) }}>Menu</MenuItem>

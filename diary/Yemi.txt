@@ -123,5 +123,7 @@ Date    Day         Plan                                    Doing
 25/3    Wednesday   - Move items between lists on frontend  - Orders can now love between lists
                                                             - Refactored code
                                                             - Made temporary menu to switch between staff
-
-
+----------------------------------------------------------------------------------------------------------------------
+26/3    Thursday    - Work on manage staff                  - Finished manage staff page template
+----------------------------------------------------------------------------------------------------------------------
+27/3    Friday      - Evaluate current design               - Slept

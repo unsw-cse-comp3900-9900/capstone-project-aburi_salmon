@@ -41,7 +41,7 @@ class StaffPage extends React.Component<IProps, IState>{
     constructor(props: any){
         super(props);
         this.state = {
-            staffType: "kitchen",
+            staffType: "manage",
         };
     }
 
