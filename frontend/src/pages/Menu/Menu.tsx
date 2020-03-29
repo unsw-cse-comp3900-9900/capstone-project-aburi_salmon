@@ -169,7 +169,7 @@ class MenuPage extends React.Component<IProps, IState> {
     })
   }
 
-  handleCloseConfirmModal(event: React.ChangeEvent<{}>) {
+  async handleCloseConfirmModal(event: React.ChangeEvent<{}>) {
 
   }
 
@@ -209,7 +209,7 @@ class MenuPage extends React.Component<IProps, IState> {
     return p;
   }
 
-  submitOrder() {
+  async submitOrder() {
     
   }
 

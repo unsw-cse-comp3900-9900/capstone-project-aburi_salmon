@@ -1,4 +1,4 @@
-import { Tables, Menu, ItemList, Order, Item } from "./models";
+import { Tables, Menu, ItemList, Order, Item, ItemQuantityOrderPair, CreateOrder, ResponseMessage } from "./models";
 
 const apiUrl = "http://localhost:5000";
 
@@ -84,6 +84,28 @@ export class Client {
     }
   }
 
+  async createOrder(itemList: Array<ItemQuantityOrderPair>) {
+    try {
+      const t: CreateOrder = {
+        order: itemList
+      }
+
+      const r: Response = await fetch(apiUrl + '/order', {
+        method: 'PUT',
+        credentials: 'include',
+        mode: 'cors',
+        body: JSON.stringify(t),
+      });
+
+      const j: ResponseMessage = await r.json();
+
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
   async modifyItemOrder(id: number, quantity: number) {
     try {
       const r: Response = await fetch(apiUrl + '/order/edit', {
@@ -107,7 +129,7 @@ export class Client {
 
   async getCurrentOrder() {
     try {
-      const r: Response = await fetch(apiUrl + '/order/order', {
+      const r: Response = await fetch(apiUrl + '/order', {
         method: 'GET',
         credentials: 'include',
         mode: 'cors',

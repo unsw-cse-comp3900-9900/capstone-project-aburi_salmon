@@ -1,3 +1,7 @@
+export type ResponseMessage = {
+  status: string,
+}
+
 export type Table = {
   occupied: boolean,
   table_id: number
@@ -60,5 +64,14 @@ export type ItemOrder = {
 
 export type Order = {
   item_order: Array<ItemOrder>,
-  total_bill: number
+  total_bill: number,
+}
+
+export type ItemQuantityOrderPair = {
+  item_id: number,
+  quantity: number,
+}
+
+export type CreateOrder = {
+  order: Array<ItemQuantityOrderPair>,
 }
