@@ -59,7 +59,7 @@ class Manage extends React.Component<IProps, IState>{
     constructor(props: any) {
         super(props);
         this.state = {
-            currPage: "Staff",
+            currPage: "Manage",
             queueList: null, //listType === 1
             cookingList: null, //listType === 2
             readyList: null, //listType === 3
@@ -76,9 +76,9 @@ class Manage extends React.Component<IProps, IState>{
             cookingList: cooking,
             readyList: ready,
         });
-        console.log('queuelist: ' + queue);
-        console.log('cookinglist: ' + cooking);
-        console.log('readylist: ' + ready);
+        //console.log('queuelist: ' + queue);
+        //console.log('cookinglist: ' + cooking);
+        //console.log('readylist: ' + ready);
     }
 
     displayCont() {
@@ -95,7 +95,7 @@ class Manage extends React.Component<IProps, IState>{
                     <Assistance />
                 </Box>
             );
-        } else if (this.state.currPage === "Staff"){
+        } else if (this.state.currPage === "Manage"){
             return(
                 <Box className={classes.staffContainer}>
                     <StaffDetails />
@@ -127,16 +127,12 @@ class Manage extends React.Component<IProps, IState>{
                         <MenuItem onClick={() => { this.setState({ currPage: "Menu" }) }}>Menu</MenuItem>
                         <MenuItem onClick={() => {this.setState({ currPage: "Orders"})}}>Orders</MenuItem>
                         <MenuItem onClick={() => { this.setState({ currPage: "Tables" }) }}>Tables</MenuItem>
-                        <MenuItem onClick={() => { this.setState({ currPage: "Staff" }) }}>Staff</MenuItem>
+                        <MenuItem onClick={() => { this.setState({ currPage: "Manage" }) }}>Manage</MenuItem>
                         <MenuItem onClick={() => { this.setState({ currPage: "Analytics" }) }}>Analytics</MenuItem>
                     </MenuList>
                 </Paper>
             </div>
         );
-    }
-
-    emptyFunction(itemId: number, item: ListItem): void{
-        //does nothing
     }
 
     render() {

@@ -1,11 +1,11 @@
 import React from 'react';
 import { createStyles, WithStyles, Theme, withStyles, Button, Box, TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper, Dialog, DialogContent, DialogContentText, DialogActions, DialogTitle, TextField, FormControl, InputLabel, Select, Input } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
+
 //mostly copied from https://codesandbox.io/s/v2eib &
 //https://material-ui.com/components/tables/
 //https://codesandbox.io/s/u0yv3
 //https://material-ui.com/components/buttons/
-
 //https://codesandbox.io/s/6r757
 //https://material-ui.com/components/dialogs/
 
@@ -29,6 +29,12 @@ const styles = (theme: Theme) =>
             margin: theme.spacing(1),
             minWidth: 120,
         },
+        registBut: {
+            float: "left"
+        },
+        tableBut: {
+            float: "right",
+        }
     });
 export interface IProps extends WithStyles<typeof styles> {
 }
@@ -64,7 +70,7 @@ const rows = [
 ];
 
 
-class StaffDetails extends React.Component<IProps, {deleteOpen: boolean, resetOpen: boolean, resetKeyOpen: boolean,resetStaff: string}>{
+class StaffDetails extends React.Component<IProps, { deleteOpen:boolean, resetOpen: boolean, resetKeyOpen: boolean,tableOpen:boolean,resetStaff: string}>{
 
     constructor(props: IProps){
         super(props);
@@ -72,10 +78,12 @@ class StaffDetails extends React.Component<IProps, {deleteOpen: boolean, resetOp
             deleteOpen: false,
             resetOpen: false,
             resetKeyOpen: false,
+            tableOpen: false,
             resetStaff: "",
         }
     }
 
+    
     deleteDialog(){
         return (
             <div>
@@ -88,8 +96,8 @@ class StaffDetails extends React.Component<IProps, {deleteOpen: boolean, resetOp
                     <DialogTitle id="alert-dialog-title">{"Are You Sure?"}</DialogTitle>
                     <DialogContent>
                         <DialogContentText id="alert-dialog-description">
-                            Are you sure you want to delete this staff? There will be no going back.
-          </DialogContentText>
+                            Are you sure you want to delete this staff? There will be no reversing this process.
+                        </DialogContentText>
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={() => this.setState({deleteOpen: false})} color="primary">
@@ -104,6 +112,38 @@ class StaffDetails extends React.Component<IProps, {deleteOpen: boolean, resetOp
         );
     }
 
+    changeTableDialog(){
+        return (
+            <div>
+                <Dialog open={this.state.tableOpen} onClose={() => this.setState({ tableOpen: false })} aria-labelledby="form-dialog-title">
+                    <DialogTitle id="form-dialog-title">Change No. of Tables</DialogTitle>
+
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                        !Please be wary that changing the number of tables will refresh current orders. This is only intended for initial setup
+                        before you start using the system.
+                        </DialogContentText>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="tableno"
+                            label="Enter number"
+                            fullWidth
+                        />
+                    </DialogContent>
+                    
+                    <DialogActions>
+                        <Button onClick={() => this.setState({ tableOpen: false })} color="primary">
+                            Cancel
+                        </Button>
+                        <Button onClick={() => this.setState({ tableOpen: false })} color="primary">
+                            Change
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </div>
+        );
+    }
 
     resetDialog() {
         return (
@@ -198,6 +238,7 @@ class StaffDetails extends React.Component<IProps, {deleteOpen: boolean, resetOp
                 {this.deleteDialog()}
                 {this.resetDialog()}
                 {this.resetKeyDialog()}
+                {this.changeTableDialog()}
                 <Table className={classes.table} aria-label="customized table" >
                     <TableHead>
                         <TableRow>
@@ -229,7 +270,7 @@ class StaffDetails extends React.Component<IProps, {deleteOpen: boolean, resetOp
                                         variant="contained"
                                         color="secondary"
                                         className={classes.button}
-                                        onClick={() => this.setState({ deleteOpen: true })} 
+                                        onClick={() => this.setState({deleteOpen: true})} 
                                         startIcon={<DeleteIcon />}>
                                         Delete
                                     </Button>
@@ -248,7 +289,8 @@ class StaffDetails extends React.Component<IProps, {deleteOpen: boolean, resetOp
             <div className={this.props.classes.wrapper}>
                 {this.printTable()}
                 <br></br>
-                <Button color="primary" onClick={() => this.setState({ resetKeyOpen: true })}>Change Registration Key</Button>
+                <Button color="primary" className={this.props.classes.registBut} onClick={() => this.setState({ resetKeyOpen: true })}>Change Registration Key</Button>
+                <Button color="primary" className={this.props.classes.tableBut} onClick={() => this.setState({ tableOpen: true })}>Change No. of Tables</Button>
             </div>
         );
     }
