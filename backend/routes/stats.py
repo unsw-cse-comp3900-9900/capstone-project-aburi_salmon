@@ -40,7 +40,7 @@ class SalesItem(Resource):
 @stats.route('/sales/category')
 class SalesCategory(Resource):
     @jwt_required
-    @stats.response(200, 'Success')
+    @stats.response(200, 'Success', model=response_model.category_sales_model)
     @stats.response(500, 'Something went wrong')
     def get(self):
         # Amount of sales for each category

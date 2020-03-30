@@ -156,6 +156,26 @@ sales_model = api.schema_model('sales_model', {
     }
 })
 
+category_sales_model = api.schema_model('category_sales_model', {
+    'type': 'object',
+    'required': ['category_sales'],
+    'properties': {
+        'category_sales': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'required': ['id','name','orders','revenue'],
+                'properties': {
+                    'id': {'type': 'integer'},
+                    'name': {'type': 'string'},
+                    'orders': {'type': 'integer'},
+                    'revenue': {'type': 'number'}
+                }
+            }
+        }
+    }
+})
+
 recommendations_model = api.schema_model('recommendations_response_model', {
     'type': 'object',
     'required': ['recommendations'],
