@@ -98,3 +98,16 @@ table_model = api.model('table_model', {
 table_assistance_model = api.model('table_assistance_model', {
     'assistance': fields.Boolean(description='The assistance status of a table session')
 })
+
+recommendations_model = api.schema_model('recommendations_model', {
+    'type': 'object',
+    'required': ['items'],
+    'properties': {
+        'items': {
+            'type': 'array',
+            'items': {
+                'type': 'integer'
+            }
+        }
+    }
+})
