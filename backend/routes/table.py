@@ -15,7 +15,7 @@ class Table(Resource):
     @table.response(400, 'Invalid request')
     # Get a list of tables and their status (occupied or not?)
     def get(self):
-        tables = db.get_tables(0)
+        tables = db.get_tables()
         return jsonify({ 'tables': tables })
 
     @jwt_required
@@ -53,7 +53,7 @@ class TableOrders(Resource):
         if (not order_id):
             abort(400, 'No orders for this table')
 
-        order_items = db.get_ordered_items_info(order_id)
+        order_items = db.get_ordered_items(order_id)
         if (order_items is None):
             abort(400, 'Something went wrong')
 

@@ -120,4 +120,40 @@ class Item(Resource):
             'status': 'success'
         })
 
+@order.route('/item/<int:item_order_id>')
+class ItemOrder(Resource):
+    @jwt_required
+    @order.response(200, 'Success')
+    @order.response(400, 'Invalid request')
+    def get(self, item_order_id):
+        item_order = db.get_item_order(item_order_id)
 
+        if (not item_order):
+            abort(500, 'Something went wrong')
+
+        return jsonify(item_order)
+
+@order.route('/<int:order_id>')
+class ItemOrderById(Resource):
+    # Most the methods for getting information about an order should be done via the table route
+
+    @jwt_required
+    @order.response(200, 'Success')
+    @order.response(500, 'Internal Error')
+    def get(self, order_id):
+        item_order = db.get_ordered_items(order_id)
+        if (item_order is None):
+            abort(500, 'Something went wrong')
+        return { 'item_order': item_order }
+
+@order.route('/status/<int:status_id>')
+class OrdersByStatus(Resource):
+    @jwt_required
+    @order.response(200, 'Success')
+    @order.response(400, 'Invalid Request')
+    def get(self, id):
+        itemlist = db.get_order_list(status_id)
+        if (not itemlist):
+            abort(400, 'Invalid request')
+
+        return {'itemList' : itemlist}
