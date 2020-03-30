@@ -214,7 +214,7 @@ export class Client {
 
   async getListItem(listStatus: number){
     try {
-      const r: Response = await fetch(apiUrl + '/kitchen/' + listStatus, {
+      const r: Response = await fetch(apiUrl + '/order/status/' + listStatus, {
         method: 'GET',
         credentials: 'include',
         mode: 'cors',
@@ -231,7 +231,7 @@ export class Client {
 
   async getTableOrders(tablenumber: number) {
     try {
-      const r: Response = await fetch(apiUrl + '/orders/' + tablenumber, {
+      const r: Response = await fetch(apiUrl + '/table/orders/' + tablenumber, {
         method: 'GET',
         credentials: 'include',
         mode: 'cors',
@@ -262,7 +262,7 @@ export class Client {
 
   async getAssistanceTable() {
     try {
-      const r: Response = await fetch(apiUrl + '/assistance', {
+      const r: Response = await fetch(apiUrl + '/table/assistance', {
         method: 'GET',
         credentials: 'include',
         mode: 'cors',

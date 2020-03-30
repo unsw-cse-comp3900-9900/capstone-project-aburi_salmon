@@ -71,8 +71,8 @@ class Wait extends React.Component<IProps, IState>{
             toServeList: toServe,
             servedList: served,
         });
-        console.log('toServeList: ' + toServe);
-        console.log('ServedList: ' + served);
+        //console.log('toServeList: ' + toServe);
+        //console.log('ServedList: ' + served);
     }
 
     displayCont(){

@@ -98,6 +98,18 @@ table_assistance_model = api.model('table_assistance_model', {
     'assistance': fields.Boolean(description='The assistance status of a table session')
 })
 
+
+edit_staff_model = api.model('edit_staff_model', {
+    "staff_id": fields.Integer(description="staff_id"),
+    "name": fields.String(description='Name'),
+    "username": fields.String(description='Username'),
+    "staff_type_id": fields.Integer(description='Staff_type_id')
+})
+
+delete_staff_model = api.model('delete_staff_model', {
+    "staff_id": fields.Integer(description="staff_id")
+})
+
 recommendations_model = api.schema_model('recommendations_model', {
     'type': 'object',
     'required': ['items'],

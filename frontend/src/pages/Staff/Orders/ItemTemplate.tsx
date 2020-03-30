@@ -36,9 +36,9 @@ class ItemCont extends React.Component<IProps, {}>{
         const { classes } = this.props;
         return (
             <button className={classes.itemContainer} onClick={() => this.props.update(this.props.itemId, this.props.item)}>
+                <b>ItemID:</b> {this.props.itemId} <br></br>
                 <b>Item Name:</b> {this.props.item.itemName} <br></br>
                 <b>Amount:</b> {this.props.item.quantity} <br></br>
-                <b>ItemID:</b> {this.props.itemId} <br></br>
                 <b>Price:</b> {this.props.item.price}
             </button>
         );
