@@ -509,26 +509,6 @@ class DB:
 
         return rows[0][0]
 
-    def get_item_order(self, id):
-        rows = self.__query(
-            'SELECT io.*, i.name, i.price FROM item_order io JOIN item i on (io.item_id = i.id) WHERE io.id = %s',
-            [id]
-        )
-
-        if (not rows or not rows[0]):
-            return None
-  
-        item_order = rows[0]
-        return {
-            'id': item_order[0],
-            'order_id': item_order[1],
-            'item_id': item_order[2],
-            'quantity': item_order[3],
-            'status_id': item_order[4],
-            'name': item_order[5],
-            'price': item_order[6]
-        }
-
     def get_order_status(self, item_order_id):
         status = self.__query('SELECT status_id FROM item_order WHERE id = %s', [item_order_id,])
 
