@@ -572,3 +572,42 @@ class DB:
             } for row in rows]
         return orders
 
+    def get_all_staff(self):
+        rows = self.__query('SELECT s.id, s.name, s.username, st.title FROM staff s, staff_type st WHERE s.staff_type_id = st.id AND st.id > %s', [0,])
+
+        if (not rows):
+            return None
+
+
+        staff_list = []
+        for row in rows:
+            myDict = {
+                'id': row[0],
+                'name': row[1],
+                'username': row[2],
+                'staff_type': row[3]
+            }
+            staff_list.append(myDict)
+
+
+        return staff_list
+
+    def get_staff_detail(self, staff_id):
+        row = self.__query('SELECT s.id, s.name, s.username, s.staff_type_id FROM staff s WHERE s.id = %s', [staff_id,])
+        print("ROW")
+        print(row)
+        if (not row):
+            return None
+
+        myDict = {
+            'id': row[0][0],
+            'name': row[0][1],
+            'username': row[0][2],
+            'staff_type': row[0][3]
+        }
+
+        return myDict
+
+
+    def modify_staff(self, nid, nname, nusername, nstaff_type):
+        return self.__update("UPDATE staff SET name = %s, username = %s, staff_type_id = %s WHERE id = %s", [nname, nusername, nstaff_type, nid])
