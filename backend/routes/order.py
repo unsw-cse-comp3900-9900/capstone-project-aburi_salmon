@@ -99,7 +99,7 @@ class Item(Resource):
         if item_order_id is None:
             abort(400, 'No existing order with that item, please make a new order instead.')
         
-        new = db.modify_order(item_order_id, quantity)
+        new = db.modify_item_order(item_order_id, quantity)
         if new == 5:
             abort(400, 'New quantity has to be >= 1 OR order has left the QUEUE status, please make a NEW order instead.')
         
@@ -123,7 +123,7 @@ class Item(Resource):
         if order_status != 1:
             abort(400, 'Cannot modify order since order has left the QUEUE status.')
         else:
-            new = db.delete_order(item_order_id)
+            new = db.delete_item_order(item_order_id)
 
         response = jsonify({
             'status': 'success'

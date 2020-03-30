@@ -12,7 +12,7 @@ import { styles } from './styles';
 import { LeftBox, RightBar } from "../../components";
 import { Order as OrderModel, ItemOrder as ItemOrderModel, Item } from "../../api/models";
 import { Client } from "../../api/client";
-import { Item as ItemModel, ItemQuantityOrderPair as ItemQuantityOrderPairModel, AddItemToOrderResponseMessage } from '../../api/models';
+import { Item as ItemModel, ItemQuantityPair as ItemQuantityPairModel, OrderItemQuantityPair as OrderItemQuantityPairModel, ResponseMessage as ResponseMessageModel } from '../../api/models';
 
 interface IProps extends WithStyles<typeof styles> { }
 
@@ -20,6 +20,8 @@ interface IState {
   order: OrderModel | null;
   openModal: boolean;
   modal: ItemModel | null;
+  item_order_id: number;
+  modalStatus: number;
   modalQuantity: number;
   modalOriginalQuantity: number;
   modalSecondButton: string;
@@ -34,6 +36,8 @@ class WaitingPage extends React.Component<IProps, IState> {
       order: null,
       openModal: false,
       modal: null,
+      item_order_id: 0,
+      modalStatus: 0,
       modalQuantity: 0,
       modalOriginalQuantity: 0,
       modalSecondButton: "Add to order",
@@ -57,10 +61,10 @@ class WaitingPage extends React.Component<IProps, IState> {
   }
 
   renderSecondButton(it: ItemOrderModel) {
-    if (it.status.id === 0) {
-      return (<Button color="secondary">Cancel</Button>);
+    if (it.status.id === 1) {
+      return (<Button color="secondary" onClick={() => this.cancelOrder(it)}>Cancel Order</Button>);
     }
-    return (<Button disabled color="secondary">Cancel</Button>);
+    return (<Button disabled color="secondary">Cancel Order</Button>);
   }
 
   async openModal(it: ItemOrderModel) {
@@ -68,12 +72,16 @@ class WaitingPage extends React.Component<IProps, IState> {
     const i: ItemModel | null = await client.getItem(it.item_id);
 
     const mq = it.status.id === 1 ? it.quantity : 0;
+    const sb = it.status.id === 4 ? "Add to order" : "Modify order";
 
     this.setState({
       openModal: true,
       modal: i,
+      item_order_id: it.id,
+      modalStatus: it.status.id,
       modalQuantity: mq,
       modalOriginalQuantity: mq,
+      modalSecondButton: sb,
       modalSecondButtonDisable: true,
     });
   }
@@ -86,6 +94,7 @@ class WaitingPage extends React.Component<IProps, IState> {
       return {
         modalQuantity: pq,
         modalSecondButtonDisable: pq === prevState.modalOriginalQuantity,
+        modalSecondButton: (pq === 0 && prevState.modalStatus === 1) ? "Cancel Order" : "Modify Order",
       }
     });
   }
@@ -96,6 +105,7 @@ class WaitingPage extends React.Component<IProps, IState> {
       return {
         modalQuantity: pq,
         modalSecondButtonDisable: pq === prevState.modalOriginalQuantity,
+        modalSecondButton: (pq === 0 && prevState.modalStatus === 1) ? "Cancel Order" : "Modify Order",
       }
     })
   }
@@ -108,19 +118,54 @@ class WaitingPage extends React.Component<IProps, IState> {
 
   async addToOrder(event: React.ChangeEvent<{}>) {
     const client = new Client();
-    const t: ItemQuantityOrderPairModel = {
-      item_id: this.state.modal!.id,
-      quantity: this.state.modalQuantity,
+    let r: ResponseMessageModel | null = null;
+    switch (this.state.modalStatus) {
+      case 1:
+        // Submit item_order_id to patch
+
+        if (this.state.modalQuantity === 0) {
+          r = await client.deleteItemOrder(this.state.item_order_id);
+        } else {
+          const s: OrderItemQuantityPairModel = {
+            id: this.state.item_order_id,
+            quantity: this.state.modalQuantity,
+          };
+          r = await client.patchItemOrder(s);
+        }
+        break;
+      case 4:
+        // Submit modal's item_id
+        const t: ItemQuantityPairModel = {
+          item_id: this.state.modal!.id,
+          quantity: this.state.modalQuantity,
+        };
+
+        r = await client.addItemToOrder(t);
+        break;
+      default:
+        return;
     }
-    console.log(t);
-    await client.addItemToOrder(t);
 
     const o: OrderModel | null = await client.getCurrentOrder();
 
     // Doesn't matter if null
     this.setState({
       openModal: false,
-      order: o
+      order: o,
+    });
+  }
+
+  async cancelOrder(it: ItemOrderModel) {
+    const client = new Client();
+
+    const r: ResponseMessageModel | null = await client.deleteItemOrder(it.id);
+    
+    const o: OrderModel | null = await client.getCurrentOrder();
+
+    // Doesn't matter if null
+    this.setState({
+      openModal: false,
+      order: o,
     });
   }
 
@@ -162,7 +207,7 @@ class WaitingPage extends React.Component<IProps, IState> {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    { this.state.order && this.state.order?.item_order && 
+                    {this.state.order && this.state.order?.item_order &&
                       this.state.order?.item_order.map((it) => {
                         return (
                           <TableRow>
@@ -171,7 +216,7 @@ class WaitingPage extends React.Component<IProps, IState> {
                             <TableCell>{it.quantity * it.price}</TableCell>
                             <TableCell>{it.status.name}</TableCell>
                             <TableCell>{this.renderFirstButton(it)}</TableCell>
-                            <TableCell><Button disabled={it.status.id > 0}>Cancel</Button></TableCell>
+                            <TableCell>{this.renderSecondButton(it)}</TableCell>
                           </TableRow>
                         )
                       })

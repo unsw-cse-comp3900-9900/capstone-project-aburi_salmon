@@ -1,4 +1,4 @@
-import { Tables, Menu, ItemList, Order, Item, ItemQuantityOrderPair, CreateOrder, ResponseMessage, AddItemToOrderResponseMessage } from "./models";
+import { Tables, Menu, ItemList, Order, Item, ItemQuantityPair, CreateOrder, ResponseMessage, AddItemToOrderResponseMessage, OrderItemQuantityPair, ItemOrder } from "./models";
 
 const apiUrl = "http://localhost:5000";
 
@@ -84,7 +84,7 @@ export class Client {
     }
   }
 
-  async createOrder(itemList: Array<ItemQuantityOrderPair>) {
+  async createOrder(itemList: Array<ItemQuantityPair>) {
     try {
       const t: CreateOrder = {
         order: itemList
@@ -106,7 +106,53 @@ export class Client {
     }
   }
 
-  async addItemToOrder(item: ItemQuantityOrderPair) {
+  async patchItemOrder(item: OrderItemQuantityPair){
+    try {
+      // In order to avoid CORS issue, headers, credentials, and mode should be specified
+      const r: Response = await fetch(apiUrl + '/order/item', {
+        method: 'PATCH',
+        credentials: 'include',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(item),
+      });
+
+      const j: ResponseMessage = await r.json();
+
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async deleteItemOrder(id: number) {
+    try {
+      // In order to avoid CORS issue, headers, credentials, and mode should be specified
+      const r: Response = await fetch(apiUrl + '/order/item', {
+        method: 'DELETE',
+        credentials: 'include',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: id
+        }),
+      });
+
+      const j: ResponseMessage = await r.json();
+
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async addItemToOrder(item: ItemQuantityPair) {
     try {
       // In order to avoid CORS issue, headers, credentials, and mode should be specified
       const r: Response = await fetch(apiUrl + '/order/item', {
