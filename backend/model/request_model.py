@@ -26,8 +26,7 @@ edit_profile_model = api.model('edit_profile', {
 #    "staff_type_id": fields.Integer(description='Staff_type_id')
 })
 
-edit_order_item_status_model = api.model('edit_order_item_status', {
-    "id": fields.Integer(description="id"),
+edit_item_order_status_model = api.model('edit_item_order_status_model', {
     "status": fields.Integer(description="status_id")
 })
 

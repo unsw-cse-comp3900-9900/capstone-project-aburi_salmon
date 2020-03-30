@@ -156,7 +156,7 @@ class DB:
     def update_staff(self, username, name, staff_type_id):
         return self.__update("UPDATE staff SET name = %s, staff_type_id = %s WHERE username = %s", [name, staff_type_id, username])
 
-    def update_ordered_item_status(self, id, status):
+    def update_item_ordered_status(self, id, status):
         return self.__update("UPDATE item_order SET status_id = %s WHERE id = %s", [status, id])
 
 
@@ -401,7 +401,7 @@ class DB:
 
     def get_ordered_items(self, order_id):
         rows = self.__query(
-            'SELECT i.name, io.quantity, i.price FROM "order" o JOIN item_order io on (o.id = io.order_id) JOIN item i on (i.id = io.item_id) WHERE o.id = %s',
+            'SELECT i.name, io.quantity, i.price, io.id, io.status_id FROM "order" o JOIN item_order io on (o.id = io.order_id) JOIN item i on (i.id = io.item_id) WHERE o.id = %s',
             [order_id]
         )
 
@@ -409,9 +409,11 @@ class DB:
             return []
 
         orders = [{
-            'name': row[0],
+            'itemName': row[0],
             'quantity': row[1],
-            'price': row[2]
+            'price': row[2],
+            'id': row[3],
+            'status_id': row[4]
         } for row in rows]
         return orders
       
@@ -538,7 +540,7 @@ class DB:
 
 
     def get_order_list(self, status):
-        rows = self.__query('SELECT item.name, io.quantity, item.price, io.id FROM item_order io JOIN item ON io.item_id = item.id WHERE io.status_id = %s', [status])
+        rows = self.__query('SELECT item.name, io.quantity, item.price, io.id, io.status_id FROM item_order io JOIN item ON io.item_id = item.id WHERE io.status_id = %s', [status])
 
         if (not rows):
             return None
@@ -548,6 +550,7 @@ class DB:
             'quantity': row[1],
             'price': row[2],
             'id': row[3],
+            'status_id': row[4]
         } for row in rows]
 
         return orders
