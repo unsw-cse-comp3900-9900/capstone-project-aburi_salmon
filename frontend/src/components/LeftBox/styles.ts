@@ -9,9 +9,11 @@ export const styles = (theme: Theme) =>
       backgroundColor: fade(theme.palette.common.white, 0.15)
     },
     firstColumn: {
-      height: '10%'
+      height: '10%',
+      width: 'auto',
     },
     secondColumn: {
-      height: '90%'
+      height: '90%',
+      width: 'auto',
     }
   });

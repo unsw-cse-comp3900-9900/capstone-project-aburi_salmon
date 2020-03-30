@@ -22,6 +22,7 @@ class DB:
         rows = c.fetchall()
         
         c.close()
+        print(rows)
         return rows if len(rows) else None
 
     def __update(self, update, params):
@@ -367,6 +368,37 @@ class DB:
             ingredient.append(row[0])
         return ingredient
 
+    def get_ordered_items_customer(self, table_id):
+        rows = self.__query("""SELECT io.id as item_order_id, io.order_id, i.name, i.id as item_id, io.quantity,
+        i.price, s.id as status_id, s.status_name
+        FROM item_order io, item i, status s, "order" o
+        WHERE s.id = io.status_id
+        AND i.id = io.item_id
+        AND io.order_id = o.id
+        AND o.id = (SELECT id from "order" WHERE table_id = %s ORDER BY id DESC LIMIT 1);""", [table_id])
+
+        if (not rows):
+            return None
+
+
+        item_order = []
+        for row in rows:
+            myDict = {
+                'id': row[0],
+                'order_id': row[1],
+                'item': row[2],
+                'item_id': row[3],
+                'quantity': row[4],
+                'price': row[5],
+                'status': {
+                    'id': row[6],
+                    'name': row[7]
+                }
+            }
+            item_order.append(myDict)
+
+        return item_order
+
     def get_ordered_items(self, order_id):
         rows = self.__query(
             'SELECT i.name, io.quantity, i.price FROM "order" o JOIN item_order io on (o.id = io.order_id) JOIN item i on (i.id = io.item_id) WHERE o.id = %s',
@@ -504,6 +536,14 @@ class DB:
             return None
 
         return status[0][0]
+
+    def add_order(self, order_id, item_id, quantity):
+        io_id = self.__query("INSERT INTO item_order (item_id, order_id, quantity, status_id) VALUES (%s, %s, %s, %s) RETURNING id;", [item_id, order_id, quantity, 1])
+
+        if (not io_id):
+            return None
+
+        return io_id[0][0]
 
     def modify_order(self, item_order_id, quantity):
         new_quantity = DB.get_quantity(self, item_order_id) + quantity
