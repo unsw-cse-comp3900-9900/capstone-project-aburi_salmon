@@ -12,7 +12,7 @@ import { styles } from './styles';
 import { LeftBox, RightBar } from "../../components";
 import { Order as OrderModel, ItemOrder as ItemOrderModel, Item } from "../../api/models";
 import { Client } from "../../api/client";
-import { Item as ItemModel } from '../../api/models';
+import { Item as ItemModel, ItemQuantityOrderPair as ItemQuantityOrderPairModel, AddItemToOrderResponseMessage } from '../../api/models';
 
 interface IProps extends WithStyles<typeof styles> { }
 
@@ -24,6 +24,7 @@ interface IState {
   modalOriginalQuantity: number;
   modalSecondButton: string;
   modalSecondButtonDisable: boolean;
+  disableBill: boolean;
 }
 
 class WaitingPage extends React.Component<IProps, IState> {
@@ -37,6 +38,7 @@ class WaitingPage extends React.Component<IProps, IState> {
       modalOriginalQuantity: 0,
       modalSecondButton: "Add to order",
       modalSecondButtonDisable: true,
+      disableBill: true,
     }
     this.openModal = this.openModal.bind(this);
     this.handleCloseModal = this.handleCloseModal.bind(this);
@@ -47,7 +49,7 @@ class WaitingPage extends React.Component<IProps, IState> {
     switch (it.status.id) {
       case 1:
         return (<Button color="primary" onClick={() => this.openModal(it)}>Modify order</Button>);
-      case 3:
+      case 4:
         return (<Button color="primary" onClick={() => this.openModal(it)}>Add more</Button>)
       default:
         return (<Button disabled color="primary">Modify order</Button>);
@@ -105,15 +107,28 @@ class WaitingPage extends React.Component<IProps, IState> {
   }
 
   async addToOrder(event: React.ChangeEvent<{}>) {
+    const client = new Client();
+    const t: ItemQuantityOrderPairModel = {
+      item_id: this.state.modal!.id,
+      quantity: this.state.modalQuantity,
+    }
+    console.log(t);
+    await client.addItemToOrder(t);
 
+    const o: OrderModel | null = await client.getCurrentOrder();
+
+    // Doesn't matter if null
     this.setState({
       openModal: false,
-    })
+      order: o
+    });
   }
 
   async componentDidMount() {
     const client = new Client();
     const o: OrderModel | null = await client.getCurrentOrder();
+
+    // Doesn't matter if null
     this.setState({
       order: o
     });
@@ -147,7 +162,7 @@ class WaitingPage extends React.Component<IProps, IState> {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {
+                    { this.state.order && this.state.order?.item_order && 
                       this.state.order?.item_order.map((it) => {
                         return (
                           <TableRow>
@@ -171,17 +186,16 @@ class WaitingPage extends React.Component<IProps, IState> {
           first={
             <div className={classes.rightdiv}>
               <Button variant="contained" color="primary">Request assistance</Button>
-              <Button variant="contained" color="primary">Add item to order</Button>
             </div>
           }
           second={
             <div className={classes.rightdiv}>
-
+              <Button variant="contained" color="primary">Add item to order</Button>
             </div>
           }
           third={
             <div className={classes.rightdiv}>
-              <Button variant="contained" color="primary" disabled>Bill Unpaid</Button>
+              <Button variant="contained" color="primary" disabled={this.state.disableBill}>Pay bill</Button>
             </div>
           }
         />
@@ -217,6 +231,7 @@ class WaitingPage extends React.Component<IProps, IState> {
                 <FormControl>
                   <FormGroup>
                     {
+                      this.state.modal && this.state.modal?.ingredients &&
                       this.state.modal?.ingredients.map(ingredient => (<FormControlLabel
                         control={<Checkbox checked={true} />}
                         disabled
