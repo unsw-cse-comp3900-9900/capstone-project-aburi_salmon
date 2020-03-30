@@ -2,12 +2,24 @@ import React from 'react';
 import { Route, Router, Switch } from "react-router-dom";
 import './App.css';
 import { MuiThemeProvider } from "@material-ui/core/styles";
-
 import history from './history';
 import { Home, Login, Staff, Table, Menu, Waiting } from "./pages";
 import { theme } from './theme/theme';
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:5000')
 
 class App extends React.Component {
+  componentDidMount() {
+    socket.on('connect', () => {
+      if (localStorage.staff) {
+        socket.emit('join')
+      }
+    })
+
+    socket.on('message', data => this.setState({ room: data.room }))
+  }
+
   render() {
     // I couldn't put MuiThemeProvider if this file is moved to a .tsx file
     return (
