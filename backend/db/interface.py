@@ -538,7 +538,6 @@ class DB:
     def delete_order(self, item_order_id):
         return self.__delete("DELETE FROM item_order WHERE id = %s", [item_order_id,])
 
-
     def get_order_list(self, status):
         rows = self.__query('SELECT item.name, io.quantity, item.price, io.id, io.status_id FROM item_order io JOIN item ON io.item_id = item.id WHERE io.status_id = %s', [status])
 
@@ -554,6 +553,49 @@ class DB:
         } for row in rows]
 
         return orders
+
+
+    def get_all_staff(self):
+        rows = self.__query('SELECT s.id, s.name, s.username, st.title FROM staff s, staff_type st WHERE s.staff_type_id = st.id AND st.id > %s', [0,])
+
+        if (not rows):
+            return None
+
+
+        staff_list = []
+        for row in rows:
+            myDict = {
+                'id': row[0],
+                'name': row[1],
+                'username': row[2],
+                'staff_type': row[3]
+            }
+            staff_list.append(myDict)
+
+
+        return staff_list
+
+    def get_staff_detail(self, staff_id):
+        row = self.__query('SELECT s.id, s.name, s.username, s.staff_type_id FROM staff s WHERE s.id = %s', [staff_id,])
+        print("ROW")
+        print(row)
+        if (not row):
+            return None
+
+        myDict = {
+            'id': row[0][0],
+            'name': row[0][1],
+            'username': row[0][2],
+            'staff_type': row[0][3]
+        }
+
+        return myDict
+
+    def modify_staff(self, nid, nname, nusername, nstaff_type):
+        return self.__update("UPDATE staff SET name = %s, username = %s, staff_type_id = %s WHERE id = %s", [nname, nusername, nstaff_type, nid])
+
+    def delete_staff(self, staff_id):
+        return self.__delete("DELETE FROM staff WHERE id = %s", [staff_id,])
 
     def get_menu_item_sales(self, item_id = None):
         if item_id is None:
@@ -601,3 +643,4 @@ class DB:
             'name': row[1],
             'count': row[2]
         } for row in rows][:3]
+
