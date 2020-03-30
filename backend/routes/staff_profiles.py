@@ -35,17 +35,6 @@ class Staff_edit(Resource):
         curr_username = staff_curr['username']
         curr_staff_type_id = staff_curr['staff_type']
 
-        print("INPUT")
-        print(staff_id)
-        print(name_new)
-        print(username_new)
-        print(staff_type_id_new)
-
-        print("PREV/CURRENT")
-        print(curr_name)
-        print(curr_username)
-        print(curr_staff_type_id)
-
         if staff_id == 0:
             abort(400, 'Please insert a staff id.')
 
@@ -63,12 +52,6 @@ class Staff_edit(Resource):
             staff_type = curr_staff_type_id
         else:
             staff_type = staff_type_id_new
-
-        print("YG MAU DIMODIFY")
-        print(staff_id)
-        print(name)
-        print(username)
-        print(staff_type)
         
         edit = db.modify_staff(staff_id, name, username, staff_type)
         if edit != 1:
@@ -78,12 +61,23 @@ class Staff_edit(Resource):
             'status': 'success'
         })
 
+    #@jwt_required
+    @staff_profile.expect(delete_staff_model)
+    @staff_profile.response(200, 'Success')
+    @staff_profile.response(400, 'Invalid request')
+    def delete(self):
 
-#delete_staff_model = api.model('delete_staff_model', {
-#    "staff_id": fields.Integer(description="staff_id")
-#})
-    
+        delete_order = request.get_json()
+        staff_id = delete_order.get('staff_id')
 
+        if staff_id == 0:
+            abort(400, 'Please insert staff id.')
 
-#edit
-#delete
+        delete = db.delete_staff(staff_id)
+
+        if delete != 1:
+            abort(400, 'Something is wrong.')
+
+        response = jsonify({
+            'status': 'success'
+        })

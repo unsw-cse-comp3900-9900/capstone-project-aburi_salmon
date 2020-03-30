@@ -554,9 +554,6 @@ class DB:
     def delete_order(self, item_order_id):
         return self.__delete("DELETE FROM item_order WHERE id = %s", [item_order_id,])
 
-
-   
-
     def get_order_list(self, status):
         rows = self.__query('SELECT item.name, io.quantity, item.price, item.id FROM item_order io JOIN item ON io.item_id = item.id WHERE io.status_id = %s', [status])
 
@@ -608,6 +605,8 @@ class DB:
 
         return myDict
 
-
     def modify_staff(self, nid, nname, nusername, nstaff_type):
         return self.__update("UPDATE staff SET name = %s, username = %s, staff_type_id = %s WHERE id = %s", [nname, nusername, nstaff_type, nid])
+
+    def delete_staff(self, staff_id):
+        return self.__delete("DELETE FROM staff WHERE id = %s", [staff_id,])
