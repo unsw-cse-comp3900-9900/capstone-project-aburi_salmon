@@ -131,7 +131,9 @@ class Item(Resource):
         })
 
 @order.route('/item/status/<int:item_order_id>')
-class ModifyItemOrder(Resource):
+class ModifyItemOrderStatus(Resource):
+    # Use this route to modify the status of an item order
+    # Pass the new status_id in the body
     @jwt_required
     @order.response(200, 'Success')
     @order.response(400, 'Invalid Request')
