@@ -9,6 +9,7 @@ import Ready from './../../Staff/Orders/ReadyList';
 import Assistance from './../../Staff/Assistance/AssistanceMain';
 import StaffDetails from './../StaffDetails/StaffDetails';
 import Analytics from './../Analytics/Analytics';
+import ManageOrders from './../Orders/ManageOrders';
 
 
 const styles = (theme: Theme) =>
@@ -85,9 +86,7 @@ class Manage extends React.Component<IProps, IState>{
         if (this.state.currPage === "Orders"){
             return (
                 <Box className={classes.staffContainer}>
-                    <Queue update={this.emptyFunction} someList={this.state.queueList} />
-                    <Cooking update={this.emptyFunction} someList={this.state.cookingList} />
-                    <Ready update={this.emptyFunction} someList={this.state.readyList} />
+                    <ManageOrders />
                 </Box>
             );
         } else if (this.state.currPage === "Tables") {
