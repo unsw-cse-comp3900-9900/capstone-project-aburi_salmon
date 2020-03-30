@@ -569,8 +569,6 @@ class DB:
         return self.__delete("DELETE FROM item_order WHERE id = %s", [item_order_id,])
 
 
-   
-
     def get_order_list(self, status):
         rows = self.__query('SELECT item.name, io.quantity, item.price, item.id FROM item_order io JOIN item ON io.item_id = item.id WHERE io.status_id = %s', [status])
 
@@ -586,3 +584,49 @@ class DB:
             } for row in rows]
         return orders
 
+    def get_menu_item_sales(self, item_id = None):
+        if item_id is None:
+            rows = self.__query(
+                'SELECT i.id, i.name, i.price, sum(io.quantity) FROM item i JOIN item_order io on (i.id = io.item_id) GROUP BY i.id'
+            )
+        else:
+            rows = self.__query(
+                'SELECT i.id, i.name, i.price, sum(io.quantity) FROM item i JOIN item_order io on (i.id = io.item_id) WHERE i.id = %s GROUP BY i.id',
+                [item_id]
+            )
+
+        if (not rows):
+            return []
+
+        return [{
+            'id': row[0],
+            'name': row[1],
+            'price': row[2],
+            'orders': row[3],
+            'revenue': row[2] * row[3]
+        } for row in rows]
+
+    def get_recommendation(self, items=[]):
+        # Orders where item appears
+        rows = self.__query(
+            'SELECT distinct o.id FROM item i JOIN item_order io on (i.id = io.item_id) JOIN "order" o on (o.id = io.order_id) WHERE i.id in %s',
+            [tuple(i for i in items)]
+        )
+
+        if (not rows or not rows[0]):
+            return None
+
+        orders = tuple(row[0] for row in rows)
+
+        # Get count of other items in these orders
+        rows = self.__query(
+            'SELECT distinct i.id, i.name, count(i.id) as seen FROM item i JOIN item_order io on (i.id = io.item_id) JOIN "order" o on (o.id = io.order_id) WHERE i.id not in %s AND o.id in %s GROUP BY i.id ORDER BY seen DESC',
+            [tuple(i for i in items), orders]
+        )
+
+        # Return top 3 recommendations
+        return [{
+            'item_id': row[0],
+            'name': row[1],
+            'count': row[2]
+        } for row in rows][:3]
