@@ -93,6 +93,7 @@ const dummyFeedback = [
     createFeedback('The food was good', 4),
     createFeedback('The pages are too white',3),
     createFeedback('Fast service', 4),
+    createFeedback('Average Star Rating', 3.1)
 ];
 
 function createItemStats(itemname: string, category: string, cost: number, amount: number, profit: number){
@@ -132,7 +133,6 @@ class Analytics extends React.Component<IProps, {data: any}>{
                         valueField="population"
                         argumentField="year"
                     />
-                    <Title text="Overall Profits (last 7 days)" />
                     <Animation />
                 </Chart>
             </Paper>
@@ -202,14 +202,17 @@ class Analytics extends React.Component<IProps, {data: any}>{
     render() {
         return (
             <div className={this.props.classes.wrapper}>
-                <div className={this.props.classes.profits}>
-                    {this.getGraph()}
-                </div>
-                <div className={this.props.classes.itemTable}>
+                {/*<div className={this.props.classes.profits}>*/}
+                <h2>Earnings (last 7 days)</h2>
+                {this.getGraph()}
+                {/*</div>*/}
+                {/*<div className={this.props.classes.itemTable}>
                     {this.printItemTable()}
-                </div>
+        </div>*/}
                 <br></br>
                 {this.printFeedbackTable()}
+                <br></br>
+                {this.printItemTable()}
             </div>
         );
     }

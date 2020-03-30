@@ -2,7 +2,7 @@ import React from 'react';
 import {  createStyles, withStyles, WithStyles, Theme, Link} from '@material-ui/core';
 import './../Assistance/Assistance.css';
 import TableInfo from './../Assistance/TableInfo';
-import { Tables as TableModel } from './../../../api/models';
+import { Tables as TableModel, AssistanceTable, AssistanceTables } from './../../../api/models';
 import { Client } from './../../../api/client';
 //https://material-ui.com/components/menus/#menus
 //https://stackoverflow.com/questions/58630490/how-to-convert-functional-componenet-to-class-component-in-react-in-material
@@ -48,6 +48,7 @@ interface IState{
     selectedTable: number,
     main: boolean,
     tables: TableModel | null,
+    assistance: AssistanceTables | null,
 }
 
 class Assistance extends React.Component<IProps, IState>{
@@ -58,6 +59,7 @@ class Assistance extends React.Component<IProps, IState>{
             selectedTable: 0, //Selected table, 0 means none selected
             main: true, //main screen
             tables: null,
+            assistance: null,
         }
     }
     
@@ -69,11 +71,11 @@ class Assistance extends React.Component<IProps, IState>{
     async componentDidMount() {
         const client = new Client()
         const t: TableModel | null = await client.getTables();
-        this.setState({ tables: t });
+        const a: AssistanceTables | null = await client.getAssistanceTable();
+        this.setState({ tables: t, assistance: a });
         console.log(t);
     }
 
-    
     createTables = () => {
         let table = [];
         let i = 0;
@@ -110,22 +112,6 @@ class Assistance extends React.Component<IProps, IState>{
         return table;
     }
 
-
-    display(){
-        if(this.state.main){
-            return (
-                <div className={this.props.classes.container}>
-                    <h1>Tables</h1>
-                    {this.createTables()}
-                </div>
-            );
-        } else {
-            return(
-                <TableInfo tableNumber={this.state.selectedTable}/>
-            )
-        }
-    }
-
     backToTables(){
         this.setState({ selectedTable: 0 });
         this.setState({ main: true });
@@ -138,6 +124,15 @@ class Assistance extends React.Component<IProps, IState>{
                 <mark className={this.props.classes.green}> Green = Empty </mark>, Grey = Occupied
             </div>
         );
+    }
+
+    needAssistance(tablenum: number):boolean{
+        this.state.assistance?.table.forEach((item: AssistanceTable) =>{
+            if(item.table_id === tablenum){
+                return item.occupied;
+            }
+        })
+        return false
     }
 
     render() {
@@ -153,7 +148,7 @@ class Assistance extends React.Component<IProps, IState>{
             return (
                 <div className={this.props.classes.wrapper}>
                     <Link onClick={()=>this.backToTables()} > Back to tables</Link>
-                    <TableInfo tableNumber={this.state.selectedTable} />
+                    <TableInfo tableNumber={this.state.selectedTable} assistance={this.needAssistance(this.state.selectedTable)}/>
                 </div>
             )
         };

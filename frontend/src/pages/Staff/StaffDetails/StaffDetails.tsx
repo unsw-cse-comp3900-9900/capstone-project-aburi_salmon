@@ -1,5 +1,5 @@
 import React from 'react';
-import { createStyles, WithStyles, Theme, withStyles, Button, Box, TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper, Dialog, DialogContent, DialogContentText, DialogActions, DialogTitle, TextField } from '@material-ui/core';
+import { createStyles, WithStyles, Theme, withStyles, Button, Box, TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper, Dialog, DialogContent, DialogContentText, DialogActions, DialogTitle, TextField, FormControl, InputLabel, Select, Input } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 //mostly copied from https://codesandbox.io/s/v2eib &
 //https://material-ui.com/components/tables/
@@ -24,7 +24,11 @@ const styles = (theme: Theme) =>
         },
         rows: {
             paddingLeft: theme.spacing(2),
-        }
+        },
+        formControl: {
+            margin: theme.spacing(1),
+            minWidth: 120,
+        },
     });
 export interface IProps extends WithStyles<typeof styles> {
 }
@@ -60,13 +64,15 @@ const rows = [
 ];
 
 
-class StaffDetails extends React.Component<IProps, {deleteOpen: boolean, resetOpen: boolean}>{
+class StaffDetails extends React.Component<IProps, {deleteOpen: boolean, resetOpen: boolean, resetKeyOpen: boolean,resetStaff: string}>{
 
     constructor(props: IProps){
         super(props);
         this.state = {
             deleteOpen: false,
             resetOpen: false,
+            resetKeyOpen: false,
+            resetStaff: "",
         }
     }
 
@@ -105,15 +111,20 @@ class StaffDetails extends React.Component<IProps, {deleteOpen: boolean, resetOp
                 <Dialog open={this.state.resetOpen} onClose={() => this.setState({resetOpen: false})} aria-labelledby="form-dialog-title">
                     <DialogTitle id="form-dialog-title">Reset Password</DialogTitle>
                     <DialogContent>
-                        <DialogContentText>
-                            Please enter new password
-                        </DialogContentText>
                         <TextField
                             autoFocus
                             margin="dense"
-                            id="name"
+                            id="pass"
                             label="New Password"
-                            type="email"
+                            type="password"
+                            fullWidth
+                        />
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="repass"
+                            type="password"
+                            label="Re-type Password"
                             fullWidth
                         />
                     </DialogContent>
@@ -130,12 +141,63 @@ class StaffDetails extends React.Component<IProps, {deleteOpen: boolean, resetOp
         );
     }
 
+    resetKeyDialog() {
+        return (
+            <div>
+                <Dialog open={this.state.resetKeyOpen} onClose={() => this.setState({ resetOpen: false })} aria-labelledby="form-dialog-title">
+                    <DialogTitle id="form-dialog-title">Change Registration Key</DialogTitle>
+                    <DialogContent>
+                        <form>
+                        <FormControl className={this.props.classes.formControl}>
+                            <InputLabel htmlFor="demo-dialog-native">Staff Type</InputLabel>
+                            <Select
+                                native
+                                onChange = {(e) => console.log(e.target.value)}
+                                input={<Input id="demo-dialog-native" />}>
+                                <option aria-label="None" value="" />
+                                <option value={"Manage"}>Manage</option>
+                                <option value={"Wait"}>Wait</option>
+                                <option value={"Kitchen"}>Kitchen</option>
+                            </Select>
+                        </FormControl>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="pass"
+                            label="New Key"
+                            type="password"
+                            fullWidth
+                        />
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="repass"
+                            type="password"
+                            label="Re-type New Key"
+                            fullWidth
+                        />
+                        </form>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => this.setState({ resetKeyOpen: false })} color="primary">
+                            Cancel
+                        </Button>
+                        <Button onClick={() => this.setState({ resetKeyOpen: false })} color="primary">
+                            Reset
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </div>
+        );
+    }
+
     printTable(){
         const { classes } = this.props;
         return (
             <TableContainer component={Paper}>
                 {this.deleteDialog()}
                 {this.resetDialog()}
+                {this.resetKeyDialog()}
                 <Table className={classes.table} aria-label="customized table" >
                     <TableHead>
                         <TableRow>
@@ -186,7 +248,7 @@ class StaffDetails extends React.Component<IProps, {deleteOpen: boolean, resetOp
             <div className={this.props.classes.wrapper}>
                 {this.printTable()}
                 <br></br>
-                <Button color="primary" onClick={() => this.setState({ resetOpen: true })}>Change Registration Key</Button>
+                <Button color="primary" onClick={() => this.setState({ resetKeyOpen: true })}>Change Registration Key</Button>
             </div>
         );
     }
