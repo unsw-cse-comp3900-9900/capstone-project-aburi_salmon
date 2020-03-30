@@ -1,5 +1,7 @@
 import React from 'react';
 import { createStyles, WithStyles, Theme, withStyles, Button, Box } from '@material-ui/core';
+import { Client } from './../../../api/client';
+import { TableInfo } from './../../../api/models'
 
 
 const styles = (theme: Theme) =>
@@ -17,95 +19,55 @@ const styles = (theme: Theme) =>
         },
         text: {
             float: 'left',
-            //position: 'static',
         },
         paidBut: {
-            //position: 'relative',
             float: 'right',
-            //backgroundColor: 'lightgreen',
         },
         itemTable: {
             width: '100%',
-            
         }
-
     });
 export interface IProps extends WithStyles<typeof styles> {
-    tableNumber: number
-}
-
-
-interface Item
-{
-    name: string,
-    amount: number,
-    cost: number,
+    tableNumber: number,
+    assistance: boolean
 }
 
 interface IState {
-    items: Item[],
-    total: number,
+    tableInfo: TableInfo | null,
     hide: string,
 }
 
-
-class TableInfo extends React.Component<IProps, IState>{
+class TableInfoClass extends React.Component<IProps, IState>{
 
     constructor(props: IProps){
         super(props);
-        //Replace below with fetch backend function
-        //---------------------------------------
-        const item1: Item = {
-            name: 'Burger',
-            amount: 2,
-            cost: 15,
-        };
-        const item2: Item = {
-            name: 'Pizza',
-            amount: 1,
-            cost: 20,
-        };
-        const item3: Item = {
-            name: 'Coffee',
-            amount: 3,
-            cost: 4,
-        };
-        const item4: Item = {
-            name: 'Pasta',
-            amount: 3,
-            cost: 22,
-        };
-        const item5: Item = {
-            name: 'Ice Cream',
-            amount: 1,
-            cost: 10,
-        };
-        var newArray = [];
-        newArray.push(item1);
-        newArray.push(item2);
-        newArray.push(item3);
-        newArray.push(item4);
-        newArray.push(item5);
         this.state = {
-            items: newArray,
-            total: 1000.20,
+            tableInfo: null,
             hide: 'block',
-        };
-        //------------------------------------------------
+        }
+    }
+
+    async componentDidMount() {
+        const client = new Client()
+        const t: TableInfo | null = await client.getTableOrders(this.props.tableNumber);
+        this.setState({ tableInfo: t });
+        console.log(t);
     }
 
     printItems(){
-        let children = [];
+        let children: Array<any> = [];
         let ret = [];
-        for (let j = 0; j < this.state.items.length; j++) {
+
+        this.state.tableInfo?.items.map(item => (
             children.push(
-                <tr key={j}>
-                    <td>{this.state.items[j].name}</td>
-                    <td>{this.state.items[j].amount}</td>
-                    <td>{this.state.items[j].cost}</td>
+                <tr key={item.name}>
+                    <td>{item.name}</td>
+                    <td>{item.quantity}</td>
+                    <td>{item.price}</td>
                 </tr>
             )
-        };
+        ));
+            
         ret.push(
             <table className={this.props.classes.itemTable}>
                 <tr>
@@ -114,16 +76,15 @@ class TableInfo extends React.Component<IProps, IState>{
                     <th>Cost (per item)</th>
                 </tr>
                 {children}
-                <tr>
-                    <td>Item name: {this.state.items.length}</td>
-                    <td>Amount</td>
-                    <td>$###</td>
-                </tr>
             </table>
         );
         return ret;
     }
 
+    problemResolved(){
+        //const client = new Client();
+        this.setState({ hide: "none" });
+    }
 
     render() {
         const { classes } = this.props;
@@ -133,7 +94,7 @@ class TableInfo extends React.Component<IProps, IState>{
                 <h1 className = {classes.text}>Table {this.props.tableNumber}</h1>
                 <Box display={this.state.hide} displayPrint="none">
                     <Button color='secondary' variant="contained" className={classes.paidBut}
-                        onClick={() => this.setState({hide: "none"})}
+                        onClick={() => this.problemResolved()}
                                     >Resolved</Button>
                 </Box>                
                 <hr className={classes.line}></hr>
@@ -141,7 +102,7 @@ class TableInfo extends React.Component<IProps, IState>{
                 {this.printItems()}
                 <hr className={classes.line}></hr>
                 <br></br>
-                Total: ${this.state.total}
+                Total: ${this.state.tableInfo?.total_cost}
                 <Button color='primary' variant="contained" className={classes.paidBut}
                 >paid</Button>
             
@@ -150,4 +111,4 @@ class TableInfo extends React.Component<IProps, IState>{
     }
 }
 
-export default withStyles(styles)(TableInfo);
+export default withStyles(styles)(TableInfoClass);

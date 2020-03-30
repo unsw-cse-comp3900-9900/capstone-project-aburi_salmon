@@ -133,3 +133,65 @@ table_order_model = api.schema_model('table order model', {
         'total_cost': {'type': 'number'}
     }
 })
+
+sales_model = api.schema_model('sales_model', {
+    'type': 'object',
+    'required': ['item_sales', 'total_revenue'],
+    'properties': {
+        'item_sales': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'required': ['id', 'name', 'orders', 'price', 'revenue'],
+                'properties': {
+                    'id': { 'type': 'integer' },
+                    'name': { 'type': 'string' },
+                    'orders': { 'type': 'integer' },
+                    'price': { 'type': 'number' },
+                    'revenue': { 'type': 'number' }
+                }
+            }
+        },
+        'total_revenue': { 'type': 'number' }
+    }
+})
+
+recommendations_model = api.schema_model('recommendations_response_model', {
+    'type': 'object',
+    'required': ['recommendations'],
+    'properties': {
+        'recommendations': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'required': ['item_id', 'count', 'name'],
+                'properties': {
+                    'item_id': { 'type': 'integer' },
+                    'count': { 'type': 'integer' },
+                    'name': { 'type': 'string' }
+                }
+            }
+        }
+    }
+})
+
+item_order_response_model = api.schema_model('item_order_response_model', {
+    'type': 'object',
+    'required': ['itemList'],
+    'properties': {
+        'itemList': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'required': ['itemName','quantity','price','id'],
+                'properties': {
+                    'itemName': {'type': 'string'},
+                    'quantity': {'type': 'integer'},
+                    'price': {'type': 'number'},
+                    'id': {'type': 'integer'},
+                    'status_id': {'type': 'integer'}
+                }
+            }
+        }
+    }
+})
