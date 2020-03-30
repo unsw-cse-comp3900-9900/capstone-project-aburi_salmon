@@ -156,7 +156,7 @@ class DB:
     def update_staff(self, username, name, staff_type_id):
         return self.__update("UPDATE staff SET name = %s, staff_type_id = %s WHERE username = %s", [name, staff_type_id, username])
 
-    def update_ordered_item_status(self, id, status):
+    def update_item_ordered_status(self, id, status):
         return self.__update("UPDATE item_order SET status_id = %s WHERE id = %s", [status, id])
 
 
@@ -401,7 +401,7 @@ class DB:
 
     def get_ordered_items(self, order_id):
         rows = self.__query(
-            'SELECT i.name, io.quantity, i.price FROM "order" o JOIN item_order io on (o.id = io.order_id) JOIN item i on (i.id = io.item_id) WHERE o.id = %s',
+            'SELECT i.name, io.quantity, i.price, io.id, io.status_id FROM "order" o JOIN item_order io on (o.id = io.order_id) JOIN item i on (i.id = io.item_id) WHERE o.id = %s',
             [order_id]
         )
 
@@ -409,9 +409,11 @@ class DB:
             return []
 
         orders = [{
-            'name': row[0],
+            'itemName': row[0],
             'quantity': row[1],
-            'price': row[2]
+            'price': row[2],
+            'id': row[3],
+            'status_id': row[4]
         } for row in rows]
         return orders
       
@@ -534,7 +536,7 @@ class DB:
 
 
     def get_order_list(self, status):
-        rows = self.__query('SELECT item.name, io.quantity, item.price, io.id FROM item_order io JOIN item ON io.item_id = item.id WHERE io.status_id = %s', [status])
+        rows = self.__query('SELECT item.name, io.quantity, item.price, io.id, io.status_id FROM item_order io JOIN item ON io.item_id = item.id WHERE io.status_id = %s', [status])
 
         if (not rows):
             return None
@@ -544,7 +546,54 @@ class DB:
             'quantity': row[1],
             'price': row[2],
             'id': row[3],
+            'status_id': row[4]
         } for row in rows]
 
         return orders
 
+    def get_menu_item_sales(self, item_id = None):
+        if item_id is None:
+            rows = self.__query(
+                'SELECT i.id, i.name, i.price, sum(io.quantity) FROM item i JOIN item_order io on (i.id = io.item_id) GROUP BY i.id'
+            )
+        else:
+            rows = self.__query(
+                'SELECT i.id, i.name, i.price, sum(io.quantity) FROM item i JOIN item_order io on (i.id = io.item_id) WHERE i.id = %s GROUP BY i.id',
+                [item_id]
+            )
+
+        if (not rows):
+            return []
+
+        return [{
+            'id': row[0],
+            'name': row[1],
+            'price': row[2],
+            'orders': row[3],
+            'revenue': row[2] * row[3]
+        } for row in rows]
+
+    def get_recommendation(self, items=[]):
+        # Orders where item appears
+        rows = self.__query(
+            'SELECT distinct o.id FROM item i JOIN item_order io on (i.id = io.item_id) JOIN "order" o on (o.id = io.order_id) WHERE i.id in %s',
+            [tuple(i for i in items)]
+        )
+
+        if (not rows or not rows[0]):
+            return None
+
+        orders = tuple(row[0] for row in rows)
+
+        # Get count of other items in these orders
+        rows = self.__query(
+            'SELECT distinct i.id, i.name, count(i.id) as seen FROM item i JOIN item_order io on (i.id = io.item_id) JOIN "order" o on (o.id = io.order_id) WHERE i.id not in %s AND o.id in %s GROUP BY i.id ORDER BY seen DESC',
+            [tuple(i for i in items), orders]
+        )
+
+        # Return top 3 recommendations
+        return [{
+            'item_id': row[0],
+            'name': row[1],
+            'count': row[2]
+        } for row in rows][:3]

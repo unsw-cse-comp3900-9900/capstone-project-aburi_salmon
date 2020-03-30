@@ -84,3 +84,27 @@ export type OrderItemQuantityPair = {
 export type CreateOrder = {
   order: Array<ItemQuantityPair>,
 }
+
+export type TableInfo = {
+  table: number,
+  order_id: number,
+  items: Array<OrderedItems>,
+  total_cost: number,
+}
+
+
+export type OrderedItems = {
+  name: string,
+  quantity: number,
+  price: number,
+
+}
+
+export type AssistanceTable = {
+  table_id: number,
+  occupied: boolean,
+}
+
+export type AssistanceTables = {
+  table: Array<AssistanceTable>
+}

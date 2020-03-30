@@ -1,4 +1,4 @@
-import { Tables, Menu, ItemList, Order, Item, ItemQuantityPair, CreateOrder, ResponseMessage, AddItemToOrderResponseMessage, OrderItemQuantityPair, ItemOrder } from "./models";
+import { Tables, Menu, ItemList, Order, Item, ItemQuantityPair, CreateOrder, ResponseMessage, AddItemToOrderResponseMessage, OrderItemQuantityPair, ItemOrder, TableInfo, AssistanceTables } from "./models";
 
 const apiUrl = "http://localhost:5000";
 
@@ -218,13 +218,6 @@ export class Client {
         method: 'GET',
         credentials: 'include',
         mode: 'cors',
-        //headers: {
-        //  'Content-Type': 'application/json'
-        //},
-        //body: JSON.stringify({
-        //  status: listStatus,
-        //  id: 1,
-        //}),
       });
 
       const j: ItemList = await r.json();
@@ -234,7 +227,54 @@ export class Client {
       console.error(e);
       return null;
     }
+  }
 
+  async getTableOrders(tablenumber: number) {
+    try {
+      const r: Response = await fetch(apiUrl + '/orders/' + tablenumber, {
+        method: 'GET',
+        credentials: 'include',
+        mode: 'cors',
+      });
+
+      const j: TableInfo = await r.json();
+      return j;
+
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async freeTable(tablenumber: number) {
+    try {
+      const r: Response = await fetch(apiUrl + '/kitchen/' + tablenumber, {
+        method: 'POST',
+        credentials: 'include',
+        mode: 'cors',
+      });
+
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async getAssistanceTable() {
+    try {
+      const r: Response = await fetch(apiUrl + '/assistance', {
+        method: 'GET',
+        credentials: 'include',
+        mode: 'cors',
+      });
+
+      const j: AssistanceTables = await r.json();
+      return j;
+
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   }
 
 }
