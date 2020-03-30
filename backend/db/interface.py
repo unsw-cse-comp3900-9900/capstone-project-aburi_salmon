@@ -527,15 +527,11 @@ class DB:
 
         return io_id[0][0]
 
-    def modify_order(self, item_order_id, quantity):
-        new_quantity = DB.get_quantity(self, item_order_id) + quantity
-
-        if new_quantity < 1:
-            return 5
-
+    def modify_item_order(self, item_order_id, quantity):
+        new_quantity = quantity
         return self.__update("UPDATE item_order SET quantity = %s, status_id = 1 WHERE id = %s", [new_quantity, item_order_id])
 
-    def delete_order(self, item_order_id):
+    def delete_item_order(self, item_order_id):
         return self.__delete("DELETE FROM item_order WHERE id = %s", [item_order_id,])
 
     def get_order_list(self, status):

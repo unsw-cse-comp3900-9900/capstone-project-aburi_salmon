@@ -71,13 +71,18 @@ export type Order = {
   total_bill: number,
 }
 
-export type ItemQuantityOrderPair = {
+export type ItemQuantityPair = {
   item_id: number,
   quantity: number,
 }
 
+export type OrderItemQuantityPair = {
+  id: number,
+  quantity: number,
+}
+
 export type CreateOrder = {
-  order: Array<ItemQuantityOrderPair>,
+  order: Array<ItemQuantityPair>,
 }
 
 export type TableInfo = {
