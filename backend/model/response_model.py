@@ -174,3 +174,24 @@ recommendations_model = api.schema_model('recommendations_response_model', {
         }
     }
 })
+
+item_order_response_model = api.schema_model('item_order_response_model', {
+    'type': 'object',
+    'required': ['itemList'],
+    'properties': {
+        'itemList': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'required': ['itemName','quantity','price','id'],
+                'properties': {
+                    'itemName': {'type': 'string'},
+                    'quantity': {'type': 'integer'},
+                    'price': {'type': 'number'},
+                    'id': {'type': 'integer'},
+                    'status_id': {'type': 'integer'}
+                }
+            }
+        }
+    }
+})

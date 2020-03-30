@@ -3,7 +3,8 @@ from flask_restx import Resource, abort, reqparse, fields
 from flask_jwt_extended import get_jwt_claims, jwt_required
 
 from app import api, db
-from model.request_model import new_order_model, modify_order_model, delete_order_model, add_order_model
+import model.response_model as response_model
+import model.request_model as request_model
 
 order = api.namespace('order', description='Order Route')
 
@@ -30,7 +31,7 @@ class Order(Resource):
         }
 
     #@jwt_required
-    @order.expect(new_order_model)
+    @order.expect(request_model.new_order_model)
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
     @order.response(500, 'Something went wrong')
@@ -59,7 +60,7 @@ class Order(Resource):
 
 @order.route('/item')
 class Item(Resource):
-    @order.expect(add_order_model)
+    @order.expect(request_model.add_order_model)
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
     def put(self):
@@ -87,7 +88,7 @@ class Item(Resource):
         
 
     #@jwt_required
-    @order.expect(modify_order_model)
+    @order.expect(request_model.modify_order_model)
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
     def patch(self):
@@ -108,7 +109,7 @@ class Item(Resource):
         })
 
     #@jwt_required
-    @order.expect(delete_order_model)
+    @order.expect(request_model.delete_order_model)
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
     def delete(self):
@@ -129,25 +130,43 @@ class Item(Resource):
             'status': 'success'
         })
 
+@order.route('/item/status/<int:item_order_id>')
+class ModifyItemOrder(Resource):
+    @jwt_required
+    @order.response(200, 'Success')
+    @order.response(400, 'Invalid Request')
+    @order.response(500, 'Something went wrong')
+    @order.expect(request_model.edit_item_order_status_model)
+    def put(self, item_order_id):
+        status = request.get_json().get('status')
+        if (not status):
+            abort(400, 'Invalid request. Missing required field \'status\'')
+        
+        if (not db.update_item_ordered_status(item_order_id, status)):
+            abort(500, 'Something went wrong')
+        
+        return jsonify({ 'status': 'success'})
+
+
 @order.route('/<int:order_id>')
 class ItemOrderById(Resource):
     # Most the methods for getting information about an order should be done via the table route
 
     @jwt_required
-    @order.response(200, 'Success')
+    @order.response(200, 'Success', model=response_model.item_order_response_model)
     @order.response(500, 'Internal Error')
     def get(self, order_id):
-        item_order = db.get_ordered_items(order_id)
-        if (item_order is None):
+        itemList = db.get_ordered_items(order_id)
+        if (itemList is None):
             abort(500, 'Something went wrong')
-        return { 'item_order': item_order }
+        return { 'itemList': itemList }
 
 @order.route('/status/<int:status_id>')
 class OrdersByStatus(Resource):
     @jwt_required
-    @order.response(200, 'Success')
+    @order.response(200, 'Success', model=response_model.item_order_response_model)
     @order.response(400, 'Invalid Request')
-    def get(self, id):
+    def get(self, status_id):
         itemlist = db.get_order_list(status_id)
         if (not itemlist):
             abort(400, 'Invalid request')
