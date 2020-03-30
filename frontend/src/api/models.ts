@@ -44,7 +44,7 @@ export type ListItem = {
   itemName: string,
   quantity: number,
   price: number,
-  item_id: number,
+  id: number,
 }
 
 export type ItemList = {
@@ -101,5 +101,5 @@ export type AssistanceTable = {
 }
 
 export type AssistanceTables = {
-  table: Array<AssistanceTable>
+  tables: Array<AssistanceTable>
 }

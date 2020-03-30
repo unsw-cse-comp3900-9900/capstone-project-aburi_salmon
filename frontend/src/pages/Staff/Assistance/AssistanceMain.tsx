@@ -48,7 +48,7 @@ interface IState{
     selectedTable: number,
     main: boolean,
     tables: TableModel | null,
-    assistance: AssistanceTables | null,
+    assistance: Array<number>,
 }
 
 class Assistance extends React.Component<IProps, IState>{
@@ -59,7 +59,7 @@ class Assistance extends React.Component<IProps, IState>{
             selectedTable: 0, //Selected table, 0 means none selected
             main: true, //main screen
             tables: null,
-            assistance: null,
+            assistance: [],
         }
     }
     
@@ -72,8 +72,16 @@ class Assistance extends React.Component<IProps, IState>{
         const client = new Client()
         const t: TableModel | null = await client.getTables();
         const a: AssistanceTables | null = await client.getAssistanceTable();
-        this.setState({ tables: t, assistance: a });
+        var temp: Array<number> = [];
+        a?.tables.map(it => {
+                temp.push(it.table_id);
+            }
+        )
+        this.setState({ tables: t, assistance: temp });
         console.log(t);
+        console.log('ass' + temp);
+        //console.log(a?.tables);
+        //console.log(a?.tables[3]);
     }
 
     createTables = () => {
@@ -84,19 +92,27 @@ class Assistance extends React.Component<IProps, IState>{
         if(this.state.tables !== null){
             while(i*5 + j < this.state.tables?.tables.length){
                 while (i * 5 + j < this.state.tables?.tables.length && j < 5){
-                    const tableNum = i*5 + j;
-                    if (this.state.tables !== null && this.state.tables?.tables[tableNum].occupied){
-                        children.push(
-                            <div className="column" key={tableNum + 1} onClick={() => this.handleClick(tableNum + 1)}>
-                                <div className="card">{tableNum + 1}
+                    const tableNum = i*5 + j; //starts from 0
+                    if (this.state.tables !== null && this.state.tables?.tables[tableNum].occupied){ 
+                        if (this.state.assistance !== [] && this.state.assistance.some(it => tableNum === it)){
+                            children.push(
+                                <div className="column" key={tableNum + 1} onClick={() => this.handleClick(tableNum)}>
+                                    <div className="redcard">{tableNum + 1}
+                                    </div>
                                 </div>
-                            </div>
-                        )
-
+                            )
+                        } else {
+                            children.push(
+                                <div className="column" key={tableNum + 1} onClick={() => this.handleClick(tableNum)}>
+                                    <div className="greencard">{tableNum + 1}
+                                    </div>
+                                </div>
+                            )
+                        }
                     } else {
                         children.push(
-                            <div className="column" key={tableNum + 1} onClick={() => this.handleClick(tableNum + 1)}>
-                                <div className="greencard">{tableNum + 1}</div>
+                            <div className="column" key={tableNum + 1} onClick={() => this.handleClick(tableNum)}>
+                                <div className="card">{tableNum + 1}</div>
                             </div>
                         )
                     }
@@ -121,25 +137,29 @@ class Assistance extends React.Component<IProps, IState>{
         return(
             <div className={this.props.classes.key}>
                 <mark className={this.props.classes.red}>Red = Assistance Required</mark>, 
-                <mark className={this.props.classes.green}> Green = Empty </mark>, Grey = Occupied
+                <mark className={this.props.classes.green}> Green = Occupied </mark>, Grey = Empty
             </div>
         );
     }
 
     needAssistance(tablenum: number):boolean{
-        this.state.assistance?.table.forEach((item: AssistanceTable) =>{
-            if(item.table_id === tablenum){
-                return item.occupied;
+        var ret = false;
+        this.state.assistance.forEach((item: number) =>{
+            console.log(item);
+            console.log(tablenum);
+            if(item === tablenum){
+                console.log('entered');
+                ret = true;
             }
         })
-        return false
+        return ret;
     }
 
     render() {
         if (this.state.main) {
             return (
                 <div className={this.props.classes.container}>
-                    <h1>~~ Tables ~~</h1>
+                    <h1>Tables</h1>
                     {this.createTables()}
                     {this.tableKey()}
                 </div>
@@ -148,7 +168,9 @@ class Assistance extends React.Component<IProps, IState>{
             return (
                 <div className={this.props.classes.wrapper}>
                     <Link onClick={()=>this.backToTables()} > Back to tables</Link>
-                    <TableInfo tableNumber={this.state.selectedTable} assistance={this.needAssistance(this.state.selectedTable)}/>
+                    <TableInfo tableNumber={this.state.selectedTable} assistance={this.needAssistance(this.state.selectedTable)}
+                        isEmpty={this.state.tables?.tables[this.state.selectedTable].occupied}/>
+        
                 </div>
             )
         };

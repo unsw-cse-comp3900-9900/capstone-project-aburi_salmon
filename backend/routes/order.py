@@ -147,7 +147,7 @@ class OrdersByStatus(Resource):
     @jwt_required
     @order.response(200, 'Success')
     @order.response(400, 'Invalid Request')
-    def get(self, id):
+    def get(self, status_id):
         itemlist = db.get_order_list(status_id)
         if (not itemlist):
             abort(400, 'Invalid request')
