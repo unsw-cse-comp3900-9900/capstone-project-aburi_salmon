@@ -37,6 +37,19 @@ class SalesItem(Resource):
 
         return jsonify(item_sales)
 
+@stats.route('/sales/category')
+class SalesCategory(Resource):
+    @jwt_required
+    @stats.response(200, 'Success', model=response_model.category_sales_model)
+    @stats.response(500, 'Something went wrong')
+    def get(self):
+        # Amount of sales for each category
+        category_sales = db.get_category_sales()
+        if (category_sales is None):
+            abort(500, 'Something went wrong')
+        
+        return jsonify({'category_sales': category_sales})
+
 @stats.route('/recommend')
 class Reccomend(Resource):
     @jwt_required

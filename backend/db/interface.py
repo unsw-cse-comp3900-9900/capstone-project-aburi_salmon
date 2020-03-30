@@ -615,6 +615,27 @@ class DB:
             'revenue': row[2] * row[3]
         } for row in rows]
 
+    def get_category_sales(self):
+        rows = self.__query(
+            '''
+            SELECT c.id, c.name, sum(io.quantity), sum(io.quantity * i.price) as revenue
+            FROM item i JOIN item_order io on (i.id = io.item_id)
+                        JOIN category_item ci on (ci.item_id = i.id)
+                        JOIN category c on (c.id = ci.category_id)
+            GROUP BY c.id
+            '''
+        )
+
+        if (not rows):
+            return []
+
+        return [{
+            'id': row[0],
+            'name': row[1],
+            'orders': row[2],
+            'revenue': row[3]
+        } for row in rows]
+
     def get_recommendation(self, items=[]):
         # Orders where item appears
         rows = self.__query(
