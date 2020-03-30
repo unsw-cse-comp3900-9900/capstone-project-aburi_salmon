@@ -156,21 +156,6 @@ class DB:
     def update_staff(self, username, name, staff_type_id):
         return self.__update("UPDATE staff SET name = %s, staff_type_id = %s WHERE username = %s", [name, staff_type_id, username])
 
-    def get_ordered_items(self):
-        rows = self.__query('SELECT * FROM item_order WHERE status_id < %s', [3])
-
-        if (not rows):
-            return None
-
-        orders = [{
-            'id': row[0],
-            'item_id': row[1],
-            'order_id': row[2],
-            'quantity': row[3],
-            'status_id': row[4]
-            } for row in rows]
-        return orders
-
     def update_ordered_item_status(self, id, status):
         return self.__update("UPDATE item_order SET status_id = %s WHERE id = %s", [status, id])
 
@@ -383,7 +368,6 @@ class DB:
             ingredient.append(row[0])
         return ingredient
 
-
     def get_ordered_items_customer(self, table_id):
         rows = self.__query("""SELECT io.id as item_order_id, io.order_id, i.name, i.id as item_id, io.quantity,
         i.price, s.id as status_id, s.status_name
@@ -415,7 +399,7 @@ class DB:
 
         return item_order
 
-    def get_ordered_items_info(self, order_id):
+    def get_ordered_items(self, order_id):
         rows = self.__query(
             'SELECT i.name, io.quantity, i.price FROM "order" o JOIN item_order io on (o.id = io.order_id) JOIN item i on (i.id = io.item_id) WHERE o.id = %s',
             [order_id]
@@ -430,27 +414,19 @@ class DB:
             'price': row[2]
         } for row in rows]
         return orders
-
-    def get_ordered_items_status(self, item_name):
-        status = self.__query('SELECT s.status_name FROM item_order io, item i, status s WHERE s.id = io.status_id AND i.id = io.item_id AND i.name = %s', item_name)
-
-        if (not status):
-            return None
-
-        return status
       
     def insert_order(self, table_id):
         self.__insert('INSERT INTO "order" (table_id) VALUES (%s);', [table_id,])
         order_id = self.__query('SELECT id FROM "order" ORDER BY id DESC LIMIT %s', [1,])[0][0]
         
         return order_id  
-      
+
     def insert_item_order(self, order_id, item_id, quantity):
         self.__insert("INSERT INTO item_order (item_id, order_id, quantity, status_id) VALUES (%s, %s, %s, %s);", [item_id, order_id, quantity, 1])
         return True
         
-    def get_tables(self, test):
-        rows = self.__query('SELECT id, state FROM public.table WHERE id > %s ORDER BY id', [test,])
+    def get_tables(self):
+        rows = self.__query('SELECT id, state FROM public.table ORDER BY id')
 
         if (not rows):
             return None
@@ -533,14 +509,6 @@ class DB:
 
         return rows[0][0]
 
-    def get_item_order_id(self, table_id, item_id):
-        res = self.__query('SELECT io.id FROM item_order io, "order" o WHERE io.item_id = %s AND o.table_id = %s AND o.id = io.order_id', [item_id, table_id])
-
-        if (not res):
-            return None
-  
-        return res
-
     def get_order_status(self, item_order_id):
         status = self.__query('SELECT status_id FROM item_order WHERE id = %s', [item_order_id,])
 
@@ -570,7 +538,7 @@ class DB:
 
 
     def get_order_list(self, status):
-        rows = self.__query('SELECT item.name, io.quantity, item.price, item.id FROM item_order io JOIN item ON io.item_id = item.id WHERE io.status_id = %s', [status])
+        rows = self.__query('SELECT item.name, io.quantity, item.price, io.id FROM item_order io JOIN item ON io.item_id = item.id WHERE io.status_id = %s', [status])
 
         if (not rows):
             return None
@@ -579,9 +547,9 @@ class DB:
             'itemName': row[0],
             'quantity': row[1],
             'price': row[2],
-            'item_id': row[3],
+            'id': row[3],
+        } for row in rows]
 
-            } for row in rows]
         return orders
 
     def get_menu_item_sales(self, item_id = None):
