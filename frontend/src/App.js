@@ -12,12 +12,20 @@ const socket = io('http://localhost:5000')
 class App extends React.Component {
   componentDidMount() {
     socket.on('connect', () => {
-      if (localStorage.staff) {
-        socket.emit('join')
-      }
+      console.log('Connected to socket');
+      console.log('Attempting to join a room...');
+      socket.emit('join');
     })
 
-    socket.on('message', data => this.setState({ room: data.room }))
+    socket.on('join', ({ room }) => {
+      this.setState({ room: room });
+      console.log(`Joined room ${room}`);
+    });
+
+    socket.on('leave', () => {
+      console.log(`Left room ${this.state.room}`);
+      this.setState({ room: false });
+    });
   }
 
   render() {
