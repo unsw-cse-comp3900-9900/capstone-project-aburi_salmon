@@ -106,9 +106,14 @@ export class Client {
     }
   }
 
-  async patchItemOrder(item: OrderItemQuantityPair){
+  async patchItemOrder(id: number, quantity: number){
     try {
       // In order to avoid CORS issue, headers, credentials, and mode should be specified
+      const p: OrderItemQuantityPair = {
+        id: id,
+        quantity: quantity,
+      }
+
       const r: Response = await fetch(apiUrl + '/order/item', {
         method: 'PATCH',
         credentials: 'include',
@@ -116,7 +121,7 @@ export class Client {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(item),
+        body: JSON.stringify(p),
       });
 
       const j: ResponseMessage = await r.json();
