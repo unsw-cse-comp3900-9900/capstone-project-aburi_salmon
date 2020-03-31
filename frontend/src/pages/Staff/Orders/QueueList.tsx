@@ -72,7 +72,7 @@ class Queue extends React.Component<IProps, {}>{
             return (
                 <td className={this.props.classes.boxQueue}>
                 {this.props.someList?.itemList.map((item, index) => (
-                    <ItemCont item={item} key={index} itemId={index}
+                    <ItemCont item={item} key={index} itemId={index} realId={item.id}
                             update={this.props.update} />
                     ))}
                 </td>

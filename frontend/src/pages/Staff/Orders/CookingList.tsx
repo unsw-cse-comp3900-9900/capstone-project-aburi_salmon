@@ -76,7 +76,7 @@ class Cooking extends React.Component<IProps, {}>{
             return (
                 <td className={this.props.classes.boxToBeServed}>
                     {this.props.someList?.itemList.map((item, index) => (
-                        <ItemCont key={index} itemId={index} item={item}
+                        <ItemCont key={index} itemId={index} item={item} realId={item.id}
                             update={this.props.update} />
                     ))}
                 </td>

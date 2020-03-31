@@ -201,19 +201,6 @@ export class Client {
     }
   }
 
-  async freeTable(tablenumber: number) {
-    try {
-      const r: Response = await fetch(apiUrl + '/kitchen/' + tablenumber, {
-        method: 'POST',
-        credentials: 'include',
-        mode: 'cors',
-      });
-
-    } catch (e) {
-      console.error(e);
-      return null;
-    }
-  }
 
   async getAssistanceTable() {
     try {
@@ -231,5 +218,33 @@ export class Client {
       return null;
     }
   }
+
+  async freeTable(tableNum: number) {
+    
+      return fetch(apiUrl + '/table/free/'+ tableNum, {
+        method: 'POST',
+        credentials: 'include',
+        mode: 'cors',
+      });
+   }
+
+   async assistance(order_id: number, assistance: boolean){
+
+    return fetch(apiUrl + '/table/assistance', {
+      method: 'PUT',
+      credentials: 'include',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(
+        {
+          order: order_id,
+          assistance: assistance,
+        }
+      ),
+    });
+   
+   }
 
 }
