@@ -94,9 +94,10 @@ export type TableInfo = {
 
 
 export type OrderedItems = {
-  name: string,
+  itemName: string,
   quantity: number,
   price: number,
+  status_id: number,
 
 }
 

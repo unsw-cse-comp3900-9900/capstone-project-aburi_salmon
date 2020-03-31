@@ -34,6 +34,16 @@ const styles = (theme: Theme) =>
         },
         tableBut: {
             float: "right",
+        },
+        wrapper1: {
+            height: '92%',
+            width: '100%',
+            overflow: 'auto',
+        },
+        wrapper2:{
+            height: '8%',
+            width: '100%',
+         
         }
     });
 export interface IProps extends WithStyles<typeof styles> {
@@ -287,10 +297,14 @@ class StaffDetails extends React.Component<IProps, { deleteOpen:boolean, resetOp
     render() {
         return (
             <div className={this.props.classes.wrapper}>
-                {this.printTable()}
-                <br></br>
-                <Button color="primary" className={this.props.classes.registBut} onClick={() => this.setState({ resetKeyOpen: true })}>Change Registration Key</Button>
-                <Button color="primary" className={this.props.classes.tableBut} onClick={() => this.setState({ tableOpen: true })}>Change No. of Tables</Button>
+                <div className={this.props.classes.wrapper1}>
+                    {this.printTable()}
+                    <br></br>
+                </div>
+                <div className={this.props.classes.wrapper2}>
+                    <Button color="primary" className={this.props.classes.registBut} onClick={() => this.setState({ resetKeyOpen: true })}>Change Registration Key</Button>
+                    <Button color="primary" className={this.props.classes.tableBut} onClick={() => this.setState({ tableOpen: true })}>Change No. of Tables</Button>
+                </div>
             </div>
         );
     }

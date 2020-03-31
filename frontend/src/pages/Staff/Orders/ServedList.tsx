@@ -73,7 +73,7 @@ class Served extends React.Component<IProps, {}>{
 
                 <td className={this.props.classes.boxServed}>
                     {this.props.someList?.itemList.map((item,index) => (
-                        <ItemCont key={index} itemId={index} item={item}
+                        <ItemCont key={index} itemId={index} item={item} realId={item.id}
                             update={this.props.update} />
                     ))}
                 </td>

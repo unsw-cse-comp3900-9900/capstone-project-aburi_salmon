@@ -1,7 +1,7 @@
 import React from 'react';
 import { createStyles, WithStyles, Theme, withStyles, Button, Box } from '@material-ui/core';
 import { Client } from './../../../api/client';
-import { TableInfo } from './../../../api/models'
+import { TableInfo } from './../../../api/models';
 
 
 const styles = (theme: Theme) =>
@@ -48,7 +48,10 @@ interface IState {
     tableInfo: TableInfo | null,
     hide: string,
     itemsOrdered: number | undefined,
+    order_id: number,
 }
+
+const statusArr = ['','Queue', 'Cooking', 'Ready', 'Served'];
 
 class TableInfoClass extends React.Component<IProps, IState>{
 
@@ -63,6 +66,7 @@ class TableInfoClass extends React.Component<IProps, IState>{
             tableInfo: null,
             hide: temp,
             itemsOrdered: 0,
+            order_id: -1,
         }
     }
 
@@ -73,7 +77,7 @@ class TableInfoClass extends React.Component<IProps, IState>{
             const t: TableInfo | null = await client.getTableOrders(this.props.tableNumber);
             this.setState({ tableInfo: t});
             if (t?.items !== undefined){
-                this.setState({itemsOrdered: t?.items.length})
+                this.setState({itemsOrdered: t?.items.length, order_id:t.order_id})
             }
             console.log(t);
         }
@@ -87,10 +91,11 @@ class TableInfoClass extends React.Component<IProps, IState>{
             if (this.state.itemsOrdered !== undefined && this.state.itemsOrdered> 0){
                 this.state.tableInfo?.items.map(item => (
                     children.push(
-                        <tr key={item.name}>
-                            <td>{item.name}</td>
+                        <tr key={item.itemName}>
+                            <td>{item.itemName}</td>
                             <td>{item.quantity}</td>
                             <td>{item.price}</td>
+                            <td>{statusArr[item.status_id]}</td>
                         </tr>
                     )
                 ));
@@ -100,6 +105,7 @@ class TableInfoClass extends React.Component<IProps, IState>{
                             <th>Name</th>
                             <th>Amount</th>
                             <th>Cost (per item)</th>
+                            <th>Status</th>
                         </tr>
                         {children}
                     </table>
@@ -110,9 +116,9 @@ class TableInfoClass extends React.Component<IProps, IState>{
     }
 
     noItemsOrdered(){
-        console.log('items ordered: ' + this.state.itemsOrdered);
+        //console.log('items ordered: ' + this.state.itemsOrdered);
         if (this.state.itemsOrdered === 0){
-            console.log('items ordered: ' + this.state.itemsOrdered);
+            //console.log('items ordered: ' + this.state.itemsOrdered);
             return (
                     <div className={this.props.classes.center}>
                         No items ordered yet
@@ -122,7 +128,36 @@ class TableInfoClass extends React.Component<IProps, IState>{
     }
 
     problemResolved(){
-        this.setState({ hide: "none" });
+        const client = new Client();
+        console.log(this.state.order_id);
+        client.assistance(this.state.order_id, false)
+            .then((msg) => {
+                //alert(msg.status);
+                if (msg.status === 200) {
+                    alert('problem resolved');
+                } else {
+                    alert(msg.statusText);
+                }
+            }).catch((status) => {
+                console.log(status);
+            });
+    }
+
+    async freeTable(){
+        const client = new Client();
+        await client.assistance(this.props.tableNumber, false)
+            .then((msg) => {
+                //alert(msg.status);
+                if (msg.status === 200) {
+                    alert('table Freed');
+            
+                } else {
+                    alert(msg.statusText);
+                }
+                
+            }).catch((status) => {
+                console.log(status);
+            });
     }
 
     render() {
@@ -144,7 +179,7 @@ class TableInfoClass extends React.Component<IProps, IState>{
                     <hr className={classes.line}></hr>
                     <br></br>
                     <b>Total: ${this.state.tableInfo?.total_cost}</b>
-                    <Button color='primary' variant="contained" className={classes.paidBut}
+                    <Button color='primary' variant="contained" className={classes.paidBut} onClick={() => this.freeTable()}
                     >paid</Button>
                    
                 </div>
