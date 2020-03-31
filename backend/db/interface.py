@@ -511,6 +511,20 @@ class DB:
 
         return rows[0][0]
 
+    def get_table_id(self, order_id):
+        rows = self.__query(
+            """
+            SELECT o.table_id FROM "order" o WHERE o.id = %s
+            """,
+            [order_id]
+        )
+
+        if (not rows or not rows[0]):
+            return None
+
+        return rows[0][0]
+
+
     def get_order_status(self, item_order_id):
         status = self.__query('SELECT status_id FROM item_order WHERE id = %s', [item_order_id,])
 
@@ -535,7 +549,15 @@ class DB:
         return self.__delete("DELETE FROM item_order WHERE id = %s", [item_order_id,])
 
     def get_order_list(self, status):
-        rows = self.__query('SELECT item.name, io.quantity, item.price, io.id, io.status_id FROM item_order io JOIN item ON io.item_id = item.id WHERE io.status_id = %s', [status])
+        rows = self.__query(
+            """
+            SELECT item.name, io.quantity, item.price, io.id, io.status_id, t.id
+            FROM item_order io JOIN item ON (io.item_id = item.id)
+                               JOIN "order" o ON (o.id = io.order_id)
+                               JOIN "table" t ON (o.table_id = t.id) 
+            WHERE io.status_id = %s AND t.state = True
+            """,
+            [status])
 
         if (not rows):
             return None
@@ -545,7 +567,8 @@ class DB:
             'quantity': row[1],
             'price': row[2],
             'id': row[3],
-            'status_id': row[4]
+            'status_id': row[4],
+            'table': row[5]
         } for row in rows]
 
         return orders

@@ -159,18 +159,19 @@ class ItemOrderById(Resource):
     @order.response(500, 'Internal Error')
     def get(self, order_id):
         itemList = db.get_ordered_items(order_id)
-        if (itemList is None):
+        table = db.get_table_id(order_id)
+        if (itemList is None or table is None):
             abort(500, 'Something went wrong')
-        return { 'itemList': itemList }
+        return jsonify({ 'itemList': itemList, 'table': table })
 
 @order.route('/status/<int:status_id>')
 class OrdersByStatus(Resource):
     @jwt_required
-    @order.response(200, 'Success', model=response_model.item_order_response_model)
+    @order.response(200, 'Success', model=response_model.item_order_status_response_model)
     @order.response(400, 'Invalid Request')
     def get(self, status_id):
         itemlist = db.get_order_list(status_id)
         if (not itemlist):
             abort(400, 'Invalid request')
 
-        return {'itemList' : itemlist}
+        return jsonify({'itemList' : itemlist})

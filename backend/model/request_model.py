@@ -95,7 +95,8 @@ table_model = api.model('table_model', {
 })
 
 table_assistance_model = api.model('table_assistance_model', {
-    'assistance': fields.Boolean(description='The assistance status of a table session')
+    'assistance': fields.Boolean(description='The assistance status of a table session'),
+    'order_id': fields.Integer(description='Optional field for order_id')
 })
 
 
