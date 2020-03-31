@@ -11,12 +11,15 @@ export const styles = (theme: Theme) =>
 
     },
     firstColumn: {
-      height: '10%'
+      height: '10%',
+      width: 'auto',
     },
     secondColumn: {
-      height: '75%'
+      height: '75%',
+      width: 'auto',
     },
     thirdColumn: {
-      height: '15%'
+      height: '15%',
+      width: 'auto',
     }
   });

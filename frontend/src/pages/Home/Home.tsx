@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './../Home/Homepage.css';
 import history from '../../history';
-//import restlogo from './../../assets/Hojiak.png';
 
 
 class PureHome extends React.Component {
@@ -13,10 +12,6 @@ class PureHome extends React.Component {
   goToLogin() {
     history.push('/login');
   }
-
-
-
-  
 
   render() {
     return (
@@ -62,7 +57,7 @@ const isLoggedIn = () => {
   }
   else {
     return (
-      <Link to='/table' className="stafflogin" onClick={() => logOut()}>
+      <Link to='/' className="stafflogin" onClick={() => logOut()}>
         Log Out
       </Link>
     );

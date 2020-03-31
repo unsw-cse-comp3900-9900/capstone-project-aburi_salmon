@@ -6,14 +6,6 @@ import history from '../../history';
 import { Alert } from '@material-ui/lab';
 import { Client } from '../../api/client';
 
-
-// const styles = (theme: Theme) =>
-//     createStyles({
-
-//     });
-
-// interface IProps extends WithStyles<typeof styles> { }
-
 interface IState {
     username: string;
     password: string;

@@ -26,8 +26,7 @@ edit_profile_model = api.model('edit_profile', {
 #    "staff_type_id": fields.Integer(description='Staff_type_id')
 })
 
-edit_order_item_status_model = api.model('edit_order_item_status', {
-    "id": fields.Integer(description="id"),
+edit_item_order_status_model = api.model('edit_item_order_status_model', {
     "status": fields.Integer(description="status_id")
 })
 
@@ -35,7 +34,7 @@ new_order_model = api.schema_model('new_order_model', {
     'type': 'object',
     'required': ['new_orders'],
     'properties': {
-        'new_orders': {
+        'order': {
             'type': 'array',
             'items': {
                 'type': 'object',
@@ -49,13 +48,18 @@ new_order_model = api.schema_model('new_order_model', {
     }
 })
 
-modify_order_model = api.model('modify_order_model', {
+add_order_model = api.model('add_order_model', {
     "item_id": fields.Integer(description="item_id"),
     "quantity": fields.Integer(description="quantity")
 })
 
+modify_order_model = api.model('modify_order_model', {
+    "id": fields.Integer(description="item_order_id"),
+    "quantity": fields.Integer(description="quantity")
+})
+
 delete_order_model = api.model('delete_order_model', {
-    "item_id": fields.Integer(description="item_id")
+    "id": fields.Integer(description="item_order_id")
 })
 
 registration_model = api.model('registration_model', {
@@ -80,4 +84,41 @@ add_item_to_category_model = api.model('add_item_to_category_model', {
 
 ingredient_model = api.model('ingredient_model', {
     'name': fields.String(description='ingredient name')
+})
+
+customer_session_model = api.model('customer_session_mode', {
+    'table': fields.Integer(description='Table number of new order')
+})
+
+table_model = api.model('table_model', {
+    'table': fields.Integer(description='New table number')
+})
+
+table_assistance_model = api.model('table_assistance_model', {
+    'assistance': fields.Boolean(description='The assistance status of a table session')
+})
+
+
+edit_staff_model = api.model('edit_staff_model', {
+    "staff_id": fields.Integer(description="staff_id"),
+    "name": fields.String(description='Name'),
+    "username": fields.String(description='Username'),
+    "staff_type_id": fields.Integer(description='Staff_type_id')
+})
+
+delete_staff_model = api.model('delete_staff_model', {
+    "staff_id": fields.Integer(description="staff_id")
+})
+
+recommendations_model = api.schema_model('recommendations_model', {
+    'type': 'object',
+    'required': ['items'],
+    'properties': {
+        'items': {
+            'type': 'array',
+            'items': {
+                'type': 'integer'
+            }
+        }
+    }
 })

@@ -111,3 +111,107 @@ specific_category_model = api.schema_model('specific category', {
         }
     }
 })
+
+table_order_model = api.schema_model('table order model', {
+    'type': 'object',
+    'required': ['table', 'order_id', 'items', 'total_cost'],
+    'properties': {
+        'table': { 'type': 'integer' },
+        'order_id': {'type': 'integer' },
+        'items': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'required': ['name', 'quantity', 'price'],
+                'properties': {
+                    'name': {'type': 'string'},
+                    'quantity': {'type': 'integer'},
+                    'price': {'type': 'number'}
+                }
+            },
+        },
+        'total_cost': {'type': 'number'}
+    }
+})
+
+sales_model = api.schema_model('sales_model', {
+    'type': 'object',
+    'required': ['item_sales', 'total_revenue'],
+    'properties': {
+        'item_sales': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'required': ['id', 'name', 'orders', 'price', 'revenue'],
+                'properties': {
+                    'id': { 'type': 'integer' },
+                    'name': { 'type': 'string' },
+                    'orders': { 'type': 'integer' },
+                    'price': { 'type': 'number' },
+                    'revenue': { 'type': 'number' }
+                }
+            }
+        },
+        'total_revenue': { 'type': 'number' }
+    }
+})
+
+category_sales_model = api.schema_model('category_sales_model', {
+    'type': 'object',
+    'required': ['category_sales'],
+    'properties': {
+        'category_sales': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'required': ['id','name','orders','revenue'],
+                'properties': {
+                    'id': {'type': 'integer'},
+                    'name': {'type': 'string'},
+                    'orders': {'type': 'integer'},
+                    'revenue': {'type': 'number'}
+                }
+            }
+        }
+    }
+})
+
+recommendations_model = api.schema_model('recommendations_response_model', {
+    'type': 'object',
+    'required': ['recommendations'],
+    'properties': {
+        'recommendations': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'required': ['item_id', 'count', 'name'],
+                'properties': {
+                    'item_id': { 'type': 'integer' },
+                    'count': { 'type': 'integer' },
+                    'name': { 'type': 'string' }
+                }
+            }
+        }
+    }
+})
+
+item_order_response_model = api.schema_model('item_order_response_model', {
+    'type': 'object',
+    'required': ['itemList'],
+    'properties': {
+        'itemList': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'required': ['itemName','quantity','price','id'],
+                'properties': {
+                    'itemName': {'type': 'string'},
+                    'quantity': {'type': 'integer'},
+                    'price': {'type': 'number'},
+                    'id': {'type': 'integer'},
+                    'status_id': {'type': 'integer'}
+                }
+            }
+        }
+    }
+})

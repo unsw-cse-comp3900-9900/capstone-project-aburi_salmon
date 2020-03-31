@@ -100,3 +100,30 @@ Date    Day         Plan                                    Doing
                     for different staff                     - Fixed register form/now works perfectly
                     - Make items clickable                  - Put diary on Github
                     - Put diary on Github                   - Made table info page
+----------------------------------------------------------------------------------------------------------------------
+20/3    Friday      - Meeting                               - Clarified how backend would work
+                    - Work on adding backend                - Made a todo list
+                                                            - Neatened my Code
+----------------------------------------------------------------------------------------------------------------------
+21/3    Saturday    - Busy                                  - Nothing 
+----------------------------------------------------------------------------------------------------------------------
+22/3    Sunday      - Work on orders page                   - Cleaned up code, added pseudocode
+                                                            - Made child comtainer communicate with parent container
+                                                            - Added keys to tables
+----------------------------------------------------------------------------------------------------------------------
+23/3    Monday      - Make a list of things I need from     - Linking front end and backend (struggling desperately)
+                    backend                                 - Had a team meeting
+                                                            - Ultra stressed
+----------------------------------------------------------------------------------------------------------------------
+24/3    Tuesday     - Meeting                               - Finally succeeded in linking frontend and backend
+                                                            - Meeting went well
+                                                            - Refactored code
+                                                            - Now prints tables dynamically
+----------------------------------------------------------------------------------------------------------------------
+25/3    Wednesday   - Move items between lists on frontend  - Orders can now love between lists
+                                                            - Refactored code
+                                                            - Made temporary menu to switch between staff
+----------------------------------------------------------------------------------------------------------------------
+26/3    Thursday    - Work on manage staff                  - Finished manage staff page template
+----------------------------------------------------------------------------------------------------------------------
+27/3    Friday      - Evaluate current design               - Slept

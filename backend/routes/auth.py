@@ -8,7 +8,7 @@ from flask_jwt_extended import create_access_token, set_access_cookies, unset_jw
 
 import config
 from app import api, db
-from model.request_model import login_model, signup_model, registration_model
+from model.request_model import login_model, signup_model, registration_model, customer_session_model
 from util.hasher import hash_password
 from util.user import User
 
@@ -162,3 +162,39 @@ class RegistrationList(Resource):
         # Get a list of all registration keys of type 'id'
         keys = db.get_registration_keys(id)
         return jsonify({ 'registration_keys': keys })
+
+@auth.route("/customer", strict_slashes=False)
+class CustomerSession(Resource):
+    # Note: To remove the customer order session, just use the logout route
+    # Create a session cookie for a customer
+    @auth.response('200', 'Success')
+    @auth.response('400', 'Invalid Request')
+    @auth.expect(customer_session_model)
+    def post(self):
+        table = request.get_json().get('table')
+
+        if (not table):
+            abort(400, 'Table number not provided')
+        
+        print('Creating order item')
+        order_id = db.insert_order(table)
+        print('Order id = ' + str(order_id))
+
+        print('Select table ' + str(table))
+        if (not db.selectTable(table)):
+            print('Table ' + str(table) + ' is taken')
+            abort(400, 'Table is taken')
+        print('Table selected')
+
+        identity = User('Customer', None, order_id)
+        access_token = create_access_token(identity=identity)
+
+        response = jsonify({
+            'status': 'success'
+        })
+
+        set_access_cookies(response, access_token)
+
+        return response
+
+
