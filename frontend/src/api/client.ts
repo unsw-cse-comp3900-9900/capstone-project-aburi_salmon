@@ -292,4 +292,20 @@ export class Client {
    
    }
 
+   async updateOrderStatus(itemId: number, newStatus: number){
+     return fetch(apiUrl + '/order/item/status/' + itemId, {
+       method: 'PUT',
+       credentials: 'include',
+       mode: 'cors',
+       headers: {
+         'Content-Type': 'application/json'
+       },
+       body: JSON.stringify(
+         {
+           status: newStatus,
+         }
+       ),
+     });
+   }
+
 }

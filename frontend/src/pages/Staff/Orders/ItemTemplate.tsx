@@ -44,13 +44,16 @@ export interface IProps extends WithStyles<typeof styles> {
     itemId: number,
     update: any,
     realId: number,
+    lastClicked: number,
+    //curr: boolean,
 }
 
 class ItemCont extends React.Component<IProps, {}>{
 
     render() {
         const { classes } = this.props;
-      /*  if (this.props.realId === this.props.item.id){
+        //console.log(this.props.lastClicked);
+        if (this.props.realId === this.props.lastClicked){
             return(
                 <button className={classes.currContainer} onClick={() => this.props.update(this.props.itemId, this.props.item)}>
                     <b>ItemID:</b> {this.props.item.id} <br></br>
@@ -59,7 +62,7 @@ class ItemCont extends React.Component<IProps, {}>{
                     <b>Price:</b> {this.props.item.price}
                 </button>
             );
-        } else {*/
+        } else {
             return (
                 <button className={classes.itemContainer} onClick={() => this.props.update(this.props.itemId, this.props.item)}>
                     <b>ItemID:</b> {this.props.item.id} <br></br>
@@ -68,7 +71,7 @@ class ItemCont extends React.Component<IProps, {}>{
                     <b>Price:</b> {this.props.item.price}
                 </button>
             );
-        //}
+        }
     }
 }
 

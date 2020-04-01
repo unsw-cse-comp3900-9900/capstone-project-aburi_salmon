@@ -146,6 +146,12 @@ class Assistance extends React.Component<IProps, IState>{
         this.setState({ main: true });
     }
 
+    paid(){
+        this.setState({ selectedTable: 0 });
+        this.setState({ main: true });
+        this.componentDidMount();
+    }
+
     tableKey(){
         return(
             <div className={this.props.classes.key}>
@@ -186,7 +192,7 @@ class Assistance extends React.Component<IProps, IState>{
                 <div className={this.props.classes.wrapper}>
                     <Link onClick={()=>this.backToTables()} > Back to tables</Link>
                     <TableInfo tableNumber={this.state.selectedTable} assistance={this.needAssistance(this.state.selectedTable)}
-                        isEmpty={this.state.tables?.tables[this.state.selectedTable].occupied}/>
+                        isEmpty={this.state.tables?.tables[this.state.selectedTable].occupied} paidFunction={this.paid}/>
         
                 </div>
             )

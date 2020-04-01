@@ -52,6 +52,7 @@ const styles = () =>
 export interface IProps extends WithStyles<typeof styles> {
     update: any;
     someList: ItemList | null;
+    lastClicked: number;
  }
 
 class Ready extends React.Component<IProps, {}>{
@@ -76,7 +77,7 @@ class Ready extends React.Component<IProps, {}>{
                 <td className={this.props.classes.boxServed}>
                     {this.props.someList?.itemList.map((item,index) => (
                         <ItemCont key={index} itemId={index} item={item} realId={item.id}
-                            update={this.props.update} />
+                            update={this.props.update} lastClicked={this.props.lastClicked}/>
                     ))}
                 </td>
             );

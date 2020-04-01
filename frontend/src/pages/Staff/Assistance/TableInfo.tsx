@@ -14,8 +14,20 @@ const styles = (theme: Theme) =>
             paddingLeft: '2%',
             height: '95%',
             paddingRight: '2%',
+        },
+        wrapper1: {
+            width: '100%',
+            paddingLeft: '2%',
+            height: '85%',
+            paddingRight: '2%',
             overflow: 'auto',
             display: 'block',
+        },
+        wrapper2: {
+            width: '100%',
+            paddingLeft: '2%',
+            height: '10%',
+            paddingRight: '2%',
         },
         text: {
             float: 'left',
@@ -28,20 +40,31 @@ const styles = (theme: Theme) =>
         },
         empty: {
             textAlign: 'center',
-            paddingTop: '20%',
+            //paddingTop: '20%',
+           display: 'flex',
+           justifyContent: 'center',
+            height: '95%',
            
+            //alignItems: 'center',
         }, 
         bottom: {
             bottom: '10%',
         },
         center: {
             textAlign: 'center',
+        },
+        centerText: {
+            position: 'absolute',
+            top: '50%',
+            //left: '50%',
+            transform: 'translate(-50%, -50%)'
         }
     });
 export interface IProps extends WithStyles<typeof styles> {
     tableNumber: number,
     assistance: boolean,
     isEmpty: boolean | undefined,
+    paidFunction: any,
 }
 
 interface IState {
@@ -150,7 +173,8 @@ class TableInfoClass extends React.Component<IProps, IState>{
                 //alert(msg.status);
                 if (msg.status === 200) {
                     alert('table Freed');
-            
+                    this.props.paidFunction();
+                    
                 } else {
                     alert(msg.statusText);
                 }
@@ -166,22 +190,25 @@ class TableInfoClass extends React.Component<IProps, IState>{
         if (this.props.isEmpty){
             return (
                 <div className={classes.wrapper}>
-                    <h1 className = {classes.text}>Table {this.props.tableNumber + 1}</h1>
-                    <Box display={this.state.hide} displayPrint="none">
-                        <Button color='secondary' variant="contained" className={classes.paidBut}
-                            onClick={() => this.problemResolved()}
-                                        >Resolved</Button>
-                    </Box>                
-                    <hr className={classes.line}></hr>
-                
-                    {this.printItems()}
-                    {this.noItemsOrdered()}
-                    <hr className={classes.line}></hr>
-                    <br></br>
-                    <b>Total: ${this.state.tableInfo?.total_cost}</b>
-                    <Button color='primary' variant="contained" className={classes.paidBut} onClick={() => this.freeTable()}
-                    >paid</Button>
-                   
+                    <div className={classes.wrapper1}>
+                        <h1 className = {classes.text}>Table {this.props.tableNumber + 1}</h1>
+                        <Box display={this.state.hide} displayPrint="none">
+                            <Button color='secondary' variant="contained" className={classes.paidBut}
+                                onClick={() => this.problemResolved()}
+                                            >Resolved</Button>
+                        </Box>                
+                        <hr className={classes.line}></hr>
+                    
+                        {this.printItems()}
+                        {this.noItemsOrdered()}
+                    </div>
+                    <div className={classes.wrapper2}>
+                        <hr className={classes.line}></hr>
+                        <br></br>
+                        <b>Total: ${this.state.tableInfo?.total_cost}</b>
+                        <Button color='primary' variant="contained" className={classes.paidBut} onClick={() => this.freeTable()}
+                        >paid</Button>
+                    </div>
                 </div>
             );
         } else {

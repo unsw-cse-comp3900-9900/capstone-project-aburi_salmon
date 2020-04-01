@@ -45,6 +45,7 @@ export type ListItem = {
   quantity: number,
   price: number,
   id: number,
+  status_id: number,
 }
 
 export type ItemList = {

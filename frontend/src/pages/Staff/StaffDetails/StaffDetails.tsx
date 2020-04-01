@@ -249,7 +249,7 @@ class StaffDetails extends React.Component<IProps, { deleteOpen:boolean, resetOp
                 {this.resetDialog()}
                 {this.resetKeyDialog()}
                 {this.changeTableDialog()}
-                <Table className={classes.table} aria-label="customized table" >
+                <Table className={classes.table} aria-label="customized table"  size="small">
                     <TableHead>
                         <TableRow>
                             <StyledTableCell>Staff Name</StyledTableCell>

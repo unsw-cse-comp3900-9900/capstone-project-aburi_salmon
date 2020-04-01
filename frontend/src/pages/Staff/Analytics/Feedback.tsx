@@ -30,6 +30,13 @@ const styles = (theme: Theme) =>
             //border: '1px solid black',
             float: 'left',
         },
+        itemTable: {
+            height: '90%',
+            width: '47%',
+            margin: '1.5%',
+            //border: '1px solid black',
+            float: 'right',
+        }
     });
 export interface IProps extends WithStyles<typeof styles> {
 }
@@ -104,7 +111,7 @@ const dummyStats = [
 
 ];
 
-class Analytics extends React.Component<IProps, {data: any}>{
+class Feedback extends React.Component<IProps, {data: any}>{
 
     constructor(props: IProps) {
         super(props);
@@ -112,33 +119,42 @@ class Analytics extends React.Component<IProps, {data: any}>{
             data,
         };
     }
-    getGraph(){
-        const { data: chartData } = this.state;
-        return (
-            <Paper>
-                <Chart
-                    data={chartData}
-                >
-                    <ArgumentAxis />
-                    <ValueAxis />
 
-                    <BarSeries
-                        valueField="population"
-                        argumentField="year"
-                    />
-                    <Animation />
-                </Chart>
-            </Paper>
+    printFeedbackTable() {
+        const { classes } = this.props;
+        return (
+            <TableContainer component={Paper}>
+                <Table className={classes.table} aria-label="customized table" size="small" >
+                    <TableHead>
+                        <TableRow>
+                            <StyledTableCell>Feedback</StyledTableCell>
+                            <StyledTableCell>Stars</StyledTableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody >
+                        {dummyFeedback.map((row, index) => (
+                            <StyledTableRow key={index}>
+                                <StyledTableCell component="th" scope="row">
+                                    {row.feedback}
+                                </StyledTableCell>
+                                <StyledTableCell>{row.stars}</StyledTableCell>
+                            </StyledTableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
         );
     }
+
+
+
     render() {
         return (
             <div className={this.props.classes.wrapper}>
-                <b><u>Earnings (last 7 days)</u></b>
-                {this.getGraph()}
+                {this.printFeedbackTable()}
             </div>
         );
     }
 }
 
-export default withStyles(styles)(Analytics);
+export default withStyles(styles)(Feedback);
