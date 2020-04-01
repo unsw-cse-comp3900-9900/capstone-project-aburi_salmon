@@ -50,6 +50,7 @@ const styles = () =>
 export interface IProps extends WithStyles<typeof styles> {
     update: any;
     someList: ItemList | null;
+    lastClicked: number,
  }
 
 
@@ -73,7 +74,7 @@ class Queue extends React.Component<IProps, {}>{
                 <td className={this.props.classes.boxQueue}>
                 {this.props.someList?.itemList.map((item, index) => (
                     <ItemCont item={item} key={index} itemId={index} realId={item.id}
-                            update={this.props.update} />
+                            update={this.props.update} lastClicked={this.props.lastClicked}/>
                     ))}
                 </td>
             );

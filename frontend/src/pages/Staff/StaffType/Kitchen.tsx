@@ -4,7 +4,7 @@ import PriorityHighIcon from '@material-ui/icons/PriorityHigh';
 import Queue from './../../Staff/Orders/QueueList';
 import Cooking from './../../Staff/Orders/CookingList';
 import Ready from './../../Staff/Orders/ReadyList';
-import {ListItem} from './../../../api/models';
+import { ListItem } from './../../../api/models';
 import { ItemList } from './../../../api/models';
 import { Client } from './../../../api/client';
 
@@ -43,6 +43,7 @@ interface IState {
     queueList: ItemList | null,
     cookingList: ItemList | null,
     readyList: ItemList | null,
+    lastClicked: number,
 }
 
 class Kitchen extends React.Component<IProps, IState>{
@@ -54,6 +55,7 @@ class Kitchen extends React.Component<IProps, IState>{
             queueList: null, //listType === 1
             cookingList: null, //listType === 2
             readyList: null, //listType === 3
+            lastClicked: -1,
         }
         this.moveToCooking = this.moveToCooking.bind(this);
         this.moveToReady = this.moveToReady.bind(this);
@@ -70,9 +72,9 @@ class Kitchen extends React.Component<IProps, IState>{
             cookingList: cooking,
             readyList: ready,
         });
-        console.log('queuelist: ' + queue);
-        console.log('cookinglist: ' + cooking);
-        console.log('readylist: ' + ready);
+        //console.log('queuelist: ' + queue);
+        //console.log('cookinglist: ' + cooking);
+        //console.log('readylist: ' + ready);
     }
 
    displayCont() {
@@ -80,9 +82,9 @@ class Kitchen extends React.Component<IProps, IState>{
         if (this.state.currPage === "Orders") {
             return (
                 <Box className={classes.staffContainer}>
-                    <Queue update={this.moveToCooking} someList={this.state.queueList}/>
-                    <Cooking update={this.moveToReady} someList={this.state.cookingList} />
-                    <Ready update={this.moveToQueue} someList={this.state.readyList} />
+                    <Queue update={this.moveToCooking} someList={this.state.queueList} lastClicked={this.state.lastClicked}/>
+                    <Cooking update={this.moveToReady} someList={this.state.cookingList} lastClicked={this.state.lastClicked}/>
+                    <Ready update={this.moveToQueue} someList={this.state.readyList} lastClicked={this.state.lastClicked}/>
                 </Box>
             );
         } else {
@@ -119,6 +121,20 @@ class Kitchen extends React.Component<IProps, IState>{
                 itemList: tempArray,
             }
             this.setState({ cookingList: ret });
+            
+            const client = new Client();
+            client.updateOrderStatus(item.id, 2)
+                .then((msg) => {
+                    //alert(msg.status);
+                    if (msg.status === 200) {
+                        this.setState({ lastClicked: item.id });
+                        //alert('success');
+                    } else {
+                        alert(msg.statusText);
+                    }
+                }).catch((status) => {
+                    console.log(status);
+                });;
             console.log(ret);
         }   
         console.log(item);
@@ -133,6 +149,20 @@ class Kitchen extends React.Component<IProps, IState>{
                 itemList: tempArray,
             }
             this.setState({readyList: ret});
+            
+            const client = new Client();
+            client.updateOrderStatus(item.id, 3)
+                .then((msg) => {
+                    //alert(msg.status);
+                    if (msg.status === 200) {
+                        this.setState({lastClicked: item.id});
+                        //alert('success');
+                    } else {
+                        alert(msg.statusText);
+                    }
+                }).catch((status) => {
+                    console.log(status);
+                });;
         }  
         console.log(item);
         this.removeItem(itemId, 2);
@@ -146,6 +176,20 @@ class Kitchen extends React.Component<IProps, IState>{
                 itemList: tempArray,
             }
             this.setState({ queueList: ret });
+            
+            const client = new Client();
+            client.updateOrderStatus(item.id, 1)
+                .then((msg) => {
+                    //alert(msg.status);
+                    if (msg.status === 200) {
+                        this.setState({ lastClicked: item.id });
+                        //alert('success');
+                    } else {
+                        alert(msg.statusText);
+                    }
+                }).catch((status) => {
+                    console.log(status);
+                });;
         }   
         console.log(item);
         this.removeItem(itemId, 3);
