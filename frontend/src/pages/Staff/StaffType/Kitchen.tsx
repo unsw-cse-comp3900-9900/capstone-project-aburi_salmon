@@ -7,6 +7,7 @@ import Ready from './../../Staff/Orders/ReadyList';
 import { ListItem } from './../../../api/models';
 import { ItemList } from './../../../api/models';
 import { Client } from './../../../api/client';
+import {Menu} from './../../Menu/Menu';
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -34,6 +35,21 @@ const styles = (theme: Theme) =>
             marginLeft: theme.spacing(2),
             marginRight: theme.spacing(2),
             marginBottom: theme.spacing(2),
+            overflow: 'auto',
+        },
+        menuContainer: {
+            backgroundColor: 'lightgrey',
+            border: '2px solid darkblue',
+            padding: theme.spacing(2),
+            flexGrow: 1,
+            display: 'flex',
+            top: theme.spacing(2),
+            left: theme.spacing(2),
+            alignSelf: 'stretch',
+            marginLeft: theme.spacing(2),
+            marginRight: theme.spacing(2),
+            marginBottom: theme.spacing(2),
+            overflow: 'auto',
         },
     });
 export interface IProps extends WithStyles<typeof styles> { }
@@ -89,8 +105,8 @@ class Kitchen extends React.Component<IProps, IState>{
             );
         } else {
             return (
-                <Box className={classes.staffContainer}>
-                    <h1> Menu should be here</h1>
+                <Box className={classes.menuContainer}>
+                    <Menu />
                 </Box>
             );
         }

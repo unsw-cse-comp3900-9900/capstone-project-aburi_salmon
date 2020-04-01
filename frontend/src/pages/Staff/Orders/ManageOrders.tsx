@@ -34,7 +34,7 @@ const styles = (theme: Theme) =>
             top: '0px',
         },
         tableCont: {
-            maxHeight: '90%',
+            maxHeight: '95%',
         }
     });
 export interface IProps extends WithStyles<typeof styles> {
