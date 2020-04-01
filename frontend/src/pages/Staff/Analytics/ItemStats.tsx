@@ -7,6 +7,8 @@ import {
     ArgumentAxis,
     ValueAxis,
 } from '@devexpress/dx-react-chart-material-ui';
+import {Client} from './../../../api/client';
+import {AllItemStats} from './../../../api/models';
 
 
 //copied from https://codesandbox.io/s/2hp3y
@@ -21,7 +23,6 @@ const styles = (theme: Theme) =>
         wrapper: {
             height: '100%',
             width: '100%',
-            overflow: 'auto',
         },
         profits: {
             height: '90%',
@@ -36,6 +37,15 @@ const styles = (theme: Theme) =>
             margin: '1.5%',
             //border: '1px solid black',
             float: 'right',
+        },
+        wrapper1: {
+            height: '94%',
+            width: '100%',
+            overflow: 'auto',
+        },
+        wrapper2: {
+            height: '5%',
+            width: '100%',
         }
     });
 export interface IProps extends WithStyles<typeof styles> {
@@ -60,41 +70,6 @@ const StyledTableRow = withStyles(theme => ({
 }))(TableRow);
 
 
-const data = [
-    { year: '1950', population: 2.525 },
-    { year: '1960', population: 3.018 },
-    { year: '1970', population: 3.682 },
-    { year: '1980', population: 4.440 },
-    { year: '1990', population: 5.310 },
-    { year: '2000', population: 6.127 },
-    { year: '2010', population: 6.930 },
-];
-
-function tempData(staffName: string, staffUsername: string, staffType: string, lastOnline: string, changePassword: string, deleteU: string) {
-    return { staffName, staffUsername, staffType, lastOnline, changePassword, deleteU };
-}
-
-const rows = [
-    tempData('Yennefer', 'admin', 'manager', 'now', '<button>', '<button>'),
-    tempData('Cirilla', 'yemi', 'wait', 'Sometime', '<button>', '<button>'),
-    tempData('Geralt', 'james', 'kitchen', 'yesterday', '<button>', '<button>'),
-    tempData('Triss', 'polly', 'wait', 'tomorrow', '<button>', '<button>'),
-    tempData('Jaskier', 'tom', 'wait', '21/3', '<button>', '<button>'),
-    tempData('Calanthe', 'queen', 'kitchen', '8/12', '<button>', '<button>'),
-];
-
-function createFeedback(feedback: string, stars: number){
-    return {feedback, stars};
-}
-
-const dummyFeedback = [
-    //createFeedback('This user interface is terrible', 2),
-    createFeedback('I suggest you have a help button to show people how to use this system', 2),
-    createFeedback('The food was good', 4),
-    createFeedback('The pages are too white',3),
-    createFeedback('Fast service', 4),
-    createFeedback('Average Star Rating', 3.1)
-];
 
 function createItemStats(itemname: string, category: string, cost: number, amount: number, profit: number){
     return {itemname, category, cost, amount, profit};
@@ -111,14 +86,22 @@ const dummyStats = [
 
 ];
 
-class ItemStats extends React.Component<IProps, {data: any}>{
+class ItemStats extends React.Component<IProps, {realData: AllItemStats | null}>{
 
-    constructor(props: IProps) {
+    constructor(props: IProps){
         super(props);
         this.state = {
-            data,
-        };
+            realData: null,
+        }
     }
+
+    async componentDidMount() {
+        const client = new Client();
+        const t: AllItemStats | null = await client.getAllStats();
+        this.setState({ realData: t });
+        console.log(t);
+    }
+
 
     printItemTable() {
         const { classes } = this.props;
@@ -152,13 +135,47 @@ class ItemStats extends React.Component<IProps, {data: any}>{
         );
     }
 
-
-
+    printItemTable2() {
+        const { classes } = this.props;
+        return (
+            <TableContainer component={Paper}>
+                <Table className={classes.table} aria-label="customized table" size="small">
+                    <TableHead>
+                        <TableRow>
+                            <StyledTableCell>Item ID</StyledTableCell>
+                            <StyledTableCell>name</StyledTableCell>
+                            <StyledTableCell>Sold</StyledTableCell>
+                            <StyledTableCell>Price ($)</StyledTableCell>
+                            <StyledTableCell>Total Profit ($)</StyledTableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody >
+                        {this.state.realData?.item_sales.map(item => (
+                            <StyledTableRow key={item.id}>
+                                <StyledTableCell component="th" scope="row">
+                                    {item.id}
+                                </StyledTableCell>
+                                <StyledTableCell>{item.name}</StyledTableCell>
+                                <StyledTableCell>{item.orders}</StyledTableCell>
+                                <StyledTableCell>{item.price}</StyledTableCell>
+                                <StyledTableCell>{item.revenue}</StyledTableCell>
+                            </StyledTableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        );
+    }
 
     render() {
         return (
             <div className={this.props.classes.wrapper}>
-                {this.printItemTable()}
+                <div className={this.props.classes.wrapper1}>
+                {this.printItemTable2()}
+                </div>
+                <div className={this.props.classes.wrapper2}>
+                    Total Revenue: ${this.state.realData?.total_revenue}
+                </div>
             </div>
         );
     }

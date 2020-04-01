@@ -6,12 +6,13 @@ import {
     Title,
     ArgumentAxis,
     ValueAxis,
+    Tooltip,
 } from '@devexpress/dx-react-chart-material-ui';
 
 
 //copied from https://codesandbox.io/s/2hp3y
 //https://devexpress.github.io/devextreme-reactive/react/chart/demos/bar/simple-bar/
-import { Animation } from '@devexpress/dx-react-chart';
+import { Animation, EventTracker } from '@devexpress/dx-react-chart';
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -23,86 +24,23 @@ const styles = (theme: Theme) =>
             width: '100%',
             overflow: 'auto',
         },
-        profits: {
-            height: '90%',
-            width: '47%',
-            margin: '1.5%',
-            //border: '1px solid black',
-            float: 'left',
-        },
+        graph: {
+            height: '85%',
+        }
     });
 export interface IProps extends WithStyles<typeof styles> {
 }
 
-const StyledTableCell = withStyles(theme => ({
-    head: {
-        backgroundColor: theme.palette.common.black,
-        color: theme.palette.common.white,
-    },
-    body: {
-        fontSize: 14,
-    },
-}))(TableCell);
-
-const StyledTableRow = withStyles(theme => ({
-    root: {
-        '&:nth-of-type(odd)': {
-            backgroundColor: theme.palette.background.default,
-        },
-    },
-}))(TableRow);
-
-
 const data = [
-    { year: '1950', population: 2.525 },
-    { year: '1960', population: 3.018 },
-    { year: '1970', population: 3.682 },
-    { year: '1980', population: 4.440 },
-    { year: '1990', population: 5.310 },
-    { year: '2000', population: 6.127 },
-    { year: '2010', population: 6.930 },
+    { year: 'Sunday', population: 1020 },
+    { year: 'Monday', population: 702 },
+    { year: 'Tuesday', population: 1325 },
+    { year: 'Wednesday', population: 500 },
+    { year: 'Thursday', population: 1203 },
+    { year: 'Friday', population: 820 },
+    { year: 'Saturday', population: 794 },
 ];
 
-function tempData(staffName: string, staffUsername: string, staffType: string, lastOnline: string, changePassword: string, deleteU: string) {
-    return { staffName, staffUsername, staffType, lastOnline, changePassword, deleteU };
-}
-
-const rows = [
-    tempData('Yennefer', 'admin', 'manager', 'now', '<button>', '<button>'),
-    tempData('Cirilla', 'yemi', 'wait', 'Sometime', '<button>', '<button>'),
-    tempData('Geralt', 'james', 'kitchen', 'yesterday', '<button>', '<button>'),
-    tempData('Triss', 'polly', 'wait', 'tomorrow', '<button>', '<button>'),
-    tempData('Jaskier', 'tom', 'wait', '21/3', '<button>', '<button>'),
-    tempData('Calanthe', 'queen', 'kitchen', '8/12', '<button>', '<button>'),
-];
-
-function createFeedback(feedback: string, stars: number){
-    return {feedback, stars};
-}
-
-const dummyFeedback = [
-    //createFeedback('This user interface is terrible', 2),
-    createFeedback('I suggest you have a help button to show people how to use this system', 2),
-    createFeedback('The food was good', 4),
-    createFeedback('The pages are too white',3),
-    createFeedback('Fast service', 4),
-    createFeedback('Average Star Rating', 3.1)
-];
-
-function createItemStats(itemname: string, category: string, cost: number, amount: number, profit: number){
-    return {itemname, category, cost, amount, profit};
-};
-
-const dummyStats = [
-    createItemStats('Aburi Salmon', 'Japanese', 11, 30, 330),
-    createItemStats('Vegetable Tempura', 'Japanese', 8, 10, 80),
-    createItemStats('Pasta', 'Italian', 22, 15, 330),
-    createItemStats('Hot Chips', 'Western', 10, 2, 20),
-    createItemStats('Fried Rice', 'Chinese', 11, 20, 220),
-    createItemStats('Green Tea', 'Japanese', 100, 1, 100),
-    createItemStats('Omelette', 'Japanese', 11, 21, 231),
-
-];
 
 class Analytics extends React.Component<IProps, {data: any}>{
 
@@ -113,11 +51,11 @@ class Analytics extends React.Component<IProps, {data: any}>{
         };
     }
     getGraph(){
-        const { data: chartData } = this.state;
         return (
             <Paper>
                 <Chart
-                    data={chartData}
+                    data={data}
+                    height={600}
                 >
                     <ArgumentAxis />
                     <ValueAxis />
@@ -126,7 +64,11 @@ class Analytics extends React.Component<IProps, {data: any}>{
                         valueField="population"
                         argumentField="year"
                     />
-                    <Animation />
+                    <Title
+                        text="Earnings (last 7 days)"
+                    />
+                    <EventTracker />
+                    <Tooltip />
                 </Chart>
             </Paper>
         );
@@ -134,7 +76,7 @@ class Analytics extends React.Component<IProps, {data: any}>{
     render() {
         return (
             <div className={this.props.classes.wrapper}>
-                <b><u>Earnings (last 7 days)</u></b>
+               
                 {this.getGraph()}
             </div>
         );

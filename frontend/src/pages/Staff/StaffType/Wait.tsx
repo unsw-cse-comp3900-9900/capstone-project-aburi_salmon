@@ -36,6 +36,20 @@ const styles = (theme: Theme) =>
             marginRight: theme.spacing(2),
             marginBottom: theme.spacing(2),
         },
+        menuContainer: {
+            backgroundColor: 'lightgrey',
+            border: '2px solid darkblue',
+            padding: theme.spacing(2),
+            flexGrow: 1,
+            display: 'flex',
+            top: theme.spacing(2),
+            left: theme.spacing(2),
+            alignSelf: 'stretch',
+            marginLeft: theme.spacing(2),
+            marginRight: theme.spacing(2),
+            marginBottom: theme.spacing(2),
+            overflow: 'auto',
+        },
 
     });
 export interface IProps extends WithStyles<typeof styles> { }
@@ -94,7 +108,7 @@ class Wait extends React.Component<IProps, IState>{
             );
         } else {
             return(
-                <Box className={classes.staffContainer}>
+                <Box className={classes.menuContainer}>
                     <h1> Menu should be here</h1>
                 </Box>
             );

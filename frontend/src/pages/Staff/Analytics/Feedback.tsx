@@ -1,17 +1,5 @@
 import React from 'react';
 import { createStyles, WithStyles, withStyles, Paper, Theme, TableContainer,  TableHead, TableRow, Button, Table, TableBody, TableCell } from '@material-ui/core';
-import {
-    Chart,
-    BarSeries,
-    Title,
-    ArgumentAxis,
-    ValueAxis,
-} from '@devexpress/dx-react-chart-material-ui';
-
-
-//copied from https://codesandbox.io/s/2hp3y
-//https://devexpress.github.io/devextreme-reactive/react/chart/demos/bar/simple-bar/
-import { Animation } from '@devexpress/dx-react-chart';
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -60,29 +48,6 @@ const StyledTableRow = withStyles(theme => ({
 }))(TableRow);
 
 
-const data = [
-    { year: '1950', population: 2.525 },
-    { year: '1960', population: 3.018 },
-    { year: '1970', population: 3.682 },
-    { year: '1980', population: 4.440 },
-    { year: '1990', population: 5.310 },
-    { year: '2000', population: 6.127 },
-    { year: '2010', population: 6.930 },
-];
-
-function tempData(staffName: string, staffUsername: string, staffType: string, lastOnline: string, changePassword: string, deleteU: string) {
-    return { staffName, staffUsername, staffType, lastOnline, changePassword, deleteU };
-}
-
-const rows = [
-    tempData('Yennefer', 'admin', 'manager', 'now', '<button>', '<button>'),
-    tempData('Cirilla', 'yemi', 'wait', 'Sometime', '<button>', '<button>'),
-    tempData('Geralt', 'james', 'kitchen', 'yesterday', '<button>', '<button>'),
-    tempData('Triss', 'polly', 'wait', 'tomorrow', '<button>', '<button>'),
-    tempData('Jaskier', 'tom', 'wait', '21/3', '<button>', '<button>'),
-    tempData('Calanthe', 'queen', 'kitchen', '8/12', '<button>', '<button>'),
-];
-
 function createFeedback(feedback: string, stars: number){
     return {feedback, stars};
 }
@@ -96,29 +61,7 @@ const dummyFeedback = [
     createFeedback('Average Star Rating', 3.1)
 ];
 
-function createItemStats(itemname: string, category: string, cost: number, amount: number, profit: number){
-    return {itemname, category, cost, amount, profit};
-};
-
-const dummyStats = [
-    createItemStats('Aburi Salmon', 'Japanese', 11, 30, 330),
-    createItemStats('Vegetable Tempura', 'Japanese', 8, 10, 80),
-    createItemStats('Pasta', 'Italian', 22, 15, 330),
-    createItemStats('Hot Chips', 'Western', 10, 2, 20),
-    createItemStats('Fried Rice', 'Chinese', 11, 20, 220),
-    createItemStats('Green Tea', 'Japanese', 100, 1, 100),
-    createItemStats('Omelette', 'Japanese', 11, 21, 231),
-
-];
-
-class Feedback extends React.Component<IProps, {data: any}>{
-
-    constructor(props: IProps) {
-        super(props);
-        this.state = {
-            data,
-        };
-    }
+class Feedback extends React.Component<IProps, {}>{
 
     printFeedbackTable() {
         const { classes } = this.props;
