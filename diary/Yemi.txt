@@ -1,4 +1,61 @@
-COMP3900 Diary
+COMP3900 Diary Summarised
+Week 1
+Formed a team with Kevin and Sharon, we decided on doing Project 6, the
+waiter project. For frontend, we will be using React with Nodejs since
+a lot of companies use it. We will also be using Typescript since it is
+easier to debug. I decided I will do frontend development. I started 
+researching reactjs and typescript.
+Downloaded the necessary packages required to run the starter code that Kevin
+put on Github. I installed a new code editor Visual Studio Code and also
+many extensions.
+I also started working on the Project Proposal (Week 3 deliverables), the
+user stories and problem statement. Signed up to Jira and scoped it out.
+
+Week 2
+I started working on designing the wireframes and finished first draft for our
+system and continued working on our project proposal.
+kav and Noah joined out team since they had a team of 2. They originally wanted
+to do the stock market project. We had most of the project proposal done.
+We brainstormed what would make our system unique, and Kav came up with having
+a recommendations system that would analyse data to recommend items to customers,
+having a takeout option.
+We looked through Kevin's design of the database, and out of nowhere, there was
+this debate about the redundancy of id being an int.
+
+
+Week 3
+I started working on HTML and CSS of some of our pages, continued improving wireframes,
+along with doing background research for the report and styling it.
+Had a standup meeting, we were all working on the project proposal. Needed to finalise
+epics and user stories, add wireframes to report, explain system flow, set out project
+sprints.
+
+Week 4
+I started making react app from scratch and worked on creating the login page. I spent
+most of the week resting...
+We decided that Kevin will work on integrating backend with frontend and customer pages,
+while I will work on Staff pages.
+
+Week 5
+Got login and register pages working and connected to backend. Finished most components
+for staff pages, still need to add javascript to it and connect to backend. Nav bar is
+working, I wrote some pseudocode for planning purposes, cleaned up the struture a bit.
+Backend seems to be working very hard on making hte database.
+
+Week 6
+Spent most of my time trying to connect frontend to backend. Finally connected wait staff
+and kitchen staff to backend. We were advised to focus on the recommendations section of
+our system as it what makes our system unique, hence I started working on designing,
+brainstorming and planning how we should process the data. I finished first draft of
+manage staff. Still waiting on approval of my teammates.
+
+Week 7
+
+
+
+
+
+COMP3900 Diary Detailed
 Date    Day         Plan                                    Doing
 ---------------------------------------------------------------------------------------------------------------------
 18/2    Tuesday     - Form a team and choose a project      - Formed team of 3: Sharon, Kevin and I
@@ -127,3 +184,6 @@ Date    Day         Plan                                    Doing
 26/3    Thursday    - Work on manage staff                  - Finished manage staff page template
 ----------------------------------------------------------------------------------------------------------------------
 27/3    Friday      - Evaluate current design               - Slept
+----------------------------------------------------------------------------------------------------------------------
+28/3    Saturday    - Busy                                  - Nothing
+----------------------------------------------------------------------------------------------------------------------

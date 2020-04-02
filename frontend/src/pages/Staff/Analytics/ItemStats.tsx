@@ -1,42 +1,19 @@
 import React from 'react';
-import { createStyles, WithStyles, withStyles, Paper, Theme, TableContainer,  TableHead, TableRow, Button, Table, TableBody, TableCell } from '@material-ui/core';
-import {
-    Chart,
-    BarSeries,
-    Title,
-    ArgumentAxis,
-    ValueAxis,
-} from '@devexpress/dx-react-chart-material-ui';
+import { createStyles, WithStyles, withStyles, Paper, Theme, TableContainer,  TableHead, TableRow, Table, TableBody, TableCell } from '@material-ui/core';
 import {Client} from './../../../api/client';
-import {AllItemStats} from './../../../api/models';
-
-
-//copied from https://codesandbox.io/s/2hp3y
-//https://devexpress.github.io/devextreme-reactive/react/chart/demos/bar/simple-bar/
-import { Animation } from '@devexpress/dx-react-chart';
+import {AllItemStats, ItemStats} from './../../../api/models';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 
 const styles = (theme: Theme) =>
     createStyles({
         table: {
             minWidth: 300,
+            tableLayout: 'fixed',
         },
         wrapper: {
             height: '100%',
             width: '100%',
-        },
-        profits: {
-            height: '90%',
-            width: '47%',
-            margin: '1.5%',
-            //border: '1px solid black',
-            float: 'left',
-        },
-        itemTable: {
-            height: '90%',
-            width: '47%',
-            margin: '1.5%',
-            //border: '1px solid black',
-            float: 'right',
         },
         wrapper1: {
             height: '94%',
@@ -46,7 +23,12 @@ const styles = (theme: Theme) =>
         wrapper2: {
             height: '5%',
             width: '100%',
-        }
+        },
+        icon: {
+            display: 'flex',
+            alignItems: 'center',
+        },
+
     });
 export interface IProps extends WithStyles<typeof styles> {
 }
@@ -69,39 +51,93 @@ const StyledTableRow = withStyles(theme => ({
     },
 }))(TableRow);
 
+interface IState {
+    order: string,
+    selected: string,
+    realData: Array<ItemStats>,
+    trevenue: number,
+}
 
 
-function createItemStats(itemname: string, category: string, cost: number, amount: number, profit: number){
-    return {itemname, category, cost, amount, profit};
-};
-
-const dummyStats = [
-    createItemStats('Aburi Salmon', 'Japanese', 11, 30, 330),
-    createItemStats('Vegetable Tempura', 'Japanese', 8, 10, 80),
-    createItemStats('Pasta', 'Italian', 22, 15, 330),
-    createItemStats('Hot Chips', 'Western', 10, 2, 20),
-    createItemStats('Fried Rice', 'Chinese', 11, 20, 220),
-    createItemStats('Green Tea', 'Japanese', 100, 1, 100),
-    createItemStats('Omelette', 'Japanese', 11, 21, 231),
-
-];
-
-class ItemStats extends React.Component<IProps, {realData: AllItemStats | null}>{
+class ItemStatsClass extends React.Component<IProps, IState>{
 
     constructor(props: IProps){
         super(props);
         this.state = {
-            realData: null,
+            realData: [],
+            order: 'des',
+            selected: 'itemId',
+            trevenue: 0,
         }
     }
 
     async componentDidMount() {
         const client = new Client();
         const t: AllItemStats | null = await client.getAllStats();
-        this.setState({ realData: t });
-        console.log(t);
+        if (t?.item_sales !== undefined){
+            this.setState({ realData: t?.item_sales});
+        }
+        if (t?.total_revenue !== undefined){
+            this.setState({trevenue: t?.total_revenue})
+        }
     }
 
+    sortData(dataType: string) {
+        var temp = this.state.realData;
+        if (this.state.order === 'asc') {
+            if (dataType === "itemId") {
+                const sorted = temp.sort((a, b) => a.id < b.id ? 1 : -1);
+                this.setState({ realData: sorted });
+            } else if (dataType === "name") {
+                const sorted = temp.sort((a, b) => a.name < b.name ? 1 : -1);
+                this.setState({ realData: sorted });
+            } else if (dataType === "sold") {
+                const sorted = temp.sort((a, b) => a.orders < b.orders ? 1 : -1);
+                this.setState({ realData: sorted });
+            } else if (dataType === "price") {
+                const sorted = temp.sort((a, b) => a.price < b.price ? 1 : -1);
+                this.setState({ realData: sorted });
+            } else if (dataType === "revenue") {
+                const sorted = temp.sort((a, b) => a.revenue < b.revenue ? 1 : -1);
+                this.setState({ realData: sorted });
+            }
+            this.setState({ order: 'des' });
+        } else {
+            if (dataType === "itemId") {
+                const sorted = temp.sort((a, b) => a.id > b.id ? 1 : -1);
+                this.setState({ realData: sorted });
+            } else if (dataType === "name") {
+                const sorted = temp.sort((a, b) => a.name > b.name ? 1 : -1);
+                this.setState({ realData: sorted });
+            } else if (dataType === "sold") {
+                const sorted = temp.sort((a, b) => a.orders > b.orders ? 1 : -1);
+                this.setState({ realData: sorted });
+            } else if (dataType === "price") {
+                const sorted = temp.sort((a, b) => a.price > b.price ? 1 : -1);
+                this.setState({ realData: sorted });
+            } else if (dataType === "revenue") {
+                const sorted = temp.sort((a, b) => a.revenue > b.revenue ? 1 : -1);
+                this.setState({ realData: sorted });
+            }
+
+            this.setState({ order: 'asc' });
+        }
+    }
+
+    printArrow(dataType: string) {
+        if (dataType === this.state.selected) {
+            if (this.state.order === 'asc') {
+                return <ExpandLessIcon />
+            } else {
+                return <ExpandMoreIcon />
+            }
+        }
+    }
+
+    handleClick(selected: string) { //sort data then re-renders
+        this.sortData(selected);
+        this.setState({ selected: selected });
+    }
 
     printItemTable() {
         const { classes } = this.props;
@@ -110,55 +146,23 @@ class ItemStats extends React.Component<IProps, {realData: AllItemStats | null}>
                 <Table className={classes.table} aria-label="customized table" size="small">
                     <TableHead>
                         <TableRow>
-                            <StyledTableCell>Item</StyledTableCell>
-                            <StyledTableCell>Category</StyledTableCell>
-                            <StyledTableCell>Cost ($)</StyledTableCell>
-                            <StyledTableCell>Sold</StyledTableCell>
-                            <StyledTableCell>Total Profit ($)</StyledTableCell>
+                            <StyledTableCell onClick={() => this.handleClick("itemId")}><div className={classes.icon}>Item ID {this.printArrow("itemId")}</div></StyledTableCell>
+                            <StyledTableCell onClick={() => this.handleClick("name")}> <div className={classes.icon}>Item Name{this.printArrow("name")}</div></StyledTableCell>
+                            <StyledTableCell onClick={() => this.handleClick("sold")}><div className={classes.icon}>Sold {this.printArrow("sold")}</div></StyledTableCell>
+                            <StyledTableCell onClick={() => this.handleClick("price")}><div className={classes.icon}>Price ($) {this.printArrow("price")}</div></StyledTableCell>
+                            <StyledTableCell onClick={() => this.handleClick("revenue")}><div className={classes.icon}>Revenue ($) {this.printArrow("revenue")}</div></StyledTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody >
-                        {dummyStats.map(row => (
-                            <StyledTableRow key={row.itemname}>
-                                <StyledTableCell component="th" scope="row">
-                                    {row.itemname}
-                                </StyledTableCell>
-                                <StyledTableCell>{row.category}</StyledTableCell>
-                                <StyledTableCell>{row.cost}</StyledTableCell>
-                                <StyledTableCell>{row.amount}</StyledTableCell>
-                                <StyledTableCell>{row.profit}</StyledTableCell>
-                            </StyledTableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        );
-    }
-
-    printItemTable2() {
-        const { classes } = this.props;
-        return (
-            <TableContainer component={Paper}>
-                <Table className={classes.table} aria-label="customized table" size="small">
-                    <TableHead>
-                        <TableRow>
-                            <StyledTableCell>Item ID</StyledTableCell>
-                            <StyledTableCell>name</StyledTableCell>
-                            <StyledTableCell>Sold</StyledTableCell>
-                            <StyledTableCell>Price ($)</StyledTableCell>
-                            <StyledTableCell>Total Profit ($)</StyledTableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody >
-                        {this.state.realData?.item_sales.map(item => (
+                        {this.state.realData.map(item => (
                             <StyledTableRow key={item.id}>
                                 <StyledTableCell component="th" scope="row">
                                     {item.id}
                                 </StyledTableCell>
                                 <StyledTableCell>{item.name}</StyledTableCell>
                                 <StyledTableCell>{item.orders}</StyledTableCell>
-                                <StyledTableCell>{item.price}</StyledTableCell>
-                                <StyledTableCell>{item.revenue}</StyledTableCell>
+                                <StyledTableCell>{item.price.toFixed(2)}</StyledTableCell>
+                                <StyledTableCell>{item.revenue.toFixed(2)}</StyledTableCell>
                             </StyledTableRow>
                         ))}
                     </TableBody>
@@ -171,14 +175,14 @@ class ItemStats extends React.Component<IProps, {realData: AllItemStats | null}>
         return (
             <div className={this.props.classes.wrapper}>
                 <div className={this.props.classes.wrapper1}>
-                {this.printItemTable2()}
+                {this.printItemTable()}
                 </div>
                 <div className={this.props.classes.wrapper2}>
-                    Total Revenue: ${this.state.realData?.total_revenue}
+                    <b>Total Revenue: ${this.state.trevenue.toFixed(2)}</b>
                 </div>
             </div>
         );
     }
 }
 
-export default withStyles(styles)(ItemStats);
+export default withStyles(styles)(ItemStatsClass);

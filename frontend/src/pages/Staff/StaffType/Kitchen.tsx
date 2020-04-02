@@ -1,6 +1,5 @@
 import React from 'react';
-import { createStyles, withStyles, WithStyles, Theme, MenuList, Paper, MenuItem, ListItemIcon, Box } from '@material-ui/core';
-import PriorityHighIcon from '@material-ui/icons/PriorityHigh';
+import { createStyles, withStyles, WithStyles, Theme, MenuList, Paper, MenuItem, Box, Dialog, DialogTitle, DialogContent,DialogActions,Button} from '@material-ui/core';
 import Queue from './../../Staff/Orders/QueueList';
 import Cooking from './../../Staff/Orders/CookingList';
 import Ready from './../../Staff/Orders/ReadyList';
@@ -8,6 +7,7 @@ import { ListItem } from './../../../api/models';
 import { ItemList } from './../../../api/models';
 import { Client } from './../../../api/client';
 import {Menu} from './../../Menu/Menu';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -51,6 +51,13 @@ const styles = (theme: Theme) =>
             marginBottom: theme.spacing(2),
             overflow: 'auto',
         },
+        minSize: {
+            width: theme.spacing(17),
+        },
+        helpIcon: {
+            float: 'right',
+            paddingRight: '1%',
+        },
     });
 export interface IProps extends WithStyles<typeof styles> { }
 
@@ -60,6 +67,7 @@ interface IState {
     cookingList: ItemList | null,
     readyList: ItemList | null,
     lastClicked: number,
+    resetOpen: boolean,
 }
 
 class Kitchen extends React.Component<IProps, IState>{
@@ -72,6 +80,7 @@ class Kitchen extends React.Component<IProps, IState>{
             cookingList: null, //listType === 2
             readyList: null, //listType === 3
             lastClicked: -1,
+            resetOpen: false,
         }
         this.moveToCooking = this.moveToCooking.bind(this);
         this.moveToReady = this.moveToReady.bind(this);
@@ -88,9 +97,6 @@ class Kitchen extends React.Component<IProps, IState>{
             cookingList: cooking,
             readyList: ready,
         });
-        //console.log('queuelist: ' + queue);
-        //console.log('cookinglist: ' + cooking);
-        //console.log('readylist: ' + ready);
     }
 
    displayCont() {
@@ -98,9 +104,11 @@ class Kitchen extends React.Component<IProps, IState>{
         if (this.state.currPage === "Orders") {
             return (
                 <Box className={classes.staffContainer}>
+                    {this.helpDialog()}
                     <Queue update={this.moveToCooking} someList={this.state.queueList} lastClicked={this.state.lastClicked}/>
                     <Cooking update={this.moveToReady} someList={this.state.cookingList} lastClicked={this.state.lastClicked}/>
                     <Ready update={this.moveToQueue} someList={this.state.readyList} lastClicked={this.state.lastClicked}/>
+                    <div className={this.props.classes.helpIcon} onClick={() => this.setState({ resetOpen: true })}><HelpOutlineIcon /></div>
                 </Box>
             );
         } else {
@@ -112,17 +120,33 @@ class Kitchen extends React.Component<IProps, IState>{
         }
     }
 
+    helpDialog() {
+        return (
+            <div>
+                <Dialog open={this.state.resetOpen} onClose={() => this.setState({ resetOpen: false })} aria-labelledby="form-dialog-title">
+                    <DialogTitle id="form-dialog-title">Help</DialogTitle>
+                    <DialogContent>
+                        Tap on item in each list to move it between lists. If item has successfully changed list, the item will appear in the new list with a bold
+                        outline.
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => this.setState({ resetOpen: false })} color="primary">
+                            Ok, I get it
+                        </Button>
+
+                    </DialogActions>
+                </Dialog>
+            </div>
+        );
+    }
+
     displayNav() {
         return (
             <div className={this.props.classes.root}>
                 <Paper className={this.props.classes.menubutton}>
-                    <MenuList >
+                    <MenuList className={this.props.classes.minSize}>
                         <MenuItem onClick={() => { this.setState({ currPage: "Menu" }) }}>Menu</MenuItem>
-                        <MenuItem onClick={() => { this.setState({ currPage: "Orders" }) }}>Orders
-                            <ListItemIcon>
-                                <PriorityHighIcon fontSize="small" />
-                            </ListItemIcon>
-                        </MenuItem>
+                        <MenuItem onClick={() => { this.setState({ currPage: "Orders" }) }}>Orders</MenuItem>
                     </MenuList>
                 </Paper>
             </div>

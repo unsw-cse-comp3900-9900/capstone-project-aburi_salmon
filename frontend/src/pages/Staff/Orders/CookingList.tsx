@@ -34,7 +34,6 @@ const styles = () =>
             background: 'linear-gradient(0deg, rgba(255, 254, 218, 1) 0%, rgba(255, 255, 255, 1) 100%)',
 
         },
-
         scroll: {
             height: '100%',
             display: 'block',
@@ -58,8 +57,6 @@ export interface IProps extends WithStyles<typeof styles> {
  }
 
 class Cooking extends React.Component<IProps, {}>{
-
-    //Get items depending on name
     getHeading(){
         return (
             <thead>

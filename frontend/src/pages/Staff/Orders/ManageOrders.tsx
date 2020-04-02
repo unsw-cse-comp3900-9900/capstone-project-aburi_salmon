@@ -1,9 +1,11 @@
 import React from 'react';
-import { createStyles, WithStyles, Theme, withStyles, Button, Box, TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper, Dialog, DialogContent, DialogContentText, DialogActions, DialogTitle, TextField, FormControl, InputLabel, Select, Input } from '@material-ui/core';
-import DeleteIcon from '@material-ui/icons/Delete';
-import { PropertyName } from 'lodash';
+import { createStyles, WithStyles, Theme, withStyles, TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper} from '@material-ui/core';
 import {ItemList, ListItem} from './../../../api/models';
 import {Client} from './../../../api/client';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
+
+
 //mostly copied from 
 //https://stackoverflow.com/questions/40541710/reactjs-with-material-ui-how-to-sort-an-array-of-material-uis-tablerow-alpha
 
@@ -12,7 +14,7 @@ const styles = (theme: Theme) =>
     createStyles({
         table: {
             minWidth: 550,
-            
+            tableLayout: 'fixed',
         },
         wrapper: {
             height: '100%',
@@ -35,13 +37,20 @@ const styles = (theme: Theme) =>
         },
         tableCont: {
             maxHeight: '95%',
-        }
+        },
+        icon: {
+            display: 'flex',
+            alignItems: 'center',
+        },
+       
+
     });
 export interface IProps extends WithStyles<typeof styles> {
 }
 const StyledTableCell = withStyles(theme => ({
     head: {
         backgroundColor: theme.palette.common.black,
+        
         color: theme.palette.common.white,
     },
     body: {
@@ -70,20 +79,21 @@ class ManageOrders extends React.Component<IProps, IState>{
     constructor(props: IProps){
         super(props);
         this.state = {
-            order: 'asc',
+            order: 'des',
             selected: 'status',
             realData: [],
         }
+        this.handleClick = this.handleClick.bind(this);
     }
 
-    sortData2(dataType: string){
+    sortData(dataType: string){
         var temp = this.state.realData;
         if (this.state.order === 'asc'){
             if (dataType === "orderId"){
                 const sorted = temp.sort((a,b) => a.id < b.id ? 1:-1);
                 this.setState({ realData: sorted });
             } else if (dataType === "tableNo") {
-                const sorted = temp.sort((a, b) => 2 > 3 ? 1 : -1);
+                const sorted = temp.sort((a, b) => a.table > b.table ? 1 : -1);
                 this.setState({ realData: sorted });
             } else if (dataType === "itemName"){
                 const sorted = temp.sort((a, b) => a.itemName < b.itemName ? 1 : -1);
@@ -101,7 +111,7 @@ class ManageOrders extends React.Component<IProps, IState>{
                 const sorted = temp.sort((a, b) => a.id > b.id ? 1 : -1);
                 this.setState({ realData: sorted });
             } else if (dataType === "tableNo") {
-                const sorted = temp.sort((a, b) => a.id > b.id ? 1 : -1);
+                const sorted = temp.sort((a, b) => a.table > b.table ? 1 : -1);
                 this.setState({ realData: sorted });
             } else if (dataType === "itemName") {
                 const sorted = temp.sort((a, b) => a.itemName > b.itemName ? 1 : -1);
@@ -137,7 +147,6 @@ class ManageOrders extends React.Component<IProps, IState>{
         if (served?.itemList !== undefined) {
             temp1 = temp1.concat(served?.itemList);
         }
-        console.log(temp1);
         this.setState({
             realData: temp1,
         });
@@ -147,15 +156,15 @@ class ManageOrders extends React.Component<IProps, IState>{
     printArrow(dataType: string){
         if (dataType === this.state.selected){
             if (this.state.order === 'asc') {
-                return " [+]"
+                return <ExpandLessIcon />
             } else {
-                return " [-]"
+                return <ExpandMoreIcon />
             }
         }
     }
 
     handleClick(selected: string){
-        this.sortData2(selected);
+        this.sortData(selected);
         this.setState({selected: selected })
     }
 
@@ -166,18 +175,18 @@ class ManageOrders extends React.Component<IProps, IState>{
                 <Table stickyHeader={true} className={classes.table} aria-label="customized table" size='small' >
                     <TableHead >
                         <TableRow>
-                            <StyledTableCell className={classes.head} onClick={() => this.handleClick("orderId")}>Order ID {this.printArrow("orderId")}</StyledTableCell>
-                            <StyledTableCell className={classes.head} onClick={() => this.handleClick("tableNo")}>Table Number {this.printArrow("tableNo")}</StyledTableCell>
-                            <StyledTableCell className={classes.head} onClick={() => this.handleClick("itemName")}>Item Name {this.printArrow("itemName")}</StyledTableCell>
-                            <StyledTableCell className={classes.head} onClick={() => this.handleClick("amount")}>Amount {this.printArrow("amount")}</StyledTableCell>
-                            <StyledTableCell className={classes.head} onClick={() => this.handleClick("status")}>Status {this.printArrow("status")}</StyledTableCell>
+                            <StyledTableCell className={classes.head} onClick={() => this.handleClick("orderId")}> <div className={classes.icon}>Order ID {this.printArrow("orderId")}</div></StyledTableCell>
+                            <StyledTableCell className={classes.head} onClick={() => this.handleClick("tableNo")}> <div className={classes.icon}>Table Number {this.printArrow("tableNo")}</div></StyledTableCell>
+                        <StyledTableCell className={classes.head} onClick={() => this.handleClick("itemName")}><div className={classes.icon}>Item Name {this.printArrow("itemName")}</div></StyledTableCell>
+                            <StyledTableCell className={classes.head} onClick={() => this.handleClick("amount")}><div className={classes.icon}>Amount {this.printArrow("amount")}</div></StyledTableCell>
+                            <StyledTableCell className={classes.head} onClick={() => this.handleClick("status")}><div className={classes.icon}>Status {this.printArrow("status")}</div></StyledTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody >
                         {this.state.realData.map(item => (
                             <StyledTableRow key={item.id}>
                                 <StyledTableCell component="th" scope="row">{item.id}</StyledTableCell>
-                                <StyledTableCell>2</StyledTableCell>
+                                <StyledTableCell>{item.table + 1}</StyledTableCell>
                                 <StyledTableCell>{item.itemName}</StyledTableCell>
                                 <StyledTableCell>{item.quantity}</StyledTableCell>
                                 <StyledTableCell>{statusArr[item.status_id]}</StyledTableCell>
@@ -189,7 +198,6 @@ class ManageOrders extends React.Component<IProps, IState>{
         );
     }
 
-    
     render() {
         return (
             <div className={this.props.classes.wrapper}>
