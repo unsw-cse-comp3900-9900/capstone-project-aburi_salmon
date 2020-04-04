@@ -1,6 +1,5 @@
 import React from 'react';
-import { createStyles,  withStyles, WithStyles, Theme, MenuList, Paper, MenuItem, ListItemIcon, Box, Snackbar, Button } from '@material-ui/core';
-import PriorityHighIcon from '@material-ui/icons/PriorityHigh';
+import { createStyles,  withStyles, WithStyles, Theme, MenuList, Paper, MenuItem, Box, Snackbar, Button, Dialog, DialogTitle, DialogContent,DialogActions } from '@material-ui/core';
 import Assistance from './../../Staff/Assistance/AssistanceMain';
 import ToServe from './../Orders/ToServeList';
 import Served from './../Orders/ServedList';
@@ -8,6 +7,7 @@ import { ListItem } from './../../../api/models';
 import { ItemList } from './../../../api/models';
 import { Client } from './../../../api/client';
 import { Alert } from '@material-ui/lab';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -36,6 +36,28 @@ const styles = (theme: Theme) =>
             marginRight: theme.spacing(2),
             marginBottom: theme.spacing(2),
         },
+        menuContainer: {
+            backgroundColor: 'lightgrey',
+            border: '2px solid darkblue',
+            padding: theme.spacing(2),
+            flexGrow: 1,
+            display: 'flex',
+            top: theme.spacing(2),
+            left: theme.spacing(2),
+            alignSelf: 'stretch',
+            marginLeft: theme.spacing(2),
+            marginRight: theme.spacing(2),
+            marginBottom: theme.spacing(2),
+            overflow: 'auto',
+        },
+        helpIcon: {
+            float: 'right',
+            paddingRight: '1%',
+        },
+        minSize: {
+            width: theme.spacing(17),
+
+        },
 
     });
 export interface IProps extends WithStyles<typeof styles> { }
@@ -45,7 +67,9 @@ interface IState{
     toServeList: ItemList | null,
     servedList: ItemList | null,
     listName: string,
-    isOpen: boolean
+    isOpen: boolean,
+    lastClicked: number,
+    resetOpen: boolean,
 }
 
 class Wait extends React.Component<IProps, IState>{
@@ -57,10 +81,32 @@ class Wait extends React.Component<IProps, IState>{
             listName: "none",
             toServeList: null,
             servedList: null,
-            isOpen: true,
+            isOpen: false,
+            lastClicked: -1,
+            resetOpen: false,
         }
         this.moveToServed = this.moveToServed.bind(this);
         this.moveToToServe = this.moveToToServe.bind(this);
+    }
+
+    helpDialog() {
+        return (
+            <div>
+                <Dialog open={this.state.resetOpen} onClose={() => this.setState({ resetOpen: false })} aria-labelledby="form-dialog-title">
+                    <DialogTitle id="form-dialog-title">Help</DialogTitle>
+                    <DialogContent>
+                        Tap on item in each list to move it between lists. If item has successfully changed list, the item will appear in the new list with a bold
+                        outline.
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => this.setState({ resetOpen: false })} color="primary">
+                            Ok, I get it
+                        </Button>
+
+                    </DialogActions>
+                </Dialog>
+            </div>
+        );
     }
 
     async componentDidMount() {
@@ -71,8 +117,8 @@ class Wait extends React.Component<IProps, IState>{
             toServeList: toServe,
             servedList: served,
         });
-        console.log('toServeList: ' + toServe);
-        console.log('ServedList: ' + served);
+        //console.log('toServeList: ' + toServe);
+        //console.log('ServedList: ' + served);
     }
 
     displayCont(){
@@ -80,8 +126,10 @@ class Wait extends React.Component<IProps, IState>{
         if (this.state.currPage === "Orders") {
             return (
                 <Box className={classes.staffContainer}>
-                    <ToServe update={this.moveToServed} someList={this.state.toServeList}/>
-                    <Served update={this.moveToToServe} someList={this.state.servedList}/>
+                    {this.helpDialog()}
+                    <ToServe update={this.moveToServed} someList={this.state.toServeList} lastClicked={this.state.lastClicked}/>
+                    <Served update={this.moveToToServe} someList={this.state.servedList} lastClicked={this.state.lastClicked}/>
+                    <div className={this.props.classes.helpIcon} onClick={() => this.setState({ resetOpen: true })}><HelpOutlineIcon /></div>
                 </Box>
             );
         } else if (this.state.currPage === "Assistance"){
@@ -92,7 +140,7 @@ class Wait extends React.Component<IProps, IState>{
             );
         } else {
             return(
-                <Box className={classes.staffContainer}>
+                <Box className={classes.menuContainer}>
                     <h1> Menu should be here</h1>
                 </Box>
             );
@@ -107,7 +155,20 @@ class Wait extends React.Component<IProps, IState>{
                 itemList: tempArray,
             }
             this.setState({ servedList: ret });
-            console.log(ret);
+            
+            const client = new Client();
+            client.updateOrderStatus(item.id, 4)
+                .then((msg) => {
+                    //alert(msg.status);
+                    if (msg.status === 200) {
+                        this.setState({ lastClicked: item.id });
+                        //alert('success');
+                    } else {
+                        alert(msg.statusText);
+                    }
+                }).catch((status) => {
+                    console.log(status);
+                });;
         }
         console.log(item);
         this.removeItem(itemId, 1);
@@ -121,7 +182,21 @@ class Wait extends React.Component<IProps, IState>{
                 itemList: tempArray,
             }
             this.setState({ toServeList: ret });
-            console.log(ret);
+            
+            const client = new Client();
+            client.updateOrderStatus(item.id, 3)
+                .then((msg) => {
+                    //alert(msg.status);
+                    if (msg.status === 200) {
+                        this.setState({ lastClicked: item.id });
+                        //alert('success');
+                    } else {
+                        alert(msg.statusText);
+                    }
+                }).catch((status) => {
+                    console.log(status);
+                });;
+            
         }
         console.log(item);
         this.removeItem(itemId, 2);
@@ -164,18 +239,10 @@ class Wait extends React.Component<IProps, IState>{
             <div className={this.props.classes.root}>
                 {this.showAlert()}
                 <Paper className={this.props.classes.menubutton}>
-                    <MenuList >
+                    <MenuList className={this.props.classes.minSize}>
                         <MenuItem onClick={() => { this.setState({ currPage: "Menu" }) }}>Menu</MenuItem>
-                        <MenuItem onClick={() => { this.setState({ currPage: "Orders" }) }}>Orders
-                        <ListItemIcon>
-                                <PriorityHighIcon fontSize="small" />
-                            </ListItemIcon>
-                        </MenuItem>
-                        <MenuItem onClick={() => { this.setState({ currPage: "Assistance" }) }}>Tables
-                        <ListItemIcon>
-                                <PriorityHighIcon fontSize="small" />
-                            </ListItemIcon>
-                        </MenuItem>
+                        <MenuItem onClick={() => { this.setState({ currPage: "Orders" }) }}>Orders</MenuItem>
+                        <MenuItem onClick={() => { this.setState({ currPage: "Assistance" }) }}>Tables</MenuItem>
                     </MenuList>
                 </Paper>
             </div>

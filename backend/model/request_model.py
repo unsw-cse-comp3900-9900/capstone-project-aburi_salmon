@@ -26,8 +26,7 @@ edit_profile_model = api.model('edit_profile', {
 #    "staff_type_id": fields.Integer(description='Staff_type_id')
 })
 
-edit_order_item_status_model = api.model('edit_order_item_status', {
-    "id": fields.Integer(description="id"),
+edit_item_order_status_model = api.model('edit_item_order_status_model', {
     "status": fields.Integer(description="status_id")
 })
 
@@ -96,5 +95,31 @@ table_model = api.model('table_model', {
 })
 
 table_assistance_model = api.model('table_assistance_model', {
-    'assistance': fields.Boolean(description='The assistance status of a table session')
+    'assistance': fields.Boolean(description='The assistance status of a table session'),
+    'order_id': fields.Integer(description='Optional field for order_id')
+})
+
+
+edit_staff_model = api.model('edit_staff_model', {
+    "staff_id": fields.Integer(description="staff_id"),
+    "name": fields.String(description='Name'),
+    "username": fields.String(description='Username'),
+    "staff_type_id": fields.Integer(description='Staff_type_id')
+})
+
+delete_staff_model = api.model('delete_staff_model', {
+    "staff_id": fields.Integer(description="staff_id")
+})
+
+recommendations_model = api.schema_model('recommendations_model', {
+    'type': 'object',
+    'required': ['items'],
+    'properties': {
+        'items': {
+            'type': 'array',
+            'items': {
+                'type': 'integer'
+            }
+        }
+    }
 })

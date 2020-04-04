@@ -136,11 +136,12 @@ class PureRegister extends React.Component<{}, IState> {
                     >{this.state.alertMessage}</Alert>
                 </Snackbar>
                 <h1><b> New Staff</b></h1>
+                
                 <div>
                     Name:
                         <br></br>
                     <TextField
-                        id="name"
+                        id="rname"
                         onChange={(e) => this.setState({ name: e.target.value })}
                         placeholder="name"
                         error={this.state.error}
@@ -151,7 +152,7 @@ class PureRegister extends React.Component<{}, IState> {
                     Username:
                         <br></br>
                     <TextField
-                        id="username"
+                        id="rusername"
                         onChange={(e) => this.setState({ username: e.target.value })}
                         placeholder="username"
                         error={this.state.error}
@@ -163,9 +164,10 @@ class PureRegister extends React.Component<{}, IState> {
                         Password:
                         <br></br>
                     <TextField
-                        id="password"
+                        id="rpassword"
                         placeholder="password"
                         type="password"
+                        autoComplete="off"
                         error={this.state.passerror}
                         onChange={(e) => this.setState({ password: e.target.value })}
                     />
@@ -177,6 +179,7 @@ class PureRegister extends React.Component<{}, IState> {
                     <TextField
                         id="repassword"
                         type="password"
+                        autoComplete="off"
                         error={this.state.passerror}
                         onChange={(e) => this.setState({ repassword: e.target.value })}
                         placeholder="repassword"
@@ -190,6 +193,7 @@ class PureRegister extends React.Component<{}, IState> {
                         id="key"
                         error={this.state.error}
                         type="password"
+                        autoComplete="off"
                         onChange={(e) => this.setState({ key: e.target.value })}
                         placeholder="key"
                     />
@@ -199,6 +203,7 @@ class PureRegister extends React.Component<{}, IState> {
                 <button className=" loginbut "
                     onClick={(e: React.MouseEvent) => this.handleRegister(e)}
                 > Register </button>
+               
 
             </div>
         );

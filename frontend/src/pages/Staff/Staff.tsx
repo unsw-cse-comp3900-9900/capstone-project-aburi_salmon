@@ -28,7 +28,6 @@ const styles = (theme: Theme) =>
         appbar: {
             background: 'black',
         }
-
     });
 export interface IProps extends WithStyles<typeof styles> { }
 
@@ -41,7 +40,7 @@ class StaffPage extends React.Component<IProps, IState>{
     constructor(props: any){
         super(props);
         this.state = {
-            staffType: "manage",
+            staffType: "Manage",
         };
     }
 
@@ -70,16 +69,16 @@ class StaffPage extends React.Component<IProps, IState>{
     }
 
     displayStaff(){
-        if (this.state.staffType === 'wait'){
+        if (this.state.staffType === 'Wait'){
             return(
                 <WaitStaff />
             );
-        } else if(this.state.staffType === 'kitchen'){
+        } else if(this.state.staffType === 'Kitchen'){
             return(
                 <KitchenStaff />
             );
 
-        } else if(this.state.staffType === 'manage'){
+        } else if(this.state.staffType === 'Manage'){
             return(
                 <ManageStaff />
             );
@@ -91,7 +90,6 @@ class StaffPage extends React.Component<IProps, IState>{
 
     changeStaffType(popupState: any, staffType: string){
         this.setState({staffType: staffType});
-        //popupState.close;
     }
 
     render() {
@@ -107,9 +105,9 @@ class StaffPage extends React.Component<IProps, IState>{
                                 StaffType
                             </Button>
                             <Menu {...bindMenu(popupState)}>
-                                <MenuItem onClick={() => this.changeStaffType(popupState, "kitchen")}>Kitchen</MenuItem>
-                                <MenuItem onClick={() => this.changeStaffType(popupState,"wait")}>Wait</MenuItem>
-                                <MenuItem onClick={() => this.changeStaffType(popupState,"manage")}>Manage</MenuItem>
+                                <MenuItem onClick={() => this.changeStaffType(popupState, "Kitchen")}>Kitchen</MenuItem>
+                                <MenuItem onClick={() => this.changeStaffType(popupState,"Wait")}>Wait</MenuItem>
+                                <MenuItem onClick={() => this.changeStaffType(popupState,"Manage")}>Manage</MenuItem>
                             </Menu>
                         </React.Fragment>
                     )}
@@ -117,14 +115,13 @@ class StaffPage extends React.Component<IProps, IState>{
                 <AppBar position="static" className={classes.appbar}>
                     <Toolbar>
                         <Typography variant="h6" className={classes.title}>
-                        Staffname: {localStorage.getItem('username')} StaffType: {this.state.staffType}
+                        {localStorage.getItem('username')}: {this.state.staffType} staff
                     </Typography>
                         <Button color="inherit" onClick={() => this.logOut()}>Logout</Button>
                     </Toolbar>
                 </AppBar>
                 <br></br>
                 {this.displayStaff()}
-                
             </div>
         );
     }

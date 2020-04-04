@@ -44,7 +44,9 @@ export type ListItem = {
   itemName: string,
   quantity: number,
   price: number,
-  item_id: number,
+  id: number,
+  status_id: number,
+  table: number,
 }
 
 export type ItemList = {
@@ -71,11 +73,65 @@ export type Order = {
   total_bill: number,
 }
 
-export type ItemQuantityOrderPair = {
+export type ItemQuantityPair = {
   item_id: number,
   quantity: number,
 }
 
+export type OrderItemQuantityPair = {
+  id: number,
+  quantity: number,
+}
+
 export type CreateOrder = {
-  order: Array<ItemQuantityOrderPair>,
+  order: Array<ItemQuantityPair>,
+}
+
+export type TableInfo = {
+  table: number,
+  order_id: number,
+  items: Array<OrderedItems>,
+  total_cost: number,
+}
+
+
+export type OrderedItems = {
+  itemName: string,
+  quantity: number,
+  price: number,
+  status_id: number,
+
+}
+
+export type AssistanceTable = {
+  table_id: number,
+  occupied: boolean,
+}
+
+export type AssistanceTables = {
+  tables: Array<AssistanceTable>
+}
+
+export type StaffInfo = {
+  id: number,
+  name: string,
+  username: string,
+  staff_type: string,
+}
+
+export type AllStaff = {
+  staff_list: Array<StaffInfo>,
+}
+
+export type ItemStats = {
+  id: number,
+  name: string,
+  price: number,
+  orders: number,
+  revenue: number,
+}
+
+export type AllItemStats = {
+    item_sales: Array<ItemStats>,
+    total_revenue: number,
 }

@@ -99,9 +99,10 @@ class Assistance(Resource):
     @table.response(401, 'Unauthorised')
     @table.expect(request_model.table_assistance_model)
     def put(self):
-        order_id = get_jwt_claims().get('order')
-        assistance = request.get_json().get('assistance')
-
+        body = request.get_json()
+        order_id = get_jwt_claims().get('order') or body.get('order_id')
+        assistance = body.get('assistance')
+        print(order_id)
         if (not order_id):
             abort(401, 'Unauthorised')
 
