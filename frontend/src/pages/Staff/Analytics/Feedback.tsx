@@ -1,5 +1,5 @@
 import React from 'react';
-import { createStyles, WithStyles, withStyles, Paper, Theme, TableContainer,  TableHead, TableRow, Button, Table, TableBody, TableCell } from '@material-ui/core';
+import { createStyles, WithStyles, withStyles, Paper, Theme, TableContainer,  TableHead, TableRow, Table, TableBody, TableCell } from '@material-ui/core';
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -11,20 +11,6 @@ const styles = (theme: Theme) =>
             width: '100%',
             overflow: 'auto',
         },
-        profits: {
-            height: '90%',
-            width: '47%',
-            margin: '1.5%',
-            //border: '1px solid black',
-            float: 'left',
-        },
-        itemTable: {
-            height: '90%',
-            width: '47%',
-            margin: '1.5%',
-            //border: '1px solid black',
-            float: 'right',
-        }
     });
 export interface IProps extends WithStyles<typeof styles> {
 }
@@ -53,7 +39,6 @@ function createFeedback(feedback: string, stars: number){
 }
 
 const dummyFeedback = [
-    //createFeedback('This user interface is terrible', 2),
     createFeedback('I suggest you have a help button to show people how to use this system', 2),
     createFeedback('The food was good', 4),
     createFeedback('The pages are too white',3),
@@ -88,8 +73,6 @@ class Feedback extends React.Component<IProps, {}>{
             </TableContainer>
         );
     }
-
-
 
     render() {
         return (

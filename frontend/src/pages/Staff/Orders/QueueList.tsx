@@ -69,7 +69,7 @@ class Queue extends React.Component<IProps, {}>{
         );
     }
     getBox(){
-        if (this.props.someList !== null){
+        if (this.props.someList !== null && this.props.someList.itemList !== undefined){
             return (
                 <td className={this.props.classes.boxQueue}>
                 {this.props.someList?.itemList.map((item, index) => (
@@ -81,6 +81,7 @@ class Queue extends React.Component<IProps, {}>{
         } else {
             return(
                 <td className={this.props.classes.boxQueue}>
+                    No orders here...
                 </td>
             );
         }

@@ -115,6 +115,7 @@ class PureLogin extends React.Component<{}, IState> {
                 </Snackbar>
                 {/*<img src={restlogo} className="logoimage" alt="logo" />*/}
                 <h1><b>Login</b></h1>
+                
                 Username: <br></br>
                 <TextField
                     id="username"
@@ -131,6 +132,7 @@ class PureLogin extends React.Component<{}, IState> {
                     id="password"
                     type="password"
                     placeholder="password"
+                    autoComplete="off"
                     error={this.state.passerror}
                     size="small"
                     onChange={(e) => this.setState({ password: e.target.value })}
@@ -141,6 +143,7 @@ class PureLogin extends React.Component<{}, IState> {
                 <button className=" loginbut "
                     onClick={() => { this.handleLogin() }}
                 >Login</button>
+                
             </div>
         );
     }

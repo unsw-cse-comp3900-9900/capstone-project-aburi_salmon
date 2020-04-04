@@ -1,7 +1,8 @@
 import React from 'react';
-import { createStyles, WithStyles, Theme, withStyles, Button, Box } from '@material-ui/core';
+import { createStyles, WithStyles, Theme, withStyles, Button, Box,  Snackbar } from '@material-ui/core';
 import { Client } from './../../../api/client';
 import { TableInfo } from './../../../api/models';
+import { Alert } from '@material-ui/lab';
 
 
 const styles = (theme: Theme) =>
@@ -40,12 +41,9 @@ const styles = (theme: Theme) =>
         },
         empty: {
             textAlign: 'center',
-            //paddingTop: '20%',
            display: 'flex',
            justifyContent: 'center',
             height: '95%',
-           
-            //alignItems: 'center',
         }, 
         bottom: {
             bottom: '10%',
@@ -56,7 +54,6 @@ const styles = (theme: Theme) =>
         centerText: {
             position: 'absolute',
             top: '50%',
-            //left: '50%',
             transform: 'translate(-50%, -50%)'
         }
     });
@@ -72,6 +69,9 @@ interface IState {
     hide: string,
     itemsOrdered: number | undefined,
     order_id: number,
+    isOpen: boolean,
+    alertMessage: string,
+    alertSeverity: "error" | "success" ,
 }
 
 const statusArr = ['','Queue', 'Cooking', 'Ready', 'Served'];
@@ -80,31 +80,33 @@ class TableInfoClass extends React.Component<IProps, IState>{
 
     constructor(props: IProps){
         super(props);
+        var temp = '';
         if (!this.props.assistance){
-            var temp = 'none';
+            temp = 'none';
         } else {
-            var temp = 'block';
+            temp = 'block';
         }
         this.state = {
             tableInfo: null,
             hide: temp,
             itemsOrdered: 0,
             order_id: -1,
+            isOpen: false,
+            alertMessage: 'somethings wrong',
+            alertSeverity: 'error'
         }
     }
 
     async componentDidMount() {
-        //console.log(this.props.isEmpty);
         if (this.props.isEmpty){
             const client = new Client()
             const t: TableInfo | null = await client.getTableOrders(this.props.tableNumber);
+            console.log(t);
             this.setState({ tableInfo: t});
             if (t?.items !== undefined){
                 this.setState({itemsOrdered: t?.items.length, order_id:t.order_id})
             }
-            console.log(t);
         }
-        console.log(this.props.assistance);
     }
 
     printItems(){
@@ -112,9 +114,9 @@ class TableInfoClass extends React.Component<IProps, IState>{
         let ret = [];
         if (this.state.tableInfo !== null) {
             if (this.state.itemsOrdered !== undefined && this.state.itemsOrdered> 0){
-                this.state.tableInfo?.items.map(item => (
+                this.state.tableInfo?.items.map((item, index) => (
                     children.push(
-                        <tr key={item.itemName}>
+                        <tr key={index}>
                             <td>{item.itemName}</td>
                             <td>{item.quantity}</td>
                             <td>{item.price}</td>
@@ -123,14 +125,18 @@ class TableInfoClass extends React.Component<IProps, IState>{
                     )
                 ));
                 ret.push(
-                    <table className={this.props.classes.itemTable}>
-                        <tr>
+                    <table className={this.props.classes.itemTable} key="table">
+                        <thead>
+                        <tr key="headings">
                             <th>Name</th>
                             <th>Amount</th>
                             <th>Cost (per item)</th>
                             <th>Status</th>
                         </tr>
-                        {children}
+                        </thead>
+                        <tbody>
+                            {children}
+                        </tbody>
                     </table>
                 );
                 return ret;
@@ -139,27 +145,43 @@ class TableInfoClass extends React.Component<IProps, IState>{
     }
 
     noItemsOrdered(){
-        //console.log('items ordered: ' + this.state.itemsOrdered);
         if (this.state.itemsOrdered === 0){
-            //console.log('items ordered: ' + this.state.itemsOrdered);
             return (
-                    <div className={this.props.classes.center}>
-                        No items ordered yet
-                    </div>
-                );
+                <div className={this.props.classes.center}>
+                    No items ordered yet
+                </div>
+            );
         }
+    }
+
+    showAlert() {
+        return (
+            <Snackbar
+                open={this.state.isOpen}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert
+                    severity={this.state.alertSeverity}
+                    action={
+                        <Button color="inherit" size="small" onClick={() => this.setState({ isOpen: false })}>
+                            OK
+                            </Button>
+                    }
+                >{this.state.alertMessage}</Alert>
+            </Snackbar>
+        );
     }
 
     problemResolved(){
         const client = new Client();
-        console.log(this.state.order_id);
         client.assistance(this.state.order_id, false)
             .then((msg) => {
-                //alert(msg.status);
                 if (msg.status === 200) {
-                    alert('problem resolved');
+                    //alert('problem resolved');
+                    this.setState({isOpen: true, alertSeverity: "success", alertMessage: "Problem Resolved"});
                 } else {
-                    alert(msg.statusText);
+                    this.setState({ isOpen: true, alertSeverity: "error", alertMessage: msg.statusText });
+                    //alert(msg.statusText);
                 }
             }).catch((status) => {
                 console.log(status);
@@ -170,13 +192,12 @@ class TableInfoClass extends React.Component<IProps, IState>{
         const client = new Client();
         await client.assistance(this.props.tableNumber, false)
             .then((msg) => {
-                //alert(msg.status);
                 if (msg.status === 200) {
-                    alert('table Freed');
+                    this.setState({ isOpen: true, alertSeverity: "success", alertMessage: "Table Freed" });
                     this.props.paidFunction();
                     
                 } else {
-                    alert(msg.statusText);
+                    this.setState({ isOpen: true, alertSeverity: "error", alertMessage: msg.statusText });
                 }
                 
             }).catch((status) => {
@@ -186,10 +207,10 @@ class TableInfoClass extends React.Component<IProps, IState>{
 
     render() {
         const { classes } = this.props;
-        //this.grabTableInfo();
         if (this.props.isEmpty){
             return (
                 <div className={classes.wrapper}>
+                    {this.showAlert()}
                     <div className={classes.wrapper1}>
                         <h1 className = {classes.text}>Table {this.props.tableNumber + 1}</h1>
                         <Box display={this.state.hide} displayPrint="none">
@@ -214,7 +235,7 @@ class TableInfoClass extends React.Component<IProps, IState>{
         } else {
             return(
                 <div className={classes.empty}>
-                    <h1>This table is empty</h1>
+                    <h1>Table {this.props.tableNumber + 1} is empty</h1>
                 </div>
             );
         }

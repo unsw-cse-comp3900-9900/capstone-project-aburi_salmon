@@ -69,7 +69,7 @@ class Served extends React.Component<IProps, {}>{
     }
 
     getBox() {
-        if (this.props.someList !== null) {
+        if (this.props.someList !== null && this.props.someList.itemList !== undefined) {
             return (
 
                 <td className={this.props.classes.boxServed}>
@@ -82,6 +82,7 @@ class Served extends React.Component<IProps, {}>{
         } else {
             return (
                 <td className={this.props.classes.boxServed}>
+                    No orders here...
                 </td>
             );
         }

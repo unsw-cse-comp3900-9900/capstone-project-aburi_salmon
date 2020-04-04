@@ -28,7 +28,6 @@ const styles = (theme: Theme) =>
         appbar: {
             background: 'black',
         }
-
     });
 export interface IProps extends WithStyles<typeof styles> { }
 
@@ -91,7 +90,6 @@ class StaffPage extends React.Component<IProps, IState>{
 
     changeStaffType(popupState: any, staffType: string){
         this.setState({staffType: staffType});
-        //popupState.close;
     }
 
     render() {
@@ -124,7 +122,6 @@ class StaffPage extends React.Component<IProps, IState>{
                 </AppBar>
                 <br></br>
                 {this.displayStaff()}
-                
             </div>
         );
     }

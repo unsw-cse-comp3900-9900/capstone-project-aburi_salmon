@@ -8,8 +8,6 @@ import {
     ValueAxis,
     Tooltip,
 } from '@devexpress/dx-react-chart-material-ui';
-
-
 //copied from https://codesandbox.io/s/2hp3y
 //https://devexpress.github.io/devextreme-reactive/react/chart/demos/bar/simple-bar/
 import { Animation, EventTracker } from '@devexpress/dx-react-chart';
@@ -24,9 +22,6 @@ const styles = (theme: Theme) =>
             width: '100%',
             overflow: 'auto',
         },
-        graph: {
-            height: '85%',
-        }
     });
 export interface IProps extends WithStyles<typeof styles> {
 }

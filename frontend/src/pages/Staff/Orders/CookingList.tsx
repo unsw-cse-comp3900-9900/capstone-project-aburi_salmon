@@ -34,7 +34,6 @@ const styles = () =>
             background: 'linear-gradient(0deg, rgba(255, 254, 218, 1) 0%, rgba(255, 255, 255, 1) 100%)',
 
         },
-
         scroll: {
             height: '100%',
             display: 'block',
@@ -58,8 +57,6 @@ export interface IProps extends WithStyles<typeof styles> {
  }
 
 class Cooking extends React.Component<IProps, {}>{
-
-    //Get items depending on name
     getHeading(){
         return (
             <thead>
@@ -73,7 +70,7 @@ class Cooking extends React.Component<IProps, {}>{
     }
 
     getBox(){
-        if (this.props.someList !== null){
+        if (this.props.someList !== null && this.props.someList.itemList !== undefined){
             return (
                 <td className={this.props.classes.boxToBeServed}>
                     {this.props.someList?.itemList.map((item, index) => (
@@ -84,7 +81,9 @@ class Cooking extends React.Component<IProps, {}>{
             );
         } else {
             return(
-                <td className={this.props.classes.boxToBeServed}></td >
+                <td className={this.props.classes.boxToBeServed}>
+                    No orders here...
+                </td >
             );
         }
     }
