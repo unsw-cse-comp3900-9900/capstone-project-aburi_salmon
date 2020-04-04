@@ -15,17 +15,30 @@ const styles = (theme: Theme) =>
         },      
         container: {
             //border: '1px solid grey',
-            height: '100%',
+            height: '90%',
             width: '100%',
             overflow: 'auto',
         },
+        container2: {
+            //border: '1px solid grey',
+            height: '10%',
+            width: '100%',
+        },
+        container3: {
+            //border: '1px solid grey',
+            height: '100%',
+            width: '100%',
+
+        },
+
         wrapper: {
             width: '100%',
             //paddingLeft: '2%',
             //paddingRight: '2%',
             textAlign: 'left',
-
+ 
         },
+        
         key: {
             position: 'relative',
             bottom:'-25%',
@@ -79,7 +92,7 @@ class Assistance extends React.Component<IProps, IState>{
         )
         this.setState({ tables: t, assistance: temp });
         console.log(t);
-        console.log('ass' + temp);
+        //console.log('ass' + temp);
         //console.log(a?.tables);
         //console.log(a?.tables[3]);
     }
@@ -133,6 +146,12 @@ class Assistance extends React.Component<IProps, IState>{
         this.setState({ main: true });
     }
 
+    paid(){
+        this.setState({ selectedTable: 0 });
+        this.setState({ main: true });
+        this.componentDidMount();
+    }
+
     tableKey(){
         return(
             <div className={this.props.classes.key}>
@@ -158,10 +177,14 @@ class Assistance extends React.Component<IProps, IState>{
     render() {
         if (this.state.main) {
             return (
-                <div className={this.props.classes.container}>
-                    <h1>Tables</h1>
-                    {this.createTables()}
-                    {this.tableKey()}
+                <div className={this.props.classes.container3}>
+                    <div className={this.props.classes.container}>
+                        <h1>Tables</h1>
+                        {this.createTables()}
+                    </div>
+                    <div className={this.props.classes.container2}>
+                        {this.tableKey()}
+                    </div>
                 </div>
             );
         } else {
@@ -169,7 +192,7 @@ class Assistance extends React.Component<IProps, IState>{
                 <div className={this.props.classes.wrapper}>
                     <Link onClick={()=>this.backToTables()} > Back to tables</Link>
                     <TableInfo tableNumber={this.state.selectedTable} assistance={this.needAssistance(this.state.selectedTable)}
-                        isEmpty={this.state.tables?.tables[this.state.selectedTable].occupied}/>
+                        isEmpty={this.state.tables?.tables[this.state.selectedTable].occupied} paidFunction={this.paid}/>
         
                 </div>
             )

@@ -45,6 +45,7 @@ export type ListItem = {
   quantity: number,
   price: number,
   id: number,
+  status_id: number,
 }
 
 export type ItemList = {
@@ -94,9 +95,10 @@ export type TableInfo = {
 
 
 export type OrderedItems = {
-  name: string,
+  itemName: string,
   quantity: number,
   price: number,
+  status_id: number,
 
 }
 
@@ -107,4 +109,28 @@ export type AssistanceTable = {
 
 export type AssistanceTables = {
   tables: Array<AssistanceTable>
+}
+
+export type StaffInfo = {
+  id: number,
+  name: string,
+  username: string,
+  staff_type: string,
+}
+
+export type AllStaff = {
+  staff_list: Array<StaffInfo>,
+}
+
+export type ItemStats = {
+  id: number,
+  name: string,
+  price: number,
+  orders: number,
+  revenue: number,
+}
+
+export type AllItemStats = {
+    item_sales: Array<ItemStats>,
+    total_revenue: number,
 }

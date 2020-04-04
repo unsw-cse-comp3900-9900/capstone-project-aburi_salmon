@@ -1,4 +1,4 @@
-import { Tables, Menu, ItemList, Order, Item, ItemQuantityPair, CreateOrder, ResponseMessage, AddItemToOrderResponseMessage, OrderItemQuantityPair, ItemOrder, TableInfo, AssistanceTables } from "./models";
+import { Tables, Menu, ItemList, Order, Item, ItemQuantityPair, CreateOrder, ResponseMessage, AddItemToOrderResponseMessage, OrderItemQuantityPair, ItemOrder, TableInfo, AssistanceTables, AllStaff, AllItemStats } from "./models";
 
 const apiUrl = "http://localhost:5000";
 
@@ -246,19 +246,6 @@ export class Client {
     }
   }
 
-  async freeTable(tablenumber: number) {
-    try {
-      const r: Response = await fetch(apiUrl + '/kitchen/' + tablenumber, {
-        method: 'POST',
-        credentials: 'include',
-        mode: 'cors',
-      });
-
-    } catch (e) {
-      console.error(e);
-      return null;
-    }
-  }
 
   async getAssistanceTable() {
     try {
@@ -269,6 +256,103 @@ export class Client {
       });
 
       const j: AssistanceTables = await r.json();
+      return j;
+
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async freeTable(tableNum: number) {
+    
+      return fetch(apiUrl + '/table/free/'+ tableNum, {
+        method: 'POST',
+        credentials: 'include',
+        mode: 'cors',
+      });
+   }
+
+   async assistance(order_id: number, assistance: boolean){
+
+    return fetch(apiUrl + '/table/assistance', {
+      method: 'PUT',
+      credentials: 'include',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(
+        {
+          order: order_id,
+          assistance: assistance,
+        }
+      ),
+    });
+   
+   }
+
+   async updateOrderStatus(itemId: number, newStatus: number){
+     return fetch(apiUrl + '/order/item/status/' + itemId, {
+       method: 'PUT',
+       credentials: 'include',
+       mode: 'cors',
+       headers: {
+         'Content-Type': 'application/json'
+       },
+       body: JSON.stringify(
+         {
+           status: newStatus,
+         }
+       ),
+     });
+   }
+
+  async getStaff() {
+    try {
+      const r: Response = await fetch(apiUrl + '/staff_profile/staff_list', {
+        method: 'GET',
+        credentials: 'include',
+        mode: 'cors',
+      });
+
+      const j: AllStaff = await r.json();
+      return j;
+
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async deleteStaff(staff_id: number) {
+
+      return( fetch(apiUrl + '/staff_profile/edit', {
+          method: 'DELETE',
+          credentials: 'include',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(
+            {
+              staff_id: staff_id,
+            }
+          ),
+        }
+      ));
+   
+  }
+
+  async getAllStats(){
+    try {
+      const r: Response = await fetch(apiUrl + '/stats/sales', {
+        method: 'GET',
+        credentials: 'include',
+        mode: 'cors',
+      });
+
+      const j: AllItemStats = await r.json();
       return j;
 
     } catch (e) {

@@ -1,7 +1,8 @@
 import React from 'react';
 import { createStyles, WithStyles, Theme, withStyles, Button, Box, TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper, Dialog, DialogContent, DialogContentText, DialogActions, DialogTitle, TextField, FormControl, InputLabel, Select, Input } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
-
+import {Client} from './../../../api/client';
+import { AllStaff } from './../../../api/models';
 //mostly copied from https://codesandbox.io/s/v2eib &
 //https://material-ui.com/components/tables/
 //https://codesandbox.io/s/u0yv3
@@ -34,6 +35,19 @@ const styles = (theme: Theme) =>
         },
         tableBut: {
             float: "right",
+        },
+        wrapper1: {
+            height: '92%',
+            width: '100%',
+            //overflow: 'auto',
+        },
+        wrapper2:{
+            height: '8%',
+            width: '100%',
+         
+        },
+        tableCont: {
+            maxHeight: '95%',
         }
     });
 export interface IProps extends WithStyles<typeof styles> {
@@ -69,8 +83,18 @@ const rows = [
     tempData('Calanthe', 'queen', 'kitchen', '8/12', '<button>', '<button>'),
 ];
 
+interface IState {
+    deleteOpen:boolean,
+    resetOpen: boolean,
+    resetKeyOpen: boolean,
+    tableOpen:boolean,
+    resetStaff: string,
+    realData: AllStaff | null,
+    selectedStaff: number,
+}
 
-class StaffDetails extends React.Component<IProps, { deleteOpen:boolean, resetOpen: boolean, resetKeyOpen: boolean,tableOpen:boolean,resetStaff: string}>{
+
+class StaffDetails extends React.Component<IProps, IState>{
 
     constructor(props: IProps){
         super(props);
@@ -80,10 +104,37 @@ class StaffDetails extends React.Component<IProps, { deleteOpen:boolean, resetOp
             resetKeyOpen: false,
             tableOpen: false,
             resetStaff: "",
+            realData: null,
+            selectedStaff: 0,
         }
     }
+    async componentDidMount() {
+        const client = new Client();
+        const temp: AllStaff | null = await client.getStaff();
+        console.log(temp);
+        this.setState({
+            realData: temp,
+        });
+    }
 
-    
+    deleteStaff(){
+        this.setState({ deleteOpen: false });
+        const client = new Client();
+        console.log(this.state.selectedStaff);
+        client.deleteStaff(this.state.selectedStaff)
+            .then((msg) => {
+                //alert(msg.status);
+                if (msg.status === 200) {
+                    alert('success');
+                } else {
+                    alert(msg.statusText);
+                }
+
+            }).catch((status) => {
+                console.log(status);
+            });
+    }
+
     deleteDialog(){
         return (
             <div>
@@ -103,7 +154,7 @@ class StaffDetails extends React.Component<IProps, { deleteOpen:boolean, resetOp
                         <Button onClick={() => this.setState({deleteOpen: false})} color="primary">
                             Nevermind
                         </Button>
-                        <Button onClick={() => this.setState({ deleteOpen: false })} color="primary" autoFocus>
+                        <Button onClick={() => this.deleteStaff()} color="primary" autoFocus>
                             Yes, I'm sure
                         </Button>
                     </DialogActions>
@@ -239,7 +290,7 @@ class StaffDetails extends React.Component<IProps, { deleteOpen:boolean, resetOp
                 {this.resetDialog()}
                 {this.resetKeyDialog()}
                 {this.changeTableDialog()}
-                <Table className={classes.table} aria-label="customized table" >
+                <Table className={classes.table} aria-label="customized table"  size="small">
                     <TableHead>
                         <TableRow>
                             <StyledTableCell>Staff Name</StyledTableCell>
@@ -284,13 +335,70 @@ class StaffDetails extends React.Component<IProps, { deleteOpen:boolean, resetOp
         );
     }
 
+    printTable2() {
+        const { classes } = this.props;
+        return (
+            <TableContainer component={Paper} className={classes.tableCont}>
+                {this.deleteDialog()}
+                {this.resetDialog()}
+                {this.resetKeyDialog()}
+                {this.changeTableDialog()}
+                <Table className={classes.table} aria-label="customized table" size="small" stickyHeader={true}>
+                    <TableHead>
+                        <TableRow>
+                            <StyledTableCell>Staff ID</StyledTableCell>
+                            <StyledTableCell>Name</StyledTableCell>
+                            <StyledTableCell>Username</StyledTableCell>
+                            <StyledTableCell>Staff Type</StyledTableCell>
+                            <StyledTableCell>Change Password</StyledTableCell>
+                            <StyledTableCell>Delete User</StyledTableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody >
+                        {this.state.realData?.staff_list.map(staff => (
+                            <StyledTableRow key={staff.id}>
+                                <StyledTableCell component="th" scope="row" padding={'none'} className={classes.rows}>
+                                    {staff.id}
+                                </StyledTableCell>
+                                <StyledTableCell padding={'none'} className={classes.rows}>{staff.name}</StyledTableCell>
+                                <StyledTableCell padding={'none'} className={classes.rows}>{staff.username}</StyledTableCell>
+                                <StyledTableCell padding={'none'} className={classes.rows}>{staff.staff_type}</StyledTableCell>
+                                <StyledTableCell padding={'none'} className={classes.rows}>
+                                    <Button variant="contained" color="primary" onClick={() => this.setState({ resetOpen: true })}>
+                                        Reset Password
+                                    </Button>
+                                </StyledTableCell>
+
+                                <StyledTableCell padding={'none'} className={classes.rows}>
+                                    <Button
+                                        variant="contained"
+                                        color="secondary"
+                                        className={classes.button}
+                                        onClick={() => this.setState({ deleteOpen: true, selectedStaff:staff.id })}
+                                        startIcon={<DeleteIcon />}>
+                                        Delete
+                                    </Button>
+
+                                </StyledTableCell>
+                            </StyledTableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        );
+    }
+
     render() {
         return (
             <div className={this.props.classes.wrapper}>
-                {this.printTable()}
-                <br></br>
-                <Button color="primary" className={this.props.classes.registBut} onClick={() => this.setState({ resetKeyOpen: true })}>Change Registration Key</Button>
-                <Button color="primary" className={this.props.classes.tableBut} onClick={() => this.setState({ tableOpen: true })}>Change No. of Tables</Button>
+                <div className={this.props.classes.wrapper1}>
+                    {this.printTable2()}
+                    <br></br>
+                </div>
+                <div className={this.props.classes.wrapper2}>
+                    <Button color="primary" className={this.props.classes.registBut} onClick={() => this.setState({ resetKeyOpen: true })}>Change Registration Key</Button>
+                    <Button color="primary" className={this.props.classes.tableBut} onClick={() => this.setState({ tableOpen: true })}>Change No. of Tables</Button>
+                </div>
             </div>
         );
     }

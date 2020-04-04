@@ -36,6 +36,20 @@ const styles = (theme: Theme) =>
             marginRight: theme.spacing(2),
             marginBottom: theme.spacing(2),
         },
+        menuContainer: {
+            backgroundColor: 'lightgrey',
+            border: '2px solid darkblue',
+            padding: theme.spacing(2),
+            flexGrow: 1,
+            display: 'flex',
+            top: theme.spacing(2),
+            left: theme.spacing(2),
+            alignSelf: 'stretch',
+            marginLeft: theme.spacing(2),
+            marginRight: theme.spacing(2),
+            marginBottom: theme.spacing(2),
+            overflow: 'auto',
+        },
 
     });
 export interface IProps extends WithStyles<typeof styles> { }
@@ -45,7 +59,8 @@ interface IState{
     toServeList: ItemList | null,
     servedList: ItemList | null,
     listName: string,
-    isOpen: boolean
+    isOpen: boolean,
+    lastClicked: number,
 }
 
 class Wait extends React.Component<IProps, IState>{
@@ -58,6 +73,7 @@ class Wait extends React.Component<IProps, IState>{
             toServeList: null,
             servedList: null,
             isOpen: true,
+            lastClicked: -1,
         }
         this.moveToServed = this.moveToServed.bind(this);
         this.moveToToServe = this.moveToToServe.bind(this);
@@ -80,8 +96,8 @@ class Wait extends React.Component<IProps, IState>{
         if (this.state.currPage === "Orders") {
             return (
                 <Box className={classes.staffContainer}>
-                    <ToServe update={this.moveToServed} someList={this.state.toServeList}/>
-                    <Served update={this.moveToToServe} someList={this.state.servedList}/>
+                    <ToServe update={this.moveToServed} someList={this.state.toServeList} lastClicked={this.state.lastClicked}/>
+                    <Served update={this.moveToToServe} someList={this.state.servedList} lastClicked={this.state.lastClicked}/>
                 </Box>
             );
         } else if (this.state.currPage === "Assistance"){
@@ -92,7 +108,7 @@ class Wait extends React.Component<IProps, IState>{
             );
         } else {
             return(
-                <Box className={classes.staffContainer}>
+                <Box className={classes.menuContainer}>
                     <h1> Menu should be here</h1>
                 </Box>
             );
@@ -107,7 +123,20 @@ class Wait extends React.Component<IProps, IState>{
                 itemList: tempArray,
             }
             this.setState({ servedList: ret });
-            console.log(ret);
+            
+            const client = new Client();
+            client.updateOrderStatus(item.id, 4)
+                .then((msg) => {
+                    //alert(msg.status);
+                    if (msg.status === 200) {
+                        this.setState({ lastClicked: item.id });
+                        //alert('success');
+                    } else {
+                        alert(msg.statusText);
+                    }
+                }).catch((status) => {
+                    console.log(status);
+                });;
         }
         console.log(item);
         this.removeItem(itemId, 1);
@@ -121,7 +150,21 @@ class Wait extends React.Component<IProps, IState>{
                 itemList: tempArray,
             }
             this.setState({ toServeList: ret });
-            console.log(ret);
+            
+            const client = new Client();
+            client.updateOrderStatus(item.id, 3)
+                .then((msg) => {
+                    //alert(msg.status);
+                    if (msg.status === 200) {
+                        this.setState({ lastClicked: item.id });
+                        //alert('success');
+                    } else {
+                        alert(msg.statusText);
+                    }
+                }).catch((status) => {
+                    console.log(status);
+                });;
+            
         }
         console.log(item);
         this.removeItem(itemId, 2);
