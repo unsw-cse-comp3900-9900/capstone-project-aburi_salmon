@@ -344,6 +344,28 @@ export class Client {
    
   }
 
+  async changeStaffType(staff_id: number, name: string, username:string, staff_type_id: number ) {
+
+    return (fetch(apiUrl + '/staff_profile/edit', {
+      method: 'PATCH',
+      credentials: 'include',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(
+        {
+          staff_id: staff_id,
+          name: name,
+          username: username,
+          staff_type_id: staff_type_id,
+        }
+      ),
+    }
+    ));
+
+  }
+
   async getAllStats(){
     try {
       const r: Response = await fetch(apiUrl + '/stats/sales', {
@@ -360,5 +382,7 @@ export class Client {
       return null;
     }
   }
+
+
 
 }

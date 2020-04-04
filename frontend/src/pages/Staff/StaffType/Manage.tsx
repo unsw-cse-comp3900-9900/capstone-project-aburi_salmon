@@ -1,18 +1,13 @@
 import React from 'react';
-import { createStyles, withStyles, WithStyles, Theme, MenuList, Paper, MenuItem, Box, Menu } from '@material-ui/core';
-import { ListItem } from './../../../api/models';
+import { createStyles, withStyles, WithStyles, Theme, MenuList, Paper, MenuItem, Box} from '@material-ui/core';
 import { ItemList } from './../../../api/models';
 import { Client } from './../../../api/client';
-import Queue from './../../Staff/Orders/QueueList';
-import Cooking from './../../Staff/Orders/CookingList';
-import Ready from './../../Staff/Orders/ReadyList';
 import Assistance from './../../Staff/Assistance/AssistanceMain';
 import StaffDetails from './../StaffDetails/StaffDetails';
-import Analytics from './../Analytics/Analytics';
+//import Analytics from './../Analytics/Analytics';
 import ManageOrders from './../Orders/ManageOrders';
 import Feedback from './../Analytics/Feedback';
 import ItemStats from './../Analytics/ItemStats';
-
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -92,9 +87,6 @@ class Manage extends React.Component<IProps, IState>{
             cookingList: cooking,
             readyList: ready,
         });
-        //console.log('queuelist: ' + queue);
-        //console.log('cookinglist: ' + cooking);
-        //console.log('readylist: ' + ready);
     }
 
     displayCont() {
@@ -117,13 +109,13 @@ class Manage extends React.Component<IProps, IState>{
                     <StaffDetails />
                 </Box>
             );
-        } else if (this.state.currPage === "Earnings") {
+        } /*else if (this.state.currPage === "Earnings") {
             return(
                 <Box className={classes.staffContainer}>
                     <Analytics />
                 </Box>
             );
-        } else if (this.state.currPage === "Feedback") {
+        } */else if (this.state.currPage === "Feedback") {
             return (
                 <Box className={classes.staffContainer}>
                     <Feedback />
@@ -150,15 +142,17 @@ class Manage extends React.Component<IProps, IState>{
     displayNav() {
         return (
             <div className={this.props.classes.root}>
+                
                 <Paper className={this.props.classes.menubutton}>
                     <MenuList className={this.props.classes.minsize}>
                         <MenuItem onClick={() => { this.setState({ currPage: "Menu" }) }}>Menu</MenuItem>
                         <MenuItem onClick={() => {this.setState({ currPage: "Orders"})}}>Orders</MenuItem>
                         <MenuItem onClick={() => { this.setState({ currPage: "Tables" }) }}>Tables</MenuItem>
                         <MenuItem onClick={() => { this.setState({ currPage: "Manage" }) }}>Manage</MenuItem>
-                        <MenuItem onClick={() => { this.setState({ currPage: "Earnings" }) }}>Earnings</MenuItem>
-                        <MenuItem onClick={() => { this.setState({ currPage: "Feedback" }) }}>Feedback</MenuItem>
+        {/*<MenuItem onClick={() => { this.setState({ currPage: "Earnings" }) }}>Earnings</MenuItem>*/}
+                        
                         <MenuItem onClick={() => { this.setState({ currPage: "ItemStats" }) }}>Item Statistics</MenuItem>
+                        <MenuItem onClick={() => { this.setState({ currPage: "Feedback" }) }}>Feedback</MenuItem>
                     </MenuList>
                 </Paper>
             </div>
@@ -169,6 +163,7 @@ class Manage extends React.Component<IProps, IState>{
         const { classes } = this.props;
         return (
             <div className={classes.container}>
+                
                 {this.displayNav()}
                 {this.displayCont()}
             </div>
