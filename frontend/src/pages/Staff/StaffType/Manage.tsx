@@ -8,6 +8,7 @@ import StaffDetails from './../StaffDetails/StaffDetails';
 import ManageOrders from './../Orders/ManageOrders';
 import Feedback from './../Analytics/Feedback';
 import ItemStats from './../Analytics/ItemStats';
+import {EditMenu} from './../Menu/EditMenu';
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -52,7 +53,6 @@ const styles = (theme: Theme) =>
             marginLeft: theme.spacing(2),
             marginRight: theme.spacing(2),
             marginBottom: theme.spacing(2),
-            overflow: 'auto',
         },
 
     });
@@ -70,7 +70,7 @@ class Manage extends React.Component<IProps, IState>{
     constructor(props: any) {
         super(props);
         this.state = {
-            currPage: "Manage",
+            currPage: "Menu",
             queueList: null, //listType === 1
             cookingList: null, //listType === 2
             readyList: null, //listType === 3
@@ -131,7 +131,7 @@ class Manage extends React.Component<IProps, IState>{
         else {
             return (
                 <Box className={classes.menuContainer}>
-                    <h1> Menu should be here</h1>
+                    <EditMenu />
                 </Box>
             );
         }

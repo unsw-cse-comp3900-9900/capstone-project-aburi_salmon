@@ -6,7 +6,7 @@ import Ready from './../../Staff/Orders/ReadyList';
 import { ListItem } from './../../../api/models';
 import { ItemList } from './../../../api/models';
 import { Client } from './../../../api/client';
-import {Menu} from './../../Menu/Menu';
+import { StaticMenu} from '../Menu/StaticMenu';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 
 const styles = (theme: Theme) =>
@@ -49,7 +49,7 @@ const styles = (theme: Theme) =>
             marginLeft: theme.spacing(2),
             marginRight: theme.spacing(2),
             marginBottom: theme.spacing(2),
-            overflow: 'auto',
+            
         },
         minSize: {
             width: theme.spacing(17),
@@ -75,7 +75,7 @@ class Kitchen extends React.Component<IProps, IState>{
     constructor(props: any) {
         super(props);
         this.state = {
-            currPage: "Orders",
+            currPage: "Menu",
             queueList: null, //listType === 1
             cookingList: null, //listType === 2
             readyList: null, //listType === 3
@@ -114,7 +114,7 @@ class Kitchen extends React.Component<IProps, IState>{
         } else {
             return (
                 <Box className={classes.menuContainer}>
-                    <Menu />
+                    <StaticMenu />
                 </Box>
             );
         }
