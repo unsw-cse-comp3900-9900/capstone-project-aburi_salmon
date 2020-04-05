@@ -5,27 +5,11 @@ import { MuiThemeProvider } from "@material-ui/core/styles";
 import history from './history';
 import { Home, Login, Staff, Table, Menu, Waiting } from "./pages";
 import { theme } from './theme/theme';
-import io from 'socket.io-client';
-
-const socket = io('http://localhost:5000')
+import { connectToSocket } from './api/socketio';
 
 class App extends React.Component {
   componentDidMount() {
-    socket.on('connect', () => {
-      console.log('Connected to socket');
-      console.log('Attempting to join a room...');
-      socket.emit('join');
-    })
-
-    socket.on('join', ({ room }) => {
-      this.setState({ room: room });
-      console.log(`Joined room ${room}`);
-    });
-
-    socket.on('leave', () => {
-      console.log(`Left room ${this.state.room}`);
-      this.setState({ room: false });
-    });
+    connectToSocket(this);
   }
 
   render() {

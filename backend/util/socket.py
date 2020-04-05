@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from flask_socketio import SocketIO, send, emit, join_room, leave_room
+from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask_jwt_extended import get_jwt_claims, get_jwt_identity, jwt_required, jwt_optional
 
 from app import flask_app
@@ -19,14 +19,17 @@ def disconnect():
 
 ## Example socketIO implementation. Do not use this
 @socket.on('join')
-@jwt_required
-def staff_join_room():
+@jwt_optional
+def on_join():
     claims = get_jwt_claims()
     user = get_jwt_identity()
     if (claims.get('role')):
-        room = claims.get('role')
+        room = 'staff' + str(claims.get('role'))
     elif (claims.get('order')):
-        room = claims.get('order')
+        room = 'customer' + str(claims.get('order'))
+    else:
+        # User is not logged in
+        return
     
     print('joining room {}'.format(room))
     join_room(room)

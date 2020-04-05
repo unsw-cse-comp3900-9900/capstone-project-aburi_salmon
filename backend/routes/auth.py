@@ -5,6 +5,8 @@ from uuid import uuid4
 from flask import request, jsonify
 from flask_restx import Resource, abort, reqparse, fields
 from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies, jwt_required
+from flask_socketio import join_room, leave_room
+from util.socket import socket
 
 import config
 from app import api, db
@@ -44,6 +46,7 @@ class Login(Resource):
             'status': 'success'
         })
         set_access_cookies(response, access_token)
+
         return response
 
 @auth.route("/logout", strict_slashes=False)
