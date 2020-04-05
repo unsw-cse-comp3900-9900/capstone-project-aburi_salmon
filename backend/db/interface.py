@@ -513,11 +513,14 @@ class DB:
 
     def get_table_id(self, order_id):
         rows = self.__query(
-            """
+            '''
             SELECT o.table_id FROM "order" o WHERE o.id = %s
-            """,
+            ''',
             [order_id]
         )
+
+        print('Getting table id')
+        print(rows)
 
         if (not rows or not rows[0]):
             return None
@@ -551,11 +554,10 @@ class DB:
     def get_order_list(self, status):
         rows = self.__query(
             """
-            SELECT item.name, io.quantity, item.price, io.id, io.status_id, t.id
+            SELECT item.name, io.quantity, item.price, io.id, io.status_id, o.table_id
             FROM item_order io JOIN item ON (io.item_id = item.id)
                                JOIN "order" o ON (o.id = io.order_id)
-                               JOIN "table" t ON (o.table_id = t.id) 
-            WHERE io.status_id = %s AND t.state = True
+            WHERE io.status_id = %s
             """,
             [status])
 
