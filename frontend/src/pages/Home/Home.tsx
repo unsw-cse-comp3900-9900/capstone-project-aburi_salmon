@@ -32,7 +32,7 @@ const  logOut = () => {
   localStorage.setItem('username', "");
   localStorage.setItem('staff', 'false');
   fetch("http://localhost:5000/auth/logout", {
-    method: 'OPTIONS',
+    method: 'POST',
     credentials: 'include',
     mode: 'cors'
   }).then((msg) => {
