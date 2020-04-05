@@ -176,11 +176,14 @@ class DB:
         return category
         
     def create_item(self, item):
-        self.__insert(
-            'INSERT INTO item (name, description, price, visible) VALUES (%s, %s, %s, %s)',
+        rows = self.__query(
+            'INSERT INTO item (name, description, price, visible) VALUES (%s, %s, %s, %s) RETURNING id',
             [item.get('name'), item.get('description'), item.get('price'), item.get('visible')]
         )
-        return True
+        if not rows or not rows[0]:
+            return None
+
+        return rows[0][0]
 
     def get_all_menu_items(self):
         rows = self.__query(

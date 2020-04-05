@@ -36,10 +36,11 @@ class CreateMenuItem(Resource):
     def post(self):
         # Create a new menu item
         item = request.get_json()
-        if (not db.create_item(item)):
+        item_id = db.create_item(item)
+        if (not item_id):
             abort(400, 'Invalid request')
         
-        return jsonify({ 'status': 'success' })
+        return jsonify({ 'item_id': item_id })
 
     @jwt_required
     @menu.response(200, 'Success', model=response_model.menu_items_model)
