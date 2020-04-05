@@ -8,6 +8,7 @@ import { ItemList } from './../../../api/models';
 import { Client } from './../../../api/client';
 import { Alert } from '@material-ui/lab';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import {StaticMenu } from '../Menu/StaticMenu';
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -48,7 +49,6 @@ const styles = (theme: Theme) =>
             marginLeft: theme.spacing(2),
             marginRight: theme.spacing(2),
             marginBottom: theme.spacing(2),
-            overflow: 'auto',
         },
         helpIcon: {
             float: 'right',
@@ -141,7 +141,7 @@ class Wait extends React.Component<IProps, IState>{
         } else {
             return(
                 <Box className={classes.menuContainer}>
-                    <h1> Menu should be here</h1>
+                    <StaticMenu />
                 </Box>
             );
         }
