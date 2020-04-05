@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './../Home/Homepage.css';
 import history from '../../history';
-
+import { socket } from '../../api/socketio';
 
 class PureHome extends React.Component {
   goToTable() {
@@ -29,9 +29,10 @@ class PureHome extends React.Component {
 }
 
 const logOut = async () => {
+  socket.emit('leave')
   localStorage.setItem('username', "");
   localStorage.setItem('staff', 'false');
-  fetch("http://localhost:5000/auth/logout", {
+  await fetch("http://localhost:5000/auth/logout", {
     method: 'POST',
     credentials: 'include',
     mode: 'cors'

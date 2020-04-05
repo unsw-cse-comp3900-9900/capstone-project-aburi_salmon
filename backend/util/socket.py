@@ -21,6 +21,7 @@ def disconnect():
 @socket.on('join')
 @jwt_optional
 def on_join():
+    print('Attempting to join room')
     claims = get_jwt_claims()
     user = get_jwt_identity()
     if (claims.get('role')):
@@ -37,7 +38,7 @@ def on_join():
 
 @socket.on('leave')
 @jwt_required
-def on_leave(data):
+def on_leave():
     claims = get_jwt_claims()
     user = get_jwt_identity()
     if (claims.get('role')):
