@@ -48,7 +48,9 @@ class PureRegister extends React.Component<{}, IState> {
             headers: {
                 'Content-Type': 'application/json',
                 'Connection': 'keep-alive'
-            }
+            },
+            credentials: 'include',
+            mode: 'cors',
         })
         .then(res => {
             var temp = this;

@@ -31,8 +31,10 @@ class PureHome extends React.Component {
 const logOut = async () => {
   localStorage.setItem('username', "");
   localStorage.setItem('staff', 'false');
-  await fetch("http://localhost:5000/auth/logout", {
+  fetch("http://localhost:5000/auth/logout", {
     method: 'POST',
+    credentials: 'include',
+    mode: 'cors'
   }).then((msg) => {
     if (msg.status === 200) {
       alert('you have successfully logged out');

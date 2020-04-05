@@ -47,8 +47,10 @@ class StaffPage extends React.Component<IProps, IState>{
     logOut() {
         localStorage.setItem('username', "");
         localStorage.setItem('staff', 'false');
-        fetch("/auth/logout", {
-            method: 'OPTIONS',
+        fetch("http://localhost:5000/auth/logout", {
+            method: 'POST',
+            credentials: 'include',
+            mode: 'cors'
         }).then((msg) => {
             if (msg.status === 200) {
                 alert('you have successfully logged out');
