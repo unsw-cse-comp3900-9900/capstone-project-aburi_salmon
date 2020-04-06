@@ -5,6 +5,7 @@ export const styles = (theme: Theme) =>
     menupage: {
       height: '100%',
       width: '100%',
+      
     },
     title: {
       margin: '30px',
@@ -50,7 +51,7 @@ export const styles = (theme: Theme) =>
       left: '50%',
       position: 'fixed',
       flexGrow: 1,
-      minWidth: '60%',
+      minWidth: '70%',
       width: 'auto',
       height: 'auto',
       backgroundColor: theme.palette.background.paper,

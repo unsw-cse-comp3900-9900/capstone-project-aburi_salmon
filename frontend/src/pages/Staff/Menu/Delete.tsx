@@ -1,12 +1,16 @@
 import React from 'react';
 import { Button, Dialog, DialogContent, DialogContentText, DialogActions, DialogTitle} from '@material-ui/core';
+import {Item, Categories} from './../../../api/models';
+
 
 export interface IProps{
     isOpen: boolean,
     setIsOpen: any, //function to change state of is open
     relevantFunction: any,
     isCat: boolean, //if 1 then it is category, if 0 then is item
-    itemname: string,
+    item: Item | null,
+    cat: Categories | null,
+
 }
 
 class Delete extends React.Component<IProps, {}>{
@@ -14,12 +18,12 @@ class Delete extends React.Component<IProps, {}>{
     selectText(){
         if (!this.props.isCat){
             return(
-                "Are you sure you want to delete the item " +  this.props.itemname +" from the menu?"
+                "Are you sure you want to delete the item " +  this.props.item?.name +" from the menu?"
                           +  " There will be no reversing this process."
             );
         } else {
             return (
-                "Are you sure you want to delete the category " + this.props.itemname + " from the menu?"
+                "Are you sure you want to delete the category " + this.props.cat?.name + " from the menu?"
                 + " There will be no reversing this process."
             );
         }

@@ -1,4 +1,4 @@
-import { Tables, Menu, ItemList, Order, Item, ItemQuantityPair, CreateOrder, ResponseMessage, AddItemToOrderResponseMessage, OrderItemQuantityPair, ItemOrder, TableInfo, AssistanceTables, AllStaff, AllItemStats } from "./models";
+import { Tables, Menu, ItemList, Order, Item, ItemId, ItemQuantityPair, CreateOrder, ResponseMessage, AddItemToOrderResponseMessage, OrderItemQuantityPair, ItemOrder, TableInfo, AssistanceTables, AllStaff, AllItemStats } from "./models";
 
 const apiUrl = "http://localhost:5000";
 
@@ -436,6 +436,88 @@ export class Client {
     } catch (e) {
       console.error(e);
       return "Failed";
+    }
+  }
+  async addItem(name: string, description: string, price: number, visible: string, position: number, catId: number) {
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/item', {
+        method: 'POST',
+        credentials: 'include',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(
+          {
+            name: name,
+            description: description,
+            price: price,
+            visible: visible,
+          }
+        ),
+      });
+      const j: ItemId = await r.json();
+      return this.addItemToCat(position, catId, j.item_id);
+
+
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async editItem(name: string, description: string, price: number, visible: string, catId: number, itemId: number) {
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/item/' + itemId, {
+        method: 'POST',
+        credentials: 'include',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(
+          {
+            name: name,
+            description: description,
+            price: price,
+            visible: visible,
+          }
+        ),
+      });
+      const j: ItemId = await r.json();
+
+
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async deleteItem() {
+
+  }
+
+  async addItemToCat(position: number, catId: number, itemId: number) {
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/category/' + catId + '/item/' + itemId, {
+        method: 'POST',
+        credentials: 'include',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(
+          {
+            position: position,
+          }
+        ),
+      });
+      const j: ItemId = await r.json();
+      return j;
+
+    } catch (e) {
+      console.error(e);
+      return null;
     }
   }
 

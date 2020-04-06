@@ -30,7 +30,7 @@ class EditCategory extends React.Component<IProps, {catName: string}>{
                         open={this.props.isOpen}
                         onClose={() => this.props.setIsOpen(false)}
                         aria-labelledby="alert-dialog-title"
-                        aria-describedaaddby="alert-dialog-description"
+                        aria-describedby="alert-dialog-description"
                     >
                         <DialogTitle id="alert-dialog-title">{"Edit Category"}</DialogTitle>
                         <DialogContent>
@@ -41,6 +41,7 @@ class EditCategory extends React.Component<IProps, {catName: string}>{
                                     id="catName"
                                     label="New Category Name"
                                     fullWidth
+                                    defaultValue={this.props.category?.name}
                                     onChange={(e) => this.setState({ catName: e.target.value })}
                                 />
                  
@@ -67,8 +68,8 @@ class EditCategory extends React.Component<IProps, {catName: string}>{
                     <Dialog
                         open={this.props.isOpen}
                         onClose={() => this.props.setIsOpen(false)}
-                        aria-labelledby="alert-dialog-title"
-                        aria-describedby="alert-dialog-description"
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
                     >
                         <DialogTitle id="alert-dialog-title">{"Add Category"}</DialogTitle>
                         <DialogContent>

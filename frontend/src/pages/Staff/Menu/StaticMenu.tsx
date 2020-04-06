@@ -1,5 +1,5 @@
 import React from 'react';
-import { withStyles, TextField, WithStyles, createStyles, Modal, Grid, FormControl, FormControlLabel, FormGroup, ButtonBase, Paper, TableBody, TableHead, TableRow, TableCell, Table, TableContainer } from '@material-ui/core';
+import { withStyles, WithStyles, Modal, Grid, FormControl, FormControlLabel, FormGroup} from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -244,6 +244,8 @@ class StaticMenuPage extends React.Component<IProps, IState> {
                 <Tabs
                   value={this.state.value}
                   onChange={this.handleTabChange}
+              scrollButtons="auto"
+              variant="scrollable"
                 >
                   {
                     this.state.menu && this.state.menu?.menu &&

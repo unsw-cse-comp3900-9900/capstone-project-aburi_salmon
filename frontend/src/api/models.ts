@@ -135,3 +135,7 @@ export type AllItemStats = {
     item_sales: Array<ItemStats>,
     total_revenue: number,
 }
+
+export type ItemId = {
+  item_id: number,
+}
