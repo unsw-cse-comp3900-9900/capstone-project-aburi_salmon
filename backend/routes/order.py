@@ -10,11 +10,11 @@ order = api.namespace('order', description='Order Route')
 
 @order.route('/', strict_slashes=False)
 class Order(Resource):
-    #@jwt_required
+    @jwt_required
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
     def get(self):
-        table_id = 1 #assuming table id is 1 for now
+        order_id = get_jwt_claims().get('order')
         item_order = db.get_ordered_items_customer(table_id)
 
         total = 0
@@ -150,6 +150,8 @@ class ModifyItemOrderStatus(Resource):
         return jsonify({ 'status': 'success'})
 
 
+# I genuinely don't get this. Why do i need to put order id when it's already inside the jwt? is this for customer? or is this for staff?
+# What's the difference between this and the '/' route?
 @order.route('/<int:order_id>')
 class ItemOrderById(Resource):
     # Most the methods for getting information about an order should be done via the table route
