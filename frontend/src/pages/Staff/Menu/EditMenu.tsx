@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button,withStyles, TextField, WithStyles, createStyles, Modal, Grid, FormControl, FormControlLabel, FormGroup, ButtonBase, Paper, TableBody, TableHead, TableRow, TableCell, Table, TableContainer } from '@material-ui/core';
+import { Button,withStyles, WithStyles,  Modal, Grid, FormControl, FormControlLabel, FormGroup } from '@material-ui/core';
 //import Button from '@material-ui/core/Button';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -22,6 +22,8 @@ import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel } f
 import EditCategory from './EditCategory';
 import EditItem from './EditItem';
 import Delete from './Delete';
+import Ingredients from './Ingredients';
+import EditIngredients from './EditIngredients';
 
 
 
@@ -59,7 +61,9 @@ interface IState {
   editItemDialog: boolean,
   editCatDialog: boolean,
   deleteDialog: boolean,
-  currItem: string,
+  ingredDialog: boolean,
+  editIngredDialog: boolean,
+  currItem: ItemModel,
   currCat: CategoriesModel | null,
   isEdit: boolean, //1 if is edit, 0 if is modify
   isCat: boolean, //1 if is category, 0 if item
@@ -69,6 +73,14 @@ interface IState {
 class EditMenuPage extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
+    var temp: ItemModel = {
+      id:0,
+      name:'',
+      description: '',
+      ingredients: [],
+      price:0,
+      visible: true,
+    }
     this.state = {
       // If menu is null, then nothing will be generated
       menu: null,
@@ -87,7 +99,10 @@ class EditMenuPage extends React.Component<IProps, IState> {
       editItemDialog: false,
       editCatDialog: false,
       deleteDialog: false,
-      currItem: '',
+      ingredDialog: false,
+      editIngredDialog: false,
+
+      currItem: temp,
       currCat: null,
       isEdit: false,
       isCat: false,
@@ -108,9 +123,14 @@ class EditMenuPage extends React.Component<IProps, IState> {
     this.itemDialogIsOpen = this.itemDialogIsOpen.bind(this);
     this.catDialogIsOpen = this.catDialogIsOpen.bind(this);
     this.deleteDialogIsOpen = this.deleteDialogIsOpen.bind(this);
+    this.ingredientDialogIsOpen = this.ingredientDialogIsOpen.bind(this);
+    this.editIngredDialogIsOpen = this.editIngredDialogIsOpen.bind(this);
+
     this.addEditItem = this.addEditItem.bind(this);
     this.addEditCat = this.addEditCat.bind(this);
     this.deleteFun = this.deleteFun.bind(this);
+    this.ingredFun = this.ingredFun.bind(this); //for items
+    this.editIngredients = this.editIngredients.bind(this);  //for just ingredients
   }
 
   itemDialogIsOpen(isOpen: boolean){
@@ -125,8 +145,25 @@ class EditMenuPage extends React.Component<IProps, IState> {
     this.setState({ deleteDialog: isOpen });
   }
 
-  addEditItem(){
-    console.log('Adding item');
+  ingredientDialogIsOpen(isOpen: boolean){
+    this.setState({ingredDialog: isOpen});
+  }
+
+  editIngredDialogIsOpen(isOpen: boolean){
+    this.setState({ editIngredDialog: isOpen });
+  }
+
+  ingredFun(){
+
+  }
+
+  editIngredients(){
+
+  }
+
+  addEditItem(name: string, description: string, price: number, visibility: string, category: number){
+    
+    console.log(name + ', ' + description + ', ' + price + ', ' + visibility + ', ' + category);
   }
 
   addEditCat(categoryName: string, isAdd: boolean, position: number){
@@ -167,14 +204,17 @@ class EditMenuPage extends React.Component<IProps, IState> {
   }
 
   deleteFun(isCat: boolean){ //isCat: 1 if is category else 0
-    console.log('Doing nothing');
+    console.log('Deleting ');
     if (isCat){
+      /*
       const client = new Client();
       alert(client.deleteCat(this.state.currCat?.id));
       this.setState({editCatDialog: false});
-      this.componentDidMount();
+      this.componentDidMount();*/
+      console.log(this.state.currCat?.name);
+    } else {
+      console.log(this.state.currItem.name);
     }
-    
   }
 
 
@@ -199,7 +239,7 @@ class EditMenuPage extends React.Component<IProps, IState> {
 
                 <div className={classes.wrapper2}>
                   <Button size="small" onClick={() => this.openModal(item)} className={classes.floatLeft}>View item</Button>
-                  <Button size="small"  className={classes.floatRight} onClick={()=>this.setState({deleteDialog: true, isEdit: false, isCat: false})} 
+                  <Button size="small"  className={classes.floatRight} onClick={()=>this.setState({deleteDialog: true, isEdit: false, isCat: false, currItem: item})} 
                   color='secondary'>Delete item</Button>
                 </div>
               </CardActions>
@@ -222,7 +262,7 @@ class EditMenuPage extends React.Component<IProps, IState> {
 
   openModal(item: ItemModel) {
     let quantity = 0;
-
+    this.setState({ currItem: item });
     this.state.orders.forEach((it: OrderItemState) => {
       if (it.item.id === item.id) {
         quantity = it.quantity;
@@ -318,15 +358,21 @@ class EditMenuPage extends React.Component<IProps, IState> {
         <EditCategory isOpen={this.state.editCatDialog} setIsOpen={this.catDialogIsOpen}
           relevantFunction={this.addEditCat} isEdit={this.state.isEdit} category={this.state.currCat} 
           catNo={this.state.catNo} deleteFun={this.deleteFun}/>
-        <EditItem isOpen={this.state.editItemDialog} setIsOpen={this.itemDialogIsOpen} 
-          relevantFunction={this.addEditItem} isEdit={this.state.isEdit} itemname={this.state.currItem}/>
+        <EditItem isOpen={this.state.editItemDialog} setIsOpen={this.itemDialogIsOpen} wholemenu={this.state.menu}
+          relevantFunction={this.addEditItem} isEdit={this.state.isEdit} item={this.state.currItem}/>
         <Delete isOpen={this.state.deleteDialog} setIsOpen={this.deleteDialogIsOpen}
-          relevantFunction={this.deleteFun} itemname={this.state.currItem} isCat={this.state.isCat}/>
+          relevantFunction={this.deleteFun} item={this.state.currItem} isCat={this.state.isCat} cat={this.state.currCat}/>
+        <Ingredients isOpen={this.state.ingredDialog} setIsOpen={this.ingredientDialogIsOpen} relevantFunction={this.ingredFun}/>
+        
+        <EditIngredients isOpen={this.state.editIngredDialog} setIsOpen={this.editIngredDialogIsOpen} relevantFunction={this.editIngredients} />
             <div className={classes.wrapper}>
               <AppBar position="static">
                 <Tabs
                   value={this.state.value}
                   onChange={this.handleTabChange}
+                  scrollButtons="auto"
+                  variant="scrollable"
+                  
                 >
                   {
                     this.state.menu && this.state.menu?.menu &&
@@ -345,10 +391,13 @@ class EditMenuPage extends React.Component<IProps, IState> {
               </div>
             </div>
             <div className={classes.wrapper3}>
+          
           <Button variant='outlined' color='primary' onClick={() => { this.setState({ editItemDialog: true, isEdit:false, isCat: false})}}
               className={classes.addFloatRight}>Add Item</Button>
           <Button variant='outlined' color='primary' onClick={() => { this.setState({ editCatDialog: true, isEdit:false, isCat:true }) }}
                className={classes.addFloatRight}>Add Category</Button>
+               <Button variant='outlined' color='primary' onClick={() => { this.setState({ editIngredDialog: true }) }}
+            className={classes.addFloatRight}>Edit Ingredients List</Button>
             </div>
 
         <Modal
@@ -393,9 +442,13 @@ class EditMenuPage extends React.Component<IProps, IState> {
               <Grid item xs={8}>
                 <Typography variant="subtitle1">{this.state.modal?.description}</Typography>
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={2}>
                 <Button size="small" variant="outlined" onClick={() => this.setState({ editItemDialog: true, isCat:false, isEdit: true})}>Edit item</Button>
               </Grid>
+              <Grid item xs={2}>
+                <Button size="small" variant="outlined" onClick={() => this.setState({ ingredDialog: true})}>Ingredients</Button>
+              </Grid>
+              
             </Grid>
           </div>
         </Modal>

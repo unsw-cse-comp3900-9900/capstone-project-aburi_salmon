@@ -50,9 +50,10 @@ brainstorming and planning how we should process the data. I finished first draf
 manage staff. Still waiting on approval of my teammates.
 
 Week 7
+Spent the week cleaning code and connecting to backend. Spent the weekend trying to 
+make frontend for edit menu. Lack of communications between team members this week.
 
-
-
+Week 8
 
 
 COMP3900 Diary Detailed
@@ -187,3 +188,24 @@ Date    Day         Plan                                    Doing
 ----------------------------------------------------------------------------------------------------------------------
 28/3    Saturday    - Busy                                  - Nothing
 ----------------------------------------------------------------------------------------------------------------------
+29/3    Sunday      - Busy                                  - Nothing
+----------------------------------------------------------------------------------------------------------------------
+30/3    Monday      - Link to backend                       - Link orders and tables to backend
+----------------------------------------------------------------------------------------------------------------------
+31/3    Tuesday     - Team meeting                          - Connected paid to backend, cleaned up code
+----------------------------------------------------------------------------------------------------------------------
+1/4     Wednesday   - Figure out what's left                - Connected staff details and item stats to backend
+----------------------------------------------------------------------------------------------------------------------
+2/4     Thursday    - Clean code                            - Cleaned up my code
+----------------------------------------------------------------------------------------------------------------------
+3/4     Friday      - Clean code                            - Cleaned up code, got rid of some errors, did some testing
+                                                            got rid of some bugs
+----------------------------------------------------------------------------------------------------------------------
+4/4     Saturday    - Busy                                  - Nothing
+----------------------------------------------------------------------------------------------------------------------
+5/4     Sunday      - Make staff menu                       - Finished frontend template for staff menu
+----------------------------------------------------------------------------------------------------------------------
+6/4     Monday      - Connect to backend                    - Connected some to backend
+----------------------------------------------------------------------------------------------------------------------
+7/4     Tuesday     - Team meeting                          - 
+

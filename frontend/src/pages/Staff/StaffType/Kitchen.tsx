@@ -49,6 +49,7 @@ const styles = (theme: Theme) =>
             marginLeft: theme.spacing(2),
             marginRight: theme.spacing(2),
             marginBottom: theme.spacing(2),
+            minWidth: '800px',
             
         },
         minSize: {
