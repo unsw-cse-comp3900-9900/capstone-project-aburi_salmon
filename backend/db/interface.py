@@ -475,7 +475,7 @@ class DB:
 
     def get_assistance_tables(self):
         rows = self.__query(
-            'SELECT t.* FROM "table" t JOIN "order" o on (t.id = o.table_id) WHERE o.assistance'
+            'SELECT distinct t.id, t.state FROM "table" t JOIN "order" o on (t.id = o.table_id) WHERE o.assistance'
         )
 
         if (not rows or not rows[0]):
