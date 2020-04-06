@@ -78,10 +78,6 @@ category_model = api.model('category_model', {
     'position': fields.Integer(description='position to show the category')
 })
 
-add_item_to_category_model = api.model('add_item_to_category_model', {
-    'position': fields.Integer(description='position to show the item in the category')
-})
-
 ingredient_model = api.model('ingredient_model', {
     'name': fields.String(description='ingredient name')
 })

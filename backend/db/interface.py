@@ -218,7 +218,7 @@ class DB:
 
     def get_items_by_category(self, category_id):
         rows = self.__query(
-            'SELECT * FROM item i JOIN category_item ci on (i.id = ci.item_id) WHERE ci.category_id = %s ORDER BY ci.position',
+            'SELECT * FROM item i JOIN category_item ci on (i.id = ci.item_id) WHERE ci.category_id = %s',
             [category_id]
         )
 
@@ -262,13 +262,27 @@ class DB:
         return self.__update(editStatement, editArr)
 
     def delete_category(self, id):
-        # Implement this later
-        pass
+        return self.__delete('DELETE FROM category WHERE id = %s', [id])
+    
+    def swapCategoryPositions(self, id1, id2):
+        print('Swapping categories {} and {}'.format(id1, id2))
+        # Get positions
+        rows = self.__query('SELECT position FROM category WHERE id in (%s, %s) ORDER BY id', [id1, id2])
+        position1 = rows[0][0]
+        position2 = rows[1][0]
 
-    def add_item_to_category(self, category_id, item_id, position):
+        print(position1, position2)
+        # Update position 1 and position 2
+        return (
+            self.__update('UPDATE category SET position = %s WHERE id = %s', [0, id1]) and
+            self.__update('UPDATE category SET position = %s WHERE id = %s', [position1, id2]) and
+            self.__update('UPDATE category SET position = %s WHERE id = %s', [position2, id1])
+        )
+
+    def add_item_to_category(self, category_id, item_id):
         self.__insert(
-            'INSERT INTO category_item (item_id, category_id, position) VALUES (%s, %s, %s)',
-            [item_id, category_id, position]
+            'INSERT INTO category_item (item_id, category_id) VALUES (%s, %s)',
+            [item_id, category_id]
         )
         return True
 
@@ -343,7 +357,7 @@ class DB:
         )
 
     def add_ingredient_to_item(self, item_id, ingredient_id):
-        self.__update(
+        self.__insert(
             'INSERT INTO item_ingredient (item_id, ingredient_id) VALUES (%s, %s)',
             [item_id, ingredient_id]
         )
