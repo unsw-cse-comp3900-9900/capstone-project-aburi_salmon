@@ -262,8 +262,7 @@ class DB:
         return self.__update(editStatement, editArr)
 
     def delete_category(self, id):
-        # Implement this later
-        pass
+        return self.__delete('DELETE FROM category WHERE id = %s', [id])
     
     def swapCategoryPositions(self, id1, id2):
         print('Swapping categories {} and {}'.format(id1, id2))
