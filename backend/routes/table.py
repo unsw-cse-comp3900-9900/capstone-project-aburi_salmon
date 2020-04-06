@@ -100,17 +100,29 @@ class Assistance(Resource):
     @table.expect(request_model.table_assistance_model)
     def put(self):
         body = request.get_json()
-        order_id = get_jwt_claims().get('order') or body.get('order_id')
+
         assistance = body.get('assistance')
+        order_id = get_jwt_claims().get('order')
+        table_id = body.get('table')
+
+
+        if (not order_id and not table_id):
+            abort(400, 'Invalid request')
+        elif (not order_id):
+            order_id = db.get_order_id(table_id)
+        elif (not table_id):
+            table_id = db.get_table_id(order_id)
+
         print(order_id)
-        if (not order_id):
+
+        if (not order_id or not table_id):
             abort(401, 'Unauthorised')
 
         if (assistance != True and assistance != False):
             abort(400, 'Invalid request')
 
 
-        if (not db.set_assistance(order_id, assistance)):
+        if (not db.set_assistance(table_id, assistance)):
             abort(400, 'Something went wrong')
 
         return jsonify({ 'status': 'success' })
