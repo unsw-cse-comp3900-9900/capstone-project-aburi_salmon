@@ -14,7 +14,7 @@ class EditItem extends React.Component<IProps, {}>{
     render() {
         if (this.props.isEdit) {
             return (
-                <div>
+                
                     <Dialog
                         open={this.props.isOpen}
                         onClose={() => this.props.setIsOpen(false)}
@@ -23,7 +23,7 @@ class EditItem extends React.Component<IProps, {}>{
                     >
                         <DialogTitle id="alert-dialog-title">{"Edit Item"}</DialogTitle>
                         <DialogContent>
-                            <DialogContentText id="alert-dialog-description">
+                       
                                 <TextField
                                     autoFocus
                                     margin="dense"
@@ -74,7 +74,7 @@ class EditItem extends React.Component<IProps, {}>{
 
                                     </Select>
                                 </FormControl>  
-                            </DialogContentText>
+                        
                         </DialogContent>
                         <DialogActions>
                             <div style={{width: '100%'}}>
@@ -91,7 +91,7 @@ class EditItem extends React.Component<IProps, {}>{
                             </div>
                         </DialogActions>
                     </Dialog>
-                </div>
+                
             );
         } else {
             return (
@@ -103,7 +103,7 @@ class EditItem extends React.Component<IProps, {}>{
                 >
                     <DialogTitle id="alert-dialog-title">{"Add Item"}</DialogTitle>
                     <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
+                   
                             <TextField
                                 autoFocus
                                 margin="dense"
@@ -155,7 +155,6 @@ class EditItem extends React.Component<IProps, {}>{
                                 </Select>
                             </FormControl>  
 
-                        </DialogContentText>
                     </DialogContent>
                     <DialogActions>
                         <div style={{width:'100%'}}>
