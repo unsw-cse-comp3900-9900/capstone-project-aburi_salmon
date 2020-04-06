@@ -113,8 +113,6 @@ class Assistance(Resource):
         elif (not table_id):
             table_id = db.get_table_id(order_id)
 
-        print(order_id)
-
         if (not order_id or not table_id):
             abort(401, 'Unauthorised')
 
