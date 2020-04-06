@@ -388,6 +388,55 @@ export class Client {
     }
   }
 
+  async addCategory(categoryName: string, position: number){
+    return fetch(apiUrl + '/menu/category', {
+      method: 'POST',
+      credentials: 'include',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(
+        {
+          name: categoryName,
+          position: position,
+        }
+      ),
+    }
+    )
+  }
 
+  async editCategory(categoryName: string, position: number|undefined, id: number|undefined){
+    return fetch(apiUrl + '/menu/category/' + id, {
+      method: 'PUT',
+      credentials: 'include',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(
+        {
+          name: categoryName,
+          position: position,
+        }
+      ),
+    }
+    )
+  }
+
+
+  async deleteCat(id: number | undefined) {
+    try {
+      await fetch(apiUrl + '/menu/category/' + id, {
+        method: 'DELETE',
+        credentials: 'include',
+        mode: 'cors',
+      });
+      return "Success"
+    } catch (e) {
+      console.error(e);
+      return "Failed";
+    }
+  }
 
 }

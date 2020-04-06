@@ -60,9 +60,10 @@ interface IState {
   editCatDialog: boolean,
   deleteDialog: boolean,
   currItem: string,
-  currCat: string,
+  currCat: CategoriesModel | null,
   isEdit: boolean, //1 if is edit, 0 if is modify
   isCat: boolean, //1 if is category, 0 if item
+  catNo: number | undefined
 }
 
 class EditMenuPage extends React.Component<IProps, IState> {
@@ -87,9 +88,10 @@ class EditMenuPage extends React.Component<IProps, IState> {
       editCatDialog: false,
       deleteDialog: false,
       currItem: '',
-      currCat: '',
+      currCat: null,
       isEdit: false,
       isCat: false,
+      catNo: 0, //number of categories
 
     }
     // To bind the tab change
@@ -106,9 +108,9 @@ class EditMenuPage extends React.Component<IProps, IState> {
     this.itemDialogIsOpen = this.itemDialogIsOpen.bind(this);
     this.catDialogIsOpen = this.catDialogIsOpen.bind(this);
     this.deleteDialogIsOpen = this.deleteDialogIsOpen.bind(this);
-    this.addItem = this.addItem.bind(this);
-    this.addCat = this.addCat.bind(this);
-    this.doNothing = this.doNothing.bind(this);
+    this.addEditItem = this.addEditItem.bind(this);
+    this.addEditCat = this.addEditCat.bind(this);
+    this.deleteFun = this.deleteFun.bind(this);
   }
 
   itemDialogIsOpen(isOpen: boolean){
@@ -123,16 +125,56 @@ class EditMenuPage extends React.Component<IProps, IState> {
     this.setState({ deleteDialog: isOpen });
   }
 
-  addItem(){
+  addEditItem(){
     console.log('Adding item');
   }
 
-  addCat(categoryName: string){
+  addEditCat(categoryName: string, isAdd: boolean, position: number){
     console.log(categoryName);
+    console.log(position);
+    console.log(this.state.currCat?.position)
+    if (isAdd){
+      const client = new Client();
+      client.addCategory(categoryName, position)
+        .then((msg) => {
+          //alert(msg.status);
+          if (msg.status === 200) {
+            alert('Success');
+            this.setState({ editCatDialog: false,})
+            this.componentDidMount();
+          } else { 
+            alert(msg.statusText);
+          }
+        }).catch((status) => {
+          console.log(status);
+        });
+    } else {
+      const client = new Client();
+      client.editCategory(categoryName, this.state.currCat?.position,this.state.currCat?.id)
+        .then((msg) => {
+          //alert(msg.status);
+          if (msg.status === 200) {
+            alert('Success');
+            this.setState({ editCatDialog: false, })
+            this.componentDidMount();
+          } else {
+            alert(msg.statusText);
+          }
+        }).catch((status) => {
+          console.log(status);
+        });
+    }
   }
 
-  doNothing(){
+  deleteFun(isCat: boolean){ //isCat: 1 if is category else 0
     console.log('Doing nothing');
+    if (isCat){
+      const client = new Client();
+      alert(client.deleteCat(this.state.currCat?.id));
+      this.setState({editCatDialog: false});
+      this.componentDidMount();
+    }
+    
   }
 
 
@@ -254,10 +296,14 @@ class EditMenuPage extends React.Component<IProps, IState> {
   async componentDidMount() {
     const client = new Client();
     const m: MenuModel | null = await client.getMenu();
-    this.setState({
-      menu: m,
-      value: m?.menu[0].name ? m?.menu[0].name : "",
-    });
+    if (m?.menu.length !== undefined){
+      this.setState({
+        menu: m,
+        value: m?.menu[0].name ? m?.menu[0].name : "",
+        catNo: (m?.menu.length + 1),
+      });
+    }
+    console.log(this.state.catNo);
   }
 
   // This will be called when there is a state change
@@ -270,11 +316,12 @@ class EditMenuPage extends React.Component<IProps, IState> {
     return (
       <div className={classes.menupage}>
         <EditCategory isOpen={this.state.editCatDialog} setIsOpen={this.catDialogIsOpen}
-          relevantFunction={this.addCat} isEdit={this.state.isEdit} name={this.state.currItem}/>
-        <EditItem isOpen={this.state.editItemDialog} setIsOpen={this.itemDialogIsOpen}
-          relevantFunction={this.addItem} isEdit={this.state.isEdit} itemname={this.state.currItem}/>
+          relevantFunction={this.addEditCat} isEdit={this.state.isEdit} category={this.state.currCat} 
+          catNo={this.state.catNo} deleteFun={this.deleteFun}/>
+        <EditItem isOpen={this.state.editItemDialog} setIsOpen={this.itemDialogIsOpen} 
+          relevantFunction={this.addEditItem} isEdit={this.state.isEdit} itemname={this.state.currItem}/>
         <Delete isOpen={this.state.deleteDialog} setIsOpen={this.deleteDialogIsOpen}
-          relevantFunction={this.doNothing} itemname={this.state.currItem} isCat={this.state.isCat}/>
+          relevantFunction={this.deleteFun} itemname={this.state.currItem} isCat={this.state.isCat}/>
             <div className={classes.wrapper}>
               <AppBar position="static">
                 <Tabs
@@ -284,7 +331,7 @@ class EditMenuPage extends React.Component<IProps, IState> {
                   {
                     this.state.menu && this.state.menu?.menu &&
                     this.state.menu?.menu.map(category => (
-                      <Tab label={<><div>{category.name + " "} <EditIcon onClick={() => this.setState({editCatDialog: true, isCat:true, isEdit:true})} /></div></>} 
+                      <Tab label={<><div>{category.name + " "} <EditIcon onClick={() => this.setState({editCatDialog: true, isCat:true, isEdit:true, currCat: category})} /></div></>} 
                       className={classes.editIcon} key={category.id} {...this.tabProps(category.name)} />
                     ))
                   }
