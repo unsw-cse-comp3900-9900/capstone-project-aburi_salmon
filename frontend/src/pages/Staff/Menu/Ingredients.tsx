@@ -18,6 +18,8 @@ class Ingredients extends React.Component<IProps, {catName: string}>{
         }
     }
 
+    
+
     render(){
         return (
                 <Dialog
@@ -31,16 +33,16 @@ class Ingredients extends React.Component<IProps, {catName: string}>{
                     <FormControl component="fieldset" >
                         <FormGroup>
                             <FormControlLabel
-                                control={<Checkbox color="primary" name="gilad" />}
-                                label="Gilad Gray"
+                                control={<Checkbox color="primary" name="1" />}
+                                label="Ingred1"
                             />
                             <FormControlLabel
-                                control={<Checkbox color="primary" name="jason" />}
-                                label="Jason Killian"
+                                control={<Checkbox color="primary" name="2" />}
+                                label="Ingred2"
                             />
                             <FormControlLabel
-                                control={<Checkbox color="primary" name="antoine" />}
-                                label="Antoine Llorca"
+                                control={<Checkbox color="primary" name="3" />}
+                                label="Ingred3"
                             />
                         </FormGroup>
                     </FormControl>
