@@ -8,7 +8,7 @@ import model.request_model as request_model
 
 order = api.namespace('order', description='Order Route')
 
-@order.route('/')
+@order.route('/', strict_slashes=False)
 class Order(Resource):
     #@jwt_required
     @order.response(200, 'Success')
@@ -35,7 +35,7 @@ class Order(Resource):
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
     @order.response(500, 'Something went wrong')
-    def put(self):
+    def post(self):
 
         new_order = request.get_json()
         num_of_orders = len(new_order.get('order'))
@@ -45,9 +45,11 @@ class Order(Resource):
         if(order_id is None):
             order_id = db.insert_order(table_id)
 
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+
         for i in range(0, num_of_orders):
-            item_id = new_order.get('new_orders')[i].get('item_id')
-            quantity = new_order.get('new_orders')[i].get('quantity')
+            item_id = new_order.get('order')[i].get('item_id')
+            quantity = new_order.get('order')[i].get('quantity')
             new = db.insert_item_order(order_id, item_id, quantity)
             if new is None:
                 abort(400, 'Backend is not working as intended or the supplied information was malformed. Make sure that your username is unique.')

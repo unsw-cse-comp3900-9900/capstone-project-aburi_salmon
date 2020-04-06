@@ -100,10 +100,13 @@ export class Client {
       }
 
       const r: Response = await fetch(apiUrl + '/order', {
-        method: 'PUT',
+        method: 'POST',
         credentials: 'include',
         mode: 'cors',
         body: JSON.stringify(t),
+        headers: {
+          'Content-Type': 'application/json'
+        },
       });
 
       const j: ResponseMessage = await r.json();
