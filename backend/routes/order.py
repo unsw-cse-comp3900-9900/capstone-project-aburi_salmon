@@ -48,19 +48,11 @@ class Order(Resource):
         new_order = request.get_json()
         num_of_orders = len(new_order.get('order'))
 
-        table_id = 3 #assuming table id is 3 for now
-        #order_id = get_jwt_claims().get('order')
-        #print('ORDER ID:' + str(order_id))
-        #print(num_of_orders)
-
-        #check if there's an existing order_id
-        order_id = db.get_order_id(table_id)
-        if(order_id is None):
-            order_id = db.insert_order(table_id)
+        order_id = get_jwt_claims().get('order')
 
         for i in range(0, num_of_orders):
-            item_id = new_order.get('new_orders')[i].get('item_id')
-            quantity = new_order.get('new_orders')[i].get('quantity')
+            item_id = new_order['order'][i].get('item_id')
+            quantity = new_order['order'][i].get('quantity')
             print('Item:' + str(item_id) + ' , Quantity:' + str(quantity))
             new = db.insert_item_order(order_id, item_id, quantity)
             if new is None:

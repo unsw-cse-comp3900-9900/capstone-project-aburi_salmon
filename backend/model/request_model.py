@@ -34,7 +34,7 @@ new_order_model = api.schema_model('new_order_model', {
     'type': 'object',
     'required': ['new_orders'],
     'properties': {
-        'order': {
+        'new_orders': {
             'type': 'array',
             'items': {
                 'type': 'object',
