@@ -14,7 +14,12 @@ class Order(Resource):
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
     def get(self):
+
+        # Gets lists of ordered items and Total Bill
+
         order_id = get_jwt_claims().get('order')
+        table_id = db.get_table_id(order_id)
+
         item_order = db.get_ordered_items_customer(table_id)
 
         total = 0
@@ -35,6 +40,7 @@ class Order(Resource):
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
     @order.response(500, 'Something went wrong')
+
     def post(self):
 
         new_order = request.get_json()
