@@ -470,12 +470,12 @@ class DB:
     def set_table_free(self, id):
         return self.__update('UPDATE "table" SET state = %s WHERE id = %s', [False, id])
 
-    def set_assistance(self, id, assistance):
-        return self.__update('UPDATE "order" SET assistance = %s WHERE id = %s', [assistance, id])
+    def set_assistance(self, table_id, assistance):
+        return self.__update('UPDATE "order" SET assistance = %s WHERE table_id = %s', [assistance, table_id])
 
     def get_assistance_tables(self):
         rows = self.__query(
-            'SELECT t.* FROM "table" t JOIN "order" o on (t.id = o.table_id) WHERE o.assistance'
+            'SELECT distinct t.id, t.state FROM "table" t JOIN "order" o on (t.id = o.table_id) WHERE o.assistance = True AND t.state = True'
         )
 
         if (not rows or not rows[0]):
