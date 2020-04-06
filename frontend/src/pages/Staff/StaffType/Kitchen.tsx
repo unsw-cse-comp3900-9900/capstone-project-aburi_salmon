@@ -8,6 +8,7 @@ import { ItemList } from './../../../api/models';
 import { Client } from './../../../api/client';
 import {Menu} from './../../Menu/Menu';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import { socket } from '../../../api/socketio';
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -179,6 +180,7 @@ class Kitchen extends React.Component<IProps, IState>{
         }   
         console.log(item);
         this.removeItem(itemId, 1);
+        socket.emit('cooking');
     }
 
     moveToReady(itemId: number, item: ListItem): void {
@@ -204,6 +206,7 @@ class Kitchen extends React.Component<IProps, IState>{
                     console.log(status);
                 });;
         }  
+        socket.emit('finished');
         console.log(item);
         this.removeItem(itemId, 2);
     }

@@ -18,6 +18,8 @@ import { LeftBox, RightBar } from '../../components';
 import { styles } from './styles';
 import { Client } from '../../api/client';
 import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel } from '../../api/models';
+import { socket } from '../../api/socketio';
+
 
 interface IProps extends WithStyles<typeof styles> { }
 
@@ -219,6 +221,7 @@ class MenuPage extends React.Component<IProps, IState> {
 
   async submitOrder() {
 
+    socket.emit('order');
   }
 
   // Component did mount gets called before render
