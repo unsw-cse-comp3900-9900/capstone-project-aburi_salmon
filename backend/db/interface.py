@@ -218,7 +218,7 @@ class DB:
 
     def get_items_by_category(self, category_id):
         rows = self.__query(
-            'SELECT * FROM item i JOIN category_item ci on (i.id = ci.item_id) WHERE ci.category_id = %s ORDER BY ci.position',
+            'SELECT * FROM item i JOIN category_item ci on (i.id = ci.item_id) WHERE ci.category_id = %s',
             [category_id]
         )
 
@@ -265,10 +265,10 @@ class DB:
         # Implement this later
         pass
 
-    def add_item_to_category(self, category_id, item_id, position):
+    def add_item_to_category(self, category_id, item_id):
         self.__insert(
-            'INSERT INTO category_item (item_id, category_id, position) VALUES (%s, %s, %s)',
-            [item_id, category_id, position]
+            'INSERT INTO category_item (item_id, category_id) VALUES (%s, %s)',
+            [item_id, category_id]
         )
         return True
 

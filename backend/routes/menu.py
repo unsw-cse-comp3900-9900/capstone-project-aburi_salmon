@@ -179,15 +179,9 @@ class MenuCategoryItem(Resource):
     @jwt_required
     @menu.response(200, 'Success')
     @menu.response(400, 'Invalid Request')
-    @menu.expect(request_model.add_item_to_category_model)
     def post(self, category_id, item_id):
         # Add an item to a category
-
-        position = request.get_json().get('position')
-        if (not position):
-            abort(400, 'No position given')
-
-        if (not db.add_item_to_category(category_id, item_id, position)):
+        if (not db.add_item_to_category(category_id, item_id)):
             abort(400, 'Invalid request')
         
         return jsonify({ 'status': 'success' })
