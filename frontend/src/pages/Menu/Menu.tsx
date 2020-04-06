@@ -17,17 +17,13 @@ import { LeftBox, RightBar } from '../../components';
 
 import { styles } from './styles';
 import { Client } from '../../api/client';
-import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel } from '../../api/models';
+import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel, ResponseMessage as ResponseMessageModel, ItemQuantityPair as ItemQuantityPairModel } from '../../api/models';
 
 interface IProps extends WithStyles<typeof styles> { }
 
 interface OrderItemState {
   item: ItemModel;
   quantity: number;
-}
-
-interface OrderState {
-  items: Array<OrderItemState>;
 }
 
 interface IState {
@@ -218,7 +214,21 @@ class MenuPage extends React.Component<IProps, IState> {
   }
 
   async submitOrder() {
+    let s: Array<ItemQuantityPairModel> = [];
+    this.state.orders?.forEach((it) => {
+      const t: ItemQuantityPairModel = {
+        item_id: it.item.id,
+        quantity: it.quantity,
+      };
+      s.push(t);
+    });
 
+    const client = new Client();
+    const m: ResponseMessageModel | null = await client.createOrder(s);
+    
+    if (m) {
+      history.push('/waiting');
+    }
   }
 
   // Component did mount gets called before render
@@ -247,7 +257,7 @@ class MenuPage extends React.Component<IProps, IState> {
             </div>
           }
           second={
-            <div>
+            <div style={{maxHeight: '100%', overflow: 'auto'}}>
               <AppBar position="static">
                 <Tabs
                   value={this.state.value}

@@ -30,7 +30,7 @@ class Order(Resource):
             'total_bill': total
         }
 
-    #@jwt_required
+    @jwt_required
     @order.expect(request_model.new_order_model)
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
@@ -40,10 +40,8 @@ class Order(Resource):
         new_order = request.get_json()
         num_of_orders = len(new_order.get('order'))
 
-        table_id = 3 #assuming table id is 3 for now
+        order_id = get_jwt_claims().get('order')
 
-        #check if there's anexisting order_id
-        order_id = db.get_order_id(table_id)
         if(order_id is None):
             order_id = db.insert_order(table_id)
 

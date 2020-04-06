@@ -13,7 +13,7 @@ table = api.namespace('table', description='Order Route')
 class Table(Resource):
     @table.response(200, 'Success', model=response_model.tables_model)
     @table.response(400, 'Invalid request')
-    # Get a list of tables and their status (occupied or not?)
+    @table.doc(description="Get a list of tables and their status (occupied or not?)")
     def get(self):
         tables = db.get_tables()
         return jsonify({ 'tables': tables })
@@ -22,7 +22,7 @@ class Table(Resource):
     @table.response(200, 'Success')
     @table.response(400, 'Invalid request')
     @table.expect(request_model.table_model)
-    # Create a new table
+    @table.doc(description="Create a new table")
     def post(self):
         table = request.get_json().get('table')
         if (not table):
@@ -35,7 +35,7 @@ class Table(Resource):
     @jwt_required
     @table.response(200, 'Success')
     @table.response(400, 'Invalid request')
-    # Delete the highest numbered table
+    @table.doc(description="Delete the highest numbered table")
     def delete(self):
         if (not db.delete_table()):
             abort(400, 'Something went wrong')
@@ -47,6 +47,7 @@ class TableOrders(Resource):
     @jwt_required
     @table.response(200, 'Success', model=response_model.table_order_model)
     @table.response(400, 'Invalid request')
+    @table.doc(description="Get the order of the table")
     def get(self, table):
         order_id = db.get_order_id(table)
 

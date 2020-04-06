@@ -20,17 +20,26 @@ export class Client {
   }
 
   async selectTable(table: number) {
-    return fetch(apiUrl + '/auth/customer', {
-      method: 'POST',
-      body: JSON.stringify({
-        table
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      credentials: 'include',
-      mode: 'cors'
-    });
+    try {
+      const r: Response = await fetch(apiUrl + '/auth/customer/login', {
+        method: 'POST',
+        body: JSON.stringify({
+          table: table
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        mode: 'cors'
+      });
+
+      const m: ResponseMessage = await r.json();
+
+      return m;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   }
 
   async getTables() {
@@ -106,7 +115,7 @@ export class Client {
     }
   }
 
-  async patchItemOrder(id: number, quantity: number){
+  async patchItemOrder(id: number, quantity: number) {
     try {
       // In order to avoid CORS issue, headers, credentials, and mode should be specified
       const p: OrderItemQuantityPair = {
@@ -217,7 +226,7 @@ export class Client {
     }
   }
 
-  async getListItem(listStatus: number){
+  async getListItem(listStatus: number) {
     try {
       const r: Response = await fetch(apiUrl + '/order/status/' + listStatus, {
         method: 'GET',
@@ -270,15 +279,15 @@ export class Client {
   }
 
   async freeTable(tableNum: number) {
-    
-      return fetch(apiUrl + '/table/free/'+ tableNum, {
-        method: 'POST',
-        credentials: 'include',
-        mode: 'cors',
-      });
-   }
 
-   async assistance(order_id: number, assistance: boolean){
+    return fetch(apiUrl + '/table/free/' + tableNum, {
+      method: 'POST',
+      credentials: 'include',
+      mode: 'cors',
+    });
+  }
+
+  async assistance(order_id: number, assistance: boolean) {
 
     return fetch(apiUrl + '/table/assistance', {
       method: 'PUT',
@@ -294,24 +303,24 @@ export class Client {
         }
       ),
     });
-   
-   }
 
-   async updateOrderStatus(itemId: number, newStatus: number){
-     return fetch(apiUrl + '/order/item/status/' + itemId, {
-       method: 'PUT',
-       credentials: 'include',
-       mode: 'cors',
-       headers: {
-         'Content-Type': 'application/json'
-       },
-       body: JSON.stringify(
-         {
-           status: newStatus,
-         }
-       ),
-     });
-   }
+  }
+
+  async updateOrderStatus(itemId: number, newStatus: number) {
+    return fetch(apiUrl + '/order/item/status/' + itemId, {
+      method: 'PUT',
+      credentials: 'include',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(
+        {
+          status: newStatus,
+        }
+      ),
+    });
+  }
 
   async getStaff() {
     try {
@@ -332,24 +341,24 @@ export class Client {
 
   async deleteStaff(staff_id: number) {
 
-      return( fetch(apiUrl + '/staff_profile/edit', {
-          method: 'DELETE',
-          credentials: 'include',
-          mode: 'cors',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(
-            {
-              staff_id: staff_id,
-            }
-          ),
+    return (fetch(apiUrl + '/staff_profile/edit', {
+      method: 'DELETE',
+      credentials: 'include',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(
+        {
+          staff_id: staff_id,
         }
-      ));
-   
+      ),
+    }
+    ));
+
   }
 
-  async changeStaffType(staff_id: number, name: string, username:string, staff_type_id: number ) {
+  async changeStaffType(staff_id: number, name: string, username: string, staff_type_id: number) {
 
     return (fetch(apiUrl + '/staff_profile/edit', {
       method: 'PATCH',
@@ -371,7 +380,7 @@ export class Client {
 
   }
 
-  async getAllStats(){
+  async getAllStats() {
     try {
       const r: Response = await fetch(apiUrl + '/stats/sales', {
         method: 'GET',
@@ -388,7 +397,7 @@ export class Client {
     }
   }
 
-  async addCategory(categoryName: string, position: number){
+  async addCategory(categoryName: string, position: number) {
     return fetch(apiUrl + '/menu/category', {
       method: 'POST',
       credentials: 'include',
@@ -406,7 +415,7 @@ export class Client {
     )
   }
 
-  async editCategory(categoryName: string, position: number|undefined, id: number|undefined){
+  async editCategory(categoryName: string, position: number | undefined, id: number | undefined) {
     return fetch(apiUrl + '/menu/category/' + id, {
       method: 'PUT',
       credentials: 'include',
