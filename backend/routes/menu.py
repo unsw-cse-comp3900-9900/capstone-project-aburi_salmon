@@ -142,9 +142,8 @@ class MenuCategory(Resource):
         if (edit.get('name')):
             editStatement += "name = %s, "
             editArr.append(edit.get('name'))
-        if (edit.get('position')):
-            editStatement += "position = %s, "
-            editArr.append(edit.get('position'))
+        else:
+            abort(400, 'Missing required field \'name\'')
 
         editStatement = editStatement.strip(', ') + ' WHERE id = %s'
         editArr.append(id)
@@ -173,6 +172,20 @@ class MenuCategory(Resource):
         
         return jsonify({ 'status': 'success' })
 
+@menu.route('/category/swap/<int:category_id1>/<int:category_id2>')
+class ManuCategorySwap(Resource):
+    @jwt_required
+    @menu.response(200, 'Success')
+    @menu.response(400, 'Invalid Request')
+    def post(self, category_id1, category_id2):
+        # Maintain the correct order when passing in arguments
+        id1 = min(category_id1, category_id2)
+        id2 = max(category_id1, category_id2)
+
+        if (not db.swapCategoryPositions(id1, id2)):
+            abort(400, 'Failed to swap category positions')
+        
+        return jsonify({ 'status': 'success' })
 
 @menu.route('/category/<int:category_id>/item/<int:item_id>')
 class MenuCategoryItem(Resource):
