@@ -401,7 +401,7 @@ class EditMenuPage extends React.Component<IProps, IState> {
       <div className={classes.menupage}>
         <EditCategory isOpen={this.state.editCatDialog} setIsOpen={this.catDialogIsOpen}
           relevantFunction={this.addEditCat} isEdit={this.state.isEdit} category={this.state.currCat} 
-          catNo={this.state.catNo} />
+          catNo={this.state.catNo} wholemenu={this.state.menu}/>
         <EditItem isOpen={this.state.editItemDialog} setIsOpen={this.itemDialogIsOpen} wholemenu={this.state.menu}
           relevantFunction={this.addEditItem} isEdit={this.state.isEdit} item={this.state.currItem}/>
         <Delete isOpen={this.state.deleteDialog} setIsOpen={this.deleteDialogIsOpen}

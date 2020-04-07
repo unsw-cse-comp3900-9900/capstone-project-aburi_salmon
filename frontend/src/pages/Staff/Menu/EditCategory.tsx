@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button, Dialog, DialogContent, DialogContentText, DialogActions,TextField, DialogTitle} from '@material-ui/core';
-import {Categories} from './../../../api/models';
+import { Button, Dialog, DialogContent, DialogContentText, DialogActions,TextField, DialogTitle, FormControl, InputLabel, NativeSelect} from '@material-ui/core';
+import {Categories, Menu} from './../../../api/models';
 import {Client} from './../../../api/client';
 
 
@@ -9,16 +9,18 @@ export interface IProps{
     setIsOpen: any, //function to change state of is open
     relevantFunction: any,
     isEdit: boolean, //if 1 then it is edit, if 0 then is create new
-    category: Categories | null,
+    category: Categories | null, //current category
     catNo: number | undefined,
+    wholemenu: Menu | null,
 }
 
-class EditCategory extends React.Component<IProps, {catName: string}>{
+class EditCategory extends React.Component<IProps, {catName: string, currCat: number}>{
 
     constructor(props: IProps){
         super(props);
         this.state = {
             catName: '',
+            currCat: -1,
         }
     }
 
@@ -40,6 +42,24 @@ class EditCategory extends React.Component<IProps, {catName: string}>{
             });
     }
 
+    printCategories(category: Categories){
+        if (category.id !== this.props.category?.id){
+            return(
+                <option value={category.id} key={category.id}>{category.name}</option>
+            );
+        }
+    }
+
+    handleClick(){
+        if (this.state.catName !== this.props.category?.name){
+            this.props.relevantFunction(this.state.catName, false);
+        }
+        if (this.state.currCat !== -1){
+            const client = new Client();
+            client.catSwitch(this.state.currCat, this.props.category?.id);
+        }
+    }
+
     render(){
         if (this.props.isEdit){
             return (
@@ -57,11 +77,26 @@ class EditCategory extends React.Component<IProps, {catName: string}>{
                                     autoFocus
                                     margin="dense"
                                     id="catName"
-                                    label="New Category Name"
+                                    label="Category Name"
                                     fullWidth
                                     defaultValue={this.props.category?.name}
                                     onChange={(e) => this.setState({ catName: e.target.value })}
                                 />
+                                
+                        <FormControl style={{ minWidth: 150, margin: '10px' }}>
+                            <InputLabel htmlFor="uncontrolled-native">Switch position with</InputLabel>
+                            <NativeSelect
+                                defaultValue={-1}
+                                onChange={(e) => this.setState({ currCat: parseInt(e.target.value) })}
+                            >
+                                <option value={-1} key={-1}>No change</option>
+                                {this.props.wholemenu && this.props.wholemenu?.menu &&
+                                    this.props.wholemenu?.menu.map(category =>
+                                     this.printCategories(category)
+                                    )
+                                }
+                            </NativeSelect>
+                        </FormControl>  
                  
                         </DialogContent>
                         <DialogActions>
@@ -72,7 +107,7 @@ class EditCategory extends React.Component<IProps, {catName: string}>{
                             <Button color="secondary" autoFocus onClick={() => this.deleteFun()}>
                                 Delete Category
                             </Button>
-                            <Button onClick={() => this.props.relevantFunction(this.state.catName, false)} style={{float:'right'}} color="primary" autoFocus>
+                            <Button onClick={() => this.handleClick()} style={{float:'right'}} color="primary" autoFocus>
                                 Modify Category
                             </Button>
                             </div>

@@ -48,6 +48,22 @@ class Ingredients extends React.Component<IProps, IState>{
 
     updateIngredients(){
         console.log(this.state.selectedIngredients);
+        var i = 0;
+        const client = new Client();
+        var temp = this.props.itemIngredients;
+        while (i < this.state.selectedIngredients.length){
+            // if ingredient is not already an ingredient, add
+            if (temp.indexOf(this.state.selectedIngredients[i]) === -1){
+                client.addIngredToItem(this.props.currItem.id, this.state.selectedIngredients[i]);
+                temp.splice(temp.indexOf(this.state.selectedIngredients[i]), 1);
+            }
+            i++;
+        }
+        i = 0;
+        while(i < temp.length){
+            client.removeIngredFromItem(this.props.currItem.id, temp[i]);
+            i++;
+        }
     }
 
     handleCheck(value: string) {

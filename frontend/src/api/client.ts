@@ -579,4 +579,30 @@ export class Client {
     }))
   }
 
+  async removeIngredFromItem(itemId: number, ingredId: number){
+    return (fetch(apiUrl + '/menu/item/' + itemId + '/ingredient/' + ingredId,{
+      method: 'DELETE',
+      credentials: 'include',
+      mode: 'cors',
+    }))
+  }
+
+  async addIngredToItem(itemId: number, ingredId: number){
+    return (fetch(apiUrl + '/menu/item/' + itemId + '/ingredient/' + ingredId, {
+      method: 'POST',
+      credentials: 'include',
+      mode: 'cors',
+    }))
+  }
+
+  async catSwitch(cat1Id: number, cat2Id: number | undefined){
+    return (fetch(apiUrl + '/menu/category/swap/' + cat1Id + '/' + cat2Id, {
+      method: 'POST',
+      credentials: 'include',
+      mode: 'cors',
+    }))
+  }
+    
+  
+
 }
