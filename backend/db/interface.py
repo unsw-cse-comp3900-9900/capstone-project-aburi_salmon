@@ -238,7 +238,10 @@ class DB:
         return self.__update(editStatement, editArr)
 
     def delete_item(self, id):
-        return self.__delete("DELETE FROM item WHERE id = %s", [id])
+        return (
+            self.__delete('DELETE FROM category_item WHERE item_id = %s', [id]) and
+            self.__delete("DELETE FROM item WHERE id = %s", [id])
+        )
 
     def create_category(self, category):
         self.__insert(
