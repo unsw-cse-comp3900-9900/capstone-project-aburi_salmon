@@ -287,6 +287,17 @@ class DB:
         )
 
     def add_item_to_category(self, category_id, item_id):
+        # Check if the item not in category already
+        rows = self.__query(
+            'SELECT * FROM category_item WHERE category_id = %s AND item_id = %s',
+            [category_id, item_id]
+        )
+        
+        if (rows != None):
+            # Item already in category
+            return False
+
+        # Add item to category
         self.__insert(
             'INSERT INTO category_item (item_id, category_id) VALUES (%s, %s)',
             [item_id, category_id]
