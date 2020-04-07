@@ -24,6 +24,7 @@ interface IProps extends WithStyles<typeof styles> { }
 interface OrderItemState {
   item: ItemModel;
   quantity: number;
+  comment: string;
 }
 
 interface IState {
@@ -35,6 +36,7 @@ interface IState {
   modal: ItemModel | null;
   modalQuantity: number;
   modalOriginalQuantity: number;
+  modalComment: string;
 
   // For list of items that user wants to order
   orders: Array<OrderItemState>;
@@ -58,6 +60,7 @@ class MenuPage extends React.Component<IProps, IState> {
       modal: null,
       modalQuantity: 0,
       modalOriginalQuantity: 0,
+      modalComment: "",
       orders: new Array<OrderItemState>(),
       modalSecondButton: "Add to order",
       modalSecondButtonDisable: true,
@@ -180,10 +183,12 @@ class MenuPage extends React.Component<IProps, IState> {
   addToOrder(event: React.ChangeEvent<{}>) {
     const item = this.state.modal!;
     const quantity = this.state.modalQuantity;
+    const comment = this.state.modalComment;
     console.log(quantity);
     const r: OrderItemState = {
       item: item,
       quantity: quantity,
+      comment: comment,
     }
 
     let orders = this.state.orders;
@@ -219,6 +224,7 @@ class MenuPage extends React.Component<IProps, IState> {
       const t: ItemQuantityPairModel = {
         item_id: it.item.id,
         quantity: it.quantity,
+        comment: it.comment,
       };
       s.push(t);
     });
@@ -379,7 +385,7 @@ class MenuPage extends React.Component<IProps, IState> {
 
               {/* Last col */}
               <Grid item xs={7}>
-                {/* nothing here */}
+                <TextField id="standard-basic" label="Comment" />
               </Grid>
               <Grid item xs={5}>
                 <Button variant="contained" onClick={this.handleCloseModal}>Cancel</Button>

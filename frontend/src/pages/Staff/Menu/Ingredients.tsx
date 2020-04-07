@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Dialog, DialogContent, DialogContentText, DialogActions,TextField, DialogTitle, FormControl, FormLabel, FormGroup, FormControlLabel, Checkbox} from '@material-ui/core';
-import {Categories} from './../../../api/models';
+import {Ingredient} from './../../../api/models';
+import {Client} from './../../../api/client';
 
 
 export interface IProps{
@@ -9,16 +10,24 @@ export interface IProps{
     relevantFunction: any,
 }
 
-class Ingredients extends React.Component<IProps, {catName: string}>{
+interface IState{
+    ingredientsList: Array<Ingredient> | null
+}
+class Ingredients extends React.Component<IProps, IState>{
 
     constructor(props: IProps){
         super(props);
         this.state = {
-            catName: '',
+            ingredientsList: null
         }
     }
 
-    
+    async componentDidMount() {
+        const client = new Client();
+        const m: Array<Ingredient> | null = await client.getIngredients();
+        this.setState({ ingredientsList: m });
+
+    }
 
     render(){
         return (
@@ -30,24 +39,22 @@ class Ingredients extends React.Component<IProps, {catName: string}>{
                 >
                     <DialogTitle id="alert-dialog-title">{"Edit Ingredients"}</DialogTitle>
                     <DialogContent>
-                    <FormControl component="fieldset" >
-                        <FormGroup>
-                            <FormControlLabel
-                                control={<Checkbox color="primary" name="1" />}
-                                label="Ingred1"
-                            />
-                            <FormControlLabel
-                                control={<Checkbox color="primary" name="2" />}
-                                label="Ingred2"
-                            />
-                            <FormControlLabel
-                                control={<Checkbox color="primary" name="3" />}
-                                label="Ingred3"
-                            />
-                        </FormGroup>
-                    </FormControl>
+                        <FormControl component="fieldset" >
+                          <FormGroup>
+                                {
+                                    this.state.ingredientsList &&
+                                    this.state.ingredientsList.map(ingredient =>
+                                        
+                                        <FormControlLabel
+                                            control={<Checkbox color="primary" value={ingredient.name} />}
+                                            label={ingredient.name}
+                                            key={ingredient.id}
+                                        />
+                                    )
+                                }
+                             </FormGroup>
                             
-                
+                        </FormControl>
                     </DialogContent>
                     <DialogActions>
                         <div style={{width:'100%'}}>

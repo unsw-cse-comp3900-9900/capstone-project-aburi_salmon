@@ -447,8 +447,8 @@ class DB:
         
         return order_id  
 
-    def insert_item_order(self, order_id, item_id, quantity):
-        self.__insert("INSERT INTO item_order (item_id, order_id, quantity, status_id) VALUES (%s, %s, %s, %s);", [item_id, order_id, quantity, 1])
+    def insert_item_order(self, order_id, item_id, quantity, comment):
+        self.__insert("INSERT INTO item_order (item_id, order_id, quantity, status_id, comment) VALUES (%s, %s, %s, %s, %s);", [item_id, order_id, quantity, 1, comment])
         return True
         
     def get_tables(self):
@@ -560,17 +560,17 @@ class DB:
 
         return status[0][0]
 
-    def add_order(self, order_id, item_id, quantity):
-        io_id = self.__query("INSERT INTO item_order (item_id, order_id, quantity, status_id) VALUES (%s, %s, %s, %s) RETURNING id;", [item_id, order_id, quantity, 1])
+    def add_order(self, order_id, item_id, quantity, comment):
+        io_id = self.__query("INSERT INTO item_order (item_id, order_id, quantity, status_id, comment) VALUES (%s, %s, %s, %s, %s) RETURNING id;", [item_id, order_id, quantity, 1, comment])
 
         if (not io_id):
             return None
 
         return io_id[0][0]
 
-    def modify_item_order(self, item_order_id, quantity):
+    def modify_item_order(self, item_order_id, comment, quantity):
         new_quantity = quantity
-        return self.__update("UPDATE item_order SET quantity = %s, status_id = 1 WHERE id = %s", [new_quantity, item_order_id])
+        return self.__update("UPDATE item_order SET quantity = %s, status_id = 1, comment = %s WHERE id = %s", [new_quantity, comment, item_order_id])
 
     def delete_item_order(self, item_order_id):
         return self.__delete("DELETE FROM item_order WHERE id = %s", [item_order_id,])

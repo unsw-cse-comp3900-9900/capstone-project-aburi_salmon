@@ -1,6 +1,7 @@
 import React from 'react';
-import { Button, Dialog, DialogContent, DialogContentText, DialogActions,TextField, DialogTitle, FormControl, FormLabel, FormGroup, FormControlLabel, Checkbox} from '@material-ui/core';
-import {Categories} from './../../../api/models';
+import { Button, Dialog, DialogContent, DialogContentText,Radio, DialogActions,TextField, DialogTitle, FormControl, FormLabel, FormGroup, FormControlLabel, Checkbox, RadioGroup} from '@material-ui/core';
+import {Categories, Ingredient} from './../../../api/models';
+import {Client} from './../../../api/client';
 
 
 export interface IProps{
@@ -9,13 +10,26 @@ export interface IProps{
     relevantFunction: any,
 }
 
-class EditIngredients extends React.Component<IProps, {isOpen: boolean, newIngred: string}>{
+interface IState{
+    isOpen: boolean,
+    newIngred: string,
+    ingredientsList: Array<Ingredient> | null,
+    selected: Ingredient,
+}
+
+class EditIngredients extends React.Component<IProps, IState>{
 
     constructor(props: IProps){
         super(props);
+        const temp: Ingredient = {
+            id: 0,
+            name: ''
+        }
         this.state = {
             isOpen: false,
             newIngred: '',
+            ingredientsList: null,
+            selected:temp,
         }
     }
 
@@ -43,7 +57,7 @@ class EditIngredients extends React.Component<IProps, {isOpen: boolean, newIngre
                     <Button onClick={() => this.setState({isOpen: false})} color="primary" style={{ float: 'left' }}>
                         Cancel
                         </Button>
-                    <Button onClick={() => this.props.relevantFunction()} style={{ float: 'right' }} color="primary" autoFocus>
+                    <Button onClick={() => this.handleAddIngred()} style={{ float: 'right' }} color="primary" autoFocus>
                         Add Ingredient
                         </Button>
                 </div>
@@ -52,6 +66,48 @@ class EditIngredients extends React.Component<IProps, {isOpen: boolean, newIngre
 
     }
 
+    handleAddIngred(){
+        const client = new Client();
+        client.addIngredient(this.state.newIngred)
+            .then((msg) => {
+                //alert(msg.status);
+                if (msg.status === 200) {
+                    alert('Success');
+                    this.componentDidMount();
+                    this.setState({ isOpen: false });
+
+    
+                } else {
+                    alert(msg.statusText);
+                }
+            }).catch((status) => {
+                console.log(status);
+            });
+
+    }
+
+    async componentDidMount() {
+        const client = new Client();
+        const m: Array<Ingredient> | null = await client.getIngredients();
+        this.setState({ingredientsList: m});
+
+    }
+
+    handleDeleteIngred(){
+        const client = new Client();
+        client.deleteIngredient(this.state.selected.id)
+            .then((msg) => {
+                //alert(msg.status);
+                if (msg.status === 200) {
+                    alert('Success');
+                    this.componentDidMount();
+                } else {
+                    alert(msg.statusText);
+                }
+            }).catch((status) => {
+                console.log(status);
+            });
+    }
 
     render(){
         return (
@@ -64,21 +120,22 @@ class EditIngredients extends React.Component<IProps, {isOpen: boolean, newIngre
                     {this.addIngred()}
                     <DialogTitle id="alert-dialog-title">{"Edit Ingredients"}</DialogTitle>
                     <DialogContent>
+
                     <FormControl component="fieldset" >
-                        <FormGroup>
-                            <FormControlLabel
-                                control={<Checkbox color="primary" name="1" />}
-                                label="Ingred1"
-                            />
-                            <FormControlLabel
-                                control={<Checkbox color="primary" name="2" />}
-                                label="Ingred2"
-                            />
-                            <FormControlLabel
-                                control={<Checkbox color="primary" name="3" />}
-                                label="Ingred3"
-                            />
-                        </FormGroup>
+                        <RadioGroup row aria-label="position" name="position" value={this.state.selected.name}>
+                        {
+                            this.state.ingredientsList && 
+                                this.state.ingredientsList.map(ingredient => 
+                                   <FormControlLabel
+                                    control={<Radio color="primary" value={ingredient.name} onChange={() => this.setState({selected: ingredient})}/>}
+                                    label={ingredient.name}
+                                    key={ingredient.id}
+                                    />
+                            )
+                                
+                        }
+                        </RadioGroup>
+                        
                     </FormControl>
                             
                 
@@ -88,7 +145,7 @@ class EditIngredients extends React.Component<IProps, {isOpen: boolean, newIngre
                         <Button onClick={() => this.props.setIsOpen(false)} color="primary" style={{float: 'left'}}>
                             Cancel
                         </Button>
-                        <Button onClick={() => this.props.relevantFunction()} style={{ float: 'right' }} color="secondary" autoFocus>
+                        <Button onClick={() => this.handleDeleteIngred()} style={{ float: 'right' }} color="secondary" autoFocus>
                             Delete Selected
                         </Button>
 
