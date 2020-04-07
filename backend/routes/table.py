@@ -89,7 +89,7 @@ class Assistance(Resource):
     @table.response(400, 'Invalid request')
     def get(self):
         tables = db.get_assistance_tables()
-        if (not tables):
+        if (tables is None):
             abort(400, 'Something went wrong')
 
         return jsonify({'tables': tables})
@@ -125,5 +125,82 @@ class Assistance(Resource):
             abort(400, 'Something went wrong')
 
         return jsonify({ 'status': 'success' })
-    
+
         
+@table.route('/paid')
+class TablePaid(Resource):
+    @jwt_required
+    @table.response(200, 'Success', model=response_model.table_paid_response_model)
+    @table.response(400, 'Invalid request')
+    @table.response(401, 'Unauthorised')
+    def get(self):
+        # Return a list of tables that have paid
+        paid = db.get_paid_tables()
+        if (paid == None):
+            abort(500, 'Something went wrong')
+        
+        return jsonify({ 'tables': paid })
+
+    @jwt_required
+    @table.response(200, 'Success')
+    @table.response(400, 'Invalid request')
+    @table.response(401, 'Unauthorised')
+    @table.expect(request_model.table_paid_model)
+    def put(self):
+        # Set the payment status of an order as true/false
+        body = request.get_json()
+
+        paid = body.get('paid')
+        table = body.get('table')
+
+        if (paid == None or table == None):
+            abort(400, "Invalid request. Missing required field")
+        
+        if (db.set_paid(table, paid) == None):
+            abort(500, 'Something went wrong.')
+        
+        return jsonify({ 'success': 'success' })
+
+@table.route('/bill')
+class TableBill(Resource):
+    @jwt_required
+    @table.response(200, 'Success', model=response_model.table_bill_response_model)
+    @table.response(400, 'Invalid request')
+    @table.response(401, 'Unauthorised')
+    def get(self):
+        # Return a list of tables that have paid
+        paid = db.get_bill_tables()
+        if (paid == None):
+            abort(500, 'Something went wrong')
+        
+        return jsonify({ 'tables': paid })
+
+    @jwt_required
+    @table.response(200, 'Success')
+    @table.response(400, 'Invalid request')
+    @table.response(401, 'Unauthorised')
+    @table.expect(request_model.table_bill_model)
+    def put(self):
+        # Set the request bill status of an order as true/false
+        body = request.get_json()
+
+        bill = body.get('bill')
+        order_id = get_jwt_claims().get('order')
+        table_id = body.get('table')
+
+
+        if (not order_id and not table_id):
+            abort(400, 'Invalid request')
+        elif (not order_id):
+            order_id = db.get_order_id(table_id)
+        elif (not table_id):
+            table_id = db.get_table_id(order_id)
+
+        if (bill == None or table_id == None):
+            abort(400, "Invalid request. Missing required field")
+        
+        if (db.set_bill(table_id, bill) == None):
+            abort(500, 'Something went wrong.')
+        
+        return jsonify({ 'success': 'success' })
+
