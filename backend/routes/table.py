@@ -89,7 +89,7 @@ class Assistance(Resource):
     @table.response(400, 'Invalid request')
     def get(self):
         tables = db.get_assistance_tables()
-        if (not tables):
+        if (tables is None):
             abort(400, 'Something went wrong')
 
         return jsonify({'tables': tables})
