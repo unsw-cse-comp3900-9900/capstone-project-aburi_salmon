@@ -1,4 +1,4 @@
-import { Tables, Menu, ItemList, Order, Item, ItemId, ItemQuantityPair, CreateOrder, ResponseMessage, AddItemToOrderResponseMessage, OrderItemQuantityPair, ItemOrder, TableInfo, AssistanceTables, AllStaff, AllItemStats } from "./models";
+import { Tables, Menu, ItemList, Order, Item, ItemId,  ItemQuantityPair, CreateOrder, ResponseMessage, AddItemToOrderResponseMessage, OrderItemQuantityPair, ItemOrder, TableInfo, AssistanceTables, AllStaff, AllItemStats, Ingredient } from "./models";
 
 const apiUrl = "http://localhost:5000";
 
@@ -289,8 +289,8 @@ export class Client {
       },
       body: JSON.stringify(
         {
-          order: order_id,
           assistance: assistance,
+          order_id: order_id,
         }
       ),
     });
@@ -438,7 +438,7 @@ export class Client {
       return "Failed";
     }
   }
-  async addItem(name: string, description: string, price: number, visible: string, position: number, catId: number) {
+  async addItem(name: string, description: string, price: number, visible: boolean, position: number, catId: number) {
     try {
       const r: Response = await fetch(apiUrl + '/menu/item', {
         method: 'POST',
@@ -466,10 +466,10 @@ export class Client {
     }
   }
 
-  async editItem(name: string, description: string, price: number, visible: string, catId: number, itemId: number) {
+  async editItem(name: string, description: string, price: number, visible: boolean, catId: number, itemId: number) {
     try {
       const r: Response = await fetch(apiUrl + '/menu/item/' + itemId, {
-        method: 'POST',
+        method: 'PUT',
         credentials: 'include',
         mode: 'cors',
         headers: {
@@ -485,16 +485,25 @@ export class Client {
         ),
       });
       const j: ItemId = await r.json();
-
-
+      return this.addItemToCat(0, catId, itemId);
     } catch (e) {
       console.error(e);
       return null;
     }
   }
 
-  async deleteItem() {
-
+  async deleteItem(id:number) {
+    try {
+      await fetch(apiUrl + '/menu/item/' + id, {
+        method: 'DELETE',
+        credentials: 'include',
+        mode: 'cors',
+      });
+      return "Success"
+    } catch (e) {
+      console.error(e);
+      return "Failed";
+    }
   }
 
   async addItemToCat(position: number, catId: number, itemId: number) {
@@ -512,13 +521,56 @@ export class Client {
           }
         ),
       });
-      const j: ItemId = await r.json();
+      const j = await r.json();
       return j;
 
     } catch (e) {
       console.error(e);
       return null;
     }
+  }
+
+  async addIngredient(name: string){
+    return fetch(apiUrl + '/menu/ingredient', {
+      method: 'POST',
+      credentials: 'include',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(
+        {
+          name: name,
+        }
+      ),
+    }
+    )
+  }
+
+  async getIngredients(){
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/ingredient', {
+        method: 'GET',
+        credentials: 'include',
+        mode: 'cors',
+      });
+
+      const j: Array<Ingredient> = await r.json();
+      return j;
+
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async deleteIngredient(id: number) {
+   return(fetch(apiUrl + '/menu/ingredient/' + id, {
+        method: 'DELETE',
+        credentials: 'include',
+        mode: 'cors',
+      }))
+    
   }
 
 }

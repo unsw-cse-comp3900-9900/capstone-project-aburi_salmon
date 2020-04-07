@@ -161,9 +161,40 @@ class EditMenuPage extends React.Component<IProps, IState> {
 
   }
 
-  addEditItem(name: string, description: string, price: number, visibility: string, category: number){
-    
-    console.log(name + ', ' + description + ', ' + price + ', ' + visibility + ', ' + category);
+  addEditItem(name: string, description: string, price: number, visibility: boolean, category: number){
+    const client = new Client();
+    if (this.state.isEdit){
+      console.log(name + ', ' + description + ', ' + price + ', ' + visibility + ', ' + category);
+      var j = client.editItem(name, description, price, visibility, category, this.state.currItem.id);
+      console.log(j);
+      j.then((msg) => {
+      //alert(msg.status);
+        if (msg.status === 200) {
+          alert('Success');
+          this.setState({ editItemDialog: false, openModal: false });
+          this.componentDidMount();
+        } else {
+          alert(msg.statusText);
+        }
+      }).catch((status) => {
+        console.log(status);
+      });
+    } else {
+      
+      var j  = client.addItem(name, description,price,visibility,0, category);
+      j.then((msg) => {
+        //alert(msg.status);
+        if (msg.status === 200) {
+          alert('Success');
+          this.setState({ editItemDialog: false, })
+          this.componentDidMount();
+        } else {
+          alert(msg.statusText);
+        }
+      }).catch((status) => {
+        console.log(status);
+      });
+    }
   }
 
   addEditCat(categoryName: string, isAdd: boolean, position: number){
@@ -205,14 +236,17 @@ class EditMenuPage extends React.Component<IProps, IState> {
 
   deleteFun(isCat: boolean){ //isCat: 1 if is category else 0
     console.log('Deleting ');
+    const client = new Client();
     if (isCat){
-      /*
-      const client = new Client();
+      
+      //.then.catch stuff for alert
       alert(client.deleteCat(this.state.currCat?.id));
       this.setState({editCatDialog: false});
-      this.componentDidMount();*/
+      this.componentDidMount();
       console.log(this.state.currCat?.name);
     } else {
+      console.log(client.deleteItem(this.state.currItem.id));
+      this.setState({ deleteDialog: false });
       console.log(this.state.currItem.name);
     }
   }
@@ -392,11 +426,11 @@ class EditMenuPage extends React.Component<IProps, IState> {
             </div>
             <div className={classes.wrapper3}>
           
-          <Button variant='outlined' color='primary' onClick={() => { this.setState({ editItemDialog: true, isEdit:false, isCat: false})}}
+          <Button variant='outlined'  onClick={() => { this.setState({ editItemDialog: true, isEdit:false, isCat: false})}}
               className={classes.addFloatRight}>Add Item</Button>
-          <Button variant='outlined' color='primary' onClick={() => { this.setState({ editCatDialog: true, isEdit:false, isCat:true }) }}
+          <Button variant='outlined'  onClick={() => { this.setState({ editCatDialog: true, isEdit:false, isCat:true }) }}
                className={classes.addFloatRight}>Add Category</Button>
-               <Button variant='outlined' color='primary' onClick={() => { this.setState({ editIngredDialog: true }) }}
+               <Button variant='outlined' onClick={() => { this.setState({ editIngredDialog: true }) }}
             className={classes.addFloatRight}>Edit Ingredients List</Button>
             </div>
 
@@ -442,11 +476,15 @@ class EditMenuPage extends React.Component<IProps, IState> {
               <Grid item xs={8}>
                 <Typography variant="subtitle1">{this.state.modal?.description}</Typography>
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={4}>
+                <Typography variant="subtitle1">${this.state.modal?.price.toFixed(2)}</Typography>
+              </Grid>
+
+              <Grid item xs={6}>
                 <Button size="small" variant="outlined" onClick={() => this.setState({ editItemDialog: true, isCat:false, isEdit: true})}>Edit item</Button>
               </Grid>
-              <Grid item xs={2}>
-                <Button size="small" variant="outlined" onClick={() => this.setState({ ingredDialog: true})}>Ingredients</Button>
+              <Grid item xs={6}>
+                <Button size="small" variant="outlined" onClick={() => this.setState({ ingredDialog: true})}>Edit Ingredients</Button>
               </Grid>
               
             </Grid>

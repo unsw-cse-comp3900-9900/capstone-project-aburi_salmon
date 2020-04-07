@@ -80,6 +80,7 @@ class Assistance extends React.Component<IProps, IState>{
         this.setState({main: false});
     }
 
+
     async componentDidMount() {
         const client = new Client()
         const t: TableModel | null = await client.getTables();

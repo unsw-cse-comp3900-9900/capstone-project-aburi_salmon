@@ -16,7 +16,7 @@ interface IState{
     name: string,
     description: string,
     price: number,
-    visibility: any,
+    visibility: boolean,
     category: any,
 }
 
@@ -29,7 +29,7 @@ class EditItem extends React.Component<IProps, IState>{
             name: '',
             description:'',
             price: 0,
-            visibility: 'true',
+            visibility: true,
             category: 1,
         }
         this.submitEdit = this.submitEdit.bind(this);
@@ -42,8 +42,9 @@ class EditItem extends React.Component<IProps, IState>{
 
 
     submitCreate(){
+
         this.props.relevantFunction(this.state.name, this.state.description, this.state.price, this.state.visibility, this.state.category);
-        this.setState({name:'', description: '', price:0, visibility:'true', category: 1});
+        this.setState({name:'', description: '', price:0, visibility:true, category: 1});
     }
 
     submitEdit(){
@@ -67,11 +68,19 @@ class EditItem extends React.Component<IProps, IState>{
 
         console.log(this.state.name);
         this.props.relevantFunction(tempname, tempdes, tempprice, this.state.visibility, this.state.category);
-        this.setState({ name: '', description: '', price: 0, visibility: 'true', category: 1 });
+        this.setState({ name: '', description: '', price: 0, visibility: true, category: 1 });
     }
 
     async componentDidMount(){
-        this.setState({ name: '', description: '', price: 0, visibility: 'true', category: 1 });
+        this.setState({ name: '', description: '', price: 0, visibility: true, category: 1 });
+    }
+
+    setChange(value: any){
+        if (value === 'true'){
+            this.setState({visibility: true});
+        } else {
+            this.setState({visibility: false});
+        }
     }
 
     render() {
@@ -119,7 +128,7 @@ class EditItem extends React.Component<IProps, IState>{
                             <InputLabel htmlFor="uncontrolled-native">Visibility</InputLabel>
                             <NativeSelect
                                 defaultValue={'true'}
-                                onChange={(e) => this.setState({ visibility: e.target.value })}
+                                onChange={(e) => this.setChange(e.target.value)}
                             >
                                 <option value={'true'}>Show</option>
                                 <option value={'false'}>Hide</option>
@@ -194,7 +203,7 @@ class EditItem extends React.Component<IProps, IState>{
                             <InputLabel htmlFor="uncontrolled-native">Visibility</InputLabel>
                             <NativeSelect
                                 defaultValue={'true'}
-                                onChange={(e) => this.setState({visibility: e.target.value})}
+                                onChange={(e) => this.setChange(e.target.value)}
                             >
                                 <option value={'true'}>Show</option>
                                 <option value={'false'}>Hide</option>

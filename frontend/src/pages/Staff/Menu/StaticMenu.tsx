@@ -304,6 +304,9 @@ class StaticMenuPage extends React.Component<IProps, IState> {
               <Grid item xs={8}>
                 <Typography variant="subtitle1">{this.state.modal?.description}</Typography>
               </Grid>
+              <Grid item xs={4}>
+                <Typography variant="subtitle1">${this.state.modal?.price.toFixed(2)}</Typography>
+              </Grid>
             </Grid>
           </div>
         </Modal>
