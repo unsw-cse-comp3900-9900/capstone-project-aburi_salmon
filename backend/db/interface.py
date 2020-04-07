@@ -176,11 +176,14 @@ class DB:
         return category
         
     def create_item(self, item):
-        self.__insert(
-            'INSERT INTO item (name, description, price, visible) VALUES (%s, %s, %s, %s)',
+        rows = self.__query(
+            'INSERT INTO item (name, description, price, visible) VALUES (%s, %s, %s, %s) RETURNING id',
             [item.get('name'), item.get('description'), item.get('price'), item.get('visible')]
         )
-        return True
+        if not rows or not rows[0]:
+            return None
+
+        return rows[0][0]
 
     def get_all_menu_items(self):
         rows = self.__query(
@@ -215,7 +218,7 @@ class DB:
 
     def get_items_by_category(self, category_id):
         rows = self.__query(
-            'SELECT * FROM item i JOIN category_item ci on (i.id = ci.item_id) WHERE ci.category_id = %s ORDER BY ci.position',
+            'SELECT * FROM item i JOIN category_item ci on (i.id = ci.item_id) WHERE ci.category_id = %s',
             [category_id]
         )
 
@@ -235,12 +238,19 @@ class DB:
         return self.__update(editStatement, editArr)
 
     def delete_item(self, id):
-        return self.__delete("DELETE FROM item WHERE id = %s", [id])
+        return (
+            self.__delete('DELETE FROM category_item WHERE item_id = %s', [id]) and
+            self.__delete("DELETE FROM item WHERE id = %s", [id])
+        )
 
-    def create_category(self, category):
+    def create_category(self, name):
+        # Set the postion to the current highest position + 1 
+        rows = self.__query('SELECT max(position) FROM category')
+        position = rows[0][0] + 1
+
         self.__insert(
             'INSERT INTO category (name, position) VALUES (%s, %s)',
-            [category.get('name'), category.get('position')]
+            [name, position]
         )
         return True
 
@@ -259,13 +269,27 @@ class DB:
         return self.__update(editStatement, editArr)
 
     def delete_category(self, id):
-        # Implement this later
-        pass
+        return self.__delete('DELETE FROM category WHERE id = %s', [id])
+    
+    def swapCategoryPositions(self, id1, id2):
+        print('Swapping categories {} and {}'.format(id1, id2))
+        # Get positions
+        rows = self.__query('SELECT position FROM category WHERE id in (%s, %s) ORDER BY id', [id1, id2])
+        position1 = rows[0][0]
+        position2 = rows[1][0]
 
-    def add_item_to_category(self, category_id, item_id, position):
+        print(position1, position2)
+        # Update position 1 and position 2
+        return (
+            self.__update('UPDATE category SET position = %s WHERE id = %s', [0, id1]) and
+            self.__update('UPDATE category SET position = %s WHERE id = %s', [position1, id2]) and
+            self.__update('UPDATE category SET position = %s WHERE id = %s', [position2, id1])
+        )
+
+    def add_item_to_category(self, category_id, item_id):
         self.__insert(
-            'INSERT INTO category_item (item_id, category_id, position) VALUES (%s, %s, %s)',
-            [item_id, category_id, position]
+            'INSERT INTO category_item (item_id, category_id) VALUES (%s, %s)',
+            [item_id, category_id]
         )
         return True
 
@@ -340,7 +364,7 @@ class DB:
         )
 
     def add_ingredient_to_item(self, item_id, ingredient_id):
-        self.__update(
+        self.__insert(
             'INSERT INTO item_ingredient (item_id, ingredient_id) VALUES (%s, %s)',
             [item_id, ingredient_id]
         )
@@ -423,8 +447,8 @@ class DB:
         
         return order_id  
 
-    def insert_item_order(self, order_id, item_id, quantity):
-        self.__insert("INSERT INTO item_order (item_id, order_id, quantity, status_id) VALUES (%s, %s, %s, %s);", [item_id, order_id, quantity, 1])
+    def insert_item_order(self, order_id, item_id, quantity, comment):
+        self.__insert("INSERT INTO item_order (item_id, order_id, quantity, status_id, comment) VALUES (%s, %s, %s, %s, %s);", [item_id, order_id, quantity, 1, comment])
         return True
         
     def get_tables(self):
@@ -453,12 +477,12 @@ class DB:
     def set_table_free(self, id):
         return self.__update('UPDATE "table" SET state = %s WHERE id = %s', [False, id])
 
-    def set_assistance(self, id, assistance):
-        return self.__update('UPDATE "order" SET assistance = %s WHERE id = %s', [assistance, id])
+    def set_assistance(self, table_id, assistance):
+        return self.__update('UPDATE "order" SET assistance = %s WHERE table_id = %s', [assistance, table_id])
 
     def get_assistance_tables(self):
         rows = self.__query(
-            'SELECT t.* FROM "table" t JOIN "order" o on (t.id = o.table_id) WHERE o.assistance'
+            'SELECT distinct t.id, t.state FROM "table" t JOIN "order" o on (t.id = o.table_id) WHERE o.assistance = True AND t.state = True'
         )
 
         if (not rows or not rows[0]):
@@ -511,6 +535,23 @@ class DB:
 
         return rows[0][0]
 
+    def get_table_id(self, order_id):
+        rows = self.__query(
+            '''
+            SELECT o.table_id FROM "order" o WHERE o.id = %s
+            ''',
+            [order_id]
+        )
+
+        print('Getting table id')
+        print(rows)
+
+        if (not rows or not rows[0]):
+            return None
+
+        return rows[0][0]
+
+
     def get_order_status(self, item_order_id):
         status = self.__query('SELECT status_id FROM item_order WHERE id = %s', [item_order_id,])
 
@@ -519,23 +560,30 @@ class DB:
 
         return status[0][0]
 
-    def add_order(self, order_id, item_id, quantity):
-        io_id = self.__query("INSERT INTO item_order (item_id, order_id, quantity, status_id) VALUES (%s, %s, %s, %s) RETURNING id;", [item_id, order_id, quantity, 1])
+    def add_order(self, order_id, item_id, quantity, comment):
+        io_id = self.__query("INSERT INTO item_order (item_id, order_id, quantity, status_id, comment) VALUES (%s, %s, %s, %s, %s) RETURNING id;", [item_id, order_id, quantity, 1, comment])
 
         if (not io_id):
             return None
 
         return io_id[0][0]
 
-    def modify_item_order(self, item_order_id, quantity):
+    def modify_item_order(self, item_order_id, comment, quantity):
         new_quantity = quantity
-        return self.__update("UPDATE item_order SET quantity = %s, status_id = 1 WHERE id = %s", [new_quantity, item_order_id])
+        return self.__update("UPDATE item_order SET quantity = %s, status_id = 1, comment = %s WHERE id = %s", [new_quantity, comment, item_order_id])
 
     def delete_item_order(self, item_order_id):
         return self.__delete("DELETE FROM item_order WHERE id = %s", [item_order_id,])
 
     def get_order_list(self, status):
-        rows = self.__query('SELECT item.name, io.quantity, item.price, io.id, io.status_id FROM item_order io JOIN item ON io.item_id = item.id WHERE io.status_id = %s', [status])
+        rows = self.__query(
+            """
+            SELECT item.name, io.quantity, item.price, io.id, io.status_id, o.table_id
+            FROM item_order io JOIN item ON (io.item_id = item.id)
+                               JOIN "order" o ON (o.id = io.order_id)
+            WHERE io.status_id = %s
+            """,
+            [status])
 
         if (not rows):
             return None
@@ -545,7 +593,8 @@ class DB:
             'quantity': row[1],
             'price': row[2],
             'id': row[3],
-            'status_id': row[4]
+            'status_id': row[4],
+            'table': row[5]
         } for row in rows]
 
         return orders

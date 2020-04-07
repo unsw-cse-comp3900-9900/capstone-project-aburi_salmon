@@ -36,10 +36,11 @@ class CreateMenuItem(Resource):
     def post(self):
         # Create a new menu item
         item = request.get_json()
-        if (not db.create_item(item)):
+        item_id = db.create_item(item)
+        if (not item_id):
             abort(400, 'Invalid request')
         
-        return jsonify({ 'status': 'success' })
+        return jsonify({ 'item_id': item_id })
 
     @jwt_required
     @menu.response(200, 'Success', model=response_model.menu_items_model)
@@ -110,8 +111,11 @@ class CreateMenuCategory(Resource):
     @menu.response(400, 'Invalid Request')
     @menu.expect(request_model.category_model)
     def post(self):
-        category = request.get_json()
-        if (not db.create_category(category)):
+        name = request.get_json().get('name')
+        if (not name):
+            abort(400, 'Missing required field \'name\'')
+
+        if (not db.create_category(name)):
             abort(400, 'Invalid request')
 
         return jsonify({ 'status': 'success' })
@@ -141,9 +145,8 @@ class MenuCategory(Resource):
         if (edit.get('name')):
             editStatement += "name = %s, "
             editArr.append(edit.get('name'))
-        if (edit.get('position')):
-            editStatement += "position = %s, "
-            editArr.append(edit.get('position'))
+        else:
+            abort(400, 'Missing required field \'name\'')
 
         editStatement = editStatement.strip(', ') + ' WHERE id = %s'
         editArr.append(id)
@@ -166,27 +169,39 @@ class MenuCategory(Resource):
     @menu.response(200, 'Success')
     @menu.response(400, 'Invalid Request')
     def delete(self, id):
+        items = db.get_items_by_category(id)
+        if (len(items) > 0):
+            abort(400, 'Can only delete empty category')
+
         # Delete a category
         if (not db.delete_category(id)):
             abort(400, 'Invalid request')
         
         return jsonify({ 'status': 'success' })
 
+@menu.route('/category/swap/<int:category_id1>/<int:category_id2>')
+class ManuCategorySwap(Resource):
+    @jwt_required
+    @menu.response(200, 'Success')
+    @menu.response(400, 'Invalid Request')
+    def post(self, category_id1, category_id2):
+        # Maintain the correct order when passing in arguments
+        id1 = min(category_id1, category_id2)
+        id2 = max(category_id1, category_id2)
+
+        if (not db.swapCategoryPositions(id1, id2)):
+            abort(400, 'Failed to swap category positions')
+        
+        return jsonify({ 'status': 'success' })
 
 @menu.route('/category/<int:category_id>/item/<int:item_id>')
 class MenuCategoryItem(Resource):
     @jwt_required
     @menu.response(200, 'Success')
     @menu.response(400, 'Invalid Request')
-    @menu.expect(request_model.add_item_to_category_model)
     def post(self, category_id, item_id):
         # Add an item to a category
-
-        position = request.get_json().get('position')
-        if (not position):
-            abort(400, 'No position given')
-
-        if (not db.add_item_to_category(category_id, item_id, position)):
+        if (not db.add_item_to_category(category_id, item_id)):
             abort(400, 'Invalid request')
         
         return jsonify({ 'status': 'success' })

@@ -8,6 +8,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormGroup from '@material-ui/core/FormGroup';
 import Checkbox from '@material-ui/core/Checkbox';
 
+import history from '../../history';
 import { styles } from './styles';
 import { LeftBox, RightBar } from "../../components";
 import { Order as OrderModel, ItemOrder as ItemOrderModel, Item } from "../../api/models";
@@ -20,11 +21,10 @@ interface IState {
   order: OrderModel | null;
   openModal: boolean;
   modal: ItemModel | null;
-  item_order_id: number;
-  modalStatus: number;
+  modal_item_order: ItemOrderModel | null;
   modalQuantity: number;
+  modalComment: string;
   modalOriginalQuantity: number;
-  modalSecondButton: string;
   modalSecondButtonDisable: boolean;
   disableBill: boolean;
 }
@@ -36,11 +36,10 @@ class WaitingPage extends React.Component<IProps, IState> {
       order: null,
       openModal: false,
       modal: null,
-      item_order_id: 0,
-      modalStatus: 0,
+      modal_item_order: null,
       modalQuantity: 0,
+      modalComment: "",
       modalOriginalQuantity: 0,
-      modalSecondButton: "Add to order",
       modalSecondButtonDisable: true,
       disableBill: true,
     }
@@ -50,38 +49,23 @@ class WaitingPage extends React.Component<IProps, IState> {
   }
 
   renderFirstButton(it: ItemOrderModel) {
-    switch (it.status.id) {
-      case 1:
-        return (<Button color="primary" onClick={() => this.openModal(it)}>Modify order</Button>);
-      case 4:
-        return (<Button color="primary" onClick={() => this.openModal(it)}>Add more</Button>)
-      default:
-        return (<Button disabled color="primary">Modify order</Button>);
-    }
-  }
-
-  renderSecondButton(it: ItemOrderModel) {
     if (it.status.id === 1) {
-      return (<Button color="secondary" onClick={() => this.cancelOrder(it)}>Cancel Order</Button>);
+      return (<Button color="primary" onClick={() => this.openModal(it)}>Modify order</Button>);
     }
-    return (<Button disabled color="secondary">Cancel Order</Button>);
+    return (<Button disabled color="primary">Modify order</Button>);
   }
 
   async openModal(it: ItemOrderModel) {
     const client = new Client();
     const i: ItemModel | null = await client.getItem(it.item_id);
 
-    const mq = it.status.id === 1 ? it.quantity : 0;
-    const sb = it.status.id === 4 ? "Add to order" : "Modify order";
-
+    const mq = it.quantity;
     this.setState({
       openModal: true,
       modal: i,
-      item_order_id: it.id,
-      modalStatus: it.status.id,
+      modal_item_order: it,
       modalQuantity: mq,
       modalOriginalQuantity: mq,
-      modalSecondButton: sb,
       modalSecondButtonDisable: true,
     });
   }
@@ -89,12 +73,11 @@ class WaitingPage extends React.Component<IProps, IState> {
   removeModalQuantity() {
     this.setState(prevState => {
       let pq = prevState.modalQuantity;
-      if (pq <= 1) pq = 0;
+      if (pq <= 2) pq = 1;
       else pq--;
       return {
         modalQuantity: pq,
         modalSecondButtonDisable: pq === prevState.modalOriginalQuantity,
-        modalSecondButton: (pq === 0 && prevState.modalStatus === 1) ? "Cancel Order" : "Modify Order",
       }
     });
   }
@@ -105,7 +88,6 @@ class WaitingPage extends React.Component<IProps, IState> {
       return {
         modalQuantity: pq,
         modalSecondButtonDisable: pq === prevState.modalOriginalQuantity,
-        modalSecondButton: (pq === 0 && prevState.modalStatus === 1) ? "Cancel Order" : "Modify Order",
       }
     })
   }
@@ -119,31 +101,15 @@ class WaitingPage extends React.Component<IProps, IState> {
   async addToOrder(event: React.ChangeEvent<{}>) {
     const client = new Client();
     let r: ResponseMessageModel | null = null;
-    switch (this.state.modalStatus) {
-      case 1:
-        // Submit item_order_id to patch
-
-        if (this.state.modalQuantity === 0) {
-          r = await client.deleteItemOrder(this.state.item_order_id);
-        } else {
-          const s: OrderItemQuantityPairModel = {
-            id: this.state.item_order_id,
-            quantity: this.state.modalQuantity,
-          };
-          r = await client.patchItemOrder(s);
-        }
-        break;
-      case 4:
-        // Submit modal's item_id
-        const t: ItemQuantityPairModel = {
-          item_id: this.state.modal!.id,
-          quantity: this.state.modalQuantity,
-        };
-
-        r = await client.addItemToOrder(t);
-        break;
-      default:
-        return;
+    if (this.state.modal_item_order?.status.id === 1) {
+      // Submit item_order_id to patch or delete
+      if (this.state.modalQuantity === 0) {
+        // Delete order
+        r = await client.deleteItemOrder(this.state.modal_item_order.id);
+      } else {
+        // Patch order
+        r = await client.patchItemOrder(this.state.modal_item_order.id, this.state.modalQuantity, this.state.modalComment);
+      }
     }
 
     const o: OrderModel | null = await client.getCurrentOrder();
@@ -159,7 +125,7 @@ class WaitingPage extends React.Component<IProps, IState> {
     const client = new Client();
 
     const r: ResponseMessageModel | null = await client.deleteItemOrder(it.id);
-    
+
     const o: OrderModel | null = await client.getCurrentOrder();
 
     // Doesn't matter if null
@@ -216,7 +182,6 @@ class WaitingPage extends React.Component<IProps, IState> {
                             <TableCell>{it.quantity * it.price}</TableCell>
                             <TableCell>{it.status.name}</TableCell>
                             <TableCell>{this.renderFirstButton(it)}</TableCell>
-                            <TableCell>{this.renderSecondButton(it)}</TableCell>
                           </TableRow>
                         )
                       })
@@ -235,7 +200,7 @@ class WaitingPage extends React.Component<IProps, IState> {
           }
           second={
             <div className={classes.rightdiv}>
-              <Button variant="contained" color="primary">Add item to order</Button>
+              <Button variant="contained" color="primary" onClick={() => history.push('/menu')}>Add item to order</Button>
             </div>
           }
           third={
@@ -294,7 +259,7 @@ class WaitingPage extends React.Component<IProps, IState> {
               <Grid item xs={4}>
                 <Typography variant="subtitle1">$ {this.state.modal?.price.toString()}</Typography>
                 <Typography variant="subtitle1">Quantity</Typography>
-                <IconButton aria-label="remove" disabled={this.state.modalQuantity <= 0} onClick={() => this.removeModalQuantity()}>
+                <IconButton aria-label="remove" disabled={this.state.modalQuantity <= 1} onClick={() => this.removeModalQuantity()}>
                   <Icon>remove_circle</Icon>
                 </IconButton>
                 {this.state.modalQuantity}
@@ -304,12 +269,17 @@ class WaitingPage extends React.Component<IProps, IState> {
               </Grid>
 
               {/* Last col */}
-              <Grid item xs={7}>
+              <Grid item xs={6}>
                 {/* nothing here */}
               </Grid>
-              <Grid item xs={5}>
+              <Grid item xs={2}>
                 <Button variant="contained" onClick={this.handleCloseModal}>Cancel</Button>
-                <Button variant="contained" color="primary" disabled={this.state.modalSecondButtonDisable} onClick={this.addToOrder}>{this.state.modalSecondButton}</Button>
+              </Grid>
+              <Grid item xs={2}>
+                <Button variant="contained" color="secondary" onClick={() => this.cancelOrder(this.state.modal_item_order!)}>Cancel Order</Button>
+              </Grid>
+              <Grid item xs={2}>
+                <Button variant="contained" color="primary" disabled={this.state.modalSecondButtonDisable} onClick={this.addToOrder}>Modify Order</Button>
               </Grid>
             </Grid>
           </div>

@@ -51,6 +51,7 @@ const styles = () =>
 export interface IProps extends WithStyles<typeof styles> {
     update: any;
     someList: ItemList | null;
+    lastClicked: number,
 }
 
 class Served extends React.Component<IProps, {}>{
@@ -68,19 +69,20 @@ class Served extends React.Component<IProps, {}>{
     }
 
     getBox() {
-        if (this.props.someList !== null) {
+        if (this.props.someList !== null && this.props.someList.itemList !== undefined) {
             return (
 
                 <td className={this.props.classes.boxServed}>
                     {this.props.someList?.itemList.map((item,index) => (
                         <ItemCont key={index} itemId={index} item={item} realId={item.id}
-                            update={this.props.update} />
+                            update={this.props.update} lastClicked={this.props.lastClicked}/>
                     ))}
                 </td>
             );
         } else {
             return (
                 <td className={this.props.classes.boxServed}>
+                    No orders here...
                 </td>
             );
         }

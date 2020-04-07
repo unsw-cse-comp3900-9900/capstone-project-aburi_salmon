@@ -1,7 +1,11 @@
 import React from 'react';
-import { createStyles, WithStyles, Theme, withStyles, Button, Box, TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper, Dialog, DialogContent, DialogContentText, DialogActions, DialogTitle, TextField, FormControl, InputLabel, Select, Input } from '@material-ui/core';
-import DeleteIcon from '@material-ui/icons/Delete';
-import { PropertyName } from 'lodash';
+import { createStyles, WithStyles, Theme, withStyles, TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper} from '@material-ui/core';
+import {ItemList, ListItem} from './../../../api/models';
+import {Client} from './../../../api/client';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
+
+
 //mostly copied from 
 //https://stackoverflow.com/questions/40541710/reactjs-with-material-ui-how-to-sort-an-array-of-material-uis-tablerow-alpha
 
@@ -10,6 +14,7 @@ const styles = (theme: Theme) =>
     createStyles({
         table: {
             minWidth: 550,
+            tableLayout: 'fixed',
         },
         wrapper: {
             height: '100%',
@@ -26,12 +31,26 @@ const styles = (theme: Theme) =>
             margin: theme.spacing(1),
             minWidth: 120,
         },
+        head: {
+            position: 'sticky',
+            top: '0px',
+        },
+        tableCont: {
+            maxHeight: '95%',
+        },
+        icon: {
+            display: 'flex',
+            alignItems: 'center',
+        },
+       
+
     });
 export interface IProps extends WithStyles<typeof styles> {
 }
 const StyledTableCell = withStyles(theme => ({
     head: {
         backgroundColor: theme.palette.common.black,
+        
         color: theme.palette.common.white,
     },
     body: {
@@ -47,81 +66,99 @@ const StyledTableRow = withStyles(theme => ({
     },
 }))(TableRow);
 
-function tempData(orderId: number, tableNo: number, itemName: string, amount: number, status: string){
-    return {orderId, tableNo, itemName, amount, status} ; 
+interface IState {
+    order: string,
+    selected: string,
+    realData: Array<ListItem>,
 }
 
-const rows = [
-    tempData(1, 3, 'Aburi Salmon',2,'Ready'),
-    tempData(2, 6, 'Cheese Pizza', 2, 'Served'),
-    tempData(3, 5, 'Pasta', 3, 'Cooking'),
-    tempData(4, 7, 'Vege Burger', 1, 'In Queue'),
-    tempData(5, 1, 'Chips', 2, 'Served'),
-    tempData(6, 2, 'Salad', 10, 'Cooking'),
-];
+const statusArr = ['', 'Queue', 'Cooking', 'Ready', 'Served'];
 
-
-class ManageOrders extends React.Component<IProps, {data: Array<any>, order: string, selected: string}>{
+class ManageOrders extends React.Component<IProps, IState>{
 
     constructor(props: IProps){
         super(props);
         this.state = {
-            data: rows,
-            order: 'asc',
-            selected: 'orderId',
+            order: 'des',
+            selected: 'status',
+            realData: [],
         }
+        this.handleClick = this.handleClick.bind(this);
     }
 
-
     sortData(dataType: string){
-        console.log('hey');
-        var temp = rows;
+        var temp = this.state.realData;
         if (this.state.order === 'asc'){
             if (dataType === "orderId"){
-                const sorted = temp.sort((a,b) => a["orderId"] < b["orderId"] ? 1:-1);
-                this.setState({ data: sorted });
+                const sorted = temp.sort((a,b) => a.id < b.id ? 1:-1);
+                this.setState({ realData: sorted });
             } else if (dataType === "tableNo") {
-                const sorted = temp.sort((a, b) => a["tableNo"] < b["tableNo"] ? 1 : -1);
-                this.setState({ data: sorted });
+                const sorted = temp.sort((a, b) => a.table > b.table ? 1 : -1);
+                this.setState({ realData: sorted });
             } else if (dataType === "itemName"){
-                const sorted = temp.sort((a, b) => a["itemName"] < b["itemName"] ? 1 : -1);
-                this.setState({ data: sorted });
+                const sorted = temp.sort((a, b) => a.itemName < b.itemName ? 1 : -1);
+                this.setState({ realData: sorted });
             } else if (dataType === "amount"){
-                const sorted = temp.sort((a, b) => a["amount"] < b["amount"] ? 1 : -1);
-                this.setState({ data: sorted });
+                const sorted = temp.sort((a, b) => a.quantity < b.quantity ? 1 : -1);
+                this.setState({ realData: sorted });
             } else if (dataType === "status"){
-                const sorted = temp.sort((a, b) => a["status"] < b["status"] ? 1 : -1);
-                this.setState({ data: sorted });
+                const sorted = temp.sort((a, b) => a.status_id <b.status_id ? 1 : -1);
+                this.setState({ realData: sorted });
             }
             this.setState({order: 'des'});
         } else {
             if (dataType === "orderId") {
-                const sorted = temp.sort((a, b) => a["orderId"] > b["orderId"] ? 1 : -1);
-                this.setState({ data: sorted });
+                const sorted = temp.sort((a, b) => a.id > b.id ? 1 : -1);
+                this.setState({ realData: sorted });
             } else if (dataType === "tableNo") {
-                const sorted = temp.sort((a, b) => a["tableNo"] > b["tableNo"] ? 1 : -1);
-                this.setState({ data: sorted });
+                const sorted = temp.sort((a, b) => a.table > b.table ? 1 : -1);
+                this.setState({ realData: sorted });
             } else if (dataType === "itemName") {
-                const sorted = temp.sort((a, b) => a["itemName"] > b["itemName"] ? 1 : -1);
-                this.setState({ data: sorted });
+                const sorted = temp.sort((a, b) => a.itemName > b.itemName ? 1 : -1);
+                this.setState({ realData: sorted });
             } else if (dataType === "amount") {
-                const sorted = temp.sort((a, b) => a["amount"] > b["amount"] ? 1 : -1);
-                this.setState({ data: sorted });
-            } else if (dataType === "status"){
-                const sorted = temp.sort((a, b) => a["status"] > b["status"] ? 1 : -1);
-                this.setState({ data: sorted });
-            };
+                const sorted = temp.sort((a, b) => a.quantity > b.quantity ? 1 : -1);
+                this.setState({ realData: sorted });
+            } else if (dataType === "status") {
+                const sorted = temp.sort((a, b) => a.status_id > b.status_id ? 1 : -1);
+                this.setState({ realData: sorted });
+            }
             
             this.setState({order: 'asc'});
         }
     }
 
+    async componentDidMount() {
+        const client = new Client();
+        const queue: ItemList | null = await client.getListItem(1);
+        const cooking: ItemList | null = await client.getListItem(2);
+        const ready: ItemList | null = await client.getListItem(3);
+        const served: ItemList | null = await client.getListItem(4);
+        var temp1: Array<ListItem> = [];
+        if (queue?.itemList !== undefined){
+            temp1 = temp1.concat(queue?.itemList);
+        }
+        if (cooking?.itemList !== undefined) {
+            temp1 = temp1.concat(cooking?.itemList);
+        }
+        if (ready?.itemList !== undefined) {
+            temp1 = temp1.concat(ready?.itemList);
+        }
+        if (served?.itemList !== undefined) {
+            temp1 = temp1.concat(served?.itemList);
+        }
+        this.setState({
+            realData: temp1,
+        });
+        
+    }
+
     printArrow(dataType: string){
         if (dataType === this.state.selected){
             if (this.state.order === 'asc') {
-                return " [+]"
+                return <ExpandLessIcon />
             } else {
-                return " [-]"
+                return <ExpandMoreIcon />
             }
         }
     }
@@ -131,28 +168,28 @@ class ManageOrders extends React.Component<IProps, {data: Array<any>, order: str
         this.setState({selected: selected })
     }
 
-    printOrders(){
-        const { classes } = this.props;
+    printOrders2() {
+    const { classes } = this.props;
         return (
-            <TableContainer component={Paper}>
-                <Table className={classes.table} aria-label="customized table" >
-                    <TableHead>
+            <TableContainer component={Paper} className={classes.tableCont}>
+                <Table stickyHeader={true} className={classes.table} aria-label="customized table" size='small' >
+                    <TableHead >
                         <TableRow>
-                            <StyledTableCell onClick={() => this.handleClick("orderId")}>Order ID {this.printArrow("orderId")}</StyledTableCell>
-                            <StyledTableCell onClick={() => this.handleClick("tableNo")}>Table Number {this.printArrow("tableNo")}</StyledTableCell>
-                            <StyledTableCell onClick={() => this.handleClick("itemName")}>Item Name {this.printArrow("itemName")}</StyledTableCell>
-                            <StyledTableCell onClick={() => this.handleClick("amount")}>Amount {this.printArrow("amount")}</StyledTableCell>
-                            <StyledTableCell onClick={() => this.handleClick("status")}>Status {this.printArrow("status")}</StyledTableCell>
+                            <StyledTableCell className={classes.head} onClick={() => this.handleClick("orderId")}> <div className={classes.icon}>Order ID {this.printArrow("orderId")}</div></StyledTableCell>
+                            <StyledTableCell className={classes.head} onClick={() => this.handleClick("tableNo")}> <div className={classes.icon}>Table Number {this.printArrow("tableNo")}</div></StyledTableCell>
+                        <StyledTableCell className={classes.head} onClick={() => this.handleClick("itemName")}><div className={classes.icon}>Item Name {this.printArrow("itemName")}</div></StyledTableCell>
+                            <StyledTableCell className={classes.head} onClick={() => this.handleClick("amount")}><div className={classes.icon}>Amount {this.printArrow("amount")}</div></StyledTableCell>
+                            <StyledTableCell className={classes.head} onClick={() => this.handleClick("status")}><div className={classes.icon}>Status {this.printArrow("status")}</div></StyledTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody >
-                        {rows.map(row => (
-                            <StyledTableRow key={row.orderId}>
-                                <StyledTableCell component="th" scope="row">{row.orderId}</StyledTableCell>
-                                <StyledTableCell>{row.tableNo}</StyledTableCell>
-                                <StyledTableCell>{row.itemName}</StyledTableCell>
-                                <StyledTableCell>{row.amount}</StyledTableCell>
-                                <StyledTableCell>{row.status}</StyledTableCell>
+                        {this.state.realData.map(item => (
+                            <StyledTableRow key={item.id}>
+                                <StyledTableCell component="th" scope="row">{item.id}</StyledTableCell>
+                                <StyledTableCell>{item.table + 1}</StyledTableCell>
+                                <StyledTableCell>{item.itemName}</StyledTableCell>
+                                <StyledTableCell>{item.quantity}</StyledTableCell>
+                                <StyledTableCell>{statusArr[item.status_id]}</StyledTableCell>
                             </StyledTableRow>
                         ))}
                     </TableBody>
@@ -164,9 +201,8 @@ class ManageOrders extends React.Component<IProps, {data: Array<any>, order: str
     render() {
         return (
             <div className={this.props.classes.wrapper}>
-                {this.printOrders()}
+                {this.printOrders2()}
                 <br></br>
-               
             </div>
         );
     }

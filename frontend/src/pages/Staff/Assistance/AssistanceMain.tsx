@@ -1,48 +1,39 @@
 import React from 'react';
-import {  createStyles, withStyles, WithStyles, Theme, Link} from '@material-ui/core';
+import {  createStyles, withStyles, WithStyles, Theme, Link, Dialog, DialogTitle,DialogContent,  DialogActions,Button} from '@material-ui/core';
 import './../Assistance/Assistance.css';
 import TableInfo from './../Assistance/TableInfo';
-import { Tables as TableModel, AssistanceTable, AssistanceTables } from './../../../api/models';
+import { Tables as TableModel, AssistanceTables } from './../../../api/models';
 import { Client } from './../../../api/client';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 //https://material-ui.com/components/menus/#menus
 //https://stackoverflow.com/questions/58630490/how-to-convert-functional-componenet-to-class-component-in-react-in-material
 
-// How to use withStyles in TS
+
 const styles = (theme: Theme) =>
     createStyles({
         title: {
             flexGrow: 1,
         },      
         container: {
-            //border: '1px solid grey',
             height: '90%',
             width: '100%',
             overflow: 'auto',
         },
         container2: {
-            //border: '1px solid grey',
             height: '10%',
             width: '100%',
         },
         container3: {
-            //border: '1px solid grey',
             height: '100%',
             width: '100%',
-
         },
-
         wrapper: {
             width: '100%',
-            //paddingLeft: '2%',
-            //paddingRight: '2%',
             textAlign: 'left',
- 
         },
-        
         key: {
             position: 'relative',
             bottom:'-25%',
-            //border: '1px solid black'
         },
         red: {
             color: 'red',
@@ -52,7 +43,10 @@ const styles = (theme: Theme) =>
             color: 'green',
             backgroundColor: 'white',
         },
-
+        helpIcon: {
+            float: 'right',
+            paddingRight: '2.5%',
+        },
     });
 export interface IProps extends WithStyles<typeof styles> {} 
 
@@ -62,6 +56,7 @@ interface IState{
     main: boolean,
     tables: TableModel | null,
     assistance: Array<number>,
+    resetOpen: boolean,
 }
 
 class Assistance extends React.Component<IProps, IState>{
@@ -72,14 +67,19 @@ class Assistance extends React.Component<IProps, IState>{
             selectedTable: 0, //Selected table, 0 means none selected
             main: true, //main screen
             tables: null,
-            assistance: [],
+            assistance: [], //tables that require assistance
+            resetOpen: false,
         }
+        this.needAssistance = this.needAssistance.bind(this);
+        this.paid = this.paid.bind(this);
+        this.handleClick = this.handleClick.bind(this);
     }
     
     handleClick(tableNum: number){
         this.setState({selectedTable: tableNum});
         this.setState({main: false});
     }
+
 
     async componentDidMount() {
         const client = new Client()
@@ -91,10 +91,6 @@ class Assistance extends React.Component<IProps, IState>{
             }
         )
         this.setState({ tables: t, assistance: temp });
-        console.log(t);
-        //console.log('ass' + temp);
-        //console.log(a?.tables);
-        //console.log(a?.tables[3]);
     }
 
     createTables = () => {
@@ -146,6 +142,12 @@ class Assistance extends React.Component<IProps, IState>{
         this.setState({ main: true });
     }
 
+    paid(){
+        this.setState({ selectedTable: 0 });
+        this.setState({ main: true });
+        this.componentDidMount();
+    }
+
     tableKey(){
         return(
             <div className={this.props.classes.key}>
@@ -158,14 +160,29 @@ class Assistance extends React.Component<IProps, IState>{
     needAssistance(tablenum: number):boolean{
         var ret = false;
         this.state.assistance.forEach((item: number) =>{
-            console.log(item);
-            console.log(tablenum);
             if(item === tablenum){
-                console.log('entered');
                 ret = true;
             }
         })
         return ret;
+    }
+    helpDialog() {
+        return (
+            <div>
+                <Dialog open={this.state.resetOpen} onClose={() => this.setState({ resetOpen: false })} aria-labelledby="form-dialog-title">
+                    <DialogTitle id="form-dialog-title">Help</DialogTitle>
+                    <DialogContent>
+                        Each rectangle represents a table with the table number in the middle. Tap on a rectangle to view information about that table.
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => this.setState({ resetOpen: false })} color="primary">
+                            Ok, I get it
+                        </Button>
+                        
+                    </DialogActions>
+                </Dialog>
+            </div>
+        );
     }
 
     render() {
@@ -173,7 +190,8 @@ class Assistance extends React.Component<IProps, IState>{
             return (
                 <div className={this.props.classes.container3}>
                     <div className={this.props.classes.container}>
-                        <h1>Tables</h1>
+                        {this.helpDialog()}
+                        <h1>Tables <div className={this.props.classes.helpIcon} onClick={() => this.setState({resetOpen: true})}><HelpOutlineIcon /></div></h1>
                         {this.createTables()}
                     </div>
                     <div className={this.props.classes.container2}>
@@ -186,7 +204,7 @@ class Assistance extends React.Component<IProps, IState>{
                 <div className={this.props.classes.wrapper}>
                     <Link onClick={()=>this.backToTables()} > Back to tables</Link>
                     <TableInfo tableNumber={this.state.selectedTable} assistance={this.needAssistance(this.state.selectedTable)}
-                        isEmpty={this.state.tables?.tables[this.state.selectedTable].occupied}/>
+                        isEmpty={this.state.tables?.tables[this.state.selectedTable].occupied} paidFunction={this.paid}/>
         
                 </div>
             )

@@ -44,31 +44,32 @@ export interface IProps extends WithStyles<typeof styles> {
     itemId: number,
     update: any,
     realId: number,
+    lastClicked: number,
 }
 
 class ItemCont extends React.Component<IProps, {}>{
 
     render() {
         const { classes } = this.props;
-      /*  if (this.props.realId === this.props.item.id){
+        if (this.props.realId === this.props.lastClicked){
             return(
                 <button className={classes.currContainer} onClick={() => this.props.update(this.props.itemId, this.props.item)}>
                     <b>ItemID:</b> {this.props.item.id} <br></br>
                     <b>Item Name:</b> {this.props.item.itemName} <br></br>
                     <b>Amount:</b> {this.props.item.quantity} <br></br>
-                    <b>Price:</b> {this.props.item.price}
+                    <b>Table Number:</b> {this.props.item.table + 1}
                 </button>
             );
-        } else {*/
+        } else {
             return (
                 <button className={classes.itemContainer} onClick={() => this.props.update(this.props.itemId, this.props.item)}>
                     <b>ItemID:</b> {this.props.item.id} <br></br>
                     <b>Item Name:</b> {this.props.item.itemName} <br></br>
                     <b>Amount:</b> {this.props.item.quantity} <br></br>
-                    <b>Price:</b> {this.props.item.price}
+                    <b>Table Number:</b> {this.props.item.table + 1}
                 </button>
             );
-        //}
+        }
     }
 }
 

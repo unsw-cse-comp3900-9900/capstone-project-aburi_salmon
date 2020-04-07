@@ -1,12 +1,13 @@
 import React from 'react';
-import { createStyles, withStyles, WithStyles, Theme, MenuList, Paper, MenuItem, ListItemIcon, Box } from '@material-ui/core';
-import PriorityHighIcon from '@material-ui/icons/PriorityHigh';
+import { createStyles, withStyles, WithStyles, Theme, MenuList, Paper, MenuItem, Box, Dialog, DialogTitle, DialogContent,DialogActions,Button} from '@material-ui/core';
 import Queue from './../../Staff/Orders/QueueList';
 import Cooking from './../../Staff/Orders/CookingList';
 import Ready from './../../Staff/Orders/ReadyList';
-import {ListItem} from './../../../api/models';
+import { ListItem } from './../../../api/models';
 import { ItemList } from './../../../api/models';
 import { Client } from './../../../api/client';
+import { StaticMenu} from '../Menu/StaticMenu';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -34,6 +35,29 @@ const styles = (theme: Theme) =>
             marginLeft: theme.spacing(2),
             marginRight: theme.spacing(2),
             marginBottom: theme.spacing(2),
+            overflow: 'auto',
+        },
+        menuContainer: {
+            backgroundColor: 'lightgrey',
+            border: '2px solid darkblue',
+            padding: theme.spacing(2),
+            flexGrow: 1,
+            display: 'flex',
+            top: theme.spacing(2),
+            left: theme.spacing(2),
+            alignSelf: 'stretch',
+            marginLeft: theme.spacing(2),
+            marginRight: theme.spacing(2),
+            marginBottom: theme.spacing(2),
+            minWidth: '800px',
+            
+        },
+        minSize: {
+            width: theme.spacing(17),
+        },
+        helpIcon: {
+            float: 'right',
+            paddingRight: '1%',
         },
     });
 export interface IProps extends WithStyles<typeof styles> { }
@@ -43,6 +67,8 @@ interface IState {
     queueList: ItemList | null,
     cookingList: ItemList | null,
     readyList: ItemList | null,
+    lastClicked: number,
+    resetOpen: boolean,
 }
 
 class Kitchen extends React.Component<IProps, IState>{
@@ -50,10 +76,12 @@ class Kitchen extends React.Component<IProps, IState>{
     constructor(props: any) {
         super(props);
         this.state = {
-            currPage: "Orders",
+            currPage: "Menu",
             queueList: null, //listType === 1
             cookingList: null, //listType === 2
             readyList: null, //listType === 3
+            lastClicked: -1,
+            resetOpen: false,
         }
         this.moveToCooking = this.moveToCooking.bind(this);
         this.moveToReady = this.moveToReady.bind(this);
@@ -70,9 +98,6 @@ class Kitchen extends React.Component<IProps, IState>{
             cookingList: cooking,
             readyList: ready,
         });
-        console.log('queuelist: ' + queue);
-        console.log('cookinglist: ' + cooking);
-        console.log('readylist: ' + ready);
     }
 
    displayCont() {
@@ -80,31 +105,49 @@ class Kitchen extends React.Component<IProps, IState>{
         if (this.state.currPage === "Orders") {
             return (
                 <Box className={classes.staffContainer}>
-                    <Queue update={this.moveToCooking} someList={this.state.queueList}/>
-                    <Cooking update={this.moveToReady} someList={this.state.cookingList} />
-                    <Ready update={this.moveToQueue} someList={this.state.readyList} />
+                    {this.helpDialog()}
+                    <Queue update={this.moveToCooking} someList={this.state.queueList} lastClicked={this.state.lastClicked}/>
+                    <Cooking update={this.moveToReady} someList={this.state.cookingList} lastClicked={this.state.lastClicked}/>
+                    <Ready update={this.moveToQueue} someList={this.state.readyList} lastClicked={this.state.lastClicked}/>
+                    <div className={this.props.classes.helpIcon} onClick={() => this.setState({ resetOpen: true })}><HelpOutlineIcon /></div>
                 </Box>
             );
         } else {
             return (
-                <Box className={classes.staffContainer}>
-                    <h1> Menu should be here</h1>
+                <Box className={classes.menuContainer}>
+                    <StaticMenu />
                 </Box>
             );
         }
+    }
+
+    helpDialog() {
+        return (
+            <div>
+                <Dialog open={this.state.resetOpen} onClose={() => this.setState({ resetOpen: false })} aria-labelledby="form-dialog-title">
+                    <DialogTitle id="form-dialog-title">Help</DialogTitle>
+                    <DialogContent>
+                        Tap on item in each list to move it between lists. If item has successfully changed list, the item will appear in the new list with a bold
+                        outline.
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => this.setState({ resetOpen: false })} color="primary">
+                            Ok, I get it
+                        </Button>
+
+                    </DialogActions>
+                </Dialog>
+            </div>
+        );
     }
 
     displayNav() {
         return (
             <div className={this.props.classes.root}>
                 <Paper className={this.props.classes.menubutton}>
-                    <MenuList >
+                    <MenuList className={this.props.classes.minSize}>
                         <MenuItem onClick={() => { this.setState({ currPage: "Menu" }) }}>Menu</MenuItem>
-                        <MenuItem onClick={() => { this.setState({ currPage: "Orders" }) }}>Orders
-                            <ListItemIcon>
-                                <PriorityHighIcon fontSize="small" />
-                            </ListItemIcon>
-                        </MenuItem>
+                        <MenuItem onClick={() => { this.setState({ currPage: "Orders" }) }}>Orders</MenuItem>
                     </MenuList>
                 </Paper>
             </div>
@@ -119,6 +162,20 @@ class Kitchen extends React.Component<IProps, IState>{
                 itemList: tempArray,
             }
             this.setState({ cookingList: ret });
+            
+            const client = new Client();
+            client.updateOrderStatus(item.id, 2)
+                .then((msg) => {
+                    //alert(msg.status);
+                    if (msg.status === 200) {
+                        this.setState({ lastClicked: item.id });
+                        //alert('success');
+                    } else {
+                        alert(msg.statusText);
+                    }
+                }).catch((status) => {
+                    console.log(status);
+                });;
             console.log(ret);
         }   
         console.log(item);
@@ -133,6 +190,20 @@ class Kitchen extends React.Component<IProps, IState>{
                 itemList: tempArray,
             }
             this.setState({readyList: ret});
+            
+            const client = new Client();
+            client.updateOrderStatus(item.id, 3)
+                .then((msg) => {
+                    //alert(msg.status);
+                    if (msg.status === 200) {
+                        this.setState({lastClicked: item.id});
+                        //alert('success');
+                    } else {
+                        alert(msg.statusText);
+                    }
+                }).catch((status) => {
+                    console.log(status);
+                });;
         }  
         console.log(item);
         this.removeItem(itemId, 2);
@@ -146,6 +217,20 @@ class Kitchen extends React.Component<IProps, IState>{
                 itemList: tempArray,
             }
             this.setState({ queueList: ret });
+            
+            const client = new Client();
+            client.updateOrderStatus(item.id, 1)
+                .then((msg) => {
+                    //alert(msg.status);
+                    if (msg.status === 200) {
+                        this.setState({ lastClicked: item.id });
+                        //alert('success');
+                    } else {
+                        alert(msg.statusText);
+                    }
+                }).catch((status) => {
+                    console.log(status);
+                });;
         }   
         console.log(item);
         this.removeItem(itemId, 3);

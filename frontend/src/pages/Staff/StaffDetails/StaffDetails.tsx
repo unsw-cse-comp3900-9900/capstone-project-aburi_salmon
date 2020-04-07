@@ -1,7 +1,13 @@
 import React from 'react';
-import { createStyles, WithStyles, Theme, withStyles, Button, Box, TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper, Dialog, DialogContent, DialogContentText, DialogActions, DialogTitle, TextField, FormControl, InputLabel, Select, Input } from '@material-ui/core';
+import { createStyles, WithStyles, Theme, withStyles, Button, Snackbar,TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper} from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
-
+import {Client} from './../../../api/client';
+import { AllStaff, StaffInfo } from './../../../api/models';
+import { Alert } from '@material-ui/lab';
+import DeleteDialog from './DeleteDialog';
+import ChangeStaffType from './ChangeStaffType';
+import ChangeTableNo from './ChangeTableNo';
+import ResetRegist from './ResetRegist';
 //mostly copied from https://codesandbox.io/s/v2eib &
 //https://material-ui.com/components/tables/
 //https://codesandbox.io/s/u0yv3
@@ -38,12 +44,15 @@ const styles = (theme: Theme) =>
         wrapper1: {
             height: '92%',
             width: '100%',
-            overflow: 'auto',
+            //overflow: 'auto',
         },
         wrapper2:{
             height: '8%',
             width: '100%',
          
+        },
+        tableCont: {
+            maxHeight: '95%',
         }
     });
 export interface IProps extends WithStyles<typeof styles> {
@@ -66,212 +75,159 @@ const StyledTableRow = withStyles(theme => ({
     },
 }))(TableRow);
 
-function tempData(staffName: string, staffUsername: string, staffType: string, lastOnline: string, changePassword: string, deleteU: string){
-    return {staffName, staffUsername, staffType, lastOnline, changePassword, deleteU} ; 
+interface IState {
+    deleteOpen:boolean,
+    resetOpen: boolean,
+    resetKeyOpen: boolean,
+    tableOpen:boolean,
+    resetStaff: string,
+    realData: AllStaff | null,
+    selectedStaff: StaffInfo,
+    isOpen: boolean,
+    alertMessage: string,
+    selectedStaffType: number,
 }
 
-const rows = [
-    tempData('Yennefer', 'admin', 'manager','now','<button>','<button>'),
-    tempData('Cirilla', 'yemi', 'wait', 'Sometime', '<button>','<button>'),
-    tempData('Geralt', 'james', 'kitchen', 'yesterday', '<button>','<button>'),
-    tempData('Triss', 'polly', 'wait', 'tomorrow', '<button>', '<button>'),
-    tempData('Jaskier', 'tom', 'wait', '21/3', '<button>', '<button>'),
-    tempData('Calanthe', 'queen', 'kitchen', '8/12', '<button>', '<button>'),
-];
-
-
-class StaffDetails extends React.Component<IProps, { deleteOpen:boolean, resetOpen: boolean, resetKeyOpen: boolean,tableOpen:boolean,resetStaff: string}>{
+class StaffDetails extends React.Component<IProps, IState>{
 
     constructor(props: IProps){
         super(props);
+        var temp: StaffInfo ={
+            id:-1,
+            name:'',
+            username:'',
+            staff_type:'',
+        }
         this.state = {
             deleteOpen: false,
             resetOpen: false,
             resetKeyOpen: false,
             tableOpen: false,
             resetStaff: "",
+            realData: null,
+            selectedStaff: temp,
+            isOpen: false,
+            alertMessage: 'False Alarm',
+            selectedStaffType: 1,
         }
+        this.deleteIsOpen = this.deleteIsOpen.bind(this);
+        this.resetIsOpen = this.resetIsOpen.bind(this);
+        this.tableNoIsOpen = this.tableNoIsOpen.bind(this);
+        this.resetKeyOpen = this.resetKeyOpen.bind(this);
+        this.deleteStaff = this.deleteStaff.bind(this);
+        this.changeStaffType = this.changeStaffType.bind(this);
     }
 
-    
-    deleteDialog(){
+    deleteIsOpen(isOpen: boolean){
+        this.setState({deleteOpen: isOpen});
+    }
+    resetIsOpen(isOpen: boolean) {
+        this.setState({ resetOpen: isOpen });
+    }
+
+    tableNoIsOpen(isOpen: boolean){
+        this.setState({tableOpen: isOpen});
+    }
+
+    resetKeyOpen(isOpen: boolean){
+        this.setState({resetKeyOpen: isOpen});
+    }
+
+    changeStaffType(staffType: number){
+        this.setState({ resetOpen: false });
+        const client = new Client();
+        client.changeStaffType(this.state.selectedStaff.id, this.state.selectedStaff.name, this.state.selectedStaff.username, staffType)
+            .then((msg) => {
+                //alert(msg.status);
+                if (msg.status === 200) {
+                    this.setState({ isOpen: true, alertMessage: 'Staff Successfully Changed' });
+                    this.componentDidMount();
+                } else {
+                    this.setState({ isOpen: true, alertMessage: msg.statusText });
+                    //alert(msg.statusText);
+                }
+
+            }).catch((status) => {
+                console.log(status);
+            });
+        
+    }
+
+    showAlert() {
         return (
-            <div>
-                <Dialog
-                    open={this.state.deleteOpen}
-                    onClose={() => this.setState({deleteOpen: false})}
-                    aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description"
-                >
-                    <DialogTitle id="alert-dialog-title">{"Are You Sure?"}</DialogTitle>
-                    <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
-                            Are you sure you want to delete this staff? There will be no reversing this process.
-                        </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={() => this.setState({deleteOpen: false})} color="primary">
-                            Nevermind
-                        </Button>
-                        <Button onClick={() => this.setState({ deleteOpen: false })} color="primary" autoFocus>
-                            Yes, I'm sure
-                        </Button>
-                    </DialogActions>
-                </Dialog>
-            </div>
+            <Snackbar
+                open={this.state.isOpen}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert
+                    severity="info"
+                    action={
+                        <Button color="inherit" size="small" onClick={() => this.setState({ isOpen: false })}>
+                            OK
+                            </Button>
+                    }
+                >{this.state.alertMessage}</Alert>
+            </Snackbar>
         );
     }
-
-    changeTableDialog(){
-        return (
-            <div>
-                <Dialog open={this.state.tableOpen} onClose={() => this.setState({ tableOpen: false })} aria-labelledby="form-dialog-title">
-                    <DialogTitle id="form-dialog-title">Change No. of Tables</DialogTitle>
-
-                    <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
-                        !Please be wary that changing the number of tables will refresh current orders. This is only intended for initial setup
-                        before you start using the system.
-                        </DialogContentText>
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="tableno"
-                            label="Enter number"
-                            fullWidth
-                        />
-                    </DialogContent>
-                    
-                    <DialogActions>
-                        <Button onClick={() => this.setState({ tableOpen: false })} color="primary">
-                            Cancel
-                        </Button>
-                        <Button onClick={() => this.setState({ tableOpen: false })} color="primary">
-                            Change
-                        </Button>
-                    </DialogActions>
-                </Dialog>
-            </div>
-        );
+    async componentDidMount() {
+        const client = new Client();
+        const temp: AllStaff | null = await client.getStaff();
+        this.setState({
+            realData: temp,
+        });
     }
 
-    resetDialog() {
-        return (
-            <div>
-                <Dialog open={this.state.resetOpen} onClose={() => this.setState({resetOpen: false})} aria-labelledby="form-dialog-title">
-                    <DialogTitle id="form-dialog-title">Reset Password</DialogTitle>
-                    <DialogContent>
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="pass"
-                            label="New Password"
-                            type="password"
-                            fullWidth
-                        />
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="repass"
-                            type="password"
-                            label="Re-type Password"
-                            fullWidth
-                        />
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={() => this.setState({resetOpen: false})} color="primary">
-                            Cancel
-                        </Button>
-                        <Button onClick={() => this.setState({resetOpen: false})} color="primary">
-                            Reset
-                        </Button>
-                    </DialogActions>
-                </Dialog>
-            </div>
-        );
+    deleteStaff(){
+        this.setState({ deleteOpen: false });
+        const client = new Client();
+        client.deleteStaff(this.state.selectedStaff.id)
+            .then((msg) => {
+                //alert(msg.status);
+                if (msg.status === 200) {
+                    this.setState({isOpen: true, alertMessage:'Staff Successfully Deleted'});
+                    this.componentDidMount();
+                } else {
+                    this.setState({ isOpen: true, alertMessage: msg.statusText });
+                    //alert(msg.statusText);
+                }
+
+            }).catch((status) => {
+                console.log(status);
+            });
     }
 
-    resetKeyDialog() {
-        return (
-            <div>
-                <Dialog open={this.state.resetKeyOpen} onClose={() => this.setState({ resetOpen: false })} aria-labelledby="form-dialog-title">
-                    <DialogTitle id="form-dialog-title">Change Registration Key</DialogTitle>
-                    <DialogContent>
-                        <form>
-                        <FormControl className={this.props.classes.formControl}>
-                            <InputLabel htmlFor="demo-dialog-native">Staff Type</InputLabel>
-                            <Select
-                                native
-                                onChange = {(e) => console.log(e.target.value)}
-                                input={<Input id="demo-dialog-native" />}>
-                                <option aria-label="None" value="" />
-                                <option value={"Manage"}>Manage</option>
-                                <option value={"Wait"}>Wait</option>
-                                <option value={"Kitchen"}>Kitchen</option>
-                            </Select>
-                        </FormControl>
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="pass"
-                            label="New Key"
-                            type="password"
-                            fullWidth
-                        />
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="repass"
-                            type="password"
-                            label="Re-type New Key"
-                            fullWidth
-                        />
-                        </form>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={() => this.setState({ resetKeyOpen: false })} color="primary">
-                            Cancel
-                        </Button>
-                        <Button onClick={() => this.setState({ resetKeyOpen: false })} color="primary">
-                            Reset
-                        </Button>
-                    </DialogActions>
-                </Dialog>
-            </div>
-        );
-    }
-
-    printTable(){
+    printTable() {
         const { classes } = this.props;
         return (
-            <TableContainer component={Paper}>
-                {this.deleteDialog()}
-                {this.resetDialog()}
-                {this.resetKeyDialog()}
-                {this.changeTableDialog()}
-                <Table className={classes.table} aria-label="customized table" >
+            <TableContainer component={Paper} className={classes.tableCont}>
+                <DeleteDialog isOpen={this.state.deleteOpen} setIsOpen={this.deleteIsOpen} deleteStaff={this.deleteStaff} />
+                <ChangeStaffType isOpen={this.state.resetOpen} setIsOpen={this.resetIsOpen} changeStaffType={this.changeStaffType} username={this.state.selectedStaff.username}/>
+                <ChangeTableNo isOpen={this.state.tableOpen} setIsOpen={this.tableNoIsOpen} />
+                <ResetRegist isOpen={this.state.resetKeyOpen} setIsOpen={this.resetKeyOpen} />
+                <Table className={classes.table} aria-label="customized table" size="small" stickyHeader={true}>
                     <TableHead>
                         <TableRow>
-                            <StyledTableCell>Staff Name</StyledTableCell>
+                            <StyledTableCell>Staff ID</StyledTableCell>
+                            <StyledTableCell>Name</StyledTableCell>
                             <StyledTableCell>Username</StyledTableCell>
                             <StyledTableCell>Staff Type</StyledTableCell>
-                            <StyledTableCell>Last Online</StyledTableCell>
-                            <StyledTableCell>Change Password</StyledTableCell>
+                            <StyledTableCell>Change Staff Type</StyledTableCell>
                             <StyledTableCell>Delete User</StyledTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody >
-                        {rows.map(row => (
-                            <StyledTableRow key={row.staffName}>
+                        {this.state.realData?.staff_list.map(staff => (
+                            <StyledTableRow key={staff.id}>
                                 <StyledTableCell component="th" scope="row" padding={'none'} className={classes.rows}>
-                                    {row.staffName}
+                                    {staff.id}
                                 </StyledTableCell>
-                                <StyledTableCell padding={'none'} className={classes.rows}>{row.staffUsername}</StyledTableCell>
-                                <StyledTableCell padding={'none'} className={classes.rows}>{row.staffType}</StyledTableCell>
-                                <StyledTableCell padding={'none'} className={classes.rows}>{row.lastOnline}</StyledTableCell>
+                                <StyledTableCell padding={'none'} className={classes.rows}>{staff.name}</StyledTableCell>
+                                <StyledTableCell padding={'none'} className={classes.rows}>{staff.username}</StyledTableCell>
+                                <StyledTableCell padding={'none'} className={classes.rows}>{staff.staff_type}</StyledTableCell>
                                 <StyledTableCell padding={'none'} className={classes.rows}>
-                                    <Button variant="contained" color="primary" onClick={() => this.setState({ resetOpen: true })}>
-                                        Reset Password
+                                    <Button variant="contained" color="primary" onClick={() => this.setState({ resetOpen: true, selectedStaff: staff })}>
+                                        Change
                                     </Button>
                                 </StyledTableCell>
 
@@ -280,11 +236,11 @@ class StaffDetails extends React.Component<IProps, { deleteOpen:boolean, resetOp
                                         variant="contained"
                                         color="secondary"
                                         className={classes.button}
-                                        onClick={() => this.setState({deleteOpen: true})} 
+                                        onClick={() => this.setState({ deleteOpen: true, selectedStaff:staff })}
                                         startIcon={<DeleteIcon />}>
                                         Delete
                                     </Button>
-                                    
+
                                 </StyledTableCell>
                             </StyledTableRow>
                         ))}
@@ -297,6 +253,7 @@ class StaffDetails extends React.Component<IProps, { deleteOpen:boolean, resetOp
     render() {
         return (
             <div className={this.props.classes.wrapper}>
+                {this.showAlert()}
                 <div className={this.props.classes.wrapper1}>
                     {this.printTable()}
                     <br></br>

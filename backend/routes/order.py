@@ -8,13 +8,18 @@ import model.request_model as request_model
 
 order = api.namespace('order', description='Order Route')
 
-@order.route('/')
+@order.route('/', strict_slashes=False)
 class Order(Resource):
-    #@jwt_required
+    @jwt_required
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
     def get(self):
-        table_id = 1 #assuming table id is 1 for now
+
+        # Gets lists of ordered items and Total Bill
+
+        order_id = get_jwt_claims().get('order')
+        table_id = db.get_table_id(order_id)
+
         item_order = db.get_ordered_items_customer(table_id)
 
         total = 0
@@ -30,27 +35,33 @@ class Order(Resource):
             'total_bill': total
         }
 
-    #@jwt_required
+    @jwt_required
     @order.expect(request_model.new_order_model)
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
     @order.response(500, 'Something went wrong')
-    def put(self):
+
+    def post(self):
 
         new_order = request.get_json()
         num_of_orders = len(new_order.get('order'))
 
-        table_id = 3 #assuming table id is 3 for now
+        order_id = get_jwt_claims().get('order')
 
-        #check if there's anexisting order_id
-        order_id = db.get_order_id(table_id)
         if(order_id is None):
             order_id = db.insert_order(table_id)
 
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+
         for i in range(0, num_of_orders):
-            item_id = new_order.get('new_orders')[i].get('item_id')
-            quantity = new_order.get('new_orders')[i].get('quantity')
-            new = db.insert_item_order(order_id, item_id, quantity)
+            item_id = new_order.get('order')[i].get('item_id')
+            quantity = new_order.get('order')[i].get('quantity')
+            comment = new_order.get('order')[i].get('comment')
+
+            if not comment:
+                comment = ""
+
+            new = db.insert_item_order(order_id, item_id, quantity, comment)
             if new is None:
                 abort(400, 'Backend is not working as intended or the supplied information was malformed. Make sure that your username is unique.')
 
@@ -67,6 +78,10 @@ class Item(Resource):
         add_order = request.get_json()
         item_id = add_order.get('item_id')
         quantity = add_order.get('quantity')
+        comment = add_order.get('comment')
+
+        if not comment:
+            comment = ""
 
         order_id = 41   # Dummy order id. Use the cookie to create order
 
@@ -76,7 +91,7 @@ class Item(Resource):
         if quantity is None or quantity == 0 or item_id is None:
             abort(400, 'Quantity or item_id missing')
         
-        new = db.add_order(order_id, item_id, quantity)
+        new = db.add_order(order_id, item_id, quantity, comment)
 
         if new is None:
             abort(400, 'Could not create entry')
@@ -96,11 +111,12 @@ class Item(Resource):
         modify_order = request.get_json()
         item_order_id = modify_order.get('id')
         quantity = modify_order.get('quantity')
+        comment = modify_order.get('comment')
 
         if item_order_id is None:
             abort(400, 'No existing order with that item, please make a new order instead.')
         
-        new = db.modify_item_order(item_order_id, quantity)
+        new = db.modify_item_order(item_order_id, comment, quantity)
         if new == 5:
             abort(400, 'New quantity has to be >= 1 OR order has left the QUEUE status, please make a NEW order instead.')
         
@@ -150,6 +166,8 @@ class ModifyItemOrderStatus(Resource):
         return jsonify({ 'status': 'success'})
 
 
+# I genuinely don't get this. Why do i need to put order id when it's already inside the jwt? is this for customer? or is this for staff?
+# What's the difference between this and the '/' route?
 @order.route('/<int:order_id>')
 class ItemOrderById(Resource):
     # Most the methods for getting information about an order should be done via the table route
@@ -159,18 +177,19 @@ class ItemOrderById(Resource):
     @order.response(500, 'Internal Error')
     def get(self, order_id):
         itemList = db.get_ordered_items(order_id)
-        if (itemList is None):
+        table = db.get_table_id(order_id)
+        if (itemList is None or table is None):
             abort(500, 'Something went wrong')
-        return { 'itemList': itemList }
+        return jsonify({ 'itemList': itemList, 'table': table })
 
 @order.route('/status/<int:status_id>')
 class OrdersByStatus(Resource):
     @jwt_required
-    @order.response(200, 'Success', model=response_model.item_order_response_model)
+    @order.response(200, 'Success', model=response_model.item_order_status_response_model)
     @order.response(400, 'Invalid Request')
     def get(self, status_id):
         itemlist = db.get_order_list(status_id)
         if (not itemlist):
             abort(400, 'Invalid request')
 
-        return {'itemList' : itemlist}
+        return jsonify({'itemList' : itemlist})
