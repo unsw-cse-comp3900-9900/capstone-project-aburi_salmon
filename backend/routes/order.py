@@ -56,7 +56,12 @@ class Order(Resource):
         for i in range(0, num_of_orders):
             item_id = new_order.get('order')[i].get('item_id')
             quantity = new_order.get('order')[i].get('quantity')
-            new = db.insert_item_order(order_id, item_id, quantity)
+            comment = new_order.get('order')[i].get('comment')
+
+            if not comment:
+                comment = ""
+
+            new = db.insert_item_order(order_id, item_id, quantity, comment)
             if new is None:
                 abort(400, 'Backend is not working as intended or the supplied information was malformed. Make sure that your username is unique.')
 
@@ -73,6 +78,10 @@ class Item(Resource):
         add_order = request.get_json()
         item_id = add_order.get('item_id')
         quantity = add_order.get('quantity')
+        comment = add_order.get('comment')
+
+        if not comment:
+            comment = ""
 
         order_id = 41   # Dummy order id. Use the cookie to create order
 
@@ -82,7 +91,7 @@ class Item(Resource):
         if quantity is None or quantity == 0 or item_id is None:
             abort(400, 'Quantity or item_id missing')
         
-        new = db.add_order(order_id, item_id, quantity)
+        new = db.add_order(order_id, item_id, quantity, comment)
 
         if new is None:
             abort(400, 'Could not create entry')
@@ -102,11 +111,12 @@ class Item(Resource):
         modify_order = request.get_json()
         item_order_id = modify_order.get('id')
         quantity = modify_order.get('quantity')
+        comment = modify_order.get('comment')
 
         if item_order_id is None:
             abort(400, 'No existing order with that item, please make a new order instead.')
         
-        new = db.modify_item_order(item_order_id, quantity)
+        new = db.modify_item_order(item_order_id, comment, quantity)
         if new == 5:
             abort(400, 'New quantity has to be >= 1 OR order has left the QUEUE status, please make a NEW order instead.')
         

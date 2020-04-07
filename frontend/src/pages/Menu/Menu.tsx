@@ -24,6 +24,7 @@ interface IProps extends WithStyles<typeof styles> { }
 interface OrderItemState {
   item: ItemModel;
   quantity: number;
+  // comment: string;
 }
 
 interface IState {
@@ -379,7 +380,7 @@ class MenuPage extends React.Component<IProps, IState> {
 
               {/* Last col */}
               <Grid item xs={7}>
-                {/* nothing here */}
+                <TextField id="standard-basic" label="Comment" />
               </Grid>
               <Grid item xs={5}>
                 <Button variant="contained" onClick={this.handleCloseModal}>Cancel</Button>

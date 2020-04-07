@@ -50,12 +50,14 @@ new_order_model = api.schema_model('new_order_model', {
 
 add_order_model = api.model('add_order_model', {
     "item_id": fields.Integer(description="item_id"),
-    "quantity": fields.Integer(description="quantity")
+    "quantity": fields.Integer(description="quantity"),
+    "comment": fields.String(description="Comment")
 })
 
 modify_order_model = api.model('modify_order_model', {
     "id": fields.Integer(description="item_order_id"),
-    "quantity": fields.Integer(description="quantity")
+    "quantity": fields.Integer(description="quantity"),
+    "comment": fields.String(description="Comment")
 })
 
 delete_order_model = api.model('delete_order_model', {
