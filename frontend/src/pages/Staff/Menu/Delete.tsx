@@ -29,6 +29,15 @@ class Delete extends React.Component<IProps, {}>{
         }
     }
 
+    handleClick(){
+        if (!this.props.isCat){
+            this.props.relevantFunction(false);
+        } else {
+            this.props.relevantFunction(true);
+        }
+        
+    }
+
     render() {
         return (
             <div>
@@ -48,7 +57,7 @@ class Delete extends React.Component<IProps, {}>{
                         <Button onClick={() => this.props.setIsOpen(false)} color="primary">
                             Nevermind
                         </Button>
-                        <Button onClick={() => this.props.relevantFunction()} color="primary" autoFocus>
+                        <Button onClick={() => this.handleClick()} color="primary" autoFocus>
                             Yes, I'm sure
                         </Button>
                     </DialogActions>

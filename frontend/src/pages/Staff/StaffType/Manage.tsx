@@ -118,13 +118,13 @@ class Manage extends React.Component<IProps, IState>{
                     <Analytics />
                 </Box>
             );
-        } */else if (this.state.currPage === "Feedback") {
+        } else if (this.state.currPage === "Feedback") {
             return (
                 <Box className={classes.staffContainer}>
                     <Feedback />
                 </Box>
             );
-        } else if (this.state.currPage === "ItemStats") {
+        }*/ else if (this.state.currPage === "ItemStats") {
             return (
                 <Box className={classes.staffContainer}>
                     <ItemStats />
@@ -155,7 +155,7 @@ class Manage extends React.Component<IProps, IState>{
         {/*<MenuItem onClick={() => { this.setState({ currPage: "Earnings" }) }}>Earnings</MenuItem>*/}
                         
                         <MenuItem onClick={() => { this.setState({ currPage: "ItemStats" }) }}>Item Statistics</MenuItem>
-                        <MenuItem onClick={() => { this.setState({ currPage: "Feedback" }) }}>Feedback</MenuItem>
+        {/* <MenuItem onClick={() => { this.setState({ currPage: "Feedback" }) }}>Feedback</MenuItem>*/}
                     </MenuList>
                 </Paper>
             </div>

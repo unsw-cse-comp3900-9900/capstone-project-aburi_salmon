@@ -139,3 +139,7 @@ export type AllItemStats = {
 export type ItemId = {
   item_id: number,
 }
+
+export type IngredientList = {
+  ingredients: Array<Ingredient>
+}
