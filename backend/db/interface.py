@@ -494,6 +494,8 @@ class DB:
     def set_paid(self, table_id, paid):
         return self.__update('UPDATE "order" SET paid = %s WHERE table_id = %s', [paid, table_id])
 
+    def set_bill(self, table_id, bill):
+        return self.__update('UPDATE "order" SET bill_request = %s WHERE table_id = %s', [bill, table_id])
 
     def get_assistance_tables(self):
         rows = self.__query(
@@ -511,6 +513,16 @@ class DB:
     def get_paid_tables(self):
         rows = self.__query(
             'SELECT distinct t.id, t.state FROM "table" t JOIN "order" o on (t.id = o.table_id) WHERE o.paid = True AND t.state = True'
+        )
+
+        if (not rows or not rows[0]):
+            return []
+
+        return [row[0] for row in rows]
+    
+    def get_bill_tables(self):
+        rows = self.__query(
+            'SELECT distinct t.id, t.state FROM "table" t JOIN "order" o on (t.id = o.table_id) WHERE o.bill_request = True AND t.state = True'
         )
 
         if (not rows or not rows[0]):

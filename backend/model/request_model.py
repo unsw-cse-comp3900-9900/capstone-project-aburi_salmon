@@ -102,6 +102,11 @@ table_paid_model = api.model('table_paid_mdoel', {
     'table': fields.Integer(description='Table number')
 })
 
+table_bill_model = api.model('table_paid_mdoel', {
+    'bill': fields.Boolean(description='The payment status of a table session'),
+    'table': fields.Integer(description='Optional field for table')
+})
+
 
 edit_staff_model = api.model('edit_staff_model', {
     "staff_id": fields.Integer(description="staff_id"),

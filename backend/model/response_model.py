@@ -239,7 +239,18 @@ item_order_status_response_model = api.schema_model('item_order_status_response_
     }
 })
 
-table_paid_response_model = api.schema_model('item_order_status_response_model', {
+table_paid_response_model = api.schema_model('table_paid_response_model', {
+    'type': 'object',
+    'required': ['tables'],
+    'properties': {
+        'tables': {
+            'type': 'array',
+            'items': { 'type': 'integer' }
+        }
+    }
+})
+
+table_bill_response_model = api.schema_model('table_bill_response_model', {
     'type': 'object',
     'required': ['tables'],
     'properties': {
