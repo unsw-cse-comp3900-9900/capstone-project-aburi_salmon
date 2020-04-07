@@ -402,8 +402,7 @@ class DB:
         AND o.id = %s;""", [order_id])
 
         if (not rows):
-            return None
-
+            return []
 
         item_order = []
         for row in rows:
@@ -476,6 +475,9 @@ class DB:
 
     def set_table_free(self, id):
         return self.__update('UPDATE "table" SET state = %s WHERE id = %s', [False, id])
+
+    def set_table_free_order_id(self, id):
+        return self.__update('UPDATE "table" t SET state = %s WHERE id = (SELECT table_id FROM "order" WHERE id = %s)', [False, id])
 
     def set_assistance(self, table_id, assistance):
         return self.__update('UPDATE "order" SET assistance = %s WHERE table_id = %s', [assistance, table_id])

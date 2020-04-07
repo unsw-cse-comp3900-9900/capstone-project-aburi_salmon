@@ -17,7 +17,7 @@ import { LeftBox, RightBar } from '../../components';
 
 import { styles } from './styles';
 import { Client } from '../../api/client';
-import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel, ResponseMessage as ResponseMessageModel, ItemQuantityPair as ItemQuantityPairModel } from '../../api/models';
+import { Menu as MenuModel, Item as ItemModel, Order as OrderModel, Categories as CategoriesModel, ResponseMessage as ResponseMessageModel, ItemQuantityPair as ItemQuantityPairModel } from '../../api/models';
 
 interface IProps extends WithStyles<typeof styles> { }
 
@@ -106,8 +106,17 @@ class MenuPage extends React.Component<IProps, IState> {
     )
   }
 
-  goToTable() {
-    history.push('/table');
+  async goBack() {
+    // Check current order. if empty, logout and go to table
+    const client = new Client();
+    const o: OrderModel | null = await client.getCurrentOrder();
+
+    if (o && o?.item_order.length !== 0) {
+      history.push('/waiting');
+    } else {
+      const r = await client.customerLogout();
+      if (r) history.push('/table');
+    }
   }
 
   handleTabChange(event: React.ChangeEvent<{}>, newValue: string) {
@@ -292,7 +301,7 @@ class MenuPage extends React.Component<IProps, IState> {
           first={
             <div>
               <Button className={classes.assistancebutton} variant="contained" color="primary">Help</Button>
-              <Button className={classes.gobackbutton} variant="contained" color="secondary" onClick={() => this.goToTable()}>Go back</Button>
+              <Button className={classes.gobackbutton} variant="contained" color="secondary" onClick={() => this.goBack()}>Go back</Button>
             </div>
           }
           second={
