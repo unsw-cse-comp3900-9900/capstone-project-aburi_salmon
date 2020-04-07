@@ -180,6 +180,13 @@ class MenuPage extends React.Component<IProps, IState> {
     })
   }
 
+  modifyModalComment(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    this.setState({
+      modalComment: event.target.value,
+      modalSecondButtonDisable: false
+    });
+  }
+
   handleCloseModal(event: React.ChangeEvent<{}>) {
     this.setState({
       openModal: false,
@@ -243,7 +250,7 @@ class MenuPage extends React.Component<IProps, IState> {
 
     const client = new Client();
     const m: ResponseMessageModel | null = await client.createOrder(s);
-    
+
     if (m) {
       history.push('/waiting');
     }
@@ -275,7 +282,7 @@ class MenuPage extends React.Component<IProps, IState> {
             </div>
           }
           second={
-            <div style={{maxHeight: '100%', overflow: 'auto'}}>
+            <div style={{ maxHeight: '100%', overflow: 'auto' }}>
               <AppBar position="static">
                 <Tabs
                   value={this.state.value}
@@ -400,7 +407,7 @@ class MenuPage extends React.Component<IProps, IState> {
 
               {/* Last col */}
               <Grid item xs={7}>
-                <TextField id="standard-basic" label="Comment" onChange={(e) => this.setState({ modalComment: e.target.value })} defaultValue={this.state.modalComment} />
+                <TextField id="standard-basic" label="Comment" onChange={(e) => this.modifyModalComment(e)} defaultValue={this.state.modalComment} />
               </Grid>
               <Grid item xs={5}>
                 <Button variant="contained" onClick={this.handleCloseModal}>Cancel</Button>

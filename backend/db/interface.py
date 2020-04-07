@@ -394,7 +394,7 @@ class DB:
 
     def get_ordered_items_customer(self, order_id):
         rows = self.__query("""SELECT io.id as item_order_id, io.order_id, i.name, i.id as item_id, io.quantity,
-        i.price, s.id as status_id, s.status_name
+        i.price, s.id as status_id, s.status_name, io.comment
         FROM item_order io, item i, status s, "order" o
         WHERE s.id = io.status_id
         AND i.id = io.item_id
@@ -413,6 +413,7 @@ class DB:
                 'item_id': row[3],
                 'quantity': row[4],
                 'price': row[5],
+                'comment': row[8],
                 'status': {
                     'id': row[6],
                     'name': row[7]
