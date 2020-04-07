@@ -5,6 +5,7 @@ import './../Login/LoginRegister.css';
 import history from '../../history';
 import { Alert } from '@material-ui/lab';
 import { Client } from '../../api/client';
+import { socket } from '../../api/socketio';
 
 interface IState {
     username: string;
@@ -58,6 +59,9 @@ class PureLogin extends React.Component<{}, IState> {
         this.setState({ isOpen: true });
         this.setState({ alertMessage: "You have successfully logged in" });
         this.setState({ severity: 'success' });
+        console.log(`${localStorage.getItem('username')} just logged in`);
+        console.log('attempting to join room');
+        socket.emit('join');
     }
 
     setError(message: string) {

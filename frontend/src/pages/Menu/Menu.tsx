@@ -17,6 +17,9 @@ import { LeftBox, RightBar } from '../../components';
 
 import { styles } from './styles';
 import { Client } from '../../api/client';
+//import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel } from '../../api/models';
+import { socket } from '../../api/socketio';
+
 import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel, ResponseMessage as ResponseMessageModel, ItemQuantityPair as ItemQuantityPairModel } from '../../api/models';
 
 interface IProps extends WithStyles<typeof styles> { }
@@ -232,6 +235,7 @@ class MenuPage extends React.Component<IProps, IState> {
       s.push(t);
     });
 
+    socket.emit('order');
     const client = new Client();
     const m: ResponseMessageModel | null = await client.createOrder(s);
     

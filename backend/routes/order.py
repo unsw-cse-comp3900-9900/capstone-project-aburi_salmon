@@ -5,6 +5,7 @@ from flask_jwt_extended import get_jwt_claims, jwt_required
 from app import api, db
 import model.response_model as response_model
 import model.request_model as request_model
+from util.socket import socket
 
 order = api.namespace('order', description='Order Route')
 
@@ -14,12 +15,14 @@ class Order(Resource):
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
     def get(self):
+        socket.emit('selecttable')
 
         # Gets lists of ordered items and Total Bill
 
         order_id = get_jwt_claims().get('order')
 
         item_order = db.get_ordered_items_customer(order_id)
+
 
         total = 0
 
@@ -131,6 +134,7 @@ class Item(Resource):
 
         delete_order = request.get_json()
         item_order_id = delete_order.get('id')
+        socket.emit('selecttable')
 
         if item_order_id is None:
             abort(400, 'No existing order with that item, please make a new order instead.')

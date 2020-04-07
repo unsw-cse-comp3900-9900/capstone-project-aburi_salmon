@@ -22,7 +22,7 @@ flask_app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False
 # Persistent
 flask_app.config['JWT_SESSION_COOKIE'] = False
 # Enable CORS
-flask_app.config['JWT_COOKIE_CSRF_PROTECT'] = False
+#flask_app.config['JWT_COOKIE_CSRF_PROTECT'] = False
 CORS(flask_app, supports_credentials=True)
 # With secret on JWT_SECRET_KEY
 flask_app.config['JWT_SECRET_KEY'] = config.JWT_SECRET_KEY
@@ -48,11 +48,11 @@ def run_app(host, port):
 
 
     ## When SocketIO is enabled, comment this
-    flask_app.run(host=host, port=port, debug=True)
+    # flask_app.run(host=host, port=port, debug=True)
 
     ## and uncomment these
-    # from util.socket import socket
-    # socket.run(flask_app, host=host, port=port, debug=True)
+    from util.socket import socket
+    socket.run(flask_app, host=host, port=port, debug=True)
 
 
 if 'HOST' in os.environ:

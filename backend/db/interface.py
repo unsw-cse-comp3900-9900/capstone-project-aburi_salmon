@@ -710,3 +710,10 @@ class DB:
             'count': row[2]
         } for row in rows][:3]
 
+
+    def get_table_number(self, order_id):
+        print('finding table number')
+        rows = self.__query('SELECT table_id FROM "order" WHERE id = %s', [order_id])
+        if (not rows):
+            return None
+        return rows[0]

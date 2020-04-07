@@ -7,6 +7,7 @@ import { LeftBox, RightBar } from '../../components';
 import { styles } from './styles';
 import { Client } from '../../api/client';
 import { Tables as TableModel } from '../../api/models';
+import { socket } from '../../api/socketio';
 
 const client = new Client();
 
@@ -42,6 +43,7 @@ class TablePage extends React.Component<IProps, IState> {
   async goToOrder(table_id: number) {
     await client.selectTable(table_id)
     history.push('/menu');
+    socket.emit('chosentable');
   }
 
   // Component did mount gets called before render
@@ -50,6 +52,7 @@ class TablePage extends React.Component<IProps, IState> {
 
     // Doesn't matter if null
     this.setState({ tables: t });
+    socket.emit('table');
   }
 
   render() {
