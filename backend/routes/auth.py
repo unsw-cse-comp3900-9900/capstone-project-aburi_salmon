@@ -4,7 +4,7 @@ import re
 from uuid import uuid4
 from flask import request, jsonify
 from flask_restx import Resource, abort, reqparse, fields
-from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies, jwt_required
+from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies, jwt_required, get_jwt_identity, get_jwt_claims
 
 import config
 from app import api, db
@@ -202,7 +202,7 @@ class CustomerSession(Resource):
 class CustomerLogoutSession(Resource):
     @jwt_required
     @auth.response('200', 'Success')
-    def delete(self):
+    def post(self):
         user = get_jwt_identity()
 
         order_id = get_jwt_claims().get('order')

@@ -41,7 +41,8 @@ new_order_model = api.schema_model('new_order_model', {
                 'required': ['item_id', 'quantity'],
                 'properties': {
                     'item_id': { 'type': 'integer' },
-                    'quantity': { 'type': 'integer' }
+                    'quantity': { 'type': 'integer' },
+                    'comment': { 'type': 'string' }
                 }
             }
         }
