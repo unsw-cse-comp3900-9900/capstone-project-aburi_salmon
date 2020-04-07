@@ -76,11 +76,13 @@ export type Order = {
 export type ItemQuantityPair = {
   item_id: number,
   quantity: number,
+  comment: string,
 }
 
 export type OrderItemQuantityPair = {
   id: number,
   quantity: number,
+  comment: string,
 }
 
 export type CreateOrder = {

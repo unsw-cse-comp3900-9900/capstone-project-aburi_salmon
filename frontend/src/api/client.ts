@@ -118,12 +118,13 @@ export class Client {
     }
   }
 
-  async patchItemOrder(id: number, quantity: number) {
+  async patchItemOrder(id: number, quantity: number, comment: string) {
     try {
       // In order to avoid CORS issue, headers, credentials, and mode should be specified
       const p: OrderItemQuantityPair = {
         id: id,
         quantity: quantity,
+        comment: comment,
       }
 
       const r: Response = await fetch(apiUrl + '/order/item', {

@@ -23,6 +23,7 @@ interface IState {
   modal: ItemModel | null;
   modal_item_order: ItemOrderModel | null;
   modalQuantity: number;
+  modalComment: string;
   modalOriginalQuantity: number;
   modalSecondButtonDisable: boolean;
   disableBill: boolean;
@@ -37,6 +38,7 @@ class WaitingPage extends React.Component<IProps, IState> {
       modal: null,
       modal_item_order: null,
       modalQuantity: 0,
+      modalComment: "",
       modalOriginalQuantity: 0,
       modalSecondButtonDisable: true,
       disableBill: true,
@@ -106,7 +108,7 @@ class WaitingPage extends React.Component<IProps, IState> {
         r = await client.deleteItemOrder(this.state.modal_item_order.id);
       } else {
         // Patch order
-        r = await client.patchItemOrder(this.state.modal_item_order.id, this.state.modalQuantity);
+        r = await client.patchItemOrder(this.state.modal_item_order.id, this.state.modalQuantity, this.state.modalComment);
       }
     }
 
