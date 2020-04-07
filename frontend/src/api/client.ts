@@ -1,4 +1,4 @@
-import { Tables, Menu, ItemList, Order, Item, ItemId,  ItemQuantityPair, CreateOrder, ResponseMessage, AddItemToOrderResponseMessage, OrderItemQuantityPair, ItemOrder, TableInfo, AssistanceTables, AllStaff, AllItemStats, Ingredient } from "./models";
+import { Tables, Menu, ItemList, Order, Item,  ItemQuantityPair, CreateOrder, ResponseMessage, AddItemToOrderResponseMessage, OrderItemQuantityPair, ItemOrder, TableInfo, AssistanceTables, AllStaff, AllItemStats, Ingredient, WholeItemList } from "./models";
 
 const apiUrl = "http://localhost:5000";
 
@@ -303,7 +303,7 @@ export class Client {
       body: JSON.stringify(
         {
           assistance: assistance,
-          order_id: order_id,
+          table: order_id,
         }
       ),
     });
@@ -439,21 +439,16 @@ export class Client {
 
 
   async deleteCat(id: number | undefined) {
-    try {
-      await fetch(apiUrl + '/menu/category/' + id, {
+   
+     return(fetch(apiUrl + '/menu/category/' + id, {
         method: 'DELETE',
         credentials: 'include',
         mode: 'cors',
-      });
-      return "Success"
-    } catch (e) {
-      console.error(e);
-      return "Failed";
-    }
+      }))
+
   }
-  async addItem(name: string, description: string, price: number, visible: boolean, position: number, catId: number) {
-    try {
-      const r: Response = await fetch(apiUrl + '/menu/item', {
+  async addItem(name: string, description: string, price: number, visible: boolean) {
+    return(fetch(apiUrl + '/menu/item', {
         method: 'POST',
         credentials: 'include',
         mode: 'cors',
@@ -468,20 +463,12 @@ export class Client {
             visible: visible,
           }
         ),
-      });
-      const j: ItemId = await r.json();
-      return this.addItemToCat(position, catId, j.item_id);
-
-
-    } catch (e) {
-      console.error(e);
-      return null;
-    }
+      }))
+     
   }
 
-  async editItem(name: string, description: string, price: number, visible: boolean, catId: number, itemId: number) {
-    try {
-      const r: Response = await fetch(apiUrl + '/menu/item/' + itemId, {
+  async editItem(name: string, description: string, price: number, visible: boolean, itemId: number) {
+    return( fetch(apiUrl + '/menu/item/' + itemId, {
         method: 'PUT',
         credentials: 'include',
         mode: 'cors',
@@ -496,32 +483,20 @@ export class Client {
             visible: visible,
           }
         ),
-      });
-      const j: ItemId = await r.json();
-      return this.addItemToCat(0, catId, itemId);
-    } catch (e) {
-      console.error(e);
-      return null;
-    }
+      }))
   }
 
-  async deleteItem(id:number) {
-    try {
-      await fetch(apiUrl + '/menu/item/' + id, {
+  async deleteItem(id:number | undefined) {
+    return(fetch(apiUrl + '/menu/item/' + id, {
         method: 'DELETE',
         credentials: 'include',
         mode: 'cors',
-      });
-      return "Success"
-    } catch (e) {
-      console.error(e);
-      return "Failed";
-    }
+      }))
+    
   }
 
   async addItemToCat(position: number, catId: number, itemId: number) {
-    try {
-      const r: Response = await fetch(apiUrl + '/menu/category/' + catId + '/item/' + itemId, {
+    return(fetch(apiUrl + '/menu/category/' + catId + '/item/' + itemId, {
         method: 'POST',
         credentials: 'include',
         mode: 'cors',
@@ -533,14 +508,7 @@ export class Client {
             position: position,
           }
         ),
-      });
-      const j = await r.json();
-      return j;
-
-    } catch (e) {
-      console.error(e);
-      return null;
-    }
+      }))
   }
 
   async addIngredient(name: string){
@@ -584,6 +552,31 @@ export class Client {
         mode: 'cors',
       }))
     
+  }
+
+  async getAllItems(){
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/item', {
+        method: 'GET',
+        credentials: 'include',
+        mode: 'cors',
+      });
+
+      const j: WholeItemList = await r.json();
+      return j;
+
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async removeItemFromCat(catId: number | undefined, itemId: number | undefined){
+    return (fetch(apiUrl + '/menu/category/' + catId + '/item/' + itemId, {
+      method: 'DELETE',
+      credentials: 'include',
+      mode: 'cors',
+    }))
   }
 
 }

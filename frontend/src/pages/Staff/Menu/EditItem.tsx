@@ -124,31 +124,9 @@ class EditItem extends React.Component<IProps, IState>{
                                 onChange={(e) => this.setState({ price: parseInt(e.target.value) })}
                             />
 
-                        <FormControl style={{ minWidth: 150, margin: '10px' }}>
-                            <InputLabel htmlFor="uncontrolled-native">Visibility</InputLabel>
-                            <NativeSelect
-                                defaultValue={'true'}
-                                onChange={(e) => this.setChange(e.target.value)}
-                            >
-                                <option value={'true'}>Show</option>
-                                <option value={'false'}>Hide</option>
-                            </NativeSelect>
-                        </FormControl>
+                        
 
-                        <FormControl style={{ minWidth: 150, margin: '10px' }}>
-                            <InputLabel htmlFor="uncontrolled-native">Category</InputLabel>
-                            <NativeSelect
-                                defaultValue={1}
-                                onChange={(e) => this.setState({ category: e.target.value })}
-                            >
-                                {this.props.wholemenu && this.props.wholemenu?.menu &&
-                                this.props.wholemenu?.menu.map(category =>
-                                    <option value={category.id} key={category.id}>{category.name}</option>
-                                    )
-                                }
-                            </NativeSelect>
-                        </FormControl>      
-
+                   
                     </DialogContent>
                     <DialogActions>
                         <div style={{width: '100%'}}>
@@ -171,7 +149,7 @@ class EditItem extends React.Component<IProps, IState>{
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
                 >
-                    <DialogTitle id="alert-dialog-title">{"Add Item"}</DialogTitle>
+                    <DialogTitle id="alert-dialog-title">{"Create Item"}</DialogTitle>
                     <DialogContent>
                             <TextField
                                 autoFocus
@@ -199,36 +177,13 @@ class EditItem extends React.Component<IProps, IState>{
                                 fullWidth
                             onChange={(e) => this.setState({ price: parseInt(e.target.value) })}
                             />
-                        <FormControl style={{ minWidth: 150, margin: '10px' }}>
-                            <InputLabel htmlFor="uncontrolled-native">Visibility</InputLabel>
-                            <NativeSelect
-                                defaultValue={'true'}
-                                onChange={(e) => this.setChange(e.target.value)}
-                            >
-                                <option value={'true'}>Show</option>
-                                <option value={'false'}>Hide</option>
-                            </NativeSelect>
-                        </FormControl>
-
-                        <FormControl style={{ minWidth: 150, margin: '10px' }}>
-                            <InputLabel htmlFor="uncontrolled-native">Category</InputLabel>
-                            <NativeSelect
-                                defaultValue={1}
-                                onChange={(e) => this.setState({category: e.target.value})}
-                            >
-                                {this.props.wholemenu && this.props.wholemenu?.menu &&
-                                    this.props.wholemenu?.menu.map(category =>
-                                        <option value={category.id} key={category.id}>{category.name}</option>
-                                    )
-                                }
-                            </NativeSelect>
-                        </FormControl>      
+             
 
                     </DialogContent>
                     <DialogActions>
                         <div style={{width:'100%'}}>
                         <Button onClick={() => this.props.setIsOpen(false)} style={{float: 'left'}} color="primary">
-                            Nevermind
+                            Cancel
                             </Button>
                         <Button onClick={() => this.submitCreate()} style={{float:'right'}} color="primary" autoFocus>
                             Create Item

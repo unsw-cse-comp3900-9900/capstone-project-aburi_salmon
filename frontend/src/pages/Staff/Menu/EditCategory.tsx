@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Dialog, DialogContent, DialogContentText, DialogActions,TextField, DialogTitle} from '@material-ui/core';
 import {Categories} from './../../../api/models';
+import {Client} from './../../../api/client';
 
 
 export interface IProps{
@@ -10,7 +11,6 @@ export interface IProps{
     isEdit: boolean, //if 1 then it is edit, if 0 then is create new
     category: Categories | null,
     catNo: number | undefined,
-    deleteFun: any
 }
 
 class EditCategory extends React.Component<IProps, {catName: string}>{
@@ -20,6 +20,24 @@ class EditCategory extends React.Component<IProps, {catName: string}>{
         this.state = {
             catName: '',
         }
+    }
+
+    deleteFun(){
+        const client = new Client();
+        //.then.catch stuff for alert
+        client.deleteCat(this.props.category?.id)
+            .then((msg) => {
+                //alert(msg.status);
+                if (msg.status === 200) {
+                    alert('Success');
+                    this.props.setIsOpen(false);
+                   
+                } else {
+                    alert(msg.statusText);
+                }
+            }).catch((status) => {
+                console.log(status);
+            });
     }
 
     render(){
@@ -49,9 +67,9 @@ class EditCategory extends React.Component<IProps, {catName: string}>{
                         <DialogActions>
                             <div style={{width:'100%'}}>
                             <Button onClick={() => this.props.setIsOpen(false)} color="primary" style={{float: 'left'}}>
-                                Nevermind
+                                Cancel
                             </Button>
-                            <Button color="secondary" autoFocus onClick={() => this.props.deleteFun(true)}>
+                            <Button color="secondary" autoFocus onClick={() => this.deleteFun()}>
                                 Delete Category
                             </Button>
                             <Button onClick={() => this.props.relevantFunction(this.state.catName, false)} style={{float:'right'}} color="primary" autoFocus>

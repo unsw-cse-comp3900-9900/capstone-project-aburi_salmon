@@ -17,13 +17,14 @@ import history from '../../../history';
 
 import { styles } from './styles';
 import { Client } from '../../../api/client';
-import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel } from '../../../api/models';
+import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel, ItemId, Item } from '../../../api/models';
 
 import EditCategory from './EditCategory';
 import EditItem from './EditItem';
 import Delete from './Delete';
 import Ingredients from './Ingredients';
 import EditIngredients from './EditIngredients';
+import AddItemCat from './AddItemCat';
 
 
 
@@ -63,11 +64,14 @@ interface IState {
   deleteDialog: boolean,
   ingredDialog: boolean,
   editIngredDialog: boolean,
+  addItemCatDialog: boolean,
   currItem: ItemModel,
   currCat: CategoriesModel | null,
   isEdit: boolean, //1 if is edit, 0 if is modify
   isCat: boolean, //1 if is category, 0 if item
-  catNo: number | undefined
+  catNo: number | undefined,
+  isDel: boolean,
+  itemIngredients: Array<number>,
 }
 
 class EditMenuPage extends React.Component<IProps, IState> {
@@ -101,12 +105,16 @@ class EditMenuPage extends React.Component<IProps, IState> {
       deleteDialog: false,
       ingredDialog: false,
       editIngredDialog: false,
+      addItemCatDialog: false,
 
       currItem: temp,
       currCat: null,
       isEdit: false,
       isCat: false,
       catNo: 0, //number of categories
+      isDel: false, //
+      itemIngredients: []
+
 
     }
     // To bind the tab change
@@ -125,10 +133,10 @@ class EditMenuPage extends React.Component<IProps, IState> {
     this.deleteDialogIsOpen = this.deleteDialogIsOpen.bind(this);
     this.ingredientDialogIsOpen = this.ingredientDialogIsOpen.bind(this);
     this.editIngredDialogIsOpen = this.editIngredDialogIsOpen.bind(this);
+    this.addItemCatIsOpen = this.addItemCatIsOpen.bind(this);
 
     this.addEditItem = this.addEditItem.bind(this);
     this.addEditCat = this.addEditCat.bind(this);
-    this.deleteFun = this.deleteFun.bind(this);
     this.ingredFun = this.ingredFun.bind(this); //for items
     this.editIngredients = this.editIngredients.bind(this);  //for just ingredients
   }
@@ -143,6 +151,7 @@ class EditMenuPage extends React.Component<IProps, IState> {
 
   deleteDialogIsOpen(isOpen: boolean){
     this.setState({ deleteDialog: isOpen });
+    this.componentDidMount();
   }
 
   ingredientDialogIsOpen(isOpen: boolean){
@@ -151,6 +160,10 @@ class EditMenuPage extends React.Component<IProps, IState> {
 
   editIngredDialogIsOpen(isOpen: boolean){
     this.setState({ editIngredDialog: isOpen });
+  }
+
+  addItemCatIsOpen(isOpen: boolean){
+    this.setState({addItemCatDialog: isOpen});
   }
 
   ingredFun(){
@@ -165,7 +178,7 @@ class EditMenuPage extends React.Component<IProps, IState> {
     const client = new Client();
     if (this.state.isEdit){
       console.log(name + ', ' + description + ', ' + price + ', ' + visibility + ', ' + category);
-      var j = client.editItem(name, description, price, visibility, category, this.state.currItem.id);
+      var j = client.editItem(name, description, price, visibility, this.state.currItem.id);
       console.log(j);
       j.then((msg) => {
       //alert(msg.status);
@@ -181,7 +194,8 @@ class EditMenuPage extends React.Component<IProps, IState> {
       });
     } else {
       
-      var j  = client.addItem(name, description,price,visibility,0, category);
+      var j: Promise<Response> = client.addItem(name, description,price,visibility);
+      
       j.then((msg) => {
         //alert(msg.status);
         if (msg.status === 200) {
@@ -234,23 +248,14 @@ class EditMenuPage extends React.Component<IProps, IState> {
     }
   }
 
-  deleteFun(isCat: boolean){ //isCat: 1 if is category else 0
-    console.log('Deleting ');
-    const client = new Client();
-    if (isCat){
-      
-      //.then.catch stuff for alert
-      alert(client.deleteCat(this.state.currCat?.id));
-      this.setState({editCatDialog: false});
-      this.componentDidMount();
-      console.log(this.state.currCat?.name);
-    } else {
-      console.log(client.deleteItem(this.state.currItem.id));
-      this.setState({ deleteDialog: false });
-      console.log(this.state.currItem.name);
-    }
+  createItemIngredients(item: Item) {
+    var temp: Array<number> = [];
+    item.ingredients.map(ingred =>
+      temp.push(ingred.id)
+    );
+    this.setState({ itemIngredients: temp });
+    console.log(temp);
   }
-
 
   generateItemsInCategory(category: CategoriesModel) {
     const { classes } = this.props;
@@ -258,9 +263,9 @@ class EditMenuPage extends React.Component<IProps, IState> {
     return (
       <div hidden={this.state.value !== categoryName} id={`tabpanel-${category.id}`} key={category.id} aria-labelledby={`tab-${category.id}`}>
         {
-          category.items.map(item => (
+          category.items.map((item,index) => (
             // If there is an item with multiple categories, this will break.
-            <Card className={classes.itemcard} key={`${category.id}-${item.id}`}>
+            <Card className={classes.itemcard} key={index}>
               <CardContent>
                 <Typography variant="h5">
                   {item.name}
@@ -273,8 +278,8 @@ class EditMenuPage extends React.Component<IProps, IState> {
 
                 <div className={classes.wrapper2}>
                   <Button size="small" onClick={() => this.openModal(item)} className={classes.floatLeft}>View item</Button>
-                  <Button size="small"  className={classes.floatRight} onClick={()=>this.setState({deleteDialog: true, isEdit: false, isCat: false, currItem: item})} 
-                  color='secondary'>Delete item</Button>
+                  <Button size="small"  className={classes.floatRight} onClick={()=>this.setState({deleteDialog: true, isEdit: false, isCat: false, currItem: item, isDel: false})} 
+                  color='secondary'>Remove item</Button>
                 </div>
               </CardActions>
             </Card>
@@ -297,6 +302,7 @@ class EditMenuPage extends React.Component<IProps, IState> {
   openModal(item: ItemModel) {
     let quantity = 0;
     this.setState({ currItem: item });
+    this.createItemIngredients(item);
     this.state.orders.forEach((it: OrderItemState) => {
       if (it.item.id === item.id) {
         quantity = it.quantity;
@@ -375,8 +381,12 @@ class EditMenuPage extends React.Component<IProps, IState> {
         menu: m,
         value: m?.menu[0].name ? m?.menu[0].name : "",
         catNo: (m?.menu.length + 1),
+        currCat: m.menu[0],
       });
     }
+
+  
+    
     console.log(this.state.catNo);
   }
 
@@ -391,14 +401,16 @@ class EditMenuPage extends React.Component<IProps, IState> {
       <div className={classes.menupage}>
         <EditCategory isOpen={this.state.editCatDialog} setIsOpen={this.catDialogIsOpen}
           relevantFunction={this.addEditCat} isEdit={this.state.isEdit} category={this.state.currCat} 
-          catNo={this.state.catNo} deleteFun={this.deleteFun}/>
+          catNo={this.state.catNo} />
         <EditItem isOpen={this.state.editItemDialog} setIsOpen={this.itemDialogIsOpen} wholemenu={this.state.menu}
           relevantFunction={this.addEditItem} isEdit={this.state.isEdit} item={this.state.currItem}/>
         <Delete isOpen={this.state.deleteDialog} setIsOpen={this.deleteDialogIsOpen}
-          relevantFunction={this.deleteFun} item={this.state.currItem} isCat={this.state.isCat} cat={this.state.currCat}/>
-        <Ingredients isOpen={this.state.ingredDialog} setIsOpen={this.ingredientDialogIsOpen} relevantFunction={this.ingredFun}/>
+        item={this.state.currItem} isDel={this.state.isDel} cat={this.state.currCat}/>
+        <Ingredients isOpen={this.state.ingredDialog} currItem={this.state.currItem} itemIngredients={this.state.itemIngredients}
+        setIsOpen={this.ingredientDialogIsOpen} relevantFunction={this.ingredFun}/>
         
         <EditIngredients isOpen={this.state.editIngredDialog} setIsOpen={this.editIngredDialogIsOpen} relevantFunction={this.editIngredients} />
+        <AddItemCat isOpen={this.state.addItemCatDialog} setIsOpen={this.addItemCatIsOpen} wholemenu={this.state.menu} />
             <div className={classes.wrapper}>
               <AppBar position="static">
                 <Tabs
@@ -412,7 +424,7 @@ class EditMenuPage extends React.Component<IProps, IState> {
                     this.state.menu && this.state.menu?.menu &&
                     this.state.menu?.menu.map(category => (
                       <Tab label={<><div>{category.name + " "} <EditIcon onClick={() => this.setState({editCatDialog: true, isCat:true, isEdit:true, currCat: category})} /></div></>} 
-                      className={classes.editIcon} key={category.id} {...this.tabProps(category.name)} />
+                      className={classes.editIcon} key={category.id} {...this.tabProps(category.name)} onClick={() => this.setState({currCat: category})} />
                     ))
                   }
                 </Tabs>
@@ -427,11 +439,15 @@ class EditMenuPage extends React.Component<IProps, IState> {
             <div className={classes.wrapper3}>
           
           <Button variant='outlined'  onClick={() => { this.setState({ editItemDialog: true, isEdit:false, isCat: false})}}
-              className={classes.addFloatRight}>Add Item</Button>
+              className={classes.addFloatRight}>Create Item</Button>
           <Button variant='outlined'  onClick={() => { this.setState({ editCatDialog: true, isEdit:false, isCat:true }) }}
                className={classes.addFloatRight}>Add Category</Button>
                <Button variant='outlined' onClick={() => { this.setState({ editIngredDialog: true }) }}
-            className={classes.addFloatRight}>Edit Ingredients List</Button>
+            className={classes.addFloatRight}>Edit Ingredients</Button>
+          <Button variant='outlined' onClick={() => { this.setState({ addItemCatDialog: true}) }}
+            className={classes.addFloatRight}>Add Item to Category</Button>
+          <Button variant='outlined' color='secondary' onClick={() => { this.setState({ deleteDialog: true, isDel: true }) }}
+            className={classes.addFloatRight}>Delete Item</Button>
             </div>
 
         <Modal

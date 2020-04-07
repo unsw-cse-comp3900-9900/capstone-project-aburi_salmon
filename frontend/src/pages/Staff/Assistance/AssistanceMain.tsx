@@ -86,11 +86,14 @@ class Assistance extends React.Component<IProps, IState>{
         const t: TableModel | null = await client.getTables();
         const a: AssistanceTables | null = await client.getAssistanceTable();
         var temp: Array<number> = [];
-        a?.tables.map(it => {
-                temp.push(it.table_id);
-            }
-        )
-        this.setState({ tables: t, assistance: temp });
+        if (a?.tables !== undefined){
+            a?.tables.map(it => {
+                    temp.push(it.table_id);
+                }
+            )
+            this.setState({assistance: temp });
+        }
+        this.setState({tables:t})
     }
 
     createTables = () => {
