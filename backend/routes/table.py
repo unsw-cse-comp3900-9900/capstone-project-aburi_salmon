@@ -129,6 +129,7 @@ class Assistance(Resource):
         
 @table.route('/paid')
 class TablePaid(Resource):
+    @jwt_required
     @table.response(200, 'Success', model=response_model.table_paid_response_model)
     @table.response(400, 'Invalid request')
     @table.response(401, 'Unauthorised')
@@ -140,6 +141,7 @@ class TablePaid(Resource):
         
         return jsonify({ 'tables': paid })
 
+    @jwt_required
     @table.response(200, 'Success')
     @table.response(400, 'Invalid request')
     @table.response(401, 'Unauthorised')
