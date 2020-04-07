@@ -74,8 +74,7 @@ menu_item_model = api.model('menu_item_model', {
 })
 
 category_model = api.model('category_model', {
-    'name': fields.String(description='category name'),
-    'position': fields.Integer(description='position to show the category')
+    'name': fields.String(description='category name')
 })
 
 ingredient_model = api.model('ingredient_model', {
