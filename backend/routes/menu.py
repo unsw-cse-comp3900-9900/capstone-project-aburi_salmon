@@ -111,8 +111,11 @@ class CreateMenuCategory(Resource):
     @menu.response(400, 'Invalid Request')
     @menu.expect(request_model.category_model)
     def post(self):
-        category = request.get_json()
-        if (not db.create_category(category)):
+        name = request.get_json().get('name')
+        if (not name):
+            abort(400, 'Missing required field \'name\'')
+
+        if (not db.create_category(name)):
             abort(400, 'Invalid request')
 
         return jsonify({ 'status': 'success' })

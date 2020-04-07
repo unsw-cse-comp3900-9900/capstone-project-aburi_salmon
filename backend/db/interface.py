@@ -238,12 +238,19 @@ class DB:
         return self.__update(editStatement, editArr)
 
     def delete_item(self, id):
-        return self.__delete("DELETE FROM item WHERE id = %s", [id])
+        return (
+            self.__delete('DELETE FROM category_item WHERE item_id = %s', [id]) and
+            self.__delete("DELETE FROM item WHERE id = %s", [id])
+        )
 
-    def create_category(self, category):
+    def create_category(self, name):
+        # Set the postion to the current highest position + 1 
+        rows = self.__query('SELECT max(position) FROM category')
+        position = rows[0][0] + 1
+
         self.__insert(
             'INSERT INTO category (name, position) VALUES (%s, %s)',
-            [category.get('name'), category.get('position')]
+            [name, position]
         )
         return True
 
