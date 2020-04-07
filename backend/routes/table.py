@@ -127,3 +127,34 @@ class Assistance(Resource):
         return jsonify({ 'status': 'success' })
     
         
+@table.route('/paid')
+class TablePaid(Resource):
+    @table.response(200, 'Success', model=response_model.table_paid_response_model)
+    @table.response(400, 'Invalid request')
+    @table.response(401, 'Unauthorised')
+    def get(self):
+        # Return a list of tables that have paid
+        paid = db.get_paid_tables()
+        if (paid == None):
+            abort(500, 'Something went wrong')
+        
+        return jsonify({ 'tables': paid })
+
+    @table.response(200, 'Success')
+    @table.response(400, 'Invalid request')
+    @table.response(401, 'Unauthorised')
+    @table.expect(request_model.table_paid_model)
+    def put(self):
+        # Set the payment status of an order as true/false
+        body = request.get_json()
+
+        paid = body.get('paid')
+        table = body.get('table')
+
+        if (paid == None or table == None):
+            abort(400, "Invalid request. Missing required field")
+        
+        if (db.set_paid(table, paid) == None):
+            abort(500, 'Something went wrong.')
+        
+        return jsonify({ 'success': 'success' })

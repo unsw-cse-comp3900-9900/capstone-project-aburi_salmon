@@ -491,6 +491,10 @@ class DB:
     def set_assistance(self, table_id, assistance):
         return self.__update('UPDATE "order" SET assistance = %s WHERE table_id = %s', [assistance, table_id])
 
+    def set_paid(self, table_id, paid):
+        return self.__update('UPDATE "order" SET paid = %s WHERE table_id = %s', [paid, table_id])
+
+
     def get_assistance_tables(self):
         rows = self.__query(
             'SELECT distinct t.id, t.state FROM "table" t JOIN "order" o on (t.id = o.table_id) WHERE o.assistance = True AND t.state = True'
@@ -503,6 +507,16 @@ class DB:
             'table_id': row[0],
             'occupied': row[1]
         } for row in rows]
+
+    def get_paid_tables(self):
+        rows = self.__query(
+            'SELECT distinct t.id, t.state FROM "table" t JOIN "order" o on (t.id = o.table_id) WHERE o.paid = True AND t.state = True'
+        )
+
+        if (not rows or not rows[0]):
+            return []
+
+        return [row[0] for row in rows]
 
     def beginCooking(self, id):
         return self.__update("UPDATE item_order SET status_id = 1 WHERE id = %s", [id])
