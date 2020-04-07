@@ -8,6 +8,7 @@ import StaffDetails from './../StaffDetails/StaffDetails';
 import ManageOrders from './../Orders/ManageOrders';
 import Feedback from './../Analytics/Feedback';
 import ItemStats from './../Analytics/ItemStats';
+import {EditMenu} from './../Menu/EditMenu';
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -52,7 +53,9 @@ const styles = (theme: Theme) =>
             marginLeft: theme.spacing(2),
             marginRight: theme.spacing(2),
             marginBottom: theme.spacing(2),
-            overflow: 'auto',
+            width: '100%',
+            
+            minWidth: '800px',
         },
 
     });
@@ -70,7 +73,7 @@ class Manage extends React.Component<IProps, IState>{
     constructor(props: any) {
         super(props);
         this.state = {
-            currPage: "Manage",
+            currPage: "Menu",
             queueList: null, //listType === 1
             cookingList: null, //listType === 2
             readyList: null, //listType === 3
@@ -115,13 +118,13 @@ class Manage extends React.Component<IProps, IState>{
                     <Analytics />
                 </Box>
             );
-        } */else if (this.state.currPage === "Feedback") {
+        } else if (this.state.currPage === "Feedback") {
             return (
                 <Box className={classes.staffContainer}>
                     <Feedback />
                 </Box>
             );
-        } else if (this.state.currPage === "ItemStats") {
+        }*/ else if (this.state.currPage === "ItemStats") {
             return (
                 <Box className={classes.staffContainer}>
                     <ItemStats />
@@ -131,7 +134,7 @@ class Manage extends React.Component<IProps, IState>{
         else {
             return (
                 <Box className={classes.menuContainer}>
-                    <h1> Menu should be here</h1>
+                    <EditMenu />
                 </Box>
             );
         }
@@ -152,7 +155,7 @@ class Manage extends React.Component<IProps, IState>{
         {/*<MenuItem onClick={() => { this.setState({ currPage: "Earnings" }) }}>Earnings</MenuItem>*/}
                         
                         <MenuItem onClick={() => { this.setState({ currPage: "ItemStats" }) }}>Item Statistics</MenuItem>
-                        <MenuItem onClick={() => { this.setState({ currPage: "Feedback" }) }}>Feedback</MenuItem>
+        {/* <MenuItem onClick={() => { this.setState({ currPage: "Feedback" }) }}>Feedback</MenuItem>*/}
                     </MenuList>
                 </Paper>
             </div>

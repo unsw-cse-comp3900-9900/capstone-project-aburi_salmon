@@ -76,11 +76,13 @@ export type Order = {
 export type ItemQuantityPair = {
   item_id: number,
   quantity: number,
+  comment: string,
 }
 
 export type OrderItemQuantityPair = {
   id: number,
   quantity: number,
+  comment: string,
 }
 
 export type CreateOrder = {
@@ -134,4 +136,12 @@ export type ItemStats = {
 export type AllItemStats = {
     item_sales: Array<ItemStats>,
     total_revenue: number,
+}
+
+export type ItemId = {
+  item_id: number,
+}
+
+export type IngredientList = {
+  ingredients: Array<Ingredient>
 }

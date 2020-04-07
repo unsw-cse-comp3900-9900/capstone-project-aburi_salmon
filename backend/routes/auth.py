@@ -4,9 +4,9 @@ import re
 from uuid import uuid4
 from flask import request, jsonify
 from flask_restx import Resource, abort, reqparse, fields
-from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies, jwt_required
 from flask_socketio import join_room, leave_room
 from util.socket import socket
+from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies, jwt_required, get_jwt_identity, get_jwt_claims
 
 import config
 from app import api, db
@@ -166,10 +166,11 @@ class RegistrationList(Resource):
         keys = db.get_registration_keys(id)
         return jsonify({ 'registration_keys': keys })
 
-@auth.route("/customer", strict_slashes=False)
+@auth.route("/customer/login", strict_slashes=False)
 class CustomerSession(Resource):
     # Note: To remove the customer order session, just use the logout route
     # Create a session cookie for a customer
+    # This will occupy the table
     @auth.response('200', 'Success')
     @auth.response('400', 'Invalid Request')
     @auth.expect(customer_session_model)
@@ -201,4 +202,21 @@ class CustomerSession(Resource):
 
         return response
 
+@auth.route("/customer/logout", strict_slashes=False)
+class CustomerLogoutSession(Resource):
+    @jwt_required
+    @auth.response('200', 'Success')
+    def post(self):
+        user = get_jwt_identity()
+
+        order_id = get_jwt_claims().get('order')
+        
+        # From the order_id, check if there is any ongoing order
+        # If there is an active order (unpaid), can't delete
+        order = db.get_order_id(order_id)
+
+        # I don't know about this. but this is absolutely terrible
+        # the user won't be able to tell whether the current order is paid or not
+        # based on order_id solely
+        pass
 

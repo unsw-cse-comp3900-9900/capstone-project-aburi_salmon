@@ -1,5 +1,5 @@
 import React from 'react';
-import { withStyles, TextField, WithStyles, createStyles, Modal, Grid, FormControl, FormControlLabel, FormGroup, ButtonBase, Paper, TableBody, TableHead, TableRow, TableCell, Table, TableContainer } from '@material-ui/core';
+import { withStyles, WithStyles, Modal, Grid, FormControl, FormControlLabel, FormGroup} from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -12,22 +12,21 @@ import IconButton from '@material-ui/core/IconButton';
 import Icon from '@material-ui/core/Icon';
 import Checkbox from '@material-ui/core/Checkbox';
 
-import history from '../../history';
-import { LeftBox, RightBar } from '../../components';
+import history from '../../../history';
 
 import { styles } from './styles';
-import { Client } from '../../api/client';
-//import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel } from '../../api/models';
-import { socket } from '../../api/socketio';
-
-import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel, ResponseMessage as ResponseMessageModel, ItemQuantityPair as ItemQuantityPairModel } from '../../api/models';
+import { Client } from '../../../api/client';
+import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel } from '../../../api/models';
 
 interface IProps extends WithStyles<typeof styles> { }
 
 interface OrderItemState {
   item: ItemModel;
   quantity: number;
-  comment: string;
+}
+
+interface OrderState {
+  items: Array<OrderItemState>;
 }
 
 interface IState {
@@ -39,7 +38,6 @@ interface IState {
   modal: ItemModel | null;
   modalQuantity: number;
   modalOriginalQuantity: number;
-  modalComment: string;
 
   // For list of items that user wants to order
   orders: Array<OrderItemState>;
@@ -51,7 +49,7 @@ interface IState {
   openConfirmModal: boolean;
 }
 
-class MenuPage extends React.Component<IProps, IState> {
+class StaticMenuPage extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -63,7 +61,6 @@ class MenuPage extends React.Component<IProps, IState> {
       modal: null,
       modalQuantity: 0,
       modalOriginalQuantity: 0,
-      modalComment: "",
       orders: new Array<OrderItemState>(),
       modalSecondButton: "Add to order",
       modalSecondButtonDisable: true,
@@ -100,7 +97,7 @@ class MenuPage extends React.Component<IProps, IState> {
                 </Typography>
               </CardContent>
               <CardActions>
-                <Button size="small" onClick={() => this.openModal(item)}>Add item</Button>
+                <Button size="small" onClick={() => this.openModal(item)}>View item</Button>
               </CardActions>
             </Card>
           ))
@@ -186,12 +183,10 @@ class MenuPage extends React.Component<IProps, IState> {
   addToOrder(event: React.ChangeEvent<{}>) {
     const item = this.state.modal!;
     const quantity = this.state.modalQuantity;
-    const comment = this.state.modalComment;
     console.log(quantity);
     const r: OrderItemState = {
       item: item,
       quantity: quantity,
-      comment: comment,
     }
 
     let orders = this.state.orders;
@@ -222,23 +217,7 @@ class MenuPage extends React.Component<IProps, IState> {
   }
 
   async submitOrder() {
-    let s: Array<ItemQuantityPairModel> = [];
-    this.state.orders?.forEach((it) => {
-      const t: ItemQuantityPairModel = {
-        item_id: it.item.id,
-        quantity: it.quantity,
-        comment: it.comment,
-      };
-      s.push(t);
-    });
 
-    socket.emit('order');
-    const client = new Client();
-    const m: ResponseMessageModel | null = await client.createOrder(s);
-    
-    if (m) {
-      history.push('/waiting');
-    }
   }
 
   // Component did mount gets called before render
@@ -260,18 +239,13 @@ class MenuPage extends React.Component<IProps, IState> {
     const { classes } = this.props;
     return (
       <div className={classes.menupage}>
-        <LeftBox
-          first={
-            <div className={classes.title}>
-              Select item
-            </div>
-          }
-          second={
-            <div style={{maxHeight: '100%', overflow: 'auto'}}>
+            <div className={classes.wrapper}>
               <AppBar position="static">
                 <Tabs
                   value={this.state.value}
                   onChange={this.handleTabChange}
+              scrollButtons="auto"
+              variant="scrollable"
                 >
                   {
                     this.state.menu && this.state.menu?.menu &&
@@ -281,57 +255,14 @@ class MenuPage extends React.Component<IProps, IState> {
                   }
                 </Tabs>
               </AppBar>
+              <div className={classes.overflow}>
               {
                 this.state.menu && this.state.menu?.menu &&
                 this.state.menu?.menu.map(category => this.generateItemsInCategory(category))
               }
+              </div>
             </div>
-          }
-        />
 
-        <RightBar
-          first={
-            <div>
-              <Button className={classes.assistancebutton} variant="contained" color="primary">Help</Button>
-              <Button className={classes.gobackbutton} variant="contained" color="secondary" onClick={() => this.goToTable()}>Go back</Button>
-            </div>
-          }
-          second={
-            <div className={classes.itemlists}>
-              {
-                this.state.orders.map((order: OrderItemState) => {
-                  return (
-                    <ButtonBase
-                      className={classes.cardaction}
-                      onClick={() => this.openModal(order.item)}
-                    >
-                      <Card className={classes.itemcard}>
-                        <CardContent>
-                          <Typography variant="h5">
-                            {order.item.name}
-                          </Typography>
-                          <Typography variant="body2" component="p">
-                            ${order.item.price} x {order.quantity} = <b>${order.item.price * order.quantity}</b>
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                    </ButtonBase>
-                  );
-                })
-              }
-            </div>
-          }
-          third={
-            <div>
-              <Typography variant="h6">Total price: ${this.calculateTotalPrice()}</Typography>
-              <Button variant="contained" color="primary" disabled={this.state.orders.length === 0} onClick={() => this.openConfirmModal()}>
-                Confirm order
-              </Button>
-            </div>
-          }
-        />
-
-        {/* First modal for items */}
         <Modal
           aria-labelledby=""
           aria-describedby=""
@@ -370,100 +301,19 @@ class MenuPage extends React.Component<IProps, IState> {
                   </FormGroup>
                 </FormControl>
               </Grid>
-
-              {/* Third col */}
               <Grid item xs={8}>
                 <Typography variant="subtitle1">{this.state.modal?.description}</Typography>
               </Grid>
               <Grid item xs={4}>
-                <Typography variant="subtitle1">$ {this.state.modal?.price.toString()}</Typography>
-                <Typography variant="subtitle1">Quantity</Typography>
-                <IconButton aria-label="remove" disabled={this.state.modalQuantity <= 0} onClick={() => this.removeModalQuantity()}>
-                  <Icon>remove_circle</Icon>
-                </IconButton>
-                {this.state.modalQuantity}
-                <IconButton aria-label="add" onClick={() => this.addModalQuantity()}>
-                  <Icon>add_circle</Icon>
-                </IconButton>
-              </Grid>
-
-              {/* Last col */}
-              <Grid item xs={7}>
-                <TextField id="standard-basic" label="Comment" />
-              </Grid>
-              <Grid item xs={5}>
-                <Button variant="contained" onClick={this.handleCloseModal}>Cancel</Button>
-                <Button variant="contained" color="primary" disabled={this.state.modalSecondButtonDisable} onClick={this.addToOrder}>{this.state.modalSecondButton}</Button>
+                <Typography variant="subtitle1">${this.state.modal?.price.toFixed(2)}</Typography>
               </Grid>
             </Grid>
           </div>
         </Modal>
 
-        {/* Second modal for confirmation */}
-        <Modal
-          aria-labelledby=""
-          aria-describedby=""
-          open={this.state.openConfirmModal}
-          onClose={this.handleCloseConfirmModal}
-          className={classes.modal}
-        >
-          <div className={classes.confirmmodal}>
-            <Grid container spacing={1}>
-              <Grid item xs={11}>
-                <Typography variant="h4">Order summary</Typography>
-              </Grid>
-              <Grid item xs={1}>
-                <IconButton aria-label="close" onClick={this.handleCloseConfirmModal}>
-                  <Icon>close</Icon>
-                </IconButton>
-              </Grid>
-
-              <Grid item xs={12}>
-                <TableContainer component={Paper}>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Name</TableCell>
-                        <TableCell>Quantity x Price</TableCell>
-                        <TableCell>Price</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {
-                        this.state.orders &&
-                        this.state.orders?.map((it: OrderItemState) => {
-                          return (
-                            <TableRow>
-                              <TableCell>{it.item.name}</TableCell>
-                              <TableCell>{it.item.price} x {it.quantity}</TableCell>
-                              <TableCell>{it.quantity * it.item.price}</TableCell>
-                            </TableRow>
-                          )
-                        })
-                      }
-                      <TableRow>
-                        <TableCell />
-                        <TableCell><b>Total Price</b></TableCell>
-                        <TableCell><b>${this.calculateTotalPrice()}</b></TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Grid>
-
-              <Grid item xs={6} />
-              <Grid item xs={3}>
-                <Button variant="contained" onClick={this.handleCloseConfirmModal}>Cancel</Button>
-              </Grid>
-              <Grid item xs={3}>
-                <Button variant="contained" color="primary" onClick={() => this.submitOrder()}>Submit Order</Button>
-              </Grid>
-            </Grid>
-          </div>
-        </Modal>
       </div >
     );
   }
 }
 
-export const Menu = withStyles(styles)(MenuPage);
+export const StaticMenu = withStyles(styles)(StaticMenuPage);

@@ -41,7 +41,8 @@ new_order_model = api.schema_model('new_order_model', {
                 'required': ['item_id', 'quantity'],
                 'properties': {
                     'item_id': { 'type': 'integer' },
-                    'quantity': { 'type': 'integer' }
+                    'quantity': { 'type': 'integer' },
+                    'comment': { 'type': 'string' }
                 }
             }
         }
@@ -50,12 +51,14 @@ new_order_model = api.schema_model('new_order_model', {
 
 add_order_model = api.model('add_order_model', {
     "item_id": fields.Integer(description="item_id"),
-    "quantity": fields.Integer(description="quantity")
+    "quantity": fields.Integer(description="quantity"),
+    "comment": fields.String(description="Comment")
 })
 
 modify_order_model = api.model('modify_order_model', {
     "id": fields.Integer(description="item_order_id"),
-    "quantity": fields.Integer(description="quantity")
+    "quantity": fields.Integer(description="quantity"),
+    "comment": fields.String(description="Comment")
 })
 
 delete_order_model = api.model('delete_order_model', {
@@ -74,12 +77,7 @@ menu_item_model = api.model('menu_item_model', {
 })
 
 category_model = api.model('category_model', {
-    'name': fields.String(description='category name'),
-    'position': fields.Integer(description='position to show the category')
-})
-
-add_item_to_category_model = api.model('add_item_to_category_model', {
-    'position': fields.Integer(description='position to show the item in the category')
+    'name': fields.String(description='category name')
 })
 
 ingredient_model = api.model('ingredient_model', {
@@ -96,7 +94,7 @@ table_model = api.model('table_model', {
 
 table_assistance_model = api.model('table_assistance_model', {
     'assistance': fields.Boolean(description='The assistance status of a table session'),
-    'order_id': fields.Integer(description='Optional field for order_id')
+    'table': fields.Integer(description='Optional field for table')
 })
 
 

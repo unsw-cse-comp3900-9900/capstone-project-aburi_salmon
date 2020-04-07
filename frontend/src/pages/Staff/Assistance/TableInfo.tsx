@@ -62,6 +62,7 @@ export interface IProps extends WithStyles<typeof styles> {
     assistance: boolean,
     isEmpty: boolean | undefined,
     paidFunction: any,
+  
 }
 
 interface IState {
@@ -178,7 +179,8 @@ class TableInfoClass extends React.Component<IProps, IState>{
             .then((msg) => {
                 if (msg.status === 200) {
                     //alert('problem resolved');
-                    this.setState({isOpen: true, alertSeverity: "success", alertMessage: "Problem Resolved"});
+                    this.setState({isOpen: true, alertSeverity: "success", alertMessage: "Problem Resolved", hide:'none'});
+                    //this.props.paidFunction();
                 } else {
                     this.setState({ isOpen: true, alertSeverity: "error", alertMessage: msg.statusText });
                     //alert(msg.statusText);
@@ -190,7 +192,7 @@ class TableInfoClass extends React.Component<IProps, IState>{
 
     async freeTable(){
         const client = new Client();
-        await client.assistance(this.props.tableNumber, false)
+        await client.freeTable(this.props.tableNumber)
             .then((msg) => {
                 if (msg.status === 200) {
                     this.setState({ isOpen: true, alertSeverity: "success", alertMessage: "Table Freed" });
