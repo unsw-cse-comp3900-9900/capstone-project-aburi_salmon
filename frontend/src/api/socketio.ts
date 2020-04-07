@@ -4,7 +4,8 @@ import App from '../App';
 export let socket: any;
 
 interface RoomObject {
-    room: string
+    room: string;
+    table: string
 }
 
 export const connectToSocket = (App: App) => {
@@ -25,4 +26,21 @@ export const connectToSocket = (App: App) => {
         console.log(`Left room ${App.state.room}`);
         App.setState({ room: false });
     });
+
+    socket.on('leave', () => {
+        console.log(`Left room ${App.state.room}`);
+        App.setState({ room: false });
+    });
+
+    socket.on('assistance', () => {
+        console.log(`Table is requesting assistance`);
+    });
+
+    socket.on('selecttable', () => {
+        console.log(`Customer is sitting at table `);
+    });
+    socket.on('modify', () => {
+        console.log(`WE AT MODIFY`);
+    });
+
 };

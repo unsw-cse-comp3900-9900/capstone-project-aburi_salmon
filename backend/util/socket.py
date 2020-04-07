@@ -53,7 +53,7 @@ def on_leave():
     leave_room(room)
     emit('leave')
 
-
+'''
 @socket.on('table')
 @jwt_required
 def select_table():
@@ -61,8 +61,8 @@ def select_table():
     claims = get_jwt_claims()
     room = claims.get('role')
     print("sending to room {}".format(room))
-    #to(room).emit('The client is choosing a table');
-
+    emit('table', room=None, include_self=True, namespace=None, callback=None)
+'''
 
 @socket.on('chosentable')
 @jwt_required

@@ -191,7 +191,8 @@ class CustomerSession(Resource):
 
         identity = User('Customer', None, order_id)
         access_token = create_access_token(identity=identity)
-
+        socket.emit('table')
+        
         response = jsonify({
             'status': 'success'
         })
