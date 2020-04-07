@@ -118,10 +118,12 @@ class MenuPage extends React.Component<IProps, IState> {
 
   openModal(item: ItemModel) {
     let quantity = 0;
+    let comment = "";
 
     this.state.orders.forEach((it: OrderItemState) => {
       if (it.item.id === item.id) {
         quantity = it.quantity;
+        comment = it.comment;
       }
     })
 
@@ -135,6 +137,7 @@ class MenuPage extends React.Component<IProps, IState> {
       // Set quantity to 0 for new item. Might need to change this if entry exists
       modalQuantity: quantity,
       modalOriginalQuantity: quantity,
+      modalComment: comment,
 
       // Set second button to modify order if quantity is not 0
       modalSecondButton: quantity === 0 ? "Add to order" : "Modify order",
@@ -309,6 +312,9 @@ class MenuPage extends React.Component<IProps, IState> {
                           <Typography variant="body2" component="p">
                             ${order.item.price} x {order.quantity} = <b>${order.item.price * order.quantity}</b>
                           </Typography>
+                          <Typography variant="body2" component="p">
+                            {order.comment}
+                          </Typography>
                         </CardContent>
                       </Card>
                     </ButtonBase>
@@ -385,7 +391,7 @@ class MenuPage extends React.Component<IProps, IState> {
 
               {/* Last col */}
               <Grid item xs={7}>
-                <TextField id="standard-basic" label="Comment" />
+                <TextField id="standard-basic" label="Comment" onChange={(e) => this.setState({ modalComment: e.target.value })} defaultValue={this.state.modalComment} />
               </Grid>
               <Grid item xs={5}>
                 <Button variant="contained" onClick={this.handleCloseModal}>Cancel</Button>
@@ -422,6 +428,7 @@ class MenuPage extends React.Component<IProps, IState> {
                         <TableCell>Name</TableCell>
                         <TableCell>Quantity x Price</TableCell>
                         <TableCell>Price</TableCell>
+                        <TableCell>Comment</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -433,6 +440,7 @@ class MenuPage extends React.Component<IProps, IState> {
                               <TableCell>{it.item.name}</TableCell>
                               <TableCell>{it.item.price} x {it.quantity}</TableCell>
                               <TableCell>{it.quantity * it.item.price}</TableCell>
+                              <TableCell>{it.comment}</TableCell>
                             </TableRow>
                           )
                         })

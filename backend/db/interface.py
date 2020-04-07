@@ -392,14 +392,14 @@ class DB:
             ingredient.append(row[0])
         return ingredient
 
-    def get_ordered_items_customer(self, table_id):
+    def get_ordered_items_customer(self, order_id):
         rows = self.__query("""SELECT io.id as item_order_id, io.order_id, i.name, i.id as item_id, io.quantity,
         i.price, s.id as status_id, s.status_name
         FROM item_order io, item i, status s, "order" o
         WHERE s.id = io.status_id
         AND i.id = io.item_id
         AND io.order_id = o.id
-        AND o.id = (SELECT id from "order" WHERE table_id = %s ORDER BY id DESC LIMIT 1);""", [table_id])
+        AND o.id = %s;""", [order_id])
 
         if (not rows):
             return None
