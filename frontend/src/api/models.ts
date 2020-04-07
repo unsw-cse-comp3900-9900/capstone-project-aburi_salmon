@@ -65,7 +65,8 @@ export type ItemOrder = {
   item_id: number,
   quantity: number,
   price: number,
-  status: Status
+  status: Status,
+  comment: string,
 }
 
 export type Order = {

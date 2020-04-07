@@ -42,6 +42,23 @@ export class Client {
     }
   }
 
+  async customerLogout() {
+    try {
+      const r: Response = await fetch(apiUrl + '/auth/customer/logout', {
+        method: 'POST',
+        credentials: 'include',
+        mode: 'cors'
+      });
+
+      const m: ResponseMessage = await r.json();
+
+      return m;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
   async getTables() {
     try {
       const r: Response = await fetch(apiUrl + '/table', {
