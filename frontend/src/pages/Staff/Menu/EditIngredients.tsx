@@ -10,26 +10,24 @@ export interface IProps{
     setIsOpen: any, //function to change state of is open
     ingredientsList: Array<Ingredient> | null, //array of all ingredients
     update: any, //force update
+    alert: any,
 }
 
 interface IState{
     isOpen: boolean, //state of dialog for entering new ingredient name
     newIngred: string, //new ingredient name
-    selected: Ingredient, //selected ingredient (for delete)
+    selected: Ingredient | null, //selected ingredient (for delete)
 }
 
 class EditIngredients extends React.Component<IProps, IState>{
 
     constructor(props: IProps){
         super(props);
-        const temp: Ingredient = { //just for initialising
-            id: 0,
-            name: ''
-        }
+        
         this.state = {
             isOpen: false,
             newIngred: '',
-            selected: temp,
+            selected: null,
         }
     }
 
@@ -67,41 +65,52 @@ class EditIngredients extends React.Component<IProps, IState>{
 
     handleAddIngred(){ //adds ingredient to ingredients list
         const client = new Client();
-        client.addIngredient(this.state.newIngred)
-            .then((msg) => {
-                //alert(msg.status);
-                if (msg.status === 200) {
-                    alert('Success');
-                    this.setState({ isOpen: false });
-                    this.props.update();
-                } else {
-                    alert(msg.statusText);
-                }
-            }).catch((status) => {
-                console.log(status);
-            });
+        if (this.state.newIngred !== ''){
+            client.addIngredient(this.state.newIngred)
+                .then((msg) => {
+                    //alert(msg.status);
+                    if (msg.status === 200) {
+                        this.props.alert(true, 'success', 'Successfully added ingredient');
+                        this.setState({ isOpen: false });
+                        this.props.update();
+                    } else {
+                        this.props.alert(true, 'error', msg.statusText);
+                    }
+                }).catch((status) => {
+                    console.log(status);
+                });
+        } else {
+            this.props.alert(true, 'error', 'Please enter ingredient name');
+        }
+        this.setState({ selected: null, newIngred:'' });
     }
 
     handleDeleteIngred(){ //deletes ingredient from ingredient list
         const client = new Client();
-        client.deleteIngredient(this.state.selected.id)
+        if (this.state.selected !== null){
+            client.deleteIngredient(this.state.selected?.id)
             .then((msg) => {
                 if (msg.status === 200) {
-                    alert('Success');
+                    this.props.alert(true, 'success', 'Successfully deleted ingredient');
                     this.props.update();
                 } else {
-                    alert(msg.statusText);
+                    this.props.alert(true, 'error', msg.statusText);
                 }
             }).catch((status) => {
                 console.log(status);
             });
+        } else {
+            this.props.alert(true, 'error', 'Please select an ingredient');
+        }
+        
+        this.setState({selected: null, newIngred:''});
     }
 
     render(){
         return (
             <Dialog
                 open={this.props.isOpen}
-                onClose={() => this.props.setIsOpen(false)}
+                onClose={() => {this.props.setIsOpen(false); this.setState({selected: null, newIngred: ''})}}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description">
                 {this.addIngred()}
@@ -109,7 +118,7 @@ class EditIngredients extends React.Component<IProps, IState>{
                 <DialogContent>
 
                 <FormControl component="fieldset" >
-                    <RadioGroup row aria-label="position" name="position" value={this.state.selected.name}>
+                    <RadioGroup row aria-label="position" name="position" value={this.state.selected?.name}>
                     {
                         this.props.ingredientsList && 
                             this.props.ingredientsList.map(ingredient => 

@@ -12,6 +12,7 @@ export interface IProps{
     category: Categories | null, //current category
     wholemenu: Menu | null, //whole menu
     update: any, //force update
+    alert: any,
 }
 
 interface IState{
@@ -36,11 +37,11 @@ class EditCategory extends React.Component<IProps, IState>{
             client.addCategory(categoryName)
                 .then((msg) => {
                     if (msg.status === 200) {
-                        alert('Success');
+                        this.props.alert(true, 'success', 'Successfully added category.');
                         this.props.setIsOpen(false);
                         this.props.update();
                     } else {
-                        alert(msg.statusText);
+                        this.props.alert(true, 'error', msg.statusText);
                     }
                 }).catch((status) => {
                     console.log(status);
@@ -49,13 +50,12 @@ class EditCategory extends React.Component<IProps, IState>{
             const client = new Client();
             client.editCategory(categoryName, this.props.category?.position, this.props.category?.id)
                 .then((msg) => {
-                    //alert(msg.status);
                     if (msg.status === 200) {
-                        alert('Successfully edited');
+                        this.props.alert(true, 'success', 'Category successfully modified.');
                         this.props.setIsOpen(false);
                         this.props.update();
                     } else {
-                        alert(msg.statusText);
+                        this.props.alert(true, 'error', msg.statusText);
                     }
                 }).catch((status) => {
                     console.log(status);
@@ -68,11 +68,11 @@ class EditCategory extends React.Component<IProps, IState>{
         client.deleteCat(this.props.category?.id)
         .then((msg) => {
             if (msg.status === 200) {
-                alert('Success');
+                this.props.alert(true, 'success', 'Successfully deleted category');
                 this.props.setIsOpen(false);
                 this.props.update();
             } else {
-                alert(msg.statusText);
+                this.props.alert(true, 'error', msg.statusText);
             }
         }).catch((status) => {
             console.log(status);
@@ -89,11 +89,11 @@ class EditCategory extends React.Component<IProps, IState>{
             client.catSwitch(this.state.currCat, this.props.category?.id)
                 .then((msg) => {
                     if (msg.status === 200) {
-                        alert('Successfully switched');
+                        this.props.alert(true, 'success', 'Successfully switched category positions');
                         this.props.setIsOpen(false);
                         this.props.update();
                     } else {
-                        alert(msg.statusText);
+                        this.props.alert(true, 'error', msg.statusText);
                     }
                 }).catch((status) => {
                     console.log(status);

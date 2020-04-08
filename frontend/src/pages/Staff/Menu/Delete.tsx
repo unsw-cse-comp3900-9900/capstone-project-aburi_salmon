@@ -14,6 +14,7 @@ export interface IProps{
     allItems: WholeItemList | null, //whole menu
     updatemenu: any, //a function to force update
     updateitems: any,
+    alert: any //function for alert
 }
 
 class Delete extends React.Component<IProps, {currItem: number}>{
@@ -45,12 +46,13 @@ class Delete extends React.Component<IProps, {currItem: number}>{
             client.deleteItem(this.state.currItem)
             .then((msg) => {
                 if (msg.status === 200) {
-                    alert('Success1');
+                    this.props.alert(true, 'success', 'Successfully deleted item');
                     this.props.setIsOpen(false);
                     this.props.updatemenu();
                     this.props.updateitems();
                 } else {
-                    alert(msg.statusText);
+                    this.props.alert(true, 'error', msg.statusText);
+                    console.log(msg);
                 }
             }).catch((status) => {
                 console.log(status);
@@ -58,14 +60,16 @@ class Delete extends React.Component<IProps, {currItem: number}>{
         } else { // delete item from category
             console.log(this.props.item?.id);
             console.log(this.props.cat?.id);
+            var itemname = this.props.item?.name;
+            var catname = this.props.cat?.name;
             client.removeItemFromCat(this.props.item?.id, this.props.cat?.id)
             .then((msg) => {
                 if (msg.status === 200) {
-                    alert('Success2');
+                    this.props.alert(true, 'success', 'Successfully removed ' + itemname + ' from ' + catname);
                     this.props.setIsOpen(false);
                     this.props.updatemenu();
-                } else {
-                    alert(msg.statusText);
+                } else {         
+                    this.props.alert(true, 'error', msg.statusText);
                 }
             }).catch((status) => {
                 console.log(status);
