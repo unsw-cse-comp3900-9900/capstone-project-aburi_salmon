@@ -176,9 +176,14 @@ class DB:
         return category
         
     def create_item(self, item):
+        image_url = item.get('image_url')
+
+        if image_url is None:
+            image_url = ""
+
         rows = self.__query(
-            'INSERT INTO item (name, description, price, visible) VALUES (%s, %s, %s, %s) RETURNING id',
-            [item.get('name'), item.get('description'), item.get('price'), item.get('visible')]
+            'INSERT INTO item (name, description, price, visible, image_url) VALUES (%s, %s, %s, %s, %s) RETURNING id',
+            [item.get('name'), item.get('description'), item.get('price'), item.get('visible'), image_url]
         )
         if not rows or not rows[0]:
             return None
@@ -187,7 +192,7 @@ class DB:
 
     def get_all_menu_items(self):
         rows = self.__query(
-            'SELECT * FROM item'
+            'SELECT id, name, description, price, visible, image_url FROM item'
         )
         if (not rows):
             return []
@@ -198,11 +203,12 @@ class DB:
             'description': row[2],
             'price': row[3],
             'visible': row[4],
+            'image_url': row[5],
             'ingredients': self.get_item_ingredients(row[0])
         } for row in rows]
 
     def get_item_by_id(self, id):
-        rows = self.__query('SELECT * FROM item WHERE id = %s', [id])
+        rows = self.__query('SELECT id, name, description, price, visible, image_url FROM item WHERE id = %s', [id])
         if (not rows):
             return None
         
@@ -213,12 +219,13 @@ class DB:
             'description': itemRow[2],
             'price': itemRow[3],
             'visible': itemRow[4],
+            'image_url': itemRow[5],
             'ingredients': self.get_item_ingredients(id)
         }
 
     def get_items_by_category(self, category_id):
         rows = self.__query(
-            'SELECT * FROM item i JOIN category_item ci on (i.id = ci.item_id) WHERE ci.category_id = %s',
+            'SELECT id, name, description, price, visible, image_url FROM item i JOIN category_item ci on (i.id = ci.item_id) WHERE ci.category_id = %s',
             [category_id]
         )
 
@@ -231,6 +238,7 @@ class DB:
             'description': row[2],
             'price': row[3],
             'visible': row[4],
+            'image_url': row[5],
             'ingredients': self.get_item_ingredients(row[0])
         } for row in rows]
 
