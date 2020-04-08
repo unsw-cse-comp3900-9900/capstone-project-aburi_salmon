@@ -3,25 +3,23 @@ import { Button, Dialog, DialogContent, DialogContentText, DialogActions, Dialog
 import {Item, Categories, WholeItemList} from './../../../api/models';
 import {Client} from './../../../api/client';
 
+//Used to render the delete dialog to delete items from category or permanently
 
 export interface IProps{
     isOpen: boolean,
     setIsOpen: any, //function to change state of is open
-
     isDel: boolean, //if 0 then is remove, else is delete (permanent)
-    item: Item | null,
-    cat: Categories | null,
-
-
+    item: Item | null, //current item
+    cat: Categories | null, //current category
+    allItems: WholeItemList | null, //whole menu
 }
 
-class Delete extends React.Component<IProps, {allItems: WholeItemList | null, currItem: number}>{
+class Delete extends React.Component<IProps, {currItem: number}>{
 
     constructor(props: IProps){
         super(props);
         this.state = {
-            allItems: null,
-            currItem: 0,
+            currItem: 0, //current item (for selecting permanent delete)
         }
     }
 
@@ -39,83 +37,71 @@ class Delete extends React.Component<IProps, {allItems: WholeItemList | null, cu
         }
     }
 
-    async componentDidMount(){
-        const client = new Client();
-        const i: WholeItemList | null = await client.getAllItems();
-        if (i !== null) {
-            this.setState({ allItems: i });
-        }
-        console.log(i);
-    }
-
     handleClick(){
         const client = new Client();
-        if (this.props.isDel){
+        if (this.props.isDel){  //permanent delete
             client.deleteItem(this.state.currItem)
-                .then((msg) => {
-                    //alert(msg.status);
-                    if (msg.status === 200) {
-                        alert('Success1');
-                        this.props.setIsOpen(false);
-                    } else {
-                        alert(msg.statusText);
-                    }
-                }).catch((status) => {
-                    console.log(status);
-                });
-        } else {
+            .then((msg) => {
+                if (msg.status === 200) {
+                    alert('Success1');
+                    this.props.setIsOpen(false);
+                } else {
+                    alert(msg.statusText);
+                }
+            }).catch((status) => {
+                console.log(status);
+            });
+        } else { // delete item from category
             console.log(this.props.item?.id);
             console.log(this.props.cat?.id);
             client.removeItemFromCat(this.props.item?.id, this.props.cat?.id)
-                .then((msg) => {
-                    //alert(msg.status);
-                    if (msg.status === 200) {
-                        alert('Success2');
-                        this.props.setIsOpen(false);
-                    } else {
-                        alert(msg.statusText);
-                    }
-                }).catch((status) => {
-                    console.log(status);
-                });
+            .then((msg) => {
+                if (msg.status === 200) {
+                    alert('Success2');
+                    this.props.setIsOpen(false);
+                } else {
+                    alert(msg.statusText);
+                }
+            }).catch((status) => {
+                console.log(status);
+            });    
         }
         
     }
 
     render() {
-        if (!this.props.isDel){
-        return (
-            <div>
-                <Dialog
-                    open={this.props.isOpen}
-                    onClose={() => this.props.setIsOpen(false)}
-                    aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description"
-                >
-                    <DialogTitle id="alert-dialog-title">{"Delete"}</DialogTitle>
-                    <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
-                            {this.selectText()}
-                        </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={() => this.props.setIsOpen(false)} color="primary">
-                            Nevermind
-                        </Button>
-                        <Button onClick={() => this.handleClick()} color="primary" autoFocus>
-                            Yes, I'm sure
-                        </Button>
-                    </DialogActions>
-                </Dialog>
-            </div>
-        )} else {
+        if (!this.props.isDel){ //delete from category
+            return (
+                <div>
+                    <Dialog
+                        open={this.props.isOpen}
+                        onClose={() => this.props.setIsOpen(false)}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description">
+                        <DialogTitle id="alert-dialog-title">{"Delete"}</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                                {this.selectText()}
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => this.props.setIsOpen(false)} color="primary">
+                                Nevermind
+                            </Button>
+                            <Button onClick={() => this.handleClick()} color="primary" autoFocus>
+                                Yes, I'm sure
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                </div>
+            )
+        } else { //delete permanently
             return(
                 <Dialog
                     open={this.props.isOpen}
                     onClose={() => this.props.setIsOpen(false)}
                     aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description"
-                >
+                    aria-describedby="alert-dialog-description">
                     <DialogTitle id="alert-dialog-title">{"Delete"}</DialogTitle>
                     <DialogContent>
                         <DialogContentText id="alert-dialog-description">
@@ -127,12 +113,11 @@ class Delete extends React.Component<IProps, {allItems: WholeItemList | null, cu
                                 defaultValue={1}
                                 onChange={(e) => this.setState({ currItem: parseInt(e.target.value) })}
                             >
-                                {this.state.allItems && this.state.allItems?.items &&
-                                    this.state.allItems?.items.map(item =>
+                                {this.props.allItems && this.props.allItems?.items &&
+                                    this.props.allItems?.items.map(item =>
                                         <option value={item.id} key={item.id}>{item.name}</option>
                                     )
                                 }
-
                             </NativeSelect>
                         </FormControl>
                     </DialogContent>

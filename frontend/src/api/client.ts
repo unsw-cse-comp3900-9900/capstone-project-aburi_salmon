@@ -401,7 +401,7 @@ export class Client {
     }
   }
 
-  async addCategory(categoryName: string, position: number) {
+  async addCategory(categoryName: string) {
     return fetch(apiUrl + '/menu/category', {
       method: 'POST',
       credentials: 'include',
@@ -412,7 +412,6 @@ export class Client {
       body: JSON.stringify(
         {
           name: categoryName,
-          position: position,
         }
       ),
     }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button,withStyles, WithStyles,  Modal, Grid, FormControl, FormControlLabel, FormGroup } from '@material-ui/core';
-//import Button from '@material-ui/core/Button';
+
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
@@ -13,11 +13,9 @@ import Icon from '@material-ui/core/Icon';
 import Checkbox from '@material-ui/core/Checkbox';
 import EditIcon from '@material-ui/icons/Edit';
 
-import history from '../../../history';
-
 import { styles } from './styles';
 import { Client } from '../../../api/client';
-import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel, ItemId, Item } from '../../../api/models';
+import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel, Item, WholeItemList, Ingredient } from '../../../api/models';
 
 import EditCategory from './EditCategory';
 import EditItem from './EditItem';
@@ -26,17 +24,11 @@ import Ingredients from './Ingredients';
 import EditIngredients from './EditIngredients';
 import AddItemCat from './AddItemCat';
 
-
-
 interface IProps extends WithStyles<typeof styles> { }
 
 interface OrderItemState {
   item: ItemModel;
   quantity: number;
-}
-
-interface OrderState {
-  items: Array<OrderItemState>;
 }
 
 interface IState {
@@ -65,13 +57,15 @@ interface IState {
   ingredDialog: boolean,
   editIngredDialog: boolean,
   addItemCatDialog: boolean,
+
   currItem: ItemModel,
   currCat: CategoriesModel | null,
   isEdit: boolean, //1 if is edit, 0 if is modify
   isCat: boolean, //1 if is category, 0 if item
-  catNo: number | undefined,
   isDel: boolean,
   itemIngredients: Array<number>,
+  allItems: WholeItemList | null,
+  ingredientsList: Array<Ingredient> | null,
 }
 
 class EditMenuPage extends React.Component<IProps, IState> {
@@ -111,10 +105,10 @@ class EditMenuPage extends React.Component<IProps, IState> {
       currCat: null,
       isEdit: false,
       isCat: false,
-      catNo: 0, //number of categories
-      isDel: false, //
-      itemIngredients: []
-
+      isDel: false,
+      itemIngredients: [],
+      allItems: null,
+      ingredientsList: null,
 
     }
     // To bind the tab change
@@ -134,11 +128,6 @@ class EditMenuPage extends React.Component<IProps, IState> {
     this.ingredientDialogIsOpen = this.ingredientDialogIsOpen.bind(this);
     this.editIngredDialogIsOpen = this.editIngredDialogIsOpen.bind(this);
     this.addItemCatIsOpen = this.addItemCatIsOpen.bind(this);
-
-    this.addEditItem = this.addEditItem.bind(this);
-    this.addEditCat = this.addEditCat.bind(this);
-    this.ingredFun = this.ingredFun.bind(this); //for items
-    this.editIngredients = this.editIngredients.bind(this);  //for just ingredients
   }
 
   itemDialogIsOpen(isOpen: boolean){
@@ -164,88 +153,6 @@ class EditMenuPage extends React.Component<IProps, IState> {
 
   addItemCatIsOpen(isOpen: boolean){
     this.setState({addItemCatDialog: isOpen});
-  }
-
-  ingredFun(){
-
-  }
-
-  editIngredients(){
-
-  }
-
-  addEditItem(name: string, description: string, price: number, visibility: boolean, category: number){
-    const client = new Client();
-    if (this.state.isEdit){
-      console.log(name + ', ' + description + ', ' + price + ', ' + visibility + ', ' + category);
-      var j = client.editItem(name, description, price, visibility, this.state.currItem.id);
-      console.log(j);
-      j.then((msg) => {
-      //alert(msg.status);
-        if (msg.status === 200) {
-          alert('Success');
-          this.setState({ editItemDialog: false, openModal: false });
-          this.componentDidMount();
-        } else {
-          alert(msg.statusText);
-        }
-      }).catch((status) => {
-        console.log(status);
-      });
-    } else {
-      
-      var j: Promise<Response> = client.addItem(name, description,price,visibility);
-      
-      j.then((msg) => {
-        //alert(msg.status);
-        if (msg.status === 200) {
-          alert('Success');
-          this.setState({ editItemDialog: false, })
-          this.componentDidMount();
-        } else {
-          alert(msg.statusText);
-        }
-      }).catch((status) => {
-        console.log(status);
-      });
-    }
-  }
-
-  addEditCat(categoryName: string, isAdd: boolean, position: number){
-    console.log(categoryName);
-    console.log(position);
-    console.log(this.state.currCat?.position)
-    if (isAdd){
-      const client = new Client();
-      client.addCategory(categoryName, position)
-        .then((msg) => {
-          //alert(msg.status);
-          if (msg.status === 200) {
-            alert('Success');
-            this.setState({ editCatDialog: false,})
-            this.componentDidMount();
-          } else { 
-            alert(msg.statusText);
-          }
-        }).catch((status) => {
-          console.log(status);
-        });
-    } else {
-      const client = new Client();
-      client.editCategory(categoryName, this.state.currCat?.position,this.state.currCat?.id)
-        .then((msg) => {
-          //alert(msg.status);
-          if (msg.status === 200) {
-            alert('Success');
-            this.setState({ editCatDialog: false, })
-            this.componentDidMount();
-          } else {
-            alert(msg.statusText);
-          }
-        }).catch((status) => {
-          console.log(status);
-        });
-    }
   }
 
   createItemIngredients(item: Item) {
@@ -289,10 +196,6 @@ class EditMenuPage extends React.Component<IProps, IState> {
     )
   }
 
-  goToTable() {
-    history.push('/table');
-  }
-
   handleTabChange(event: React.ChangeEvent<{}>, newValue: string) {
     this.setState({
       value: newValue,
@@ -311,9 +214,6 @@ class EditMenuPage extends React.Component<IProps, IState> {
 
     this.setState({
       openModal: true,
-
-      // Note: always pass in the whole ModalState object when setting new state on open modal. It will break if you're not passing the whole object
-      // Read https://stackoverflow.com/questions/49348996/react-change-a-json-object-in-setstate
       modal: item,
 
       // Set quantity to 0 for new item. Might need to change this if entry exists
@@ -328,28 +228,6 @@ class EditMenuPage extends React.Component<IProps, IState> {
 
   openConfirmModal() {
     this.setState({ openConfirmModal: true });
-  }
-
-  removeModalQuantity() {
-    this.setState(prevState => {
-      let pq = prevState.modalQuantity;
-      if (pq <= 1) pq = 0;
-      else pq--;
-      return {
-        modalQuantity: pq,
-        modalSecondButtonDisable: pq === prevState.modalOriginalQuantity,
-      }
-    });
-  }
-
-  addModalQuantity() {
-    this.setState(prevState => {
-      let pq = this.state.modalQuantity + 1;
-      return {
-        modalQuantity: pq,
-        modalSecondButtonDisable: pq === prevState.modalOriginalQuantity,
-      }
-    })
   }
 
   handleCloseModal(event: React.ChangeEvent<{}>) {
@@ -380,19 +258,16 @@ class EditMenuPage extends React.Component<IProps, IState> {
       this.setState({
         menu: m,
         value: m?.menu[0].name ? m?.menu[0].name : "",
-        catNo: (m?.menu.length + 1),
         currCat: m.menu[0],
       });
+      
     }
-
-  
-    
-    console.log(this.state.catNo);
-  }
-
-  // This will be called when there is a state change
-  componentDidUpdate() {
-
+    const i: WholeItemList | null = await client.getAllItems();
+    if (i !== null) {
+      this.setState({ allItems: i });
+    }
+    const ingred: Array<Ingredient> | null = await client.getIngredients();
+    this.setState({ ingredientsList: ingred });
   }
 
   render() {
@@ -400,17 +275,18 @@ class EditMenuPage extends React.Component<IProps, IState> {
     return (
       <div className={classes.menupage}>
         <EditCategory isOpen={this.state.editCatDialog} setIsOpen={this.catDialogIsOpen}
-          relevantFunction={this.addEditCat} isEdit={this.state.isEdit} category={this.state.currCat} 
-          catNo={this.state.catNo} wholemenu={this.state.menu}/>
+          isEdit={this.state.isEdit} category={this.state.currCat} wholemenu={this.state.menu}/>
         <EditItem isOpen={this.state.editItemDialog} setIsOpen={this.itemDialogIsOpen} wholemenu={this.state.menu}
-          relevantFunction={this.addEditItem} isEdit={this.state.isEdit} item={this.state.currItem}/>
-        <Delete isOpen={this.state.deleteDialog} setIsOpen={this.deleteDialogIsOpen}
+          isEdit={this.state.isEdit} item={this.state.currItem}/>
+        <Delete isOpen={this.state.deleteDialog} setIsOpen={this.deleteDialogIsOpen} allItems={this.state.allItems}
         item={this.state.currItem} isDel={this.state.isDel} cat={this.state.currCat}/>
         <Ingredients isOpen={this.state.ingredDialog} currItem={this.state.currItem} itemIngredients={this.state.itemIngredients}
-        setIsOpen={this.ingredientDialogIsOpen} relevantFunction={this.ingredFun}/>
+          setIsOpen={this.ingredientDialogIsOpen} ingredientsList={this.state.ingredientsList}/>
         
-        <EditIngredients isOpen={this.state.editIngredDialog} setIsOpen={this.editIngredDialogIsOpen} relevantFunction={this.editIngredients} />
-        <AddItemCat isOpen={this.state.addItemCatDialog} setIsOpen={this.addItemCatIsOpen} wholemenu={this.state.menu} />
+        <EditIngredients isOpen={this.state.editIngredDialog} setIsOpen={this.editIngredDialogIsOpen} 
+          ingredientsList={this.state.ingredientsList} />
+        <AddItemCat isOpen={this.state.addItemCatDialog} allItems={this.state.allItems}
+        setIsOpen={this.addItemCatIsOpen} wholemenu={this.state.menu} />
             <div className={classes.wrapper}>
               <AppBar position="static">
                 <Tabs

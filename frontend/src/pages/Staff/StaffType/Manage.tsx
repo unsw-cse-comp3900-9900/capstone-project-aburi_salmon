@@ -112,19 +112,7 @@ class Manage extends React.Component<IProps, IState>{
                     <StaffDetails />
                 </Box>
             );
-        } /*else if (this.state.currPage === "Earnings") {
-            return(
-                <Box className={classes.staffContainer}>
-                    <Analytics />
-                </Box>
-            );
-        } else if (this.state.currPage === "Feedback") {
-            return (
-                <Box className={classes.staffContainer}>
-                    <Feedback />
-                </Box>
-            );
-        }*/ else if (this.state.currPage === "ItemStats") {
+        } else if (this.state.currPage === "ItemStats") {
             return (
                 <Box className={classes.staffContainer}>
                     <ItemStats />
