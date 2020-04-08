@@ -371,8 +371,10 @@ class MenuPage extends React.Component<IProps, IState> {
 
               {/* Second col */}
               <Grid item xs={8}>
-                insert image here
-                    </Grid>
+                <div className={classes.imageboxmodaldiv}>
+                    <img src={this.state.modal?.image_url} className={classes.imageboxmodal} />
+                </div>
+              </Grid>
               <Grid item xs={4}>
                 <Typography variant="h6">Ingredients</Typography>
                 <FormControl>

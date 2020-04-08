@@ -20,6 +20,7 @@ interface IState{
     name: string, //name of new item
     description: string, //description of new item
     price: number, //price of new item
+    image_url: string,
 }
 
 class EditItem extends React.Component<IProps, IState>{
@@ -30,12 +31,13 @@ class EditItem extends React.Component<IProps, IState>{
             name: '',
             description:'',
             price: 0,
+            image_url: '',
         }
         this.submitEdit = this.submitEdit.bind(this);
     }
 
     submitCreate(){ //create new item
-        this.addEditItem(this.state.name, this.state.description, this.state.price);
+        this.addEditItem(this.state.name, this.state.description, this.state.price, this.state.image_url);
         this.componentDidMount();
     }
 
@@ -56,18 +58,24 @@ class EditItem extends React.Component<IProps, IState>{
         }else {
             var tempprice = this.state.price;
         }
-        this.addEditItem(tempname, tempdes, tempprice);
+        if (this.state.description === ''){
+            var tempurl = this.props.item?.image_url;
+        } else {
+            var tempurl = this.state.image_url;
+        }
+
+        this.addEditItem(tempname, tempdes, tempprice, tempurl);
         this.componentDidMount();
     }
 
     async componentDidMount(){ //reset values
-        this.setState({ name: '', description: '', price: 0});
+        this.setState({ name: '', description: '', price: 0, image_url: ''});
     }
 
-    addEditItem(name: string, description: string, price: number) { //fetchs from server
+    addEditItem(name: string, description: string, price: number, image_url: string) { //fetchs from server
         const client = new Client();
         if (this.props.isEdit) { //if editing existing item
-            client.editItem(name, description, price, true ,this.props.item.id)
+            client.editItem(name, description, price, true ,this.props.item.id, image_url)
             .then((msg) => {
                 if (msg.status === 200) {
                     this.props.alert(true, 'success', 'Successfully edited item');
@@ -80,7 +88,7 @@ class EditItem extends React.Component<IProps, IState>{
                 console.log(status);
             });
         } else { //if adding item
-            client.addItem(name, description, price, true)
+            client.addItem(name, description, price, true, image_url)
             .then((msg) => {
                 if (msg.status === 200) {
                     this.props.alert(true, 'success', 'Successfully added item');
@@ -133,6 +141,15 @@ class EditItem extends React.Component<IProps, IState>{
                                 defaultValue={this.props.item?.price}
                                 onChange={(e) => this.setState({ price: parseInt(e.target.value) })}
                             />
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                id="imageurl"
+                                label="Image URL (can be blank)"
+                                fullWidth
+                                defaultValue={this.props.item?.image_url}
+                                onChange={(e) => this.setState({ image_url: e.target.value })}
+                            />
                     </DialogContent>
                     <DialogActions>
                         <div style={{width: '100%'}}>
@@ -181,6 +198,14 @@ class EditItem extends React.Component<IProps, IState>{
                                 label="Price"
                                 fullWidth
                             onChange={(e) => this.setState({ price: parseInt(e.target.value) })}
+                            />
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                id="imageurl"
+                                label="Image URL (blank for no image)"
+                                fullWidth
+                            onChange={(e) => this.setState({ image_url: e.target.value })}
                             />
                     </DialogContent>
                     <DialogActions>

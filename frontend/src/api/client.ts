@@ -463,7 +463,8 @@ export class Client {
       }))
 
   }
-  async addItem(name: string, description: string, price: number, visible: boolean) {
+  
+  async addItem(name: string, description: string, price: number, visible: boolean, image_url: string) {
     return(fetch(apiUrl + '/menu/item', {
         method: 'POST',
         credentials: 'include',
@@ -477,13 +478,14 @@ export class Client {
             description: description,
             price: price,
             visible: visible,
+            image_url: image_url,
           }
         ),
       }))
      
   }
 
-  async editItem(name: string, description: string, price: number, visible: boolean, itemId: number) {
+  async editItem(name: string, description: string, price: number, visible: boolean, itemId: number, image_url: string) {
     return( fetch(apiUrl + '/menu/item/' + itemId, {
         method: 'PUT',
         credentials: 'include',
@@ -497,6 +499,7 @@ export class Client {
             description: description,
             price: price,
             visible: visible,
+            image_url: image_url,
           }
         ),
       }))

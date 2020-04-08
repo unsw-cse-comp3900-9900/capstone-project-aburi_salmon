@@ -103,6 +103,16 @@ export const styles = (theme: Theme) =>
        display: 'flex',
        alignItems: 'center',
        textAlign: 'center',
-     }
+     },
+     imageboxmodaldiv: {
+       height: 450,
+       width: 600,
+     },
+     imageboxmodal: {
+       height: '100%',
+       maxHeight: '100%',
+       width: 'auto',
+       maxWidth: '100%',
+     },
 
   });
