@@ -216,8 +216,6 @@ class EditMenuPage extends React.Component<IProps, IState> {
     }
   }
 
-
-
   async forceUpdateItemlist(){
     const client = new Client();
     const i: WholeItemList | null = await client.getAllItems();
