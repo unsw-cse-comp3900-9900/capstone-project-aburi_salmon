@@ -16,8 +16,6 @@ interface IState {
     alertMessage: string;
 }
 
-
-
 class PureLogin extends React.Component<{}, IState> {
 
     constructor(props: any) {
@@ -148,6 +146,5 @@ class PureLogin extends React.Component<{}, IState> {
         );
     }
 }
-
 
 export const LoginForm = PureLogin;
