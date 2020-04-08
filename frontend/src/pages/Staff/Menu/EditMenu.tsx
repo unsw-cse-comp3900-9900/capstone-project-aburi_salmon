@@ -23,6 +23,7 @@ import Delete from './Delete';
 import Ingredients from './Ingredients';
 import EditIngredients from './EditIngredients';
 import AddItemCat from './AddItemCat';
+import AlertSnackbar from './../AlertSnackbar';
 
 interface IProps extends WithStyles<typeof styles> { }
 
@@ -49,6 +50,12 @@ interface IState {
   itemIngredients: Array<number>,
   allItems: WholeItemList | null,
   ingredientsList: Array<Ingredient> | null,
+
+  //alert
+  alertDialog: boolean,
+  severity: "success" | "info" | "error" | "warning",
+  alertMessage: string,
+
 }
 
 class EditMenuPage extends React.Component<IProps, IState> {
@@ -86,6 +93,11 @@ class EditMenuPage extends React.Component<IProps, IState> {
       allItems: null,
       ingredientsList: null,
 
+      //alert
+      alertDialog: false,
+      severity: "error",
+      alertMessage: "What???"
+
     }
 
     // Displaying menu
@@ -105,6 +117,10 @@ class EditMenuPage extends React.Component<IProps, IState> {
     this.forceUpdateIngredList = this.forceUpdateIngredList.bind(this);
     this.forceUpdateItemlist = this.forceUpdateItemlist.bind(this);
     this.forceUpdateMenu = this.forceUpdateMenu.bind(this);
+
+    //alert
+    this.alertDialogIsOpen = this.alertDialogIsOpen.bind(this);
+    this.setAlert = this.setAlert.bind(this);
   }
 
   itemDialogIsOpen(isOpen: boolean){
@@ -133,6 +149,14 @@ class EditMenuPage extends React.Component<IProps, IState> {
 
   modalIsOpen(isOpen: boolean){
     this.setState({openModal: isOpen});
+  }
+
+  alertDialogIsOpen(isOpen: boolean){
+    this.setState({alertDialog: isOpen});
+  }
+
+  setAlert(isOpen: boolean, severity: "success" | "error", alertMessage: string){
+    this.setState({alertDialog: isOpen, severity: severity, alertMessage: alertMessage});
   }
 
   createItemIngredients(item: Item) {
@@ -206,7 +230,7 @@ class EditMenuPage extends React.Component<IProps, IState> {
   async forceUpdateMenu(){
     const client = new Client();
     const m: MenuModel | null = await client.getMenu();
-    if (m?.menu.length !== undefined) {
+    if (m !== null && m?.menu.length !== undefined) {
       this.setState({
         menu: m,
         value: m?.menu[0].name ? m?.menu[0].name : "",
@@ -242,25 +266,28 @@ class EditMenuPage extends React.Component<IProps, IState> {
     return (
       <div className={classes.menupage}>
         <EditCategory isOpen={this.state.editCatDialog} setIsOpen={this.catDialogIsOpen} update={this.forceUpdateMenu}
-          isEdit={this.state.isEdit} category={this.state.currCat} wholemenu={this.state.menu}/>
+          isEdit={this.state.isEdit} category={this.state.currCat} wholemenu={this.state.menu} alert={this.setAlert}/>
 
         <EditItem isOpen={this.state.editItemDialog} setIsOpen={this.itemDialogIsOpen} wholemenu={this.state.menu}
           isEdit={this.state.isEdit} item={this.state.currItem} updatemenu={this.forceUpdateMenu} 
-          updateitems={this.forceUpdateItemlist}/>
+          updateitems={this.forceUpdateItemlist} alert={this.setAlert}/>
 
         <Delete isOpen={this.state.deleteDialog} setIsOpen={this.deleteDialogIsOpen} allItems={this.state.allItems}
         item={this.state.currItem} isDel={this.state.isDel} cat={this.state.currCat} updatemenu={this.forceUpdateMenu}
-        updateitems={this.forceUpdateItemlist}/>
+        updateitems={this.forceUpdateItemlist} alert={this.setAlert}/>
 
         <Ingredients isOpen={this.state.ingredDialog} currItem={this.state.currItem} itemIngredients={this.state.itemIngredients}
           setIsOpen={this.ingredientDialogIsOpen} ingredientsList={this.state.ingredientsList} 
-          update={this.forceUpdateMenu} setModalIsOpen={this.modalIsOpen}/>
+          update={this.forceUpdateMenu} setModalIsOpen={this.modalIsOpen} alert={this.setAlert}/>
         
         <EditIngredients isOpen={this.state.editIngredDialog} setIsOpen={this.editIngredDialogIsOpen} 
-          ingredientsList={this.state.ingredientsList} update={this.forceUpdateIngredList}/>
+          ingredientsList={this.state.ingredientsList} update={this.forceUpdateIngredList} alert={this.setAlert}/>
 
-        <AddItemCat isOpen={this.state.addItemCatDialog} allItems={this.state.allItems}
+        <AddItemCat isOpen={this.state.addItemCatDialog} allItems={this.state.allItems} alert={this.setAlert}
           setIsOpen={this.addItemCatIsOpen} wholemenu={this.state.menu} update={this.forceUpdateMenu} />
+
+        <AlertSnackbar isOpen={this.state.alertDialog} severity={this.state.severity} alertMessage={this.state.alertMessage}
+            changeState={this.alertDialogIsOpen}/>
 
             <div className={classes.wrapper}>
               <AppBar position="static">

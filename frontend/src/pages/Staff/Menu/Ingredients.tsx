@@ -13,6 +13,7 @@ export interface IProps{
     ingredientsList: Array<Ingredient> | null, //list of all available ingredients
     setModalIsOpen: any,
     update: any, //force update menu
+    alert: any,
 }
 
 interface IState{
@@ -57,7 +58,7 @@ class Ingredients extends React.Component<IProps, IState>{
             client.removeIngredFromItem(this.props.currItem.id, temp[i]);
             i++;
         }
-        alert('success');
+        this.props.alert(true, 'success', 'Success');
         this.props.update();
         this.props.setIsOpen(false);
         this.props.setModalIsOpen(false);

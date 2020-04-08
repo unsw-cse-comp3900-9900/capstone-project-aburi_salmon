@@ -57,6 +57,7 @@ interface IState{
     tables: TableModel | null,
     assistance: Array<number>,
     resetOpen: boolean,
+
 }
 
 class Assistance extends React.Component<IProps, IState>{
@@ -147,7 +148,7 @@ class Assistance extends React.Component<IProps, IState>{
 
     paid(){
         this.setState({ selectedTable: 0 });
-        this.setState({ main: true });
+        //this.setState({ main: true });
         this.componentDidMount();
     }
 

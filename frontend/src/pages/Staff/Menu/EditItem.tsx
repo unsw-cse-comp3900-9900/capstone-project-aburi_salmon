@@ -13,6 +13,7 @@ export interface IProps{
     wholemenu: Menu | null, //whole menu
     updatemenu: any, //force update menu
     updateitems: any,  //force update items
+    alert: any,
 }
 
 interface IState{
@@ -69,11 +70,11 @@ class EditItem extends React.Component<IProps, IState>{
             client.editItem(name, description, price, true ,this.props.item.id)
             .then((msg) => {
                 if (msg.status === 200) {
-                    alert('Success');
+                    this.props.alert(true, 'success', 'Successfully edited item');
                     this.props.setIsOpen(false);
                     this.props.updatemenu();
                 } else {
-                    alert(msg.statusText);
+                    this.props.alert(true, 'error', msg.statusText);
                 }
             }).catch((status) => {
                 console.log(status);
@@ -82,11 +83,11 @@ class EditItem extends React.Component<IProps, IState>{
             client.addItem(name, description, price, true)
             .then((msg) => {
                 if (msg.status === 200) {
-                    alert('Success');
+                    this.props.alert(true, 'success', 'Successfully added item');
                     this.props.setIsOpen(false);
                     this.props.updateitems();
                 } else {
-                    alert(msg.statusText);
+                    this.props.alert(true, 'error', msg.statusText);
                 }
             }).catch((status) => {
                 console.log(status);

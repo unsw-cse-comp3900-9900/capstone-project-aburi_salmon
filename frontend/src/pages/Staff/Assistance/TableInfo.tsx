@@ -2,7 +2,7 @@ import React from 'react';
 import { createStyles, WithStyles, Theme, withStyles, Button, Box,  Snackbar } from '@material-ui/core';
 import { Client } from './../../../api/client';
 import { TableInfo } from './../../../api/models';
-import { Alert } from '@material-ui/lab';
+import AlertSnackbar from './../AlertSnackbar';
 
 
 const styles = (theme: Theme) =>
@@ -92,10 +92,11 @@ class TableInfoClass extends React.Component<IProps, IState>{
             hide: temp,
             itemsOrdered: 0,
             order_id: -1,
-            isOpen: false,
+            isOpen: true,
             alertMessage: 'somethings wrong',
             alertSeverity: 'error'
         }
+        this.changeAlertState = this.changeAlertState.bind(this);
     }
 
     async componentDidMount() {
@@ -108,6 +109,10 @@ class TableInfoClass extends React.Component<IProps, IState>{
                 this.setState({itemsOrdered: t?.items.length, order_id:t.order_id})
             }
         }
+    }
+
+    changeAlertState(isOpen: boolean){
+        this.setState({isOpen: isOpen});
     }
 
     printItems(){
@@ -155,35 +160,14 @@ class TableInfoClass extends React.Component<IProps, IState>{
         }
     }
 
-    showAlert() {
-        return (
-            <Snackbar
-                open={this.state.isOpen}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            >
-                <Alert
-                    severity={this.state.alertSeverity}
-                    action={
-                        <Button color="inherit" size="small" onClick={() => this.setState({ isOpen: false })}>
-                            OK
-                            </Button>
-                    }
-                >{this.state.alertMessage}</Alert>
-            </Snackbar>
-        );
-    }
-
     problemResolved(){
         const client = new Client();
         client.assistance(this.state.order_id, false)
             .then((msg) => {
                 if (msg.status === 200) {
-                    //alert('problem resolved');
                     this.setState({isOpen: true, alertSeverity: "success", alertMessage: "Problem Resolved", hide:'none'});
-                    //this.props.paidFunction();
                 } else {
                     this.setState({ isOpen: true, alertSeverity: "error", alertMessage: msg.statusText });
-                    //alert(msg.statusText);
                 }
             }).catch((status) => {
                 console.log(status);
@@ -212,7 +196,8 @@ class TableInfoClass extends React.Component<IProps, IState>{
         if (this.props.isEmpty){
             return (
                 <div className={classes.wrapper}>
-                    {this.showAlert()}
+                    <AlertSnackbar isOpen={this.state.isOpen} severity={this.state.alertSeverity}
+                        alertMessage={this.state.alertMessage} changeState={this.changeAlertState} />
                     <div className={classes.wrapper1}>
                         <h1 className = {classes.text}>Table {this.props.tableNumber + 1}</h1>
                         <Box display={this.state.hide} displayPrint="none">
