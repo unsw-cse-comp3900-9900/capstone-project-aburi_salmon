@@ -9,6 +9,7 @@ export interface IProps{
     isOpen: boolean, //if dialog is open
     setIsOpen: any, //function to change state of is open
     ingredientsList: Array<Ingredient> | null, //array of all ingredients
+    update: any, //force update
 }
 
 interface IState{
@@ -72,6 +73,7 @@ class EditIngredients extends React.Component<IProps, IState>{
                 if (msg.status === 200) {
                     alert('Success');
                     this.setState({ isOpen: false });
+                    this.props.update();
                 } else {
                     alert(msg.statusText);
                 }
@@ -86,6 +88,7 @@ class EditIngredients extends React.Component<IProps, IState>{
             .then((msg) => {
                 if (msg.status === 200) {
                     alert('Success');
+                    this.props.update();
                 } else {
                     alert(msg.statusText);
                 }

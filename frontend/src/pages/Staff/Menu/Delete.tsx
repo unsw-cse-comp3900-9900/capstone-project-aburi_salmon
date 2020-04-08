@@ -6,12 +6,14 @@ import {Client} from './../../../api/client';
 //Used to render the delete dialog to delete items from category or permanently
 
 export interface IProps{
-    isOpen: boolean,
+    isOpen: boolean, //state of dialog
     setIsOpen: any, //function to change state of is open
     isDel: boolean, //if 0 then is remove, else is delete (permanent)
     item: Item | null, //current item
     cat: Categories | null, //current category
     allItems: WholeItemList | null, //whole menu
+    updatemenu: any, //a function to force update
+    updateitems: any,
 }
 
 class Delete extends React.Component<IProps, {currItem: number}>{
@@ -45,6 +47,8 @@ class Delete extends React.Component<IProps, {currItem: number}>{
                 if (msg.status === 200) {
                     alert('Success1');
                     this.props.setIsOpen(false);
+                    this.props.updatemenu();
+                    this.props.updateitems();
                 } else {
                     alert(msg.statusText);
                 }
@@ -59,12 +63,13 @@ class Delete extends React.Component<IProps, {currItem: number}>{
                 if (msg.status === 200) {
                     alert('Success2');
                     this.props.setIsOpen(false);
+                    this.props.updatemenu();
                 } else {
                     alert(msg.statusText);
                 }
             }).catch((status) => {
                 console.log(status);
-            });    
+            });  
         }
         
     }

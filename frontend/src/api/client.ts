@@ -1,4 +1,4 @@
-import { Tables, Menu, ItemList, Order, Item,  ItemQuantityPair, CreateOrder, ResponseMessage, AddItemToOrderResponseMessage, OrderItemQuantityPair, ItemOrder, TableInfo, AssistanceTables, AllStaff, AllItemStats, Ingredient, WholeItemList } from "./models";
+import { Tables, Menu, ItemList, Order, Item,  ItemQuantityPair, CreateOrder, ResponseMessage, AddItemToOrderResponseMessage, OrderItemQuantityPair, TableInfo, AssistanceTables, AllStaff, AllItemStats, Ingredient, WholeItemList } from "./models";
 
 const apiUrl = "http://localhost:5000";
 

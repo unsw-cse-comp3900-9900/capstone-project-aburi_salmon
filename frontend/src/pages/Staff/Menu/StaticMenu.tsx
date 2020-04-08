@@ -50,9 +50,8 @@ class StaticMenuPage extends React.Component<IProps, IState> {
     return (
       <div hidden={this.state.value !== categoryName} id={`tabpanel-${category.id}`} key={category.id} aria-labelledby={`tab-${category.id}`}>
         {
-          category.items.map(item => (
-            // If there is an item with multiple categories, this will break.
-            <Card className={classes.itemcard} key={`${category.id}-${item.id}`}>
+          category.items.map((item,index) => (
+            <Card className={classes.itemcard} key={index}>
               <CardContent>
                 <Typography variant="h5">
                   {item.name}

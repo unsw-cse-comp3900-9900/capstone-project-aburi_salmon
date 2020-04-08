@@ -11,6 +11,7 @@ export interface IProps{
     setIsOpen: any, //function that controls whether to open dialog
     wholemenu: Menu | null, //whole menu
     allItems: WholeItemList | null, //all existing items
+    update: any, //actually a function
 }
 
 //States it keeps track of
@@ -37,6 +38,7 @@ class AddItemCat extends React.Component<IProps, IState>{
             if (msg.status === 200) {
                 alert('Success');
                 this.props.setIsOpen(false);
+                this.props.update();
             } else {
                 alert(msg.statusText);
             }

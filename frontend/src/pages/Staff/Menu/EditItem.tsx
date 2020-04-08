@@ -11,6 +11,8 @@ export interface IProps{
     isEdit: boolean, //if 1 then it is edit, if 0 then is create new
     item: Item, //current item
     wholemenu: Menu | null, //whole menu
+    updatemenu: any, //force update menu
+    updateitems: any,  //force update items
 }
 
 interface IState{
@@ -40,7 +42,6 @@ class EditItem extends React.Component<IProps, IState>{
         //had some problems with setState   
         if (this.state.name === ''){
             var tempname = this.props.item?.name;
-            console.log('entered');
         } else {
             var tempname = this.state.name;
         }
@@ -70,6 +71,7 @@ class EditItem extends React.Component<IProps, IState>{
                 if (msg.status === 200) {
                     alert('Success');
                     this.props.setIsOpen(false);
+                    this.props.updatemenu();
                 } else {
                     alert(msg.statusText);
                 }
@@ -82,6 +84,7 @@ class EditItem extends React.Component<IProps, IState>{
                 if (msg.status === 200) {
                     alert('Success');
                     this.props.setIsOpen(false);
+                    this.props.updateitems();
                 } else {
                     alert(msg.statusText);
                 }

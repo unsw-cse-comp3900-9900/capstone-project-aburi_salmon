@@ -11,6 +11,7 @@ export interface IProps{
     isEdit: boolean, //if 1 then it is edit, if 0 then is create new
     category: Categories | null, //current category
     wholemenu: Menu | null, //whole menu
+    update: any, //force update
 }
 
 interface IState{
@@ -37,6 +38,7 @@ class EditCategory extends React.Component<IProps, IState>{
                     if (msg.status === 200) {
                         alert('Success');
                         this.props.setIsOpen(false);
+                        this.props.update();
                     } else {
                         alert(msg.statusText);
                     }
@@ -51,7 +53,7 @@ class EditCategory extends React.Component<IProps, IState>{
                     if (msg.status === 200) {
                         alert('Successfully edited');
                         this.props.setIsOpen(false);
-                        this.componentDidMount();
+                        this.props.update();
                     } else {
                         alert(msg.statusText);
                     }
@@ -68,6 +70,7 @@ class EditCategory extends React.Component<IProps, IState>{
             if (msg.status === 200) {
                 alert('Success');
                 this.props.setIsOpen(false);
+                this.props.update();
             } else {
                 alert(msg.statusText);
             }
@@ -88,7 +91,7 @@ class EditCategory extends React.Component<IProps, IState>{
                     if (msg.status === 200) {
                         alert('Successfully switched');
                         this.props.setIsOpen(false);
-                        this.componentDidMount();
+                        this.props.update();
                     } else {
                         alert(msg.statusText);
                     }
