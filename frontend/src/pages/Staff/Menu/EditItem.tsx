@@ -18,6 +18,7 @@ interface IState{
     price: number,
     visibility: boolean,
     category: any,
+    image_url: string,
 }
 
 class EditItem extends React.Component<IProps, IState>{
@@ -31,6 +32,7 @@ class EditItem extends React.Component<IProps, IState>{
             price: 0,
             visibility: true,
             category: 1,
+            image_url: '',
         }
         this.submitEdit = this.submitEdit.bind(this);
     }
@@ -43,8 +45,8 @@ class EditItem extends React.Component<IProps, IState>{
 
     submitCreate(){
 
-        this.props.relevantFunction(this.state.name, this.state.description, this.state.price, this.state.visibility, this.state.category);
-        this.setState({name:'', description: '', price:0, visibility:true, category: 1});
+        this.props.relevantFunction(this.state.name, this.state.description, this.state.price, this.state.visibility, this.state.category, this.state.image_url);
+        this.setState({name:'', description: '', price:0, visibility:true, category: 1, image_url:''});
     }
 
     submitEdit(){
@@ -67,7 +69,7 @@ class EditItem extends React.Component<IProps, IState>{
         }
 
         console.log(this.state.name);
-        this.props.relevantFunction(tempname, tempdes, tempprice, this.state.visibility, this.state.category);
+        this.props.relevantFunction(tempname, tempdes, tempprice, this.state.visibility, this.state.category, this.state.image_url);
         this.setState({ name: '', description: '', price: 0, visibility: true, category: 1 });
     }
 
@@ -123,7 +125,15 @@ class EditItem extends React.Component<IProps, IState>{
                                 defaultValue={this.props.item?.price}
                                 onChange={(e) => this.setState({ price: parseInt(e.target.value) })}
                             />
-
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                id="imageurl"
+                                label="Image URL (can be blank)"
+                                fullWidth
+                                defaultValue={this.props.item?.image_url}
+                                onChange={(e) => this.setState({ image_url: e.target.value })}
+                            />
                         <FormControl style={{ minWidth: 150, margin: '10px' }}>
                             <InputLabel htmlFor="uncontrolled-native">Visibility</InputLabel>
                             <NativeSelect
@@ -198,6 +208,14 @@ class EditItem extends React.Component<IProps, IState>{
                                 label="Price"
                                 fullWidth
                             onChange={(e) => this.setState({ price: parseInt(e.target.value) })}
+                            />
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                id="imageurl"
+                                label="Image URL (blank for no image)"
+                                fullWidth
+                            onChange={(e) => this.setState({ image_url: e.target.value })}
                             />
                         <FormControl style={{ minWidth: 150, margin: '10px' }}>
                             <InputLabel htmlFor="uncontrolled-native">Visibility</InputLabel>

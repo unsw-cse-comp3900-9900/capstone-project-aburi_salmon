@@ -468,7 +468,7 @@ export class Client {
       return "Failed";
     }
   }
-  async addItem(name: string, description: string, price: number, visible: boolean, position: number, catId: number) {
+  async addItem(name: string, description: string, price: number, visible: boolean, position: number, image_url: string, catId: number) {
     try {
       const r: Response = await fetch(apiUrl + '/menu/item', {
         method: 'POST',
@@ -483,6 +483,7 @@ export class Client {
             description: description,
             price: price,
             visible: visible,
+            image_url: image_url,
           }
         ),
       });
@@ -496,7 +497,7 @@ export class Client {
     }
   }
 
-  async editItem(name: string, description: string, price: number, visible: boolean, catId: number, itemId: number) {
+  async editItem(name: string, description: string, price: number, visible: boolean, catId: number, image_url: string, itemId: number) {
     try {
       const r: Response = await fetch(apiUrl + '/menu/item/' + itemId, {
         method: 'PUT',
@@ -511,6 +512,7 @@ export class Client {
             description: description,
             price: price,
             visible: visible,
+            image_url: image_url,
           }
         ),
       });

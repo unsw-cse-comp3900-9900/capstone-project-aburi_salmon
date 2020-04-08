@@ -80,6 +80,7 @@ class EditMenuPage extends React.Component<IProps, IState> {
       ingredients: [],
       price:0,
       visible: true,
+      image_url: '',
     }
     this.state = {
       // If menu is null, then nothing will be generated
@@ -161,11 +162,11 @@ class EditMenuPage extends React.Component<IProps, IState> {
 
   }
 
-  addEditItem(name: string, description: string, price: number, visibility: boolean, category: number){
+  addEditItem(name: string, description: string, price: number, visibility: boolean, category: number, image_url:string){
     const client = new Client();
     if (this.state.isEdit){
       console.log(name + ', ' + description + ', ' + price + ', ' + visibility + ', ' + category);
-      var j = client.editItem(name, description, price, visibility, category, this.state.currItem.id);
+      var j = client.editItem(name, description, price, visibility, category, image_url, this.state.currItem.id);
       console.log(j);
       j.then((msg) => {
       //alert(msg.status);
@@ -181,7 +182,7 @@ class EditMenuPage extends React.Component<IProps, IState> {
       });
     } else {
       
-      var j  = client.addItem(name, description,price,visibility,0, category);
+      var j  = client.addItem(name, description, price, visibility, 0, image_url, category);
       j.then((msg) => {
         //alert(msg.status);
         if (msg.status === 200) {
@@ -455,8 +456,10 @@ class EditMenuPage extends React.Component<IProps, IState> {
 
               {/* Second col */}
               <Grid item xs={8}>
-                insert image here
-                    </Grid>
+                <div className={classes.imageboxmodaldiv}>
+                  <img src={this.state.modal?.image_url} className={classes.imageboxmodal}/>
+                </div>
+              </Grid>
               <Grid item xs={4}>
                 <Typography variant="h6">Ingredients</Typography>
                 <FormControl>

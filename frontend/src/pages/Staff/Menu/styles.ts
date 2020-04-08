@@ -5,7 +5,7 @@ export const styles = (theme: Theme) =>
     menupage: {
       height: '100%',
       width: '100%',
-      
+
     },
     title: {
       margin: '30px',
@@ -79,30 +79,39 @@ export const styles = (theme: Theme) =>
       height: '90%',
       position: 'static',
     },
-     wrapper: {
-       height: '92%',
-     },
-     wrapper2: {
-       width:'100%',
-     },
-     wrapper3: {
+    wrapper: {
+      height: '92%',
+    },
+    wrapper2: {
+      width: '100%',
+    },
+    wrapper3: {
       height: "8%",
       width: '100%',
-     },
-     floatRight: {
-       float: 'right',
-     },
-     addFloatRight: {
-       float: 'right',
-       margin: '10px',
-     },
-     floatLeft: {
-       float: 'left',
-     },
-     editIcon: {
-       display: 'flex',
-       alignItems: 'center',
-       textAlign: 'center',
-     }
-
-  });
+    },
+    floatRight: {
+      float: 'right',
+    },
+    addFloatRight: {
+      float: 'right',
+      margin: '10px',
+    },
+    floatLeft: {
+      float: 'left',
+    },
+    editIcon: {
+      display: 'flex',
+      alignItems: 'center',
+      textAlign: 'center',
+    },
+    imageboxmodaldiv: {
+      height: 450,
+      width: 600,
+    },
+    imageboxmodal: {
+      height: '100%',
+      maxHeight: '100%',
+      width: 'auto',
+      maxWidth: '100%',
+    },
+});
