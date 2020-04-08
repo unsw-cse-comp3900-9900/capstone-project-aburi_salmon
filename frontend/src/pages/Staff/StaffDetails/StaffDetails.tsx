@@ -86,6 +86,7 @@ interface IState {
     isOpen: boolean,
     alertMessage: string,
     selectedStaffType: number,
+    severity: 'success' | 'error'
 }
 
 class StaffDetails extends React.Component<IProps, IState>{
@@ -109,6 +110,7 @@ class StaffDetails extends React.Component<IProps, IState>{
             isOpen: false,
             alertMessage: 'False Alarm',
             selectedStaffType: 1,
+            severity: 'error',
         }
         this.deleteIsOpen = this.deleteIsOpen.bind(this);
         this.resetIsOpen = this.resetIsOpen.bind(this);
@@ -138,19 +140,16 @@ class StaffDetails extends React.Component<IProps, IState>{
         const client = new Client();
         client.changeStaffType(this.state.selectedStaff.id, this.state.selectedStaff.name, this.state.selectedStaff.username, staffType)
             .then((msg) => {
-                //alert(msg.status);
                 if (msg.status === 200) {
-                    this.setState({ isOpen: true, alertMessage: 'Staff Successfully Changed' });
+                    this.setState({ isOpen: true, alertMessage: 'Staff Successfully Changed', severity: 'success'});
                     this.componentDidMount();
                 } else {
-                    this.setState({ isOpen: true, alertMessage: msg.statusText });
-                    //alert(msg.statusText);
+                    this.setState({ isOpen: true, alertMessage: msg.statusText, severity: 'error' });
                 }
 
             }).catch((status) => {
                 console.log(status);
             });
-        
     }
 
     showAlert() {
@@ -160,7 +159,7 @@ class StaffDetails extends React.Component<IProps, IState>{
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
             >
                 <Alert
-                    severity="info"
+                    severity={this.state.severity}
                     action={
                         <Button color="inherit" size="small" onClick={() => this.setState({ isOpen: false })}>
                             OK
@@ -185,10 +184,10 @@ class StaffDetails extends React.Component<IProps, IState>{
             .then((msg) => {
                 //alert(msg.status);
                 if (msg.status === 200) {
-                    this.setState({isOpen: true, alertMessage:'Staff Successfully Deleted'});
+                    this.setState({isOpen: true, alertMessage:'Staff Successfully Deleted', severity: 'success'});
                     this.componentDidMount();
                 } else {
-                    this.setState({ isOpen: true, alertMessage: msg.statusText });
+                    this.setState({ isOpen: true, alertMessage: msg.statusText , severity: 'error'});
                     //alert(msg.statusText);
                 }
 

@@ -168,7 +168,7 @@ class ManageOrders extends React.Component<IProps, IState>{
         this.setState({selected: selected })
     }
 
-    printOrders2() {
+    printOrders() {
     const { classes } = this.props;
         return (
             <TableContainer component={Paper} className={classes.tableCont}>
@@ -201,7 +201,7 @@ class ManageOrders extends React.Component<IProps, IState>{
     render() {
         return (
             <div className={this.props.classes.wrapper}>
-                {this.printOrders2()}
+                {this.printOrders()}
                 <br></br>
             </div>
         );

@@ -147,3 +147,7 @@ export type ItemId = {
 export type IngredientList = {
   ingredients: Array<Ingredient>
 }
+
+export type WholeItemList = {
+  items: Array<Item>
+}

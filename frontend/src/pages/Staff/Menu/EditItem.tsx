@@ -1,21 +1,25 @@
 import React from 'react';
-import { Button, Dialog, DialogContent,  DialogActions, DialogTitle, TextField, FormControl, InputLabel, NativeSelect} from '@material-ui/core';
+import { Button, Dialog, DialogContent,  DialogActions, DialogTitle, TextField} from '@material-ui/core';
 import {Item, Menu} from './../../../api/models';
+import {Client} from './../../../api/client';
 
+//renders the edit or create item dialog
 
 export interface IProps{
-    isOpen: boolean,
-    setIsOpen: any, //function to change state of is open
-    relevantFunction: any,
+    isOpen: boolean, //state of dialog
+    setIsOpen: any, //function to change state of isOpen
     isEdit: boolean, //if 1 then it is edit, if 0 then is create new
-    item: Item,
-    wholemenu: Menu | null,
+    item: Item, //current item
+    wholemenu: Menu | null, //whole menu
+    updatemenu: any, //force update menu
+    updateitems: any,  //force update items
+    alert: any,
 }
 
 interface IState{
-    name: string,
-    description: string,
-    price: number,
+    name: string, //name of new item
+    description: string, //description of new item
+    price: number, //price of new item
     visibility: boolean,
     category: any,
     image_url: string,
@@ -25,7 +29,6 @@ class EditItem extends React.Component<IProps, IState>{
 
     constructor(props: IProps){
         super(props);
-        
         this.state = {
             name: '',
             description:'',
@@ -37,9 +40,9 @@ class EditItem extends React.Component<IProps, IState>{
         this.submitEdit = this.submitEdit.bind(this);
     }
 
-    changeCat(value: any){
-        this.setState({category: value});
-        console.log(value);
+    submitCreate(){ //create new item
+        this.addEditItem(this.state.name, this.state.description, this.state.price);
+        this.componentDidMount();
     }
 
 
@@ -51,9 +54,9 @@ class EditItem extends React.Component<IProps, IState>{
 
     submitEdit(){
         console.log(this.props.item?.name);      
+
         if (this.state.name === ''){
             var tempname = this.props.item?.name;
-            console.log('entered');
         } else {
             var tempname = this.state.name;
         }
@@ -67,36 +70,56 @@ class EditItem extends React.Component<IProps, IState>{
         }else {
             var tempprice = this.state.price;
         }
-
-        console.log(this.state.name);
-        this.props.relevantFunction(tempname, tempdes, tempprice, this.state.visibility, this.state.category, this.state.image_url);
-        this.setState({ name: '', description: '', price: 0, visibility: true, category: 1 });
+                    
+        this.addEditItem(tempname, tempdes, tempprice, this.state.image_url);
+        this.componentDidMount();
     }
 
-    async componentDidMount(){
-        this.setState({ name: '', description: '', price: 0, visibility: true, category: 1 });
+    async componentDidMount(){ //reset values
+        this.setState({ name: '', description: '', price: 0});
     }
 
-    setChange(value: any){
-        if (value === 'true'){
-            this.setState({visibility: true});
-        } else {
-            this.setState({visibility: false});
+    addEditItem(name: string, description: string, price: number, image_url: string) { //fetchs from server
+        const client = new Client();
+        if (this.props.isEdit) { //if editing existing item
+            client.editItem(name, description, price, true ,this.props.item.id, image_url)
+            .then((msg) => {
+                if (msg.status === 200) {
+                    this.props.alert(true, 'success', 'Successfully edited item');
+                    this.props.setIsOpen(false);
+                    this.props.updatemenu();
+                } else {
+                    this.props.alert(true, 'error', msg.statusText);
+                }
+            }).catch((status) => {
+                console.log(status);
+            });
+        } else { //if adding item
+            client.addItem(name, description, price, true, image_url)
+            .then((msg) => {
+                if (msg.status === 200) {
+                    this.props.alert(true, 'success', 'Successfully added item');
+                    this.props.setIsOpen(false);
+                    this.props.updateitems();
+                } else {
+                    this.props.alert(true, 'error', msg.statusText);
+                }
+            }).catch((status) => {
+                console.log(status);
+            });
         }
     }
 
     render() {
-        if (this.props.isEdit) {    
+        if (this.props.isEdit) { //if is editing item, the current fields will be filled in
             return (
                 <Dialog
                     open={this.props.isOpen}
                     onClose={() => this.props.setIsOpen(false)}
                     aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description"
-                >
+                    aria-describedby="alert-dialog-description">
                     <DialogTitle id="alert-dialog-title">{"Edit Item"}</DialogTitle>
                     <DialogContent>
-                            
                             <TextField
                                 autoFocus
                                 margin="dense"
@@ -125,6 +148,7 @@ class EditItem extends React.Component<IProps, IState>{
                                 defaultValue={this.props.item?.price}
                                 onChange={(e) => this.setState({ price: parseInt(e.target.value) })}
                             />
+
                             <TextField
                                 autoFocus
                                 margin="dense"
@@ -173,15 +197,14 @@ class EditItem extends React.Component<IProps, IState>{
                 </Dialog>
                 
             );
-        } else {
+        } else { //adding new item
             return (
                 <Dialog
                     open={this.props.isOpen}
                     onClose={() => this.props.setIsOpen(false)}
                     aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description"
-                >
-                    <DialogTitle id="alert-dialog-title">{"Add Item"}</DialogTitle>
+                    aria-describedby="alert-dialog-description">
+                    <DialogTitle id="alert-dialog-title">{"Create Item"}</DialogTitle>
                     <DialogContent>
                             <TextField
                                 autoFocus
@@ -209,6 +232,7 @@ class EditItem extends React.Component<IProps, IState>{
                                 fullWidth
                             onChange={(e) => this.setState({ price: parseInt(e.target.value) })}
                             />
+
                             <TextField
                                 autoFocus
                                 margin="dense"
@@ -246,7 +270,7 @@ class EditItem extends React.Component<IProps, IState>{
                     <DialogActions>
                         <div style={{width:'100%'}}>
                         <Button onClick={() => this.props.setIsOpen(false)} style={{float: 'left'}} color="primary">
-                            Nevermind
+                            Cancel
                             </Button>
                         <Button onClick={() => this.submitCreate()} style={{float:'right'}} color="primary" autoFocus>
                             Create Item

@@ -4,9 +4,7 @@ import { ItemList } from './../../../api/models';
 import { Client } from './../../../api/client';
 import Assistance from './../../Staff/Assistance/AssistanceMain';
 import StaffDetails from './../StaffDetails/StaffDetails';
-//import Analytics from './../Analytics/Analytics';
 import ManageOrders from './../Orders/ManageOrders';
-import Feedback from './../Analytics/Feedback';
 import ItemStats from './../Analytics/ItemStats';
 import {EditMenu} from './../Menu/EditMenu';
 
@@ -112,19 +110,7 @@ class Manage extends React.Component<IProps, IState>{
                     <StaffDetails />
                 </Box>
             );
-        } /*else if (this.state.currPage === "Earnings") {
-            return(
-                <Box className={classes.staffContainer}>
-                    <Analytics />
-                </Box>
-            );
-        } else if (this.state.currPage === "Feedback") {
-            return (
-                <Box className={classes.staffContainer}>
-                    <Feedback />
-                </Box>
-            );
-        }*/ else if (this.state.currPage === "ItemStats") {
+        } else if (this.state.currPage === "ItemStats") {
             return (
                 <Box className={classes.staffContainer}>
                     <ItemStats />
@@ -138,24 +124,18 @@ class Manage extends React.Component<IProps, IState>{
                 </Box>
             );
         }
-        
-        
     }
 
     displayNav() {
         return (
             <div className={this.props.classes.root}>
-                
                 <Paper className={this.props.classes.menubutton}>
                     <MenuList className={this.props.classes.minsize}>
                         <MenuItem onClick={() => { this.setState({ currPage: "Menu" }) }}>Menu</MenuItem>
                         <MenuItem onClick={() => {this.setState({ currPage: "Orders"})}}>Orders</MenuItem>
                         <MenuItem onClick={() => { this.setState({ currPage: "Tables" }) }}>Tables</MenuItem>
                         <MenuItem onClick={() => { this.setState({ currPage: "Manage" }) }}>Manage</MenuItem>
-        {/*<MenuItem onClick={() => { this.setState({ currPage: "Earnings" }) }}>Earnings</MenuItem>*/}
-                        
                         <MenuItem onClick={() => { this.setState({ currPage: "ItemStats" }) }}>Item Statistics</MenuItem>
-        {/* <MenuItem onClick={() => { this.setState({ currPage: "Feedback" }) }}>Feedback</MenuItem>*/}
                     </MenuList>
                 </Paper>
             </div>
@@ -166,7 +146,6 @@ class Manage extends React.Component<IProps, IState>{
         const { classes } = this.props;
         return (
             <div className={classes.container}>
-                
                 {this.displayNav()}
                 {this.displayCont()}
             </div>
