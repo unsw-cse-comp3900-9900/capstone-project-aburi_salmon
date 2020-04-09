@@ -1,5 +1,5 @@
 import { createStyles, Theme} from "@material-ui/core";
-import background from './../../assets/FoodBackground.jpg';
+
 export const styles = (theme: Theme) =>
   createStyles({
     table: {

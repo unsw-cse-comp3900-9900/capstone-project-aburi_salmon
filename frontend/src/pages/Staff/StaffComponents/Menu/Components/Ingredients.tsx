@@ -1,7 +1,6 @@
 import React from 'react';
-import { Button, Dialog, DialogContent, DialogActions, DialogTitle, FormControl, FormGroup, FormControlLabel, Checkbox, ThemeProvider} from '@material-ui/core';
+import { Button, Dialog, DialogContent, DialogActions, DialogTitle, FormControl, FormGroup, FormControlLabel, Checkbox} from '@material-ui/core';
 import {Ingredient, Item} from './../../../../../api/models';
-import {Client} from './../../../../../api/client';
 
 //renders the dialog for adding ingredients to an item
 
@@ -31,27 +30,17 @@ class Ingredients extends React.Component<IProps, IState>{
     }
 
     printIngred(ingredient: Ingredient, index: number){ //print the checkbox
-        if (this.state.selected !== []){
-            return(
-                <FormControlLabel
-                    control={<Checkbox color="primary" checked={this.state.selected[index]}
-                        onChange={(e) => this.handleCheck(parseInt(e.target.value))}
-                    value={index} />}
-                    label={ingredient.name}
-                    key={ingredient.id}
-                />
-            );
-        } else {
-            return (
-                <FormControlLabel
-                    control={<Checkbox color="primary"
-                        onChange={(e) => this.handleCheck(parseInt(e.target.value))}
-                        value={index} />}
-                    label={ingredient.name}
-                    key={ingredient.id}
-                />
-            );
-        }
+
+        return(
+            <FormControlLabel
+                control={<Checkbox color="primary" checked={this.state.selected[index]}
+                    onChange={(e) => this.handleCheck(parseInt(e.target.value))}
+                value={index} />}
+                label={ingredient.name}
+                key={ingredient.id}
+            />
+        );
+
     }
 
     updateIngredients(){ //update ingredient in an item
@@ -108,13 +97,17 @@ class Ingredients extends React.Component<IProps, IState>{
         }
         this.setState({selectedIngredients: temp});
     }*/
+    componentDidUpdate(prevProps: any, prevState: any){
+        if (prevState.selected !== this.state.selected){
+            this.render();
+        }
 
-    async whenOpened(){
+    }
+
+    whenOpened(){
         this.setState({ ingredientsId: [], selected: [] });
-        /*
-        this.setState({ ingredientsId: [], selected: [] });
-        var temp = this.state.selected;
-        var temp2 = this.state.ingredientsId;
+        var temp: Array<boolean> = [];
+        var temp2: Array<number> = [];
         this.props.ingredientsList?.map(ingredient =>{
             if (this.props.itemIngredients.indexOf(ingredient.id) !== -1) {
                 temp.push(true);
@@ -124,10 +117,9 @@ class Ingredients extends React.Component<IProps, IState>{
             temp2.push(ingredient.id);
             console.log(temp);
             console.log(temp2);
-            this.setState({ selected: temp, ingredientsId: temp2 });
-        });*/
+        });
+        this.setState({ selected: temp, ingredientsId: temp2 }, () => this.render());
     }
-
 
     render(){
         return (
@@ -143,25 +135,24 @@ class Ingredients extends React.Component<IProps, IState>{
                         <FormGroup row={true}>
                             {
                                 this.props.ingredientsList &&
-                                this.props.ingredientsList.map((ingredient,index) => this.printIngred(ingredient,index))
+                                this.props.ingredientsList.map((ingredient, index) => this.printIngred(ingredient, index))
                             }
-                            </FormGroup> 
+                        </FormGroup>
                     </FormControl>
                 </DialogContent>
                 <DialogActions>
-                    <div style={{width:'100%'}}>
-                    <Button onClick={() => this.props.setIsOpen(false)} color="primary" style={{float: 'left'}}>
-                        Nevermind
+                    <div style={{ width: '100%' }}>
+                        <Button onClick={() => this.props.setIsOpen(false)} color="primary" style={{ float: 'left' }}>
+                            Nevermind
                     </Button>
-                    
-                    <Button onClick={() => this.updateIngredients()} style={{float:'right'}} color="primary" autoFocus>
-                        Update
+
+                        <Button onClick={() => this.updateIngredients()} style={{ float: 'right' }} color="primary" autoFocus>
+                            Update
                     </Button>
                     </div>
                 </DialogActions>
             </Dialog>
         );
-
     }
 }
 

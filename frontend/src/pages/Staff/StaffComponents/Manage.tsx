@@ -1,5 +1,5 @@
 import React from 'react';
-import { createStyles, withStyles, WithStyles, Theme, MenuList, Paper, MenuItem, Box} from '@material-ui/core';
+import { withStyles, WithStyles, MenuList, Paper, MenuItem, Box} from '@material-ui/core';
 import { ItemList, Menu, Categories, WholeItemList, Ingredient, Tables, AssistanceTables, ListItem, AllStaff, AllItemStats, ItemStats as ItemStatsModel} from './../../../api/models';
 import { Client } from './../../../api/client';
 import Assistance from './Assistance/AssistanceMain';

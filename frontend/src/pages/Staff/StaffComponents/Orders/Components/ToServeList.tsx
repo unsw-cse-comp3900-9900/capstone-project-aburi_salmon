@@ -1,5 +1,5 @@
 import React from 'react';
-import { createStyles, WithStyles, withStyles } from '@material-ui/core';
+import { WithStyles, withStyles } from '@material-ui/core';
 import ItemCont from './ItemTemplate';
 import { ItemList} from './../../../../../api/models';
 import {styles} from './styles';

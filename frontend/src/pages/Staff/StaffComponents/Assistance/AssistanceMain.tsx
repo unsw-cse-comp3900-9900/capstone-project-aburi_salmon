@@ -25,8 +25,6 @@ interface IState{
 class Assistance extends React.Component<IProps, IState>{
     constructor(props: IProps){
         super(props);
-        var temptables = this.props.tables;
-        var tempass = this.props.assistance;
         this.state = {
             numTables: 15,
             selectedTable: 0, //Selected table, 0 means none selected
