@@ -3,60 +3,8 @@ import { createStyles, WithStyles, Theme, withStyles, Button, Box,  Snackbar } f
 import { Client } from './../../../../api/client';
 import { TableInfo } from './../../../../api/models';
 import AlertSnackbar from './../../../AlertSnackbar';
+import {styles} from './styles';
 
-
-const styles = (theme: Theme) =>
-    createStyles({
-        line:{
-            width: '100%',
-        },
-        wrapper: {
-            width: '100%',
-            paddingLeft: '2%',
-            height: '95%',
-            paddingRight: '2%',
-        },
-        wrapper1: {
-            width: '100%',
-            paddingLeft: '2%',
-            height: '85%',
-            paddingRight: '2%',
-            overflow: 'auto',
-            display: 'block',
-        },
-        wrapper2: {
-            width: '100%',
-            paddingLeft: '2%',
-            height: '10%',
-            paddingRight: '2%',
-        },
-        text: {
-            float: 'left',
-        },
-        paidBut: {
-            float: 'right',
-        },
-        itemTable: {
-            width: '100%',
-        },
-        empty: {
-            textAlign: 'center',
-           display: 'flex',
-           justifyContent: 'center',
-            height: '95%',
-        }, 
-        bottom: {
-            bottom: '10%',
-        },
-        center: {
-            textAlign: 'center',
-        },
-        centerText: {
-            position: 'absolute',
-            top: '50%',
-            transform: 'translate(-50%, -50%)'
-        }
-    });
 export interface IProps extends WithStyles<typeof styles> {
     tableNumber: number,
     assistance: boolean,
@@ -196,7 +144,7 @@ class TableInfoClass extends React.Component<IProps, IState>{
         const { classes } = this.props;
         if (this.props.isEmpty){
             return (
-                <div className={classes.wrapper}>
+                <div className={classes.wrappert}>
                     <AlertSnackbar isOpen={this.state.isOpen} severity={this.state.alertSeverity}
                         alertMessage={this.state.alertMessage} changeState={this.changeAlertState} />
                     <div className={classes.wrapper1}>

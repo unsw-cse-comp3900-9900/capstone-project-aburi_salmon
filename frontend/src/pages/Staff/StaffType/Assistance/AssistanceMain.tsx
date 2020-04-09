@@ -1,53 +1,13 @@
 import React from 'react';
-import {  createStyles, withStyles, WithStyles, Theme, Link, Dialog, DialogTitle,DialogContent,  DialogActions,Button} from '@material-ui/core';
+import {  withStyles, WithStyles, Link, Dialog, DialogTitle,DialogContent,  DialogActions,Button} from '@material-ui/core';
 import './../Assistance/Assistance.css';
 import TableInfo from './../Assistance/TableInfo';
-import { Tables as TableModel, AssistanceTables } from './../../../../api/models';
-import { Client } from './../../../../api/client';
+import { Tables as TableModel } from './../../../../api/models';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import {styles} from './styles';
 //https://material-ui.com/components/menus/#menus
 //https://stackoverflow.com/questions/58630490/how-to-convert-functional-componenet-to-class-component-in-react-in-material
 
-
-const styles = (theme: Theme) =>
-    createStyles({
-        title: {
-            flexGrow: 1,
-        },      
-        container: {
-            height: '90%',
-            width: '100%',
-            overflow: 'auto',
-        },
-        container2: {
-            height: '10%',
-            width: '100%',
-        },
-        container3: {
-            height: '100%',
-            width: '100%',
-        },
-        wrapper: {
-            width: '100%',
-            textAlign: 'left',
-        },
-        key: {
-            position: 'relative',
-            bottom:'-25%',
-        },
-        red: {
-            color: 'red',
-            backgroundColor: 'white',
-        },
-        green:{
-            color: 'green',
-            backgroundColor: 'white',
-        },
-        helpIcon: {
-            float: 'right',
-            paddingRight: '2.5%',
-        },
-    });
 export interface IProps extends WithStyles<typeof styles> {
     tables: TableModel | null,
     assistance: Array<number>, 
@@ -82,23 +42,6 @@ class Assistance extends React.Component<IProps, IState>{
         this.setState({selectedTable: tableNum});
         this.setState({main: false});
     }
-
-
-    /*
-    async update(){
-        const client = new Client()
-        const t: TableModel | null = await client.getTables();
-        const a: AssistanceTables | null = await client.getAssistanceTable();
-        var temp: Array<number> = [];
-        if (a?.tables !== undefined){
-            a?.tables.map(it => {
-                    temp.push(it.table_id);
-                }
-            )
-            this.setState({assistance: temp });
-        }
-            this.setState({tables:t});
-    }*/
 
     createTables = () => {
         let table = [];

@@ -1,49 +1,14 @@
 import React from 'react';
-import { createStyles, WithStyles, Theme, withStyles, TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper} from '@material-ui/core';
+import { WithStyles, withStyles, TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper} from '@material-ui/core';
 import {ItemList, ListItem} from './../../../../api/models';
 import {Client} from './../../../../api/client';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
+import {styles} from './styles';
 
 //sorting mostly copied from 
 //https://stackoverflow.com/questions/40541710/reactjs-with-material-ui-how-to-sort-an-array-of-material-uis-tablerow-alpha
 
-
-const styles = (theme: Theme) =>
-    createStyles({
-        table: {
-            minWidth: 550,
-            tableLayout: 'fixed',
-        },
-        wrapper: {
-            height: '100%',
-            width: '100%',
-            overflow: 'auto',
-        },
-        button: {
-            margin: theme.spacing(1),
-        },
-        rows: {
-            paddingLeft: theme.spacing(2),
-        },
-        formControl: {
-            margin: theme.spacing(1),
-            minWidth: 120,
-        },
-        head: {
-            position: 'sticky',
-            top: '0px',
-        },
-        tableCont: {
-            maxHeight: '95%',
-        },
-        icon: {
-            display: 'flex',
-            alignItems: 'center',
-        },
-       
-
-    });
 export interface IProps extends WithStyles<typeof styles> {
     realData: Array<ListItem>,
 }

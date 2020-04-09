@@ -7,56 +7,8 @@ import StaffDetails from './StaffDetails/StaffDetails';
 import ManageOrders from './Orders/ManageOrders';
 import ItemStats from './Analytics/ItemStats';
 import {EditMenu} from './Menu/EditMenu';
+import {styles} from './styles';
 
-const styles = (theme: Theme) =>
-    createStyles({
-        container: {
-            display: 'flex',
-            alignItems: 'flex-start',
-            height: '85vh',
-        },
-        menubutton: {
-            marginRight: theme.spacing(1),
-            paddingRight: '10px',
-        },
-        root: {
-            display: 'flex',
-        },
-        staffContainer: {
-            backgroundColor: 'white',
-            border: '2px solid darkblue',
-            padding: theme.spacing(2),
-            flexGrow: 1,
-            display: 'flex',
-            top: theme.spacing(2),
-            left: theme.spacing(2),
-            alignSelf: 'stretch',
-            marginLeft: theme.spacing(2),
-            marginRight: theme.spacing(2),
-            marginBottom: theme.spacing(2),
-        },
-        minsize: {
-            width: theme.spacing(17),
-            
-        },
-        menuContainer: {
-            backgroundColor: 'lightgrey',
-            border: '2px solid darkblue',
-            padding: theme.spacing(2),
-            flexGrow: 1,
-            display: 'flex',
-            top: theme.spacing(2),
-            left: theme.spacing(2),
-            alignSelf: 'stretch',
-            marginLeft: theme.spacing(2),
-            marginRight: theme.spacing(2),
-            marginBottom: theme.spacing(2),
-            width: '100%',
-            
-            minWidth: '800px',
-        },
-
-    });
 export interface IProps extends WithStyles<typeof styles> { }
 
 interface IState {
@@ -290,7 +242,7 @@ class Manage extends React.Component<IProps, IState>{
         return (
             <div className={this.props.classes.root}>
                 <Paper className={this.props.classes.menubutton}>
-                    <MenuList className={this.props.classes.minsize}>
+                    <MenuList className={this.props.classes.minSize}>
                         <MenuItem onClick={() => { this.setState({ currPage: "Menu" }) }}>Menu</MenuItem>
                         <MenuItem onClick={() => {this.setState({ currPage: "Orders"})}}>Orders</MenuItem>
                         <MenuItem onClick={() => { this.setState({ currPage: "Tables" }) }}>Tables</MenuItem>

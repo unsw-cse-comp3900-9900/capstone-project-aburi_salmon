@@ -1,13 +1,6 @@
 import React from 'react';
-import { createStyles,WithStyles, Theme, withStyles, Button, Dialog, DialogContent, TextField, DialogContentText, DialogActions, DialogTitle} from '@material-ui/core';
-
-const styles = (theme: Theme) =>
-    createStyles({
-        formControl: {
-            margin: theme.spacing(1),
-            minWidth: 120,
-        },
-    });
+import { WithStyles, withStyles, Button, Dialog, DialogContent, TextField, DialogContentText, DialogActions, DialogTitle} from '@material-ui/core';
+import {styles} from './styles';
 
 export interface IProps extends WithStyles<typeof styles>{
     isOpen: boolean,

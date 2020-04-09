@@ -1,5 +1,5 @@
 import React from 'react';
-import { createStyles, WithStyles, Theme, withStyles, Button, Snackbar,TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper} from '@material-ui/core';
+import { WithStyles,withStyles, Button, Snackbar,TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper} from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {Client} from './../../../../api/client';
 import { AllStaff, StaffInfo } from './../../../../api/models';
@@ -8,6 +8,7 @@ import DeleteDialog from './Components/DeleteDialog';
 import ChangeStaffType from './Components/ChangeStaffType';
 import ChangeTableNo from './Components/ChangeTableNo';
 import ResetRegist from './Components/ResetRegist';
+import {styles} from './styles';
 //mostly copied from https://codesandbox.io/s/v2eib &
 //https://material-ui.com/components/tables/
 //https://codesandbox.io/s/u0yv3
@@ -15,46 +16,6 @@ import ResetRegist from './Components/ResetRegist';
 //https://codesandbox.io/s/6r757
 //https://material-ui.com/components/dialogs/
 
-const styles = (theme: Theme) =>
-    createStyles({
-        table: {
-            minWidth: 550,
-        },
-        wrapper: {
-            height: '100%',
-            width: '100%',
-            overflow: 'auto',
-        },
-        button: {
-            margin: theme.spacing(1),
-        },
-        rows: {
-            paddingLeft: theme.spacing(2),
-        },
-        formControl: {
-            margin: theme.spacing(1),
-            minWidth: 120,
-        },
-        registBut: {
-            float: "left"
-        },
-        tableBut: {
-            float: "right",
-        },
-        wrapper1: {
-            height: '92%',
-            width: '100%',
-            //overflow: 'auto',
-        },
-        wrapper2:{
-            height: '8%',
-            width: '100%',
-         
-        },
-        tableCont: {
-            maxHeight: '95%',
-        }
-    });
 
 const StyledTableCell = withStyles(theme => ({
     head: {

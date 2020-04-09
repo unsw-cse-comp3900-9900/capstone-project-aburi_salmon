@@ -4,32 +4,7 @@ import {Client} from './../../../../api/client';
 import {AllItemStats, ItemStats} from './../../../../api/models';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
-
-const styles = (theme: Theme) =>
-    createStyles({
-        table: {
-            minWidth: 300,
-            tableLayout: 'fixed',
-        },
-        wrapper: {
-            height: '100%',
-            width: '100%',
-        },
-        wrapper1: {
-            height: '94%',
-            width: '100%',
-            overflow: 'auto',
-        },
-        wrapper2: {
-            height: '5%',
-            width: '100%',
-        },
-        icon: {
-            display: 'flex',
-            alignItems: 'center',
-        },
-
-    });
+import {styles} from './styles';
 
 
 const StyledTableCell = withStyles(theme => ({
@@ -62,7 +37,6 @@ interface IState {
     trevenue: number,
 }
 
-
 class ItemStatsClass extends React.Component<IProps, IState>{
 
     constructor(props: IProps){
@@ -76,18 +50,6 @@ class ItemStatsClass extends React.Component<IProps, IState>{
             trevenue: temprev,
         }
     }
-
-    /*
-    async componentDidMount() {
-        const client = new Client();
-        const t: AllItemStats | null = await client.getAllStats();
-        if (t?.item_sales !== undefined){
-            this.setState({ realData: t?.item_sales});
-        }
-        if (t?.total_revenue !== undefined){
-            this.setState({trevenue: t?.total_revenue})
-        }
-    }*/
 
     sortData(dataType: string) {
         var temp = this.state.realData;

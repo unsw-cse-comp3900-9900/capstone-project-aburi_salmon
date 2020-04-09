@@ -1,13 +1,6 @@
 import React from 'react';
-import { createStyles,WithStyles, Theme, withStyles, Button, Dialog, DialogContent, DialogActions, DialogTitle, FormControl, InputLabel, Select, Input} from '@material-ui/core';
-
-const styles = (theme: Theme) =>
-    createStyles({
-        formControl: {
-            margin: theme.spacing(1),
-            minWidth: 120,
-        },
-    });
+import { WithStyles, withStyles, Button, Dialog, DialogContent, DialogActions, DialogTitle, FormControl, InputLabel, Select, Input} from '@material-ui/core';
+import {styles} from './styles';
 
 export interface IProps extends WithStyles<typeof styles>{
     isOpen: boolean,
@@ -27,7 +20,6 @@ class ChangeStaffType extends React.Component<IProps, {staffType: number}>{
 
     changeStaffType(e: any){
         this.setState({staffType: parseInt(e.target.value)});
-
     }
 
     render() {

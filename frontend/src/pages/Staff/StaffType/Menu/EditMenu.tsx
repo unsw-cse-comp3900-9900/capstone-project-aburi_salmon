@@ -14,7 +14,6 @@ import Checkbox from '@material-ui/core/Checkbox';
 import EditIcon from '@material-ui/icons/Edit';
 
 import { styles } from './styles';
-import { Client } from './../../../../api/client';
 import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel, Item, WholeItemList, Ingredient } from './../../../../api/models';
 
 import EditCategory from './Components/EditCategory';
