@@ -87,8 +87,8 @@ class Assistance extends React.Component<IProps, IState>{
     }
 
 
-    /*
-    async componentDidMount() {
+    
+    async update(){
         const client = new Client()
         const t: TableModel | null = await client.getTables();
         const a: AssistanceTables | null = await client.getAssistanceTable();
@@ -100,8 +100,8 @@ class Assistance extends React.Component<IProps, IState>{
             )
             this.setState({assistance: temp });
         }
-        this.setState({tables:t})
-    }*/
+            this.setState({tables:t});
+    }
 
     createTables = () => {
         let table = [];
@@ -153,9 +153,7 @@ class Assistance extends React.Component<IProps, IState>{
     }
 
     paid(){
-        this.setState({ selectedTable: 0 });
-        //this.setState({ main: true });
-        //this.componentDidMount();
+        this.update();
     }
 
     tableKey(){
@@ -176,6 +174,7 @@ class Assistance extends React.Component<IProps, IState>{
         })
         return ret;
     }
+
     helpDialog() {
         return (
             <div>

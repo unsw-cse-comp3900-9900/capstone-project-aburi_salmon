@@ -62,7 +62,7 @@ export interface IProps extends WithStyles<typeof styles> {
     assistance: boolean,
     isEmpty: boolean | undefined,
     paidFunction: any,
-  
+
 }
 
 interface IState {
@@ -166,6 +166,7 @@ class TableInfoClass extends React.Component<IProps, IState>{
             .then((msg) => {
                 if (msg.status === 200) {
                     this.setState({isOpen: true, alertSeverity: "success", alertMessage: "Problem Resolved", hide:'none'});
+                    this.props.paidFunction();
                 } else {
                     this.setState({ isOpen: true, alertSeverity: "error", alertMessage: msg.statusText });
                 }
@@ -222,6 +223,8 @@ class TableInfoClass extends React.Component<IProps, IState>{
         } else {
             return(
                 <div className={classes.empty}>
+                    <AlertSnackbar isOpen={this.state.isOpen} severity={this.state.alertSeverity}
+                        alertMessage={this.state.alertMessage} changeState={this.changeAlertState} />
                     <h1>Table {this.props.tableNumber} is empty</h1>
                 </div>
             );
