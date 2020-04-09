@@ -34,4 +34,14 @@ export const styles = (theme: Theme) =>
       padding: theme.spacing(2, 4, 3),
       transform: `translate(-50%,-50%)`,
     },
+    imageboxmodaldiv: {
+      height: 450,
+      width: 600,
+    },
+    imageboxmodal: {
+      height: '100%',
+      maxHeight: '100%',
+      width: 'auto',
+      maxWidth: '100%',
+    },
   });

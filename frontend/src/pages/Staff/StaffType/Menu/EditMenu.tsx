@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button,withStyles, WithStyles,  Modal, Grid, FormControl, FormControlLabel, FormGroup } from '@material-ui/core';
+import { Button, withStyles, WithStyles, Modal, Grid, FormControl, FormControlLabel, FormGroup } from '@material-ui/core';
 
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -71,12 +71,13 @@ class EditMenuPage extends React.Component<IProps, IState> {
     var tempitems = this.props.allItems;
     var tempingred = this.props.ingredientsList;
     var temp: ItemModel = { //for initialisation (don't want to deal with null)
-      id:0,
-      name:'',
+      id: 0,
+      name: '',
       description: '',
       ingredients: [],
-      price:0,
+      price: 0,
       visible: true,
+      image_url: '',
     }
     this.state = {
       //displaying menu
@@ -132,40 +133,40 @@ class EditMenuPage extends React.Component<IProps, IState> {
     this.setAlert = this.setAlert.bind(this);
   }
 
-  itemDialogIsOpen(isOpen: boolean){
-    this.setState({editItemDialog: isOpen});
+  itemDialogIsOpen(isOpen: boolean) {
+    this.setState({ editItemDialog: isOpen });
   }
 
-  catDialogIsOpen(isOpen: boolean){
+  catDialogIsOpen(isOpen: boolean) {
     this.setState({ editCatDialog: isOpen });
   }
 
-  deleteDialogIsOpen(isOpen: boolean){
+  deleteDialogIsOpen(isOpen: boolean) {
     this.setState({ deleteDialog: isOpen });
   }
 
-  ingredientDialogIsOpen(isOpen: boolean){
-    this.setState({ingredDialog: isOpen});
+  ingredientDialogIsOpen(isOpen: boolean) {
+    this.setState({ ingredDialog: isOpen });
   }
 
-  editIngredDialogIsOpen(isOpen: boolean){
+  editIngredDialogIsOpen(isOpen: boolean) {
     this.setState({ editIngredDialog: isOpen });
   }
 
-  addItemCatIsOpen(isOpen: boolean){
-    this.setState({addItemCatDialog: isOpen});
+  addItemCatIsOpen(isOpen: boolean) {
+    this.setState({ addItemCatDialog: isOpen });
   }
 
-  modalIsOpen(isOpen: boolean){
-    this.setState({openModal: isOpen});
+  modalIsOpen(isOpen: boolean) {
+    this.setState({ openModal: isOpen });
   }
 
-  alertDialogIsOpen(isOpen: boolean){
-    this.setState({alertDialog: isOpen});
+  alertDialogIsOpen(isOpen: boolean) {
+    this.setState({ alertDialog: isOpen });
   }
 
-  setAlert(isOpen: boolean, severity: "success" | "error", alertMessage: string){
-    this.setState({alertDialog: isOpen, severity: severity, alertMessage: alertMessage});
+  setAlert(isOpen: boolean, severity: "success" | "error", alertMessage: string) {
+    this.setState({ alertDialog: isOpen, severity: severity, alertMessage: alertMessage });
   }
 
   createItemIngredients(item: Item) {
@@ -182,7 +183,7 @@ class EditMenuPage extends React.Component<IProps, IState> {
     return (
       <div hidden={this.state.value !== categoryName} id={`tabpanel-${category.id}`} key={category.id} aria-labelledby={`tab-${category.id}`}>
         {
-          category.items.map((item,index) => (
+          category.items.map((item, index) => (
             <Card className={classes.itemcard} key={index}>
               <CardContent>
                 <Typography variant="h5">
@@ -196,8 +197,8 @@ class EditMenuPage extends React.Component<IProps, IState> {
 
                 <div className={classes.wrapper2}>
                   <Button size="small" onClick={() => this.openModal(item)} className={classes.floatLeft}>View item</Button>
-                  <Button size="small"  className={classes.floatRight} onClick={()=>this.setState({deleteDialog: true, isEdit: false, isCat: false, currItem: item, isDel: false})} 
-                  color='secondary'>Remove item</Button>
+                  <Button size="small" className={classes.floatRight} onClick={() => this.setState({ deleteDialog: true, isEdit: false, isCat: false, currItem: item, isDel: false })}
+                    color='secondary'>Remove item</Button>
                 </div>
               </CardActions>
             </Card>
@@ -236,7 +237,7 @@ class EditMenuPage extends React.Component<IProps, IState> {
     };
   }
 
-  async forceUpdateMenu(){
+  async forceUpdateMenu() {
     const client = new Client();
     const m: MenuModel | null = await client.getMenu();
     if (m !== null && m?.menu.length !== undefined) {
@@ -248,7 +249,7 @@ class EditMenuPage extends React.Component<IProps, IState> {
     }
   }
 
-  async forceUpdateItemlist(){
+  async forceUpdateItemlist() {
     const client = new Client();
     const i: WholeItemList | null = await client.getAllItems();
     if (i !== null) {
@@ -256,7 +257,7 @@ class EditMenuPage extends React.Component<IProps, IState> {
     }
   }
 
-  async forceUpdateIngredList(){
+  async forceUpdateIngredList() {
     const client = new Client();
     const ingred: Array<Ingredient> | null = await client.getIngredients();
     this.setState({ ingredientsList: ingred });
@@ -275,72 +276,72 @@ class EditMenuPage extends React.Component<IProps, IState> {
     return (
       <div className={classes.menupage}>
         <EditCategory isOpen={this.state.editCatDialog} setIsOpen={this.catDialogIsOpen} update={this.forceUpdateMenu}
-          isEdit={this.state.isEdit} category={this.state.currCat} wholemenu={this.state.menu} alert={this.setAlert}/>
+          isEdit={this.state.isEdit} category={this.state.currCat} wholemenu={this.state.menu} alert={this.setAlert} />
 
         <EditItem isOpen={this.state.editItemDialog} setIsOpen={this.itemDialogIsOpen} wholemenu={this.state.menu}
-          isEdit={this.state.isEdit} item={this.state.currItem} updatemenu={this.forceUpdateMenu} 
-          updateitems={this.forceUpdateItemlist} alert={this.setAlert}/>
+          isEdit={this.state.isEdit} item={this.state.currItem} updatemenu={this.forceUpdateMenu}
+          updateitems={this.forceUpdateItemlist} alert={this.setAlert} />
 
         <Delete isOpen={this.state.deleteDialog} setIsOpen={this.deleteDialogIsOpen} allItems={this.state.allItems}
-        item={this.state.currItem} isDel={this.state.isDel} cat={this.state.currCat} updatemenu={this.forceUpdateMenu}
-        updateitems={this.forceUpdateItemlist} alert={this.setAlert}/>
+          item={this.state.currItem} isDel={this.state.isDel} cat={this.state.currCat} updatemenu={this.forceUpdateMenu}
+          updateitems={this.forceUpdateItemlist} alert={this.setAlert} />
 
         <Ingredients isOpen={this.state.ingredDialog} currItem={this.state.currItem} itemIngredients={this.state.itemIngredients}
-          setIsOpen={this.ingredientDialogIsOpen} ingredientsList={this.state.ingredientsList} 
-          update={this.forceUpdateMenu} setModalIsOpen={this.modalIsOpen} alert={this.setAlert}/>
-        
-        <EditIngredients isOpen={this.state.editIngredDialog} setIsOpen={this.editIngredDialogIsOpen} 
-          ingredientsList={this.state.ingredientsList} update={this.forceUpdateIngredList} alert={this.setAlert}/>
+          setIsOpen={this.ingredientDialogIsOpen} ingredientsList={this.state.ingredientsList}
+          update={this.forceUpdateMenu} setModalIsOpen={this.modalIsOpen} alert={this.setAlert} />
+
+        <EditIngredients isOpen={this.state.editIngredDialog} setIsOpen={this.editIngredDialogIsOpen}
+          ingredientsList={this.state.ingredientsList} update={this.forceUpdateIngredList} alert={this.setAlert} />
 
         <AddItemCat isOpen={this.state.addItemCatDialog} allItems={this.state.allItems} alert={this.setAlert}
           setIsOpen={this.addItemCatIsOpen} wholemenu={this.state.menu} update={this.forceUpdateMenu} />
 
         <AlertSnackbar isOpen={this.state.alertDialog} severity={this.state.severity} alertMessage={this.state.alertMessage}
-            changeState={this.alertDialogIsOpen}/>
+          changeState={this.alertDialogIsOpen} />
 
-            <div className={classes.wrapper}>
-              <AppBar position="static">
-                <Tabs
-                  value={this.state.value}
-                  onChange={this.handleTabChange}
-                  scrollButtons="auto"
-                  variant="scrollable"
-                  
-                >
-                  {
-                    this.state.menu && this.state.menu?.menu &&
-                    this.state.menu?.menu.map(category => (
-                      <Tab label={<><div>{category.name + " "} <EditIcon onClick={() => this.setState({editCatDialog: true, isCat:true, isEdit:true, currCat: category})} /></div></>} 
-                      className={classes.editIcon} key={category.id} {...this.tabProps(category.name)} onClick={() => this.setState({currCat: category})} />
-                    ))
-                  }
-                </Tabs>
-              </AppBar>
-              <div className={classes.overflow}>
+        <div className={classes.wrapper}>
+          <AppBar position="static">
+            <Tabs
+              value={this.state.value}
+              onChange={this.handleTabChange}
+              scrollButtons="auto"
+              variant="scrollable"
+
+            >
               {
                 this.state.menu && this.state.menu?.menu &&
-                this.state.menu?.menu.map(category => this.generateItemsInCategory(category))
+                this.state.menu?.menu.map(category => (
+                  <Tab label={<><div>{category.name + " "} <EditIcon onClick={() => this.setState({ editCatDialog: true, isCat: true, isEdit: true, currCat: category })} /></div></>}
+                    className={classes.editIcon} key={category.id} {...this.tabProps(category.name)} onClick={() => this.setState({ currCat: category })} />
+                ))
               }
-              </div>
-            </div>
-            <div className={classes.wrapper3}>
-          
-              <Button variant='outlined'  onClick={() => { this.setState({ editItemDialog: true, isEdit:false, isCat: false})}}
-                  className={classes.addFloatRight}>Create Item</Button>
+            </Tabs>
+          </AppBar>
+          <div className={classes.overflow}>
+            {
+              this.state.menu && this.state.menu?.menu &&
+              this.state.menu?.menu.map(category => this.generateItemsInCategory(category))
+            }
+          </div>
+        </div>
+        <div className={classes.wrapper3}>
 
-              <Button variant='outlined'  onClick={() => { this.setState({ editCatDialog: true, isEdit:false, isCat:true }) }}
-                    className={classes.addFloatRight}>Add Category</Button>
+          <Button variant='outlined' onClick={() => { this.setState({ editItemDialog: true, isEdit: false, isCat: false }) }}
+            className={classes.addFloatRight}>Create Item</Button>
 
-                    <Button variant='outlined' onClick={() => { this.setState({ editIngredDialog: true }) }}
-                className={classes.addFloatRight}>Edit Ingredients</Button>
+          <Button variant='outlined' onClick={() => { this.setState({ editCatDialog: true, isEdit: false, isCat: true }) }}
+            className={classes.addFloatRight}>Add Category</Button>
 
-              <Button variant='outlined' onClick={() => { this.setState({ addItemCatDialog: true}) }}
-                className={classes.addFloatRight}>Add Item to Category</Button>
+          <Button variant='outlined' onClick={() => { this.setState({ editIngredDialog: true }) }}
+            className={classes.addFloatRight}>Edit Ingredients</Button>
 
-              <Button variant='outlined' color='secondary' onClick={() => { this.setState({ deleteDialog: true, isDel: true }) }}
-                className={classes.addFloatRight}>Delete Item</Button>
+          <Button variant='outlined' onClick={() => { this.setState({ addItemCatDialog: true }) }}
+            className={classes.addFloatRight}>Add Item to Category</Button>
 
-            </div>
+          <Button variant='outlined' color='secondary' onClick={() => { this.setState({ deleteDialog: true, isDel: true }) }}
+            className={classes.addFloatRight}>Delete Item</Button>
+
+        </div>
 
         <Modal
           aria-labelledby=""
@@ -363,8 +364,10 @@ class EditMenuPage extends React.Component<IProps, IState> {
 
               {/* Second col */}
               <Grid item xs={8}>
-                insert image here
-                    </Grid>
+                <div className={classes.imageboxmodaldiv}>
+                  <img src={this.state.modal?.image_url} className={classes.imageboxmodal} />
+                </div>
+              </Grid>
               <Grid item xs={4}>
                 <Typography variant="h6">Ingredients</Typography>
                 <FormControl>
@@ -389,12 +392,12 @@ class EditMenuPage extends React.Component<IProps, IState> {
               </Grid>
 
               <Grid item xs={6}>
-                <Button size="small" variant="outlined" onClick={() => this.setState({ editItemDialog: true, isCat:false, isEdit: true})}>Edit item</Button>
+                <Button size="small" variant="outlined" onClick={() => this.setState({ editItemDialog: true, isCat: false, isEdit: true })}>Edit item</Button>
               </Grid>
               <Grid item xs={6}>
-                <Button size="small" variant="outlined" onClick={() => this.setState({ ingredDialog: true})}>Edit Ingredients</Button>
+                <Button size="small" variant="outlined" onClick={() => this.setState({ ingredDialog: true })}>Edit Ingredients</Button>
               </Grid>
-              
+
             </Grid>
           </div>
         </Modal>

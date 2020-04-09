@@ -27,6 +27,7 @@ export type Item = {
   ingredients: Array<Ingredient>,
   price: number,
   visible: boolean,
+  image_url: string,
 }
 
 export type Categories = {
