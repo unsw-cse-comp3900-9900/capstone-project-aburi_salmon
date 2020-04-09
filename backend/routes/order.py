@@ -15,7 +15,7 @@ class Order(Resource):
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
     def get(self):
-        socket.emit('selecttable')
+        socket.emit('order')
 
         # Gets lists of ordered items and Total Bill
 
@@ -113,6 +113,7 @@ class Item(Resource):
         item_order_id = modify_order.get('id')
         quantity = modify_order.get('quantity')
         comment = modify_order.get('comment')
+        socket.emit('modify')
 
         if item_order_id is None:
             abort(400, 'No existing order with that item, please make a new order instead.')
@@ -133,7 +134,7 @@ class Item(Resource):
 
         delete_order = request.get_json()
         item_order_id = delete_order.get('id')
-        socket.emit('selecttable')
+        socket.emit('delete')
 
         if item_order_id is None:
             abort(400, 'No existing order with that item, please make a new order instead.')
@@ -157,6 +158,7 @@ class ModifyItemOrderStatus(Resource):
     @order.response(400, 'Invalid Request')
     @order.response(500, 'Something went wrong')
     @order.expect(request_model.edit_item_order_status_model)
+
     def put(self, item_order_id):
         status = request.get_json().get('status')
         if (not status):
@@ -165,6 +167,12 @@ class ModifyItemOrderStatus(Resource):
         if (not db.update_item_ordered_status(item_order_id, status)):
             abort(500, 'Something went wrong')
         
+        if status == 2 :
+            socket.emit('cooking')
+        elif status == 3:
+            socket.emit('ready')
+        
+    
         return jsonify({ 'status': 'success'})
 
 

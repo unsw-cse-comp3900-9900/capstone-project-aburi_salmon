@@ -36,11 +36,24 @@ export const connectToSocket = (App: App) => {
         console.log(`Table is requesting assistance`);
     });
 
-    socket.on('selecttable', () => {
-        console.log(`Customer is sitting at table `);
+    socket.on('order', () => {
+        console.log(`Customer has ordered an item `);
     });
+
     socket.on('modify', () => {
-        console.log(`WE AT MODIFY`);
+        console.log(`Customer has modified an item`);
+    });
+
+    socket.on('delete', () => {
+        console.log(`Customer has deleted an item`);
+    });
+
+    socket.on('cooking', () => {
+        console.log(`Your item is cooking`);
+    });
+
+    socket.on('ready', () => {
+        console.log(`Your item is ready to serve`);
     });
 
 };
