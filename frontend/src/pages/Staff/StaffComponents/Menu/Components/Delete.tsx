@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Dialog, DialogContent, DialogContentText, DialogActions, DialogTitle, FormControl, InputLabel, NativeSelect} from '@material-ui/core';
-import {Item, Categories, WholeItemList} from './../../../../../api/models';
+import {Item, Categories, WholeItemList, ResponseMessage} from './../../../../../api/models';
 import {Client} from './../../../../../api/client';
 
 //Used to render the delete dialog to delete items from category or permanently
@@ -39,42 +39,38 @@ class Delete extends React.Component<IProps, {currItem: number}>{
         }
     }
 
-    handleClick(){
+    async handleClick(){
         const client = new Client();
         if (this.props.isDel){  //permanent delete
-            client.deleteItem(this.state.currItem)
-            .then((msg) => {
-                if (msg.status === 200) {
-                    this.props.alert(true, 'success', 'Successfully deleted item');
-                    this.props.setIsOpen(false);
-                    this.props.updatemenu();
-                    this.props.updateitems();
-                } else {
-                    this.props.alert(true, 'error', msg.statusText);
-                    console.log(msg);
-                }
-            }).catch((status) => {
-                console.log(status);
-            });
+            const r: ResponseMessage | null= await client.deleteItem(this.state.currItem);
+            console.log(r);
+            if (r === null) {
+                this.props.alert(true, 'error', "Something went wrong");
+            } else if (r?.status === "success") {
+                this.props.alert(true, 'success', 'Successfully deleted item');
+                this.props.setIsOpen(false);
+                this.props.updatemenu();
+                this.props.updateitems();
+            } else {
+                this.props.alert(true, 'error', r.status);
+            }
         } else { // delete item from category
             console.log(this.props.item?.id);
             console.log(this.props.cat?.id);
             var itemname = this.props.item?.name;
             var catname = this.props.cat?.name;
-            client.removeItemFromCat(this.props.item?.id, this.props.cat?.id)
-            .then((msg) => {
-                if (msg.status === 200) {
-                    this.props.alert(true, 'success', 'Successfully removed ' + itemname + ' from ' + catname);
-                    this.props.setIsOpen(false);
-                    this.props.updatemenu();
-                } else {         
-                    this.props.alert(true, 'error', msg.statusText);
-                }
-            }).catch((status) => {
-                console.log(status);
-            });  
-        }
-        
+            const r: ResponseMessage | null = await client.removeItemFromCat(this.props.item?.id, this.props.cat?.id);
+            console.log(r);
+            if (r === null) {
+                this.props.alert(true, 'error', "Something went wrong");
+            } else if (r?.status === "success") {
+                this.props.alert(true, 'success', 'Successfully removed ' + itemname + ' from ' + catname);
+                this.props.setIsOpen(false);
+                this.props.updatemenu();
+            } else {
+                this.props.alert(true, 'error', r.status);
+            }
+        } 
     }
 
     render() {

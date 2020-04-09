@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Dialog, DialogContent, Radio, DialogActions,TextField, DialogTitle, FormControl, FormLabel, FormGroup, FormControlLabel, Checkbox, RadioGroup} from '@material-ui/core';
-import {Categories, Ingredient} from './../../../../../api/models';
+import {Categories, Ingredient, ResponseMessage} from './../../../../../api/models';
 import {Client} from './../../../../../api/client';
 
 //renders edit ingredients dialog (for adding and deleting)
@@ -63,42 +63,37 @@ class EditIngredients extends React.Component<IProps, IState>{
 
     }  
 
-    handleAddIngred(){ //adds ingredient to ingredients list
+    async handleAddIngred(){ //adds ingredient to ingredients list
         const client = new Client();
         if (this.state.newIngred !== ''){
-            client.addIngredient(this.state.newIngred)
-                .then((msg) => {
-                    //alert(msg.status);
-                    if (msg.status === 200) {
-                        this.props.alert(true, 'success', 'Successfully added ingredient');
-                        this.setState({ isOpen: false });
-                        this.props.update();
-                    } else {
-                        this.props.alert(true, 'error', msg.statusText);
-                    }
-                }).catch((status) => {
-                    console.log(status);
-                });
+            const r: ResponseMessage | null = await client.addIngredient(this.state.newIngred);
+            if (r === null) {
+                this.props.alert(true, 'error', "Something went wrong");
+            } else if (r?.status === "success") {
+                this.props.alert(true, 'success', 'Successfully added ingredient');
+                this.setState({ isOpen: false });
+                this.props.update();
+            } else {
+                this.props.alert(true, 'error', r.status);
+            }
         } else {
             this.props.alert(true, 'error', 'Please enter ingredient name');
         }
         this.setState({ selected: null, newIngred:'' });
     }
 
-    handleDeleteIngred(){ //deletes ingredient from ingredient list
+    async handleDeleteIngred(){ //deletes ingredient from ingredient list
         const client = new Client();
         if (this.state.selected !== null){
-            client.deleteIngredient(this.state.selected?.id)
-            .then((msg) => {
-                if (msg.status === 200) {
-                    this.props.alert(true, 'success', 'Successfully deleted ingredient');
-                    this.props.update();
-                } else {
-                    this.props.alert(true, 'error', msg.statusText);
-                }
-            }).catch((status) => {
-                console.log(status);
-            });
+            const r: ResponseMessage | null = await client.deleteIngredient(this.state.selected?.id);
+            if (r === null) {
+                this.props.alert(true, 'error', "Something went wrong");
+            } else if (r?.status === "success") {
+                this.props.alert(true, 'success', 'Successfully deleted ingredient');
+                this.props.update();
+            } else {
+                this.props.alert(true, 'error', r.status);
+            }
         } else {
             this.props.alert(true, 'error', 'Please select an ingredient');
         }

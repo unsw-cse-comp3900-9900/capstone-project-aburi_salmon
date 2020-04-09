@@ -300,34 +300,48 @@ export class Client {
   }
 
   async freeTable(tableNum: number) {
-
-    return fetch(apiUrl + '/table/free/' + tableNum, {
+    try {
+      const r: Response = await fetch(apiUrl + '/table/free/' + tableNum, {
       method: 'POST',
       credentials: 'include',
       mode: 'cors',
     });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   }
 
   async assistance(table: number, assistance: boolean) {
-    return fetch(apiUrl + '/table/assistance', {
-      method: 'PUT',
-      credentials: 'include',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(
-        {
-          assistance: assistance,
-          table: table,
-        }
-      ),
-    });
+    try {
+      const r: Response = await fetch(apiUrl + '/table/assistance', {
+        method: 'PUT',
+        credentials: 'include',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(
+          {
+            assistance: assistance,
+            table: table,
+          }
+        ),
+      });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
 
   }
 
   async updateOrderStatus(itemId: number, newStatus: number) {
-    return fetch(apiUrl + '/order/item/status/' + itemId, {
+    try {
+      const r: Response = await fetch(apiUrl + '/order/item/status/' + itemId, {
       method: 'PUT',
       credentials: 'include',
       mode: 'cors',
@@ -340,6 +354,13 @@ export class Client {
         }
       ),
     });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+
   }
 
   async getStaff() {
@@ -361,7 +382,8 @@ export class Client {
 
   async deleteStaff(staff_id: number) {
 
-    return (fetch(apiUrl + '/staff_profile/edit', {
+    try {
+      const r: Response = await fetch(apiUrl + '/staff_profile/edit', {
       method: 'DELETE',
       credentials: 'include',
       mode: 'cors',
@@ -373,14 +395,20 @@ export class Client {
           staff_id: staff_id,
         }
       ),
+    });
+      const j: number = await r.status;
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
     }
-    ));
 
   }
 
   async changeStaffType(staff_id: number, name: string, username: string, staff_type_id: number) {
 
-    return (fetch(apiUrl + '/staff_profile/edit', {
+    try {
+      const r: Response = await fetch(apiUrl + '/staff_profile/edit', {
       method: 'PATCH',
       credentials: 'include',
       mode: 'cors',
@@ -395,8 +423,13 @@ export class Client {
           staff_type_id: staff_type_id,
         }
       ),
+      });
+      const j: number = await r.status;
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
     }
-    ));
 
   }
 
@@ -418,7 +451,8 @@ export class Client {
   }
 
   async addCategory(categoryName: string) {
-    return fetch(apiUrl + '/menu/category', {
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/category', {
       method: 'POST',
       credentials: 'include',
       mode: 'cors',
@@ -430,12 +464,18 @@ export class Client {
           name: categoryName,
         }
       ),
+    });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
     }
-    )
   }
 
   async editCategory(categoryName: string, position: number | undefined, id: number | undefined) {
-    return fetch(apiUrl + '/menu/category/' + id, {
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/category/' + id, {
       method: 'PUT',
       credentials: 'include',
       mode: 'cors',
@@ -448,23 +488,36 @@ export class Client {
           position: position,
         }
       ),
+    });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
     }
-    )
   }
 
 
   async deleteCat(id: number | undefined) {
    
-     return(fetch(apiUrl + '/menu/category/' + id, {
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/category/' + id, {
         method: 'DELETE',
         credentials: 'include',
         mode: 'cors',
-      }))
+      });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
 
   }
   
   async addItem(name: string, description: string, price: number, visible: boolean, image_url: string) {
-    return(fetch(apiUrl + '/menu/item', {
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/item', {
         method: 'POST',
         credentials: 'include',
         mode: 'cors',
@@ -480,12 +533,19 @@ export class Client {
             image_url: image_url,
           }
         ),
-      }))
+      });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
      
   }
 
   async editItem(name: string, description: string, price: number, visible: boolean, itemId: number, image_url: string) {
-    return( fetch(apiUrl + '/menu/item/' + itemId, {
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/item/' + itemId, {
         method: 'PUT',
         credentials: 'include',
         mode: 'cors',
@@ -501,20 +561,35 @@ export class Client {
             image_url: image_url,
           }
         ),
-      }))
+      });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+
   }
 
   async deleteItem(id:number | undefined) {
-    return(fetch(apiUrl + '/menu/item/' + id, {
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/item/' + id, {
         method: 'DELETE',
         credentials: 'include',
         mode: 'cors',
-      }))
+    });
+    const j: ResponseMessage = await r.json();
+    return j;
+  } catch(e) {
+    console.error(e);
+    return null;
+  }
     
   }
 
   async addItemToCat(position: number, catId: number, itemId: number) {
-    return(fetch(apiUrl + '/menu/category/' + catId + '/item/' + itemId, {
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/category/' + catId + '/item/' + itemId, {
         method: 'POST',
         credentials: 'include',
         mode: 'cors',
@@ -526,11 +601,18 @@ export class Client {
             position: position,
           }
         ),
-      }))
+      });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   }
 
   async addIngredient(name: string){
-    return fetch(apiUrl + '/menu/ingredient', {
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/ingredient', {
       method: 'POST',
       credentials: 'include',
       mode: 'cors',
@@ -542,8 +624,13 @@ export class Client {
           name: name,
         }
       ),
+    });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
     }
-    )
   }
 
   async getIngredients(){
@@ -564,11 +651,18 @@ export class Client {
   }
 
   async deleteIngredient(id: number) {
-   return(fetch(apiUrl + '/menu/ingredient/' + id, {
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/ingredient/' + id, {
         method: 'DELETE',
         credentials: 'include',
         mode: 'cors',
-      }))
+      });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
     
   }
 
@@ -590,37 +684,63 @@ export class Client {
   }
 
   async removeItemFromCat(catId: number | undefined, itemId: number | undefined){
-    return (fetch(apiUrl + '/menu/category/' + catId + '/item/' + itemId, {
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/category/' + catId + '/item/' + itemId, {
       method: 'DELETE',
       credentials: 'include',
       mode: 'cors',
-    }))
+      });
+      const j: ResponseMessage = await r.json();
+      return j;    
+    } catch(e) {
+      console.error(e);
+      return null;
+    }
   }
 
   async removeIngredFromItem(itemId: number, ingredId: number){
-    return (fetch(apiUrl + '/menu/item/' + itemId + '/ingredient/' + ingredId,{
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/item/' + itemId + '/ingredient/' + ingredId,{
       method: 'DELETE',
       credentials: 'include',
       mode: 'cors',
-    }))
+      });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   }
 
   async addIngredToItem(itemId: number, ingredId: number){
-    return (fetch(apiUrl + '/menu/item/' + itemId + '/ingredient/' + ingredId, {
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/item/' + itemId + '/ingredient/' + ingredId, {
       method: 'POST',
       credentials: 'include',
       mode: 'cors',
-    }))
+      });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   }
 
   async catSwitch(cat1Id: number, cat2Id: number | undefined){
-    return (fetch(apiUrl + '/menu/category/swap/' + cat1Id + '/' + cat2Id, {
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/category/swap/' + cat1Id + '/' + cat2Id, {
       method: 'POST',
       credentials: 'include',
       mode: 'cors',
-    }))
+      });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   }
-    
-  
 
 }

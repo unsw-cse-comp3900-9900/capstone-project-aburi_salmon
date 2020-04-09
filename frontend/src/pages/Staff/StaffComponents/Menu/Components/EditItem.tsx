@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Dialog, DialogContent,  DialogActions, DialogTitle, TextField} from '@material-ui/core';
-import {Item, Menu} from './../../../../../api/models';
+import {Item, Menu, ResponseMessage} from './../../../../../api/models';
 import {Client} from './../../../../../api/client';
 
 //renders the edit or create item dialog
@@ -72,34 +72,32 @@ class EditItem extends React.Component<IProps, IState>{
         this.setState({ name: '', description: '', price: 0, image_url: ''});
     }
 
-    addEditItem(name: string, description: string, price: number, image_url: string) { //fetchs from server
+    async addEditItem(name: string, description: string, price: number, image_url: string) { //fetchs from server
         const client = new Client();
         if (this.props.isEdit) { //if editing existing item
-            client.editItem(name, description, price, true ,this.props.item.id, image_url)
-            .then((msg) => {
-                if (msg.status === 200) {
-                    this.props.alert(true, 'success', 'Successfully edited item');
-                    this.props.setIsOpen(false);
-                    this.props.updatemenu();
-                } else {
-                    this.props.alert(true, 'error', msg.statusText);
-                }
-            }).catch((status) => {
-                console.log(status);
-            });
+            const r: ResponseMessage | null = await client.editItem(name, description, price, true ,this.props.item.id, image_url);
+            console.log(r);
+            if (r === null) {
+                this.props.alert(true, 'error', "Something went wrong");
+            } else if (r?.status === "success") {
+                this.props.alert(true, 'success', 'Successfully edited item');
+                this.props.setIsOpen(false);
+                this.props.updatemenu();
+            } else {
+                this.props.alert(true, 'error', r.status);
+            }
         } else { //if adding item
-            client.addItem(name, description, price, true, image_url)
-            .then((msg) => {
-                if (msg.status === 200) {
-                    this.props.alert(true, 'success', 'Successfully added item');
-                    this.props.setIsOpen(false);
-                    this.props.updateitems();
-                } else {
-                    this.props.alert(true, 'error', msg.statusText);
-                }
-            }).catch((status) => {
-                console.log(status);
-            });
+            const r: ResponseMessage | null = await client.addItem(name, description, price, true, image_url);
+            console.log(r);
+            if (r === null) {
+                this.props.alert(true, 'error', "Something went wrong");
+            } else if (r?.status === "success") {
+                this.props.alert(true, 'success', 'Successfully added item');
+                this.props.setIsOpen(false);
+                this.props.updateitems();
+            } else {
+                this.props.alert(true, 'error', r.status);
+            }
         }
     }
 

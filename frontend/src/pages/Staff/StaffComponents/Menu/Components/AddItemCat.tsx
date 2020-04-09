@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Dialog, DialogContent,  DialogActions, DialogTitle, FormControl, InputLabel, NativeSelect} from '@material-ui/core';
-import {Menu, WholeItemList} from './../../../../../api/models';
+import {Menu, WholeItemList, ResponseMessage} from './../../../../../api/models';
 import {Client} from './../../../../../api/client';
 
 //Class that renders dialog for adding an item to a category
@@ -32,20 +32,28 @@ class AddItemCat extends React.Component<IProps, IState>{
     }
 
     //sends info to server
-    handleClick(){
+    async handleClick(){
         const client = new Client();
-        const r =  client.addItemToCat(0,this.state.currCat, this.state.currItem);
-        r.then((msg) => {
+        const r: ResponseMessage | null= await client.addItemToCat(0,this.state.currCat, this.state.currItem);
+        console.log(r);
+        if (r === null) {
+            this.props.alert(true, 'error', "Something went wrong");
+        } else if (r?.status === "success") {
+            this.props.alert(true, 'success', 'Successful');
+            this.props.setIsOpen(false);
+            this.props.update();
+        } else {
+            this.props.alert(true, 'error', r.status);
+        }
+        /*
             if (msg.status === 200) {
                 this.props.alert(true,'success', 'Successful');
                 this.props.setIsOpen(false);
                 this.props.update();
             } else {
                 this.props.alert(true, 'error', msg.statusText);
-            }
-        }).catch((status) => {
-            console.log(status);
-        });
+            }*/
+        
     }
 
     render() {

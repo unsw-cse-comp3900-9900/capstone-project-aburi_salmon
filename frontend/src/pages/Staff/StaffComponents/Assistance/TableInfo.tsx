@@ -1,7 +1,7 @@
 import React from 'react';
-import { createStyles, WithStyles, Theme, withStyles, Button, Box,  Snackbar } from '@material-ui/core';
+import {  WithStyles, withStyles, Button, Box } from '@material-ui/core';
 import { Client } from './../../../../api/client';
-import { TableInfo } from './../../../../api/models';
+import { TableInfo, ResponseMessage as ResponseMessageModel } from './../../../../api/models';
 import AlertSnackbar from './../../../AlertSnackbar';
 import {styles} from './styles';
 
@@ -51,7 +51,6 @@ class TableInfoClass extends React.Component<IProps, IState>{
         if (this.props.isEmpty){
             const client = new Client()
             const t: TableInfo | null = await client.getTableOrders(this.props.tableNumber);
-            console.log(t);
             this.setState({ tableInfo: t});
             if (t?.items !== undefined){
                 this.setState({itemsOrdered: t?.items.length, order_id:t.order_id})
@@ -108,36 +107,30 @@ class TableInfoClass extends React.Component<IProps, IState>{
         }
     }
 
-    problemResolved(){
+    async problemResolved(){
         const client = new Client();
-        client.assistance(this.props.tableNumber, false)
-            .then((msg) => {
-                if (msg.status === 200) {
-                    this.setState({isOpen: true, alertSeverity: "success", alertMessage: "Problem Resolved", hide:'none'});
-                    this.props.paidFunction();
-                } else {
-                    this.setState({ isOpen: true, alertSeverity: "error", alertMessage: msg.statusText });
-                }
-            }).catch((status) => {
-                console.log(status);
-            });
+        const r: ResponseMessageModel | null= await client.assistance(this.props.tableNumber, false);
+        if (r === null){
+            this.setState({ isOpen: true, alertSeverity: "error", alertMessage: "Something went wrong" });
+        } else if (r?.status === "success") {
+            this.setState({isOpen: true, alertSeverity: "success", alertMessage: "Problem Resolved", hide:'none'});
+            this.props.paidFunction();
+        } else {
+            this.setState({ isOpen: true, alertSeverity: "error", alertMessage: r?.status });
+        }
     }
 
     async freeTable(){
         const client = new Client();
-        await client.freeTable(this.props.tableNumber)
-            .then((msg) => {
-                if (msg.status === 200) {
-                    this.setState({ isOpen: true, alertSeverity: "success", alertMessage: "Table Freed" });
-                    this.props.paidFunction();
-                    
-                } else {
-                    this.setState({ isOpen: true, alertSeverity: "error", alertMessage: msg.statusText });
-                }
-                
-            }).catch((status) => {
-                console.log(status);
-            });
+        const r: ResponseMessageModel | null = await client.freeTable(this.props.tableNumber);
+        if (r === null) {
+            this.setState({ isOpen: true, alertSeverity: "error", alertMessage: "Something went wrong" });
+        } else if (r?.status === "success") {
+            this.setState({ isOpen: true, alertSeverity: "success", alertMessage: "Table Freed" });
+            this.props.paidFunction();
+        } else {
+            this.setState({ isOpen: true, alertSeverity: "error", alertMessage: r?.status });
+        }
     }
 
     render() {

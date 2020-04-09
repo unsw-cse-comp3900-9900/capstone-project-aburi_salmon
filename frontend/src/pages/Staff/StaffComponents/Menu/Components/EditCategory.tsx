@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Dialog, DialogContent, DialogActions,TextField, DialogTitle, FormControl, InputLabel, NativeSelect} from '@material-ui/core';
-import {Categories, Menu} from './../../../../../api/models';
+import {Categories, Menu, ResponseMessage} from './../../../../../api/models';
 import {Client} from './../../../../../api/client';
 
 //renders edit category and add category dialog
@@ -30,74 +30,70 @@ class EditCategory extends React.Component<IProps, IState>{
         }
     }
 
-    addEditCat(categoryName: string, isAdd: boolean) { //add or edit category
+    async addEditCat(categoryName: string, isAdd: boolean) { //add or edit category
         console.log(categoryName);
         if (isAdd) { //add category
             const client = new Client();
-            client.addCategory(categoryName)
-                .then((msg) => {
-                    if (msg.status === 200) {
-                        this.props.alert(true, 'success', 'Successfully added category.');
-                        this.props.setIsOpen(false);
-                        this.props.update();
-                    } else {
-                        this.props.alert(true, 'error', msg.statusText);
-                    }
-                }).catch((status) => {
-                    console.log(status);
-                });
-        } else { //edit category
-            const client = new Client();
-            client.editCategory(categoryName, this.props.category?.position, this.props.category?.id)
-                .then((msg) => {
-                    if (msg.status === 200) {
-                        this.props.alert(true, 'success', 'Category successfully modified.');
-                        this.props.setIsOpen(false);
-                        this.props.update();
-                    } else {
-                        this.props.alert(true, 'error', msg.statusText);
-                    }
-                }).catch((status) => {
-                    console.log(status);
-                });
-        }
-    }
-
-    deleteFun(){ //delete category
-        const client = new Client();
-        client.deleteCat(this.props.category?.id)
-        .then((msg) => {
-            if (msg.status === 200) {
-                this.props.alert(true, 'success', 'Successfully deleted category');
+            const r: ResponseMessage | null = await client.addCategory(categoryName);
+            console.log(r);
+            if (r === null) {
+                this.props.alert(true, 'error', "Something went wrong");
+            } else if (r?.status === "success") {
+                this.props.alert(true, 'success', 'Successfully added category.');
                 this.props.setIsOpen(false);
                 this.props.update();
             } else {
-                this.props.alert(true, 'error', msg.statusText);
+                this.props.alert(true, 'error', r.status);
             }
-        }).catch((status) => {
-            console.log(status);
-        });
+        } else { //edit category
+            const client = new Client();
+            const r: ResponseMessage | null = await client.editCategory(categoryName, this.props.category?.position, this.props.category?.id);
+            console.log(r);
+            if (r === null) {
+                this.props.alert(true, 'error', "Something went wrong");
+            } else if (r?.status === "success") {
+                this.props.alert(true, 'success', 'Category successfully modified.');
+                this.props.setIsOpen(false);
+                this.props.update();
+            } else {
+                this.props.alert(true, 'error', r.status);
+            }
+        }
     }
 
-    handleClick(){ //for switching category positions
+    async deleteFun(){ //delete category
+        const client = new Client();
+        const r: ResponseMessage | null = await client.deleteCat(this.props.category?.id);
+        console.log(r);
+        if (r === null) {
+            this.props.alert(true, 'error', "Something went wrong");
+        } else if (r?.status === "success") {
+            this.props.alert(true, 'success', 'Successfully deleted category');
+            this.props.setIsOpen(false);
+            this.props.update();
+        } else {
+            this.props.alert(true, 'error', r.status);
+        }
+    }
+
+    async handleClick(){ //for switching category positions
         //if name is different, send to server
         if (this.state.catName !== this.props.category?.name && this.state.catName !== ''){
             this.addEditCat(this.state.catName, false);
         } //if wants to switch position
         if (this.state.currCat !== -1){
             const client = new Client();
-            client.catSwitch(this.state.currCat, this.props.category?.id)
-                .then((msg) => {
-                    if (msg.status === 200) {
-                        this.props.alert(true, 'success', 'Successfully switched category positions');
-                        this.props.setIsOpen(false);
-                        this.props.update();
-                    } else {
-                        this.props.alert(true, 'error', msg.statusText);
-                    }
-                }).catch((status) => {
-                    console.log(status);
-                });
+            const r: ResponseMessage | null= await client.catSwitch(this.state.currCat, this.props.category?.id)
+            console.log(r);
+            if (r === null) {
+                this.props.alert(true, 'error', "Something went wrong");
+            } else if (r?.status === "success") {
+                this.props.alert(true, 'success', 'Successfully switched category positions');
+                this.props.setIsOpen(false);
+                this.props.update();
+            } else {
+                this.props.alert(true, 'error', r.status);
+            }
         }
     }
 

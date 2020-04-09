@@ -3,7 +3,7 @@ import { createStyles,  withStyles, WithStyles, Theme, MenuList, Paper, MenuItem
 import Assistance from './Assistance/AssistanceMain';
 import ToServe from './Orders/Components/ToServeList';
 import Served from './Orders/Components/ServedList';
-import { ListItem, Menu, Tables, AssistanceTables, ItemList} from './../../../api/models';
+import { ListItem, Menu, Tables, AssistanceTables, ItemList, ResponseMessage} from './../../../api/models';
 import { Client } from './../../../api/client';
 import { Alert } from '@material-ui/lab';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
@@ -150,7 +150,7 @@ class Wait extends React.Component<IProps, IState>{
         this.setState({ menuvalue: newValue })
     }
 
-    moveToServed(itemId: number, item: ListItem): void {
+    async moveToServed(itemId: number, item: ListItem) {
         var tempList = this.state.servedList;
         if (tempList !== null) {
             const tempArray = tempList?.itemList.concat(item);
@@ -158,26 +158,16 @@ class Wait extends React.Component<IProps, IState>{
                 itemList: tempArray,
             }
             this.setState({ servedList: ret });
-            
             const client = new Client();
-            client.updateOrderStatus(item.id, 4)
-                .then((msg) => {
-                    //alert(msg.status);
-                    if (msg.status === 200) {
-                        this.setState({ lastClicked: item.id });
-                        //alert('success');
-                    } else {
-                        alert(msg.statusText);
-                    }
-                }).catch((status) => {
-                    console.log(status);
-                });;
+            const r: ResponseMessage | null = await client.updateOrderStatus(item.id, 4);
+            if (r?.status === "success") {
+                this.setState({ lastClicked: item.id });
+            }
         }
-        console.log(item);
         this.removeItem(itemId, 1);
     }
 
-    moveToToServe(itemId: number, item: ListItem): void {
+    async moveToToServe(itemId: number, item: ListItem){
         var tempList = this.state.toServeList;
         if (tempList !== null) {
             const tempArray = tempList?.itemList.concat(item);
@@ -187,21 +177,11 @@ class Wait extends React.Component<IProps, IState>{
             this.setState({ toServeList: ret });
             
             const client = new Client();
-            client.updateOrderStatus(item.id, 3)
-                .then((msg) => {
-                    //alert(msg.status);
-                    if (msg.status === 200) {
-                        this.setState({ lastClicked: item.id });
-                        //alert('success');
-                    } else {
-                        alert(msg.statusText);
-                    }
-                }).catch((status) => {
-                    console.log(status);
-                });;
-            
+            const r: ResponseMessage | null = await client.updateOrderStatus(item.id, 3);
+            if (r?.status === "success") {
+                this.setState({ lastClicked: item.id });
+            }
         }
-        console.log(item);
         this.removeItem(itemId, 2);
     }
 
@@ -210,12 +190,10 @@ class Wait extends React.Component<IProps, IState>{
             var array1 = this.state.toServeList;
             array1?.itemList.splice(itemKey, 1);
             this.setState({ toServeList: array1 });
-            console.log(this.state.toServeList);
         } else if (listType === 2) {
             var array2 = this.state.servedList;
             array2?.itemList.splice(itemKey, 1);
             this.setState({ servedList: array2 });
-            console.log(this.state.servedList);
         }
     }
 

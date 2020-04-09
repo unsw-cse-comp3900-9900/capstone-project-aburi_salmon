@@ -2,7 +2,7 @@ import React from 'react';
 import { WithStyles,withStyles, Button, Snackbar,TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper} from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {Client} from './../../../../api/client';
-import { AllStaff, StaffInfo } from './../../../../api/models';
+import { AllStaff, StaffInfo, ResponseMessage } from './../../../../api/models';
 import { Alert } from '@material-ui/lab';
 import DeleteDialog from './Components/DeleteDialog';
 import ChangeStaffType from './Components/ChangeStaffType';
@@ -98,21 +98,17 @@ class StaffDetails extends React.Component<IProps, IState>{
         this.setState({resetKeyOpen: isOpen});
     }
 
-    changeStaffType(staffType: number){
+    async changeStaffType(staffType: number){
         this.setState({ resetOpen: false });
         const client = new Client();
-        client.changeStaffType(this.state.selectedStaff.id, this.state.selectedStaff.name, this.state.selectedStaff.username, staffType)
-            .then((msg) => {
-                if (msg.status === 200) {
-                    this.setState({ isOpen: true, alertMessage: 'Staff Successfully Changed', severity: 'success'});
-                    this.props.update();
-                } else {
-                    this.setState({ isOpen: true, alertMessage: msg.statusText, severity: 'error' });
-                }
-
-            }).catch((status) => {
-                console.log(status);
-            });
+        const r: number | null = await client.changeStaffType(this.state.selectedStaff.id, this.state.selectedStaff.name, this.state.selectedStaff.username, staffType);
+        console.log(r);
+        if (r !== 200) {
+            this.setState({ isOpen: true, alertMessage: "Something went wrong", severity: 'error' });
+        } else {
+            this.setState({ isOpen: true, alertMessage: 'Staff Successfully Changed', severity: 'success' });
+            this.props.update();
+        }
     }
 
     showAlert() {
@@ -133,23 +129,17 @@ class StaffDetails extends React.Component<IProps, IState>{
         );
     }
 
-    deleteStaff(){
+    async deleteStaff(){
         this.setState({ deleteOpen: false });
         const client = new Client();
-        client.deleteStaff(this.state.selectedStaff.id)
-            .then((msg) => {
-                //alert(msg.status);
-                if (msg.status === 200) {
-                    this.setState({isOpen: true, alertMessage:'Staff Successfully Deleted', severity: 'success'});
-                    this.props.update();
-                } else {
-                    this.setState({ isOpen: true, alertMessage: msg.statusText , severity: 'error'});
-                    //alert(msg.statusText);
-                }
-
-            }).catch((status) => {
-                console.log(status);
-            });
+        const r: number | null = await client.deleteStaff(this.state.selectedStaff.id);
+        console.log(r);
+        if (r !== 200) {
+            this.setState({ isOpen: true, alertMessage: 'Something went wrong', severity: 'error' });
+        } else {
+            this.setState({ isOpen: true, alertMessage: 'Staff Successfully Deleted', severity: 'success' });
+            this.props.update();
+        }
     }
 
     printTable() {

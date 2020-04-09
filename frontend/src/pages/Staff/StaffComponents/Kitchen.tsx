@@ -3,7 +3,7 @@ import { createStyles, withStyles, WithStyles, Theme, MenuList, Paper, MenuItem,
 import Queue from './Orders/Components/QueueList';
 import Cooking from './Orders/Components/CookingList';
 import Ready from './Orders/Components/ReadyList';
-import { ListItem, Menu, ItemList } from './../../../api/models';
+import { ListItem, Menu, ItemList, ResponseMessage } from './../../../api/models';
 import { Client } from './../../../api/client';
 import { StaticMenu} from './Menu/StaticMenu';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
@@ -117,7 +117,7 @@ class Kitchen extends React.Component<IProps, IState>{
         );
     }
 
-    moveToCooking(itemId:number, item: ListItem):void{
+    async moveToCooking(itemId:number, item: ListItem){
         var tempList = this.state.cookingList;
         if (tempList !== null) {
             const tempArray = tempList?.itemList.concat(item);
@@ -127,25 +127,15 @@ class Kitchen extends React.Component<IProps, IState>{
             this.setState({ cookingList: ret });
             
             const client = new Client();
-            client.updateOrderStatus(item.id, 2)
-                .then((msg) => {
-                    //alert(msg.status);
-                    if (msg.status === 200) {
-                        this.setState({ lastClicked: item.id });
-                        //alert('success');
-                    } else {
-                        alert(msg.statusText);
-                    }
-                }).catch((status) => {
-                    console.log(status);
-                });;
-            console.log(ret);
+            const r: ResponseMessage | null = await client.updateOrderStatus(item.id, 2);
+            if (r?.status === "success") {
+                this.setState({ lastClicked: item.id });
+            }
         }   
-        console.log(item);
         this.removeItem(itemId, 1);
     }
 
-    moveToReady(itemId: number, item: ListItem): void {
+    async moveToReady(itemId: number, item: ListItem){
         var tempList = this.state.readyList;
         if (tempList !== null){
             const tempArray= tempList?.itemList.concat(item);
@@ -155,24 +145,15 @@ class Kitchen extends React.Component<IProps, IState>{
             this.setState({readyList: ret});
             
             const client = new Client();
-            client.updateOrderStatus(item.id, 3)
-                .then((msg) => {
-                    //alert(msg.status);
-                    if (msg.status === 200) {
-                        this.setState({lastClicked: item.id});
-                        //alert('success');
-                    } else {
-                        alert(msg.statusText);
-                    }
-                }).catch((status) => {
-                    console.log(status);
-                });;
+            const r: ResponseMessage | null = await client.updateOrderStatus(item.id, 3);
+            if (r?.status === "success") {
+                this.setState({ lastClicked: item.id });
+            }
         }  
-        console.log(item);
         this.removeItem(itemId, 2);
     }
 
-    moveToQueue(itemId: number, item: ListItem): void {
+    async moveToQueue(itemId: number, item: ListItem){
         var tempList = this.state.queueList;
         if (tempList !== null) {
             const tempArray = tempList?.itemList.concat(item);
@@ -182,20 +163,11 @@ class Kitchen extends React.Component<IProps, IState>{
             this.setState({ queueList: ret });
             
             const client = new Client();
-            client.updateOrderStatus(item.id, 1)
-                .then((msg) => {
-                    //alert(msg.status);
-                    if (msg.status === 200) {
-                        this.setState({ lastClicked: item.id });
-                        //alert('success');
-                    } else {
-                        alert(msg.statusText);
-                    }
-                }).catch((status) => {
-                    console.log(status);
-                });;
+            const r: ResponseMessage | null = await client.updateOrderStatus(item.id, 1);
+            if (r?.status === "success") {
+                this.setState({ lastClicked: item.id });
+            }
         }   
-        console.log(item);
         this.removeItem(itemId, 3);
     }
 
@@ -204,17 +176,14 @@ class Kitchen extends React.Component<IProps, IState>{
             var array1 = this.state.queueList;
             array1?.itemList.splice(itemKey, 1);
             this.setState({ queueList: array1 });
-            console.log(this.state.queueList);
         } else if (listType === 2){
             var array2 = this.state.cookingList;
             array2?.itemList.splice(itemKey, 1);
             this.setState({ cookingList: array2 });
-            console.log(this.state.cookingList);
         } else if (listType === 3){
             var array3 = this.state.readyList;
             array3?.itemList.splice(itemKey, 1);
             this.setState({ readyList: array3 });
-            console.log(this.state.readyList);
         }
     }
 

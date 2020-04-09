@@ -1,9 +1,9 @@
 import React from 'react';
 import { AppBar, Toolbar,  Typography, Button, withStyles, WithStyles, MenuItem, Menu} from '@material-ui/core';
 import history from '../../history';
-import { KitchenStaff } from './../Staff/StaffType/Kitchen';
-import { WaitStaff } from './../Staff/StaffType/Wait';
-import { ManageStaff } from './../Staff/StaffType/Manage';
+import { KitchenStaff } from './../Staff/StaffComponents/Kitchen';
+import { WaitStaff } from './../Staff/StaffComponents/Wait';
+import { ManageStaff } from './../Staff/StaffComponents/Manage';
 import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import {styles} from './styles';
 
