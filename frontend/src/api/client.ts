@@ -308,8 +308,7 @@ export class Client {
     });
   }
 
-  async assistance(order_id: number, assistance: boolean) {
-
+  async assistance(table: number, assistance: boolean) {
     return fetch(apiUrl + '/table/assistance', {
       method: 'PUT',
       credentials: 'include',
@@ -320,7 +319,7 @@ export class Client {
       body: JSON.stringify(
         {
           assistance: assistance,
-          table: order_id,
+          table: table,
         }
       ),
     });

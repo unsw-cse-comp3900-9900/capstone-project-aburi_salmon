@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Dialog, DialogContent, DialogActions,TextField, DialogTitle, FormControl, InputLabel, NativeSelect} from '@material-ui/core';
-import {Categories, Menu} from './../../../api/models';
-import {Client} from './../../../api/client';
+import {Categories, Menu} from './../../../../../api/models';
+import {Client} from './../../../../../api/client';
 
 //renders edit category and add category dialog
 

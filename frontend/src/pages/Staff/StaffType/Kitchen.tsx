@@ -1,12 +1,11 @@
 import React from 'react';
 import { createStyles, withStyles, WithStyles, Theme, MenuList, Paper, MenuItem, Box, Dialog, DialogTitle, DialogContent,DialogActions,Button} from '@material-ui/core';
-import Queue from './../../Staff/Orders/QueueList';
-import Cooking from './../../Staff/Orders/CookingList';
-import Ready from './../../Staff/Orders/ReadyList';
-import { ListItem } from './../../../api/models';
-import { ItemList } from './../../../api/models';
+import Queue from './Orders/Components/QueueList';
+import Cooking from './Orders/Components/CookingList';
+import Ready from './Orders/Components/ReadyList';
+import { ListItem, Menu, ItemList } from './../../../api/models';
 import { Client } from './../../../api/client';
-import { StaticMenu} from '../Menu/StaticMenu';
+import { StaticMenu} from './Menu/StaticMenu';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 
 const styles = (theme: Theme) =>
@@ -69,6 +68,9 @@ interface IState {
     readyList: ItemList | null,
     lastClicked: number,
     resetOpen: boolean,
+    //initialise menu
+    menu: Menu | null;
+    menuvalue: string;
 }
 
 class Kitchen extends React.Component<IProps, IState>{
@@ -82,6 +84,9 @@ class Kitchen extends React.Component<IProps, IState>{
             readyList: null, //listType === 3
             lastClicked: -1,
             resetOpen: false,
+
+            menu: null,
+            menuvalue: '',
         }
         this.moveToCooking = this.moveToCooking.bind(this);
         this.moveToReady = this.moveToReady.bind(this);
@@ -93,10 +98,13 @@ class Kitchen extends React.Component<IProps, IState>{
         const queue: ItemList | null = await client.getListItem(1);
         const cooking: ItemList | null = await client.getListItem(2);
         const ready: ItemList | null = await client.getListItem(3);
+        const m: Menu | null = await client.getMenu();
         this.setState({
             queueList: queue,
             cookingList: cooking,
             readyList: ready,
+            menu: m,
+            menuvalue: m?.menu[0].name ? m?.menu[0].name : "",
         });
     }
 
@@ -115,7 +123,7 @@ class Kitchen extends React.Component<IProps, IState>{
         } else {
             return (
                 <Box className={classes.menuContainer}>
-                    <StaticMenu />
+                    <StaticMenu menu={this.state.menu} value={this.state.menuvalue}/>
                 </Box>
             );
         }

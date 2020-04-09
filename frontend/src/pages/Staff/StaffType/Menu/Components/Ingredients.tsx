@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Dialog, DialogContent, DialogActions, DialogTitle, FormControl, FormGroup, FormControlLabel, Checkbox} from '@material-ui/core';
-import {Ingredient, Item} from './../../../api/models';
-import {Client} from './../../../api/client';
+import {Ingredient, Item} from './../../../../../api/models';
+import {Client} from './../../../../../api/client';
 
 //renders the dialog for adding ingredients to an item
 

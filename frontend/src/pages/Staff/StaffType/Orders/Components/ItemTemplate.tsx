@@ -1,6 +1,6 @@
 import React from 'react';
 import { createStyles, WithStyles, Theme, withStyles } from '@material-ui/core';
-import {ListItem} from '../../../api/models';
+import {ListItem} from './../../../../../api/models';
 //Personal note:
 //Props is what is passed in {declare in interface}
 //state is what you store {decalre in react component}

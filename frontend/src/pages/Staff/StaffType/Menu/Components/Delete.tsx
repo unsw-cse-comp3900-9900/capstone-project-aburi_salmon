@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Dialog, DialogContent, DialogContentText, DialogActions, DialogTitle, FormControl, InputLabel, NativeSelect} from '@material-ui/core';
-import {Item, Categories, WholeItemList} from './../../../api/models';
-import {Client} from './../../../api/client';
+import {Item, Categories, WholeItemList} from './../../../../../api/models';
+import {Client} from './../../../../../api/client';
 
 //Used to render the delete dialog to delete items from category or permanently
 

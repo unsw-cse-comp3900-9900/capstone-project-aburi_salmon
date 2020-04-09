@@ -1,13 +1,13 @@
 import React from 'react';
 import { createStyles, WithStyles, Theme, withStyles, Button, Snackbar,TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper} from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
-import {Client} from './../../../api/client';
-import { AllStaff, StaffInfo } from './../../../api/models';
+import {Client} from './../../../../api/client';
+import { AllStaff, StaffInfo } from './../../../../api/models';
 import { Alert } from '@material-ui/lab';
-import DeleteDialog from './DeleteDialog';
-import ChangeStaffType from './ChangeStaffType';
-import ChangeTableNo from './ChangeTableNo';
-import ResetRegist from './ResetRegist';
+import DeleteDialog from './Components/DeleteDialog';
+import ChangeStaffType from './Components/ChangeStaffType';
+import ChangeTableNo from './Components/ChangeTableNo';
+import ResetRegist from './Components/ResetRegist';
 //mostly copied from https://codesandbox.io/s/v2eib &
 //https://material-ui.com/components/tables/
 //https://codesandbox.io/s/u0yv3
@@ -56,6 +56,7 @@ const styles = (theme: Theme) =>
         }
     });
 export interface IProps extends WithStyles<typeof styles> {
+    realData: AllStaff | null,
 }
 const StyledTableCell = withStyles(theme => ({
     head: {
@@ -93,6 +94,7 @@ class StaffDetails extends React.Component<IProps, IState>{
 
     constructor(props: IProps){
         super(props);
+        var tempdata = this.props.realData;
         var temp: StaffInfo ={
             id:-1,
             name:'',
@@ -105,7 +107,7 @@ class StaffDetails extends React.Component<IProps, IState>{
             resetKeyOpen: false,
             tableOpen: false,
             resetStaff: "",
-            realData: null,
+            realData: tempdata,
             selectedStaff: temp,
             isOpen: false,
             alertMessage: 'False Alarm',
@@ -142,7 +144,7 @@ class StaffDetails extends React.Component<IProps, IState>{
             .then((msg) => {
                 if (msg.status === 200) {
                     this.setState({ isOpen: true, alertMessage: 'Staff Successfully Changed', severity: 'success'});
-                    this.componentDidMount();
+                    //this.componentDidMount();
                 } else {
                     this.setState({ isOpen: true, alertMessage: msg.statusText, severity: 'error' });
                 }
@@ -169,13 +171,14 @@ class StaffDetails extends React.Component<IProps, IState>{
             </Snackbar>
         );
     }
+    /*
     async componentDidMount() {
         const client = new Client();
         const temp: AllStaff | null = await client.getStaff();
         this.setState({
             realData: temp,
         });
-    }
+    }*/
 
     deleteStaff(){
         this.setState({ deleteOpen: false });
@@ -185,7 +188,7 @@ class StaffDetails extends React.Component<IProps, IState>{
                 //alert(msg.status);
                 if (msg.status === 200) {
                     this.setState({isOpen: true, alertMessage:'Staff Successfully Deleted', severity: 'success'});
-                    this.componentDidMount();
+                    //this.componentDidMount();
                 } else {
                     this.setState({ isOpen: true, alertMessage: msg.statusText , severity: 'error'});
                     //alert(msg.statusText);

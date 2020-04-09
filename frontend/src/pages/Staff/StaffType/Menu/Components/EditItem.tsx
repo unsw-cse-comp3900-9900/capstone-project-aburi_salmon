@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Dialog, DialogContent,  DialogActions, DialogTitle, TextField} from '@material-ui/core';
-import {Item, Menu} from './../../../api/models';
-import {Client} from './../../../api/client';
+import {Item, Menu} from './../../../../../api/models';
+import {Client} from './../../../../../api/client';
 
 //renders the edit or create item dialog
 

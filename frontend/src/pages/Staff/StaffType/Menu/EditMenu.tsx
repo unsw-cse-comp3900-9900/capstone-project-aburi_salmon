@@ -14,18 +14,23 @@ import Checkbox from '@material-ui/core/Checkbox';
 import EditIcon from '@material-ui/icons/Edit';
 
 import { styles } from './styles';
-import { Client } from '../../../api/client';
-import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel, Item, WholeItemList, Ingredient } from '../../../api/models';
+import { Client } from './../../../../api/client';
+import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel, Item, WholeItemList, Ingredient } from './../../../../api/models';
 
-import EditCategory from './EditCategory';
-import EditItem from './EditItem';
-import Delete from './Delete';
-import Ingredients from './Ingredients';
-import EditIngredients from './EditIngredients';
-import AddItemCat from './AddItemCat';
-import AlertSnackbar from './../AlertSnackbar';
+import EditCategory from './Components/EditCategory';
+import EditItem from './Components/EditItem';
+import Delete from './Components/Delete';
+import Ingredients from './Components/Ingredients';
+import EditIngredients from './Components/EditIngredients';
+import AddItemCat from './Components/AddItemCat';
+import AlertSnackbar from './../../../AlertSnackbar';
 
-interface IProps extends WithStyles<typeof styles> { }
+interface IProps extends WithStyles<typeof styles> {
+  menu: MenuModel | null;
+  value: string;
+  allItems: WholeItemList | null,
+  ingredientsList: Array<Ingredient> | null,
+}
 
 interface IState {
   //displaying menu
@@ -61,6 +66,10 @@ interface IState {
 class EditMenuPage extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
+    var tempmenu = this.props.menu;
+    var tempvalue = this.props.value;
+    var tempitems = this.props.allItems;
+    var tempingred = this.props.ingredientsList;
     var temp: ItemModel = { //for initialisation (don't want to deal with null)
       id:0,
       name:'',
@@ -71,8 +80,8 @@ class EditMenuPage extends React.Component<IProps, IState> {
     }
     this.state = {
       //displaying menu
-      menu: null,
-      value: "",
+      menu: tempmenu,
+      value: tempvalue,
       openModal: false,
       modal: null,
 
@@ -90,8 +99,8 @@ class EditMenuPage extends React.Component<IProps, IState> {
       isCat: false,
       isDel: false,
       itemIngredients: [],
-      allItems: null,
-      ingredientsList: null,
+      allItems: tempitems,
+      ingredientsList: tempingred,
 
       //alert
       alertDialog: false,
@@ -236,7 +245,6 @@ class EditMenuPage extends React.Component<IProps, IState> {
         value: m?.menu[0].name ? m?.menu[0].name : "",
         currCat: m.menu[0],
       });
-
     }
   }
 
@@ -255,11 +263,12 @@ class EditMenuPage extends React.Component<IProps, IState> {
   }
 
   // Component did mount gets called before render
+  /*
   async componentDidMount() {
     this.forceUpdateMenu();
     this.forceUpdateItemlist();
     this.forceUpdateIngredList();
-  }
+  }*/
 
   render() {
     const { classes } = this.props;

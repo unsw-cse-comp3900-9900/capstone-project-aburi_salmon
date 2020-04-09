@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Dialog, DialogContent,  DialogActions, DialogTitle, FormControl, InputLabel, NativeSelect} from '@material-ui/core';
-import {Menu, WholeItemList} from './../../../api/models';
-import {Client} from './../../../api/client';
+import {Menu, WholeItemList} from './../../../../../api/models';
+import {Client} from './../../../../../api/client';
 
 //Class that renders dialog for adding an item to a category
 
