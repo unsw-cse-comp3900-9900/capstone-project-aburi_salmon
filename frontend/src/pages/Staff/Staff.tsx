@@ -1,34 +1,13 @@
 import React from 'react';
-import { AppBar, Toolbar,  Typography, createStyles, Button, withStyles, WithStyles, Theme, MenuItem, Menu} from '@material-ui/core';
-import background from './../../assets/FoodBackground.jpg';
+import { AppBar, Toolbar,  Typography, Button, withStyles, WithStyles, MenuItem, Menu} from '@material-ui/core';
 import history from '../../history';
-import { KitchenStaff } from './../Staff/StaffType/Kitchen';
-import { WaitStaff } from './../Staff/StaffType/Wait';
-import { ManageStaff } from './../Staff/StaffType/Manage';
+import { KitchenStaff } from './../Staff/StaffComponents/Kitchen';
+import { WaitStaff } from './../Staff/StaffComponents/Wait';
+import { ManageStaff } from './../Staff/StaffComponents/Manage';
 import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
-//import { PopupState } from 'material-ui-popup-state/core';
+import {styles} from './styles';
 
-const styles = (theme: Theme) =>
-    createStyles({
-        title: {
-            flexGrow: 1,
-        },      
-        wrapper: {
-            height: '97vh',
-            width: '100%',
-            backgroundImage: background,
-        },
-        menubutton: {
-            marginRight: theme.spacing(1),
-            paddingRight: '10px',
-        },
-        root: {
-            display: 'flex',
-        },
-        appbar: {
-            background: 'black',
-        }
-    });
+
 export interface IProps extends WithStyles<typeof styles> { }
 
 interface IState{
