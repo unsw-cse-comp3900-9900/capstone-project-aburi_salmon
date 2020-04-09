@@ -30,12 +30,16 @@ interface IProps extends WithStyles<typeof styles> {
   value: string;
   allItems: WholeItemList | null,
   ingredientsList: Array<Ingredient> | null,
+
+  forceUpdateMenu: any,
+  forceUpdateItemlist: any,
+  forceUpdateIngredList: any,
+
+  changeValue:any,
 }
 
 interface IState {
   //displaying menu
-  menu: MenuModel | null;
-  value: string;
   openModal: boolean;
   modal: ItemModel | null;
 
@@ -53,8 +57,6 @@ interface IState {
   isCat: boolean, //1 if is category, 0 if item
   isDel: boolean,
   itemIngredients: Array<number>,
-  allItems: WholeItemList | null,
-  ingredientsList: Array<Ingredient> | null,
 
   //alert
   alertDialog: boolean,
@@ -66,10 +68,6 @@ interface IState {
 class EditMenuPage extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
-    var tempmenu = this.props.menu;
-    var tempvalue = this.props.value;
-    var tempitems = this.props.allItems;
-    var tempingred = this.props.ingredientsList;
     var temp: ItemModel = { //for initialisation (don't want to deal with null)
       id: 0,
       name: '',
@@ -81,8 +79,6 @@ class EditMenuPage extends React.Component<IProps, IState> {
     }
     this.state = {
       //displaying menu
-      menu: tempmenu,
-      value: tempvalue,
       openModal: false,
       modal: null,
 
@@ -100,8 +96,6 @@ class EditMenuPage extends React.Component<IProps, IState> {
       isCat: false,
       isDel: false,
       itemIngredients: [],
-      allItems: tempitems,
-      ingredientsList: tempingred,
 
       //alert
       alertDialog: false,
@@ -123,10 +117,6 @@ class EditMenuPage extends React.Component<IProps, IState> {
     this.editIngredDialogIsOpen = this.editIngredDialogIsOpen.bind(this);
     this.addItemCatIsOpen = this.addItemCatIsOpen.bind(this);
     this.modalIsOpen = this.modalIsOpen.bind(this);
-
-    this.forceUpdateIngredList = this.forceUpdateIngredList.bind(this);
-    this.forceUpdateItemlist = this.forceUpdateItemlist.bind(this);
-    this.forceUpdateMenu = this.forceUpdateMenu.bind(this);
 
     //alert
     this.alertDialogIsOpen = this.alertDialogIsOpen.bind(this);
@@ -181,7 +171,7 @@ class EditMenuPage extends React.Component<IProps, IState> {
     const { classes } = this.props;
     const categoryName = category.name;
     return (
-      <div hidden={this.state.value !== categoryName} id={`tabpanel-${category.id}`} key={category.id} aria-labelledby={`tab-${category.id}`}>
+      <div hidden={this.props.value !== categoryName} id={`tabpanel-${category.id}`} key={category.id} aria-labelledby={`tab-${category.id}`}>
         {
           category.items.map((item, index) => (
             <Card className={classes.itemcard} key={index}>
@@ -209,9 +199,7 @@ class EditMenuPage extends React.Component<IProps, IState> {
   }
 
   handleTabChange(event: React.ChangeEvent<{}>, newValue: string) {
-    this.setState({
-      value: newValue,
-    });
+    this.props.changeValue(newValue);
   }
 
   openModal(item: ItemModel) {
@@ -237,64 +225,30 @@ class EditMenuPage extends React.Component<IProps, IState> {
     };
   }
 
-  async forceUpdateMenu() {
-    const client = new Client();
-    const m: MenuModel | null = await client.getMenu();
-    if (m !== null && m?.menu.length !== undefined) {
-      this.setState({
-        menu: m,
-        value: m?.menu[0].name ? m?.menu[0].name : "",
-        currCat: m.menu[0],
-      });
-    }
-  }
-
-  async forceUpdateItemlist() {
-    const client = new Client();
-    const i: WholeItemList | null = await client.getAllItems();
-    if (i !== null) {
-      this.setState({ allItems: i });
-    }
-  }
-
-  async forceUpdateIngredList() {
-    const client = new Client();
-    const ingred: Array<Ingredient> | null = await client.getIngredients();
-    this.setState({ ingredientsList: ingred });
-  }
-
-  // Component did mount gets called before render
-  /*
-  async componentDidMount() {
-    this.forceUpdateMenu();
-    this.forceUpdateItemlist();
-    this.forceUpdateIngredList();
-  }*/
-
   render() {
     const { classes } = this.props;
     return (
       <div className={classes.menupage}>
-        <EditCategory isOpen={this.state.editCatDialog} setIsOpen={this.catDialogIsOpen} update={this.forceUpdateMenu}
-          isEdit={this.state.isEdit} category={this.state.currCat} wholemenu={this.state.menu} alert={this.setAlert} />
+        <EditCategory isOpen={this.state.editCatDialog} setIsOpen={this.catDialogIsOpen} update={this.props.forceUpdateMenu}
+          isEdit={this.state.isEdit} category={this.state.currCat} wholemenu={this.props.menu} alert={this.setAlert} />
 
-        <EditItem isOpen={this.state.editItemDialog} setIsOpen={this.itemDialogIsOpen} wholemenu={this.state.menu}
-          isEdit={this.state.isEdit} item={this.state.currItem} updatemenu={this.forceUpdateMenu}
-          updateitems={this.forceUpdateItemlist} alert={this.setAlert} />
+        <EditItem isOpen={this.state.editItemDialog} setIsOpen={this.itemDialogIsOpen} wholemenu={this.props.menu}
+          isEdit={this.state.isEdit} item={this.state.currItem} updatemenu={this.props.forceUpdateMenu}
+          updateitems={this.props.forceUpdateItemlist} alert={this.setAlert} />
 
-        <Delete isOpen={this.state.deleteDialog} setIsOpen={this.deleteDialogIsOpen} allItems={this.state.allItems}
-          item={this.state.currItem} isDel={this.state.isDel} cat={this.state.currCat} updatemenu={this.forceUpdateMenu}
-          updateitems={this.forceUpdateItemlist} alert={this.setAlert} />
+        <Delete isOpen={this.state.deleteDialog} setIsOpen={this.deleteDialogIsOpen} allItems={this.props.allItems}
+          item={this.state.currItem} isDel={this.state.isDel} cat={this.state.currCat} updatemenu={this.props.forceUpdateMenu}
+          updateitems={this.props.forceUpdateItemlist} alert={this.setAlert} />
 
         <Ingredients isOpen={this.state.ingredDialog} currItem={this.state.currItem} itemIngredients={this.state.itemIngredients}
-          setIsOpen={this.ingredientDialogIsOpen} ingredientsList={this.state.ingredientsList}
-          update={this.forceUpdateMenu} setModalIsOpen={this.modalIsOpen} alert={this.setAlert} />
+          setIsOpen={this.ingredientDialogIsOpen} ingredientsList={this.props.ingredientsList}
+          update={this.props.forceUpdateMenu} setModalIsOpen={this.modalIsOpen} alert={this.setAlert} />
 
         <EditIngredients isOpen={this.state.editIngredDialog} setIsOpen={this.editIngredDialogIsOpen}
-          ingredientsList={this.state.ingredientsList} update={this.forceUpdateIngredList} alert={this.setAlert} />
+          ingredientsList={this.props.ingredientsList} update={this.props.forceUpdateIngredList} alert={this.setAlert} />
 
-        <AddItemCat isOpen={this.state.addItemCatDialog} allItems={this.state.allItems} alert={this.setAlert}
-          setIsOpen={this.addItemCatIsOpen} wholemenu={this.state.menu} update={this.forceUpdateMenu} />
+        <AddItemCat isOpen={this.state.addItemCatDialog} allItems={this.props.allItems} alert={this.setAlert}
+          setIsOpen={this.addItemCatIsOpen} wholemenu={this.props.menu} update={this.props.forceUpdateMenu} />
 
         <AlertSnackbar isOpen={this.state.alertDialog} severity={this.state.severity} alertMessage={this.state.alertMessage}
           changeState={this.alertDialogIsOpen} />
@@ -302,15 +256,15 @@ class EditMenuPage extends React.Component<IProps, IState> {
         <div className={classes.wrapper}>
           <AppBar position="static">
             <Tabs
-              value={this.state.value}
+              value={this.props.value}
               onChange={this.handleTabChange}
               scrollButtons="auto"
               variant="scrollable"
 
             >
               {
-                this.state.menu && this.state.menu?.menu &&
-                this.state.menu?.menu.map(category => (
+                this.props.menu && this.props.menu?.menu &&
+                this.props.menu?.menu.map(category => (
                   <Tab label={<><div>{category.name + " "} <EditIcon onClick={() => this.setState({ editCatDialog: true, isCat: true, isEdit: true, currCat: category })} /></div></>}
                     className={classes.editIcon} key={category.id} {...this.tabProps(category.name)} onClick={() => this.setState({ currCat: category })} />
                 ))
@@ -319,8 +273,8 @@ class EditMenuPage extends React.Component<IProps, IState> {
           </AppBar>
           <div className={classes.overflow}>
             {
-              this.state.menu && this.state.menu?.menu &&
-              this.state.menu?.menu.map(category => this.generateItemsInCategory(category))
+              this.props.menu && this.props.menu?.menu &&
+              this.props.menu?.menu.map(category => this.generateItemsInCategory(category))
             }
           </div>
         </div>

@@ -55,9 +55,7 @@ const styles = (theme: Theme) =>
             maxHeight: '95%',
         }
     });
-export interface IProps extends WithStyles<typeof styles> {
-    realData: AllStaff | null,
-}
+
 const StyledTableCell = withStyles(theme => ({
     head: {
         backgroundColor: theme.palette.common.black,
@@ -76,13 +74,17 @@ const StyledTableRow = withStyles(theme => ({
     },
 }))(TableRow);
 
+export interface IProps extends WithStyles<typeof styles> {
+    realData: AllStaff | null,
+    update: any,
+}
+
 interface IState {
     deleteOpen:boolean,
     resetOpen: boolean,
     resetKeyOpen: boolean,
     tableOpen:boolean,
     resetStaff: string,
-    realData: AllStaff | null,
     selectedStaff: StaffInfo,
     isOpen: boolean,
     alertMessage: string,
@@ -94,7 +96,6 @@ class StaffDetails extends React.Component<IProps, IState>{
 
     constructor(props: IProps){
         super(props);
-        var tempdata = this.props.realData;
         var temp: StaffInfo ={
             id:-1,
             name:'',
@@ -107,7 +108,6 @@ class StaffDetails extends React.Component<IProps, IState>{
             resetKeyOpen: false,
             tableOpen: false,
             resetStaff: "",
-            realData: tempdata,
             selectedStaff: temp,
             isOpen: false,
             alertMessage: 'False Alarm',
@@ -144,7 +144,7 @@ class StaffDetails extends React.Component<IProps, IState>{
             .then((msg) => {
                 if (msg.status === 200) {
                     this.setState({ isOpen: true, alertMessage: 'Staff Successfully Changed', severity: 'success'});
-                    //this.componentDidMount();
+                    this.props.update();
                 } else {
                     this.setState({ isOpen: true, alertMessage: msg.statusText, severity: 'error' });
                 }
@@ -171,14 +171,6 @@ class StaffDetails extends React.Component<IProps, IState>{
             </Snackbar>
         );
     }
-    /*
-    async componentDidMount() {
-        const client = new Client();
-        const temp: AllStaff | null = await client.getStaff();
-        this.setState({
-            realData: temp,
-        });
-    }*/
 
     deleteStaff(){
         this.setState({ deleteOpen: false });
@@ -188,7 +180,7 @@ class StaffDetails extends React.Component<IProps, IState>{
                 //alert(msg.status);
                 if (msg.status === 200) {
                     this.setState({isOpen: true, alertMessage:'Staff Successfully Deleted', severity: 'success'});
-                    //this.componentDidMount();
+                    this.props.update();
                 } else {
                     this.setState({ isOpen: true, alertMessage: msg.statusText , severity: 'error'});
                     //alert(msg.statusText);
@@ -219,7 +211,7 @@ class StaffDetails extends React.Component<IProps, IState>{
                         </TableRow>
                     </TableHead>
                     <TableBody >
-                        {this.state.realData?.staff_list.map(staff => (
+                        {this.props.realData?.staff_list.map(staff => (
                             <StyledTableRow key={staff.id}>
                                 <StyledTableCell component="th" scope="row" padding={'none'} className={classes.rows}>
                                     {staff.id}

@@ -19,11 +19,10 @@ import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel } f
 interface IProps extends WithStyles<typeof styles> {
   menu: MenuModel | null;
   value: string;
+  changeValue: any
 }
 
 interface IState {
-  menu: MenuModel | null;
-  value: string;
   openModal: boolean;
   modal: ItemModel | null; //selected item
 }
@@ -32,11 +31,7 @@ class StaticMenuPage extends React.Component<IProps, IState> {
 
   constructor(props: IProps) {
     super(props);
-    var tempmenu = this.props.menu;
-    var tempvalue = this.props.value;
     this.state = {
-      menu: tempmenu,
-      value: tempvalue,
       openModal: false,
       modal: null,
     }
@@ -52,7 +47,7 @@ class StaticMenuPage extends React.Component<IProps, IState> {
     const { classes } = this.props;
     const categoryName = category.name;
     return (
-      <div hidden={this.state.value !== categoryName} id={`tabpanel-${category.id}`} key={category.id} aria-labelledby={`tab-${category.id}`}>
+      <div hidden={this.props.value !== categoryName} id={`tabpanel-${category.id}`} key={category.id} aria-labelledby={`tab-${category.id}`}>
         {
           category.items.map((item,index) => (
             <Card className={classes.itemcard} key={index}>
@@ -75,9 +70,11 @@ class StaticMenuPage extends React.Component<IProps, IState> {
   }
 
   handleTabChange(event: React.ChangeEvent<{}>, newValue: string) {
+    this.props.changeValue(newValue);
+    /*
     this.setState({
       value: newValue,
-    });
+    });*/
   }
 
   openModal(item: ItemModel) {
@@ -108,14 +105,14 @@ class StaticMenuPage extends React.Component<IProps, IState> {
             <div className={classes.wrapper}>
               <AppBar position="static">
                 <Tabs
-                  value={this.state.value}
+                  value={this.props.value}
                   onChange={this.handleTabChange}
               scrollButtons="auto"
               variant="scrollable"
                 >
                   {
-                    this.state.menu && this.state.menu?.menu &&
-                    this.state.menu?.menu.map(category => (
+                    this.props.menu && this.props.menu?.menu &&
+                    this.props.menu?.menu.map(category => (
                       <Tab label={category.name} key={category.id} {...this.tabProps(category.name)} />
                     ))
                   }
@@ -123,8 +120,8 @@ class StaticMenuPage extends React.Component<IProps, IState> {
               </AppBar>
               <div className={classes.overflow}>
               {
-                this.state.menu && this.state.menu?.menu &&
-                this.state.menu?.menu.map(category => this.generateItemsInCategory(category))
+                this.props.menu && this.props.menu?.menu &&
+                this.props.menu?.menu.map(category => this.generateItemsInCategory(category))
               }
               </div>
             </div>
@@ -150,7 +147,9 @@ class StaticMenuPage extends React.Component<IProps, IState> {
 
               {/* Second col */}
               <Grid item xs={8}>
-                insert image here
+                <div className={classes.imageboxmodaldiv}>
+                  <img src={this.state.modal?.image_url} className={classes.imageboxmodal} />
+                </div>
                     </Grid>
               <Grid item xs={4}>
                 <Typography variant="h6">Ingredients</Typography>

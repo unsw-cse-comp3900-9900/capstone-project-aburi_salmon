@@ -101,6 +101,9 @@ class Wait extends React.Component<IProps, IState>{
         }
         this.moveToServed = this.moveToServed.bind(this);
         this.moveToToServe = this.moveToToServe.bind(this);
+        this.changeMenuValue = this.changeMenuValue.bind(this);
+        this.updateAssist = this.updateAssist.bind(this);
+        
     }
 
     helpDialog() {
@@ -165,16 +168,36 @@ class Wait extends React.Component<IProps, IState>{
         } else if (this.state.currPage === "Assistance"){
             return (
                 <Box className={classes.staffContainer}>
-                    <Assistance tables={this.state.tables} assistance={this.state.assistance}/>
+                    <Assistance tables={this.state.tables} assistance={this.state.assistance}
+                    update={this.updateAssist}/>
                 </Box>
             );
         } else {
             return(
                 <Box className={classes.menuContainer}>
-                    <StaticMenu menu={this.state.menu} value={this.state.menuvalue}/>
+                    <StaticMenu menu={this.state.menu} value={this.state.menuvalue} changeValue={this.changeMenuValue}/>
                 </Box>
             );
         }
+    }
+
+    async updateAssist(){
+        const client = new Client()
+        const t: Tables| null = await client.getTables();
+        const a: AssistanceTables | null = await client.getAssistanceTable();
+        var temp: Array<number> = [];
+        if (a?.tables !== undefined) {
+            a?.tables.map(it => {
+                temp.push(it.table_id);
+            }
+            )
+            this.setState({ assistance: temp });
+        }
+        this.setState({ tables: t });
+    }
+
+    changeMenuValue(newValue: string) {
+        this.setState({ menuvalue: newValue })
     }
 
     moveToServed(itemId: number, item: ListItem): void {

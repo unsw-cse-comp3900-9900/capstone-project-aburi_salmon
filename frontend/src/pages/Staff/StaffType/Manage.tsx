@@ -113,6 +113,12 @@ class Manage extends React.Component<IProps, IState>{
             allItems: null,
             ingredientsList: null,
         }
+        this.updateAssist = this.updateAssist.bind(this);
+        this.updateStaff = this.updateStaff.bind(this);
+        this.forceUpdateIngredList = this.forceUpdateIngredList.bind(this);
+        this.forceUpdateItemlist = this.forceUpdateItemlist.bind(this);
+        this.forceUpdateMenu = this.forceUpdateMenu.bind(this);
+        this.changeMenuValue = this.changeMenuValue.bind(this);
     }
 
     async componentDidMount() {
@@ -187,6 +193,51 @@ class Manage extends React.Component<IProps, IState>{
         });
     }
 
+    async updateAssist() {
+        const client = new Client()
+        const t: Tables | null = await client.getTables();
+        const a: AssistanceTables | null = await client.getAssistanceTable();
+        var temp: Array<number> = [];
+        if (a?.tables !== undefined) {
+            a?.tables.map(it => {
+                temp.push(it.table_id);
+            }
+            )
+            this.setState({ assistance: temp });
+        }
+        this.setState({ tables: t });
+    }
+
+    async forceUpdateMenu() {
+        const client = new Client();
+        const m: Menu | null = await client.getMenu();
+        if (m !== null && m?.menu.length !== undefined) {
+            this.setState({
+                menu: m,
+                menuvalue: m?.menu[0].name ? m?.menu[0].name : "",
+                currCat: m.menu[0],
+            });
+        }
+    }
+
+    async forceUpdateItemlist() {
+        const client = new Client();
+        const i: WholeItemList | null = await client.getAllItems();
+        if (i !== null) {
+            this.setState({ allItems: i });
+        }
+    }
+
+    async forceUpdateIngredList() {
+        const client = new Client();
+        const ingred: Array<Ingredient> | null = await client.getIngredients();
+        this.setState({ ingredientsList: ingred });
+    }
+
+    changeMenuValue(newValue: string) {
+        this.setState({ menuvalue: newValue })
+    }
+
     displayCont() {
         const { classes } = this.props;
         if (this.state.currPage === "Orders"){
@@ -198,13 +249,14 @@ class Manage extends React.Component<IProps, IState>{
         } else if (this.state.currPage === "Tables") {
             return (
                 <Box className={classes.staffContainer}>
-                    <Assistance tables={this.state.tables} assistance={this.state.assistance}/>
+                    <Assistance tables={this.state.tables} assistance={this.state.assistance}
+                        update={this.updateAssist}/>
                 </Box>
             );
         } else if (this.state.currPage === "Manage"){
             return(
                 <Box className={classes.staffContainer}>
-                    <StaffDetails realData={this.state.staffRealData}/>
+                    <StaffDetails realData={this.state.staffRealData} update={this.updateStaff}/>
                 </Box>
             );
         } else if (this.state.currPage === "ItemStats") {
@@ -218,10 +270,20 @@ class Manage extends React.Component<IProps, IState>{
             return (
                 <Box className={classes.menuContainer}>
                     <EditMenu menu={this.state.menu} value={this.state.menuvalue}
-                    allItems={this.state.allItems} ingredientsList={this.state.ingredientsList}/>
+                    allItems={this.state.allItems} ingredientsList={this.state.ingredientsList}
+                    forceUpdateIngredList={this.forceUpdateIngredList} forceUpdateItemlist={this.forceUpdateItemlist}
+                    forceUpdateMenu={this.forceUpdateMenu} changeValue={this.changeMenuValue}/>
                 </Box>
             );
         }
+    }
+
+    async updateStaff(){
+        const client = new Client();
+        const temp: AllStaff | null = await client.getStaff();
+        this.setState({
+            staffRealData: temp,
+        });
     }
 
     displayNav() {

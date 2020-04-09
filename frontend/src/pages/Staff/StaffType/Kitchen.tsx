@@ -91,6 +91,7 @@ class Kitchen extends React.Component<IProps, IState>{
         this.moveToCooking = this.moveToCooking.bind(this);
         this.moveToReady = this.moveToReady.bind(this);
         this.moveToQueue = this.moveToQueue.bind(this);
+        this.changeMenuValue = this.changeMenuValue.bind(this);
     }
 
     async componentDidMount() {
@@ -123,10 +124,14 @@ class Kitchen extends React.Component<IProps, IState>{
         } else {
             return (
                 <Box className={classes.menuContainer}>
-                    <StaticMenu menu={this.state.menu} value={this.state.menuvalue}/>
+                    <StaticMenu menu={this.state.menu} value={this.state.menuvalue} changeValue={this.changeMenuValue}/>
                 </Box>
             );
         }
+    }
+
+    changeMenuValue(newValue: string){
+        this.setState({menuvalue: newValue})
     }
 
     helpDialog() {

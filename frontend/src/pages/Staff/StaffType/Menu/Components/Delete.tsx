@@ -29,8 +29,7 @@ class Delete extends React.Component<IProps, {currItem: number}>{
     selectText(){
         if (this.props.isDel){
             return(
-                "Are you sure you want to delete the item " +  this.props.item?.name +" from the menu?"
-                          +  " There will be no reversing this process."
+                      "Note: There will be no reversing this process."
             );
         } else {
             return (
