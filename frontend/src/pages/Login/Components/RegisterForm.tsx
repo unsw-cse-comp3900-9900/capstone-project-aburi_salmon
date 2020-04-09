@@ -1,8 +1,8 @@
 
 import React from 'react';
-import './../Login/LoginRegister.css';
+import './../LoginRegister.css';
 import { TextField, Button, Snackbar } from '@material-ui/core';
-import history from '../../history';
+import history from './../../../history';
 import { Alert, Color } from '@material-ui/lab';
 
 interface IState {

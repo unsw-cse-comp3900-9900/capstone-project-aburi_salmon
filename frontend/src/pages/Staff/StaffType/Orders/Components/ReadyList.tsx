@@ -1,7 +1,7 @@
 import React from 'react';
 import { createStyles, WithStyles, withStyles } from '@material-ui/core';
-import ItemCont from './../Orders/ItemTemplate';
-import { ItemList } from '../../../api/models';
+import ItemCont from './ItemTemplate';
+import { ItemList} from './../../../../../api/models';
 
 const styles = () =>
     createStyles({
@@ -32,6 +32,7 @@ const styles = () =>
             background: 'linear-gradient(0deg, rgba(160, 235, 176, 1) 0%, rgba(255, 255, 255, 1) 100%)',
         },
 
+
         scroll: {
             height: '100%',
             display: 'block',
@@ -46,32 +47,33 @@ const styles = () =>
             flexGrow: 1,
             width: '100%',
         }
-
+        
     });
 export interface IProps extends WithStyles<typeof styles> {
     update: any;
     someList: ItemList | null;
-    lastClicked: number,
-}
+    lastClicked: number;
+ }
 
-class Served extends React.Component<IProps, {}>{
+class Ready extends React.Component<IProps, {}>{
+
     //Get items depending on name
-    getHeading() {
-        return (
+    getHeading(){
+        return(
             <thead>
                 <tr className={this.props.classes.headingServed}>
                     <th className={this.props.classes.headingServed}>
-                        Served
+                        Ready
                     </th>
                 </tr>
             </thead>
+            
         );
     }
 
-    getBox() {
+    getBox(){
         if (this.props.someList !== null && this.props.someList.itemList !== undefined) {
             return (
-
                 <td className={this.props.classes.boxServed}>
                     {this.props.someList?.itemList.map((item,index) => (
                         <ItemCont key={index} itemId={index} item={item} realId={item.id}
@@ -87,27 +89,28 @@ class Served extends React.Component<IProps, {}>{
             );
         }
     }
+
     render() {
         const { classes } = this.props;
         return (
             <table className={classes.table}>
                 {this.getHeading()}
                 <tbody>
-                    <tr >
-                        <td className={classes.scroll}>
-                            <table className={classes.table2}>
-                                <tbody>
-                                    <tr>
-                                        {this.getBox()}
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </td>
-                    </tr>
+                <tr >
+                    <td className={classes.scroll}>
+                    <table className={classes.table2}>
+                        <tbody>
+                            <tr>
+                                {this.getBox()}     
+                            </tr>
+                        </tbody>
+                    </table>
+                    </td>
+                </tr>
                 </tbody>
             </table>
         );
     }
 }
 
-export default withStyles(styles)(Served);
+export default withStyles(styles)(Ready);

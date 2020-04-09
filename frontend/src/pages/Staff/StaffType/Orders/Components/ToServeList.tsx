@@ -1,8 +1,7 @@
 import React from 'react';
 import { createStyles, WithStyles, withStyles } from '@material-ui/core';
 import ItemCont from './ItemTemplate';
-import { ItemList} from '../../../api/models';
-
+import { ItemList} from './../../../../../api/models';
 
 const styles = () =>
     createStyles({
@@ -25,14 +24,12 @@ const styles = () =>
             border: '2px solid green',
             background: 'radial-gradient(circle, rgba(250, 255, 161, 1) 0%, rgba(255, 254, 92, 1) 73%)',
         },
-
         boxToBeServed: {
             verticalAlign: 'top',
             flexGrow: 1,
             width: '100%',
             padding: '10px 5px 5px 10px',
             background: 'linear-gradient(0deg, rgba(255, 254, 218, 1) 0%, rgba(255, 255, 255, 1) 100%)',
-
         },
         scroll: {
             height: '100%',
@@ -56,13 +53,15 @@ export interface IProps extends WithStyles<typeof styles> {
     lastClicked: number;
  }
 
-class Cooking extends React.Component<IProps, {}>{
+class ToServe extends React.Component<IProps, {}>{
+
+    //Get items depending on name
     getHeading(){
         return (
             <thead>
                 <tr className={this.props.classes.headingToBeServed}>
                     <th className={this.props.classes.headingToBeServed}>
-                        Cooking
+                        To Be Served
                     </th>
                 </tr>
             </thead>
@@ -70,7 +69,7 @@ class Cooking extends React.Component<IProps, {}>{
     }
 
     getBox(){
-        if (this.props.someList !== null && this.props.someList.itemList !== undefined){
+        if (this.props.someList !== null && this.props.someList.itemList !== undefined) {
             return (
                 <td className={this.props.classes.boxToBeServed}>
                     {this.props.someList?.itemList.map((item, index) => (
@@ -80,10 +79,10 @@ class Cooking extends React.Component<IProps, {}>{
                 </td>
             );
         } else {
-            return(
+            return (
                 <td className={this.props.classes.boxToBeServed}>
                     No orders here...
-                </td >
+                </td>
             );
         }
     }
@@ -91,24 +90,24 @@ class Cooking extends React.Component<IProps, {}>{
     render() {
         const { classes } = this.props;
         return (
-                <table className={classes.table}>
-                    {this.getHeading()}
-                    <tbody>
-                    <tr >
-                       <td className={classes.scroll}>
-                        <table className={classes.table2}>
-                            <tbody>
-                                <tr>
-                                    {this.getBox()}     
-                                </tr>
-                            </tbody>
-                        </table>
-                       </td>
-                    </tr>
-                    </tbody>
-                </table>
+            <table className={classes.table}>
+                {this.getHeading()}
+                <tbody>
+                <tr >
+                    <td className={classes.scroll}>
+                    <table className={classes.table2}>
+                        <tbody>
+                            <tr>
+                                {this.getBox()}     
+                            </tr>
+                        </tbody>
+                    </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         );
     }
 }
 
-export default withStyles(styles)(Cooking);
+export default withStyles(styles)(ToServe);

@@ -1,10 +1,10 @@
 import React from 'react';
 import { TextField, Button, Snackbar } from '@material-ui/core';
 import { Color } from '@material-ui/lab';
-import './../Login/LoginRegister.css';
-import history from '../../history';
+import './../LoginRegister.css';
+import history from './../../../history';
 import { Alert } from '@material-ui/lab';
-import { Client } from '../../api/client';
+import { Client } from './../../../api/client';
 
 interface IState {
     username: string;

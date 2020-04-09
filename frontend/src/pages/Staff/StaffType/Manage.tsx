@@ -1,12 +1,12 @@
 import React from 'react';
 import { createStyles, withStyles, WithStyles, Theme, MenuList, Paper, MenuItem, Box} from '@material-ui/core';
-import { ItemList } from './../../../api/models';
+import { ItemList, Menu, Categories, WholeItemList, Ingredient, Tables, AssistanceTables, ListItem, AllStaff, AllItemStats, ItemStats as ItemStatsModel} from './../../../api/models';
 import { Client } from './../../../api/client';
-import Assistance from './../../Staff/Assistance/AssistanceMain';
-import StaffDetails from './../StaffDetails/StaffDetails';
-import ManageOrders from './../Orders/ManageOrders';
-import ItemStats from './../Analytics/ItemStats';
-import {EditMenu} from './../Menu/EditMenu';
+import Assistance from './Assistance/AssistanceMain';
+import StaffDetails from './StaffDetails/StaffDetails';
+import ManageOrders from './Orders/ManageOrders';
+import ItemStats from './Analytics/ItemStats';
+import {EditMenu} from './Menu/EditMenu';
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -64,6 +64,27 @@ interface IState {
     queueList: ItemList | null,
     cookingList: ItemList | null,
     readyList: ItemList | null,
+
+    //initialise assist
+    tables: Tables | null,
+    assistance: Array<number>, 
+
+    //initialise orders
+    orderRealData: Array<ListItem>,
+
+    //initialise manage staff
+    staffRealData: AllStaff | null,
+
+    //initialise item stats
+    itemRealData: Array<ItemStatsModel>,
+    trevenue: number,
+
+    //initialise menu
+    menu: Menu | null, 
+    menuvalue:string,
+    currCat:Categories | null,
+    allItems: WholeItemList | null,
+    ingredientsList: Array<Ingredient> | null,
 }
 
 class Manage extends React.Component<IProps, IState>{
@@ -75,6 +96,22 @@ class Manage extends React.Component<IProps, IState>{
             queueList: null, //listType === 1
             cookingList: null, //listType === 2
             readyList: null, //listType === 3
+
+            tables: null,
+            assistance: [],
+
+            orderRealData: [],
+
+            staffRealData: null,
+
+            itemRealData: [],
+            trevenue: 0,
+
+            menu: null,
+            menuvalue:'',
+            currCat: null,
+            allItems: null,
+            ingredientsList: null,
         }
     }
 
@@ -83,10 +120,70 @@ class Manage extends React.Component<IProps, IState>{
         const queue: ItemList | null = await client.getListItem(1);
         const cooking: ItemList | null = await client.getListItem(2);
         const ready: ItemList | null = await client.getListItem(3);
+
+        //assistance
+        const t: Tables | null = await client.getTables();
+        const a: AssistanceTables | null = await client.getAssistanceTable();
+        var temp: Array<number> = [];
+        if (a?.tables !== undefined) {
+            a?.tables.map(it => {
+                temp.push(it.table_id);
+            }
+            )
+            this.setState({ assistance: temp });
+        }
+
+        //manage orders
+        const served: ItemList | null = await client.getListItem(4);
+        var temp1: Array<ListItem> = [];
+        if (queue?.itemList !== undefined) {
+            temp1 = temp1.concat(queue?.itemList);
+        }
+        if (cooking?.itemList !== undefined) {
+            temp1 = temp1.concat(cooking?.itemList);
+        }
+        if (ready?.itemList !== undefined) {
+            temp1 = temp1.concat(ready?.itemList);
+        }
+        if (served?.itemList !== undefined) {
+            temp1 = temp1.concat(served?.itemList);
+        }
+
+        //manage staff
+        const allStaff: AllStaff | null = await client.getStaff();
+
+        //item stats
+        const itemStats: AllItemStats | null = await client.getAllStats();
+        if (itemStats?.item_sales !== undefined) {
+            this.setState({ itemRealData: itemStats?.item_sales });
+        }
+        if (itemStats?.total_revenue !== undefined) {
+            this.setState({ trevenue: itemStats?.total_revenue })
+        }
+
+        //menu
+        const menu: Menu | null = await client.getMenu();
+        if (menu !== null && menu?.menu.length !== undefined) {
+            this.setState({
+                menu: menu,
+                menuvalue: menu?.menu[0].name ? menu?.menu[0].name : "",
+                currCat: menu.menu[0],
+            });
+        }
+        const i: WholeItemList | null = await client.getAllItems();
+        if (i !== null) {
+            this.setState({ allItems: i });
+        }
+        const ingred: Array<Ingredient> | null = await client.getIngredients();
+        this.setState({ ingredientsList: ingred });
+
         this.setState({
             queueList: queue,
             cookingList: cooking,
             readyList: ready,
+            tables: t,
+            orderRealData: temp1,
+            staffRealData: allStaff,
         });
     }
 
@@ -95,32 +192,33 @@ class Manage extends React.Component<IProps, IState>{
         if (this.state.currPage === "Orders"){
             return (
                 <Box className={classes.staffContainer}>
-                    <ManageOrders />
+                    <ManageOrders realData={this.state.orderRealData}/>
                 </Box>
             );
         } else if (this.state.currPage === "Tables") {
             return (
                 <Box className={classes.staffContainer}>
-                    <Assistance />
+                    <Assistance tables={this.state.tables} assistance={this.state.assistance}/>
                 </Box>
             );
         } else if (this.state.currPage === "Manage"){
             return(
                 <Box className={classes.staffContainer}>
-                    <StaffDetails />
+                    <StaffDetails realData={this.state.staffRealData}/>
                 </Box>
             );
         } else if (this.state.currPage === "ItemStats") {
             return (
                 <Box className={classes.staffContainer}>
-                    <ItemStats />
+                    <ItemStats realData={this.state.itemRealData} trevenue={this.state.trevenue}/>
                 </Box>
             );
         } 
         else {
             return (
                 <Box className={classes.menuContainer}>
-                    <EditMenu />
+                    <EditMenu menu={this.state.menu} value={this.state.menuvalue}
+                    allItems={this.state.allItems} ingredientsList={this.state.ingredientsList}/>
                 </Box>
             );
         }

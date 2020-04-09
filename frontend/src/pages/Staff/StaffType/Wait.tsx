@@ -1,14 +1,13 @@
 import React from 'react';
 import { createStyles,  withStyles, WithStyles, Theme, MenuList, Paper, MenuItem, Box, Snackbar, Button, Dialog, DialogTitle, DialogContent,DialogActions } from '@material-ui/core';
-import Assistance from './../../Staff/Assistance/AssistanceMain';
-import ToServe from './../Orders/ToServeList';
-import Served from './../Orders/ServedList';
-import { ListItem } from './../../../api/models';
-import { ItemList } from './../../../api/models';
+import Assistance from './Assistance/AssistanceMain';
+import ToServe from './Orders/Components/ToServeList';
+import Served from './Orders/Components/ServedList';
+import { ListItem, Menu, Tables, AssistanceTables, ItemList} from './../../../api/models';
 import { Client } from './../../../api/client';
 import { Alert } from '@material-ui/lab';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
-import {StaticMenu } from '../Menu/StaticMenu';
+import {StaticMenu } from './Menu/StaticMenu';
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -71,6 +70,14 @@ interface IState{
     isOpen: boolean,
     lastClicked: number,
     resetOpen: boolean,
+
+    //initialise menu
+    menu: Menu | null;
+    menuvalue: string;
+
+    //initialise assistance
+    tables: Tables | null,
+    assistance: Array<number>, 
 }
 
 class Wait extends React.Component<IProps, IState>{
@@ -85,6 +92,12 @@ class Wait extends React.Component<IProps, IState>{
             isOpen: false,
             lastClicked: -1,
             resetOpen: false,
+
+            menu: null,
+            menuvalue: '',
+
+            tables: null,
+            assistance: [],
         }
         this.moveToServed = this.moveToServed.bind(this);
         this.moveToToServe = this.moveToToServe.bind(this);
@@ -114,12 +127,28 @@ class Wait extends React.Component<IProps, IState>{
         const client = new Client();
         const toServe: ItemList | null = await client.getListItem(3);
         const served: ItemList | null = await client.getListItem(4);
+        //menu
+        const m: Menu | null = await client.getMenu();
+        //assistance
+        const t: Tables | null = await client.getTables();
+        const a: AssistanceTables | null = await client.getAssistanceTable();
+        var temp: Array<number> = [];
+
+        if (a?.tables !== undefined) {
+            a?.tables.map(it => {
+                temp.push(it.table_id);
+            }
+            )
+            this.setState({ assistance: temp });
+        }
+
         this.setState({
             toServeList: toServe,
             servedList: served,
+            menu: m,
+            menuvalue: m?.menu[0].name ? m?.menu[0].name : "",
+            tables: t,
         });
-        //console.log('toServeList: ' + toServe);
-        //console.log('ServedList: ' + served);
     }
 
     displayCont(){
@@ -136,13 +165,13 @@ class Wait extends React.Component<IProps, IState>{
         } else if (this.state.currPage === "Assistance"){
             return (
                 <Box className={classes.staffContainer}>
-                    <Assistance />
+                    <Assistance tables={this.state.tables} assistance={this.state.assistance}/>
                 </Box>
             );
         } else {
             return(
                 <Box className={classes.menuContainer}>
-                    <StaticMenu />
+                    <StaticMenu menu={this.state.menu} value={this.state.menuvalue}/>
                 </Box>
             );
         }

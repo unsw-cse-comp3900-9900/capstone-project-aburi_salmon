@@ -1,8 +1,8 @@
 import React from 'react';
 import { createStyles, WithStyles, Theme, withStyles, Button, Box,  Snackbar } from '@material-ui/core';
-import { Client } from './../../../api/client';
-import { TableInfo } from './../../../api/models';
-import AlertSnackbar from './../AlertSnackbar';
+import { Client } from './../../../../api/client';
+import { TableInfo } from './../../../../api/models';
+import AlertSnackbar from './../../../AlertSnackbar';
 
 
 const styles = (theme: Theme) =>
@@ -62,7 +62,7 @@ export interface IProps extends WithStyles<typeof styles> {
     assistance: boolean,
     isEmpty: boolean | undefined,
     paidFunction: any,
-  
+
 }
 
 interface IState {
@@ -92,7 +92,7 @@ class TableInfoClass extends React.Component<IProps, IState>{
             hide: temp,
             itemsOrdered: 0,
             order_id: -1,
-            isOpen: true,
+            isOpen: false,
             alertMessage: 'somethings wrong',
             alertSeverity: 'error'
         }
@@ -162,10 +162,11 @@ class TableInfoClass extends React.Component<IProps, IState>{
 
     problemResolved(){
         const client = new Client();
-        client.assistance(this.state.order_id, false)
+        client.assistance(this.props.tableNumber, false)
             .then((msg) => {
                 if (msg.status === 200) {
                     this.setState({isOpen: true, alertSeverity: "success", alertMessage: "Problem Resolved", hide:'none'});
+                    this.props.paidFunction();
                 } else {
                     this.setState({ isOpen: true, alertSeverity: "error", alertMessage: msg.statusText });
                 }
@@ -199,7 +200,7 @@ class TableInfoClass extends React.Component<IProps, IState>{
                     <AlertSnackbar isOpen={this.state.isOpen} severity={this.state.alertSeverity}
                         alertMessage={this.state.alertMessage} changeState={this.changeAlertState} />
                     <div className={classes.wrapper1}>
-                        <h1 className = {classes.text}>Table {this.props.tableNumber + 1}</h1>
+                        <h1 className = {classes.text}>Table {this.props.tableNumber}</h1>
                         <Box display={this.state.hide} displayPrint="none">
                             <Button color='secondary' variant="contained" className={classes.paidBut}
                                 onClick={() => this.problemResolved()}
@@ -222,7 +223,9 @@ class TableInfoClass extends React.Component<IProps, IState>{
         } else {
             return(
                 <div className={classes.empty}>
-                    <h1>Table {this.props.tableNumber + 1} is empty</h1>
+                    <AlertSnackbar isOpen={this.state.isOpen} severity={this.state.alertSeverity}
+                        alertMessage={this.state.alertMessage} changeState={this.changeAlertState} />
+                    <h1>Table {this.props.tableNumber} is empty</h1>
                 </div>
             );
         }

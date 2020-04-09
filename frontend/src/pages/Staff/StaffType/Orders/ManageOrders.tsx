@@ -1,12 +1,11 @@
 import React from 'react';
 import { createStyles, WithStyles, Theme, withStyles, TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper} from '@material-ui/core';
-import {ItemList, ListItem} from './../../../api/models';
-import {Client} from './../../../api/client';
+import {ItemList, ListItem} from './../../../../api/models';
+import {Client} from './../../../../api/client';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 
-
-//mostly copied from 
+//sorting mostly copied from 
 //https://stackoverflow.com/questions/40541710/reactjs-with-material-ui-how-to-sort-an-array-of-material-uis-tablerow-alpha
 
 
@@ -46,6 +45,7 @@ const styles = (theme: Theme) =>
 
     });
 export interface IProps extends WithStyles<typeof styles> {
+    realData: Array<ListItem>,
 }
 const StyledTableCell = withStyles(theme => ({
     head: {
@@ -78,10 +78,11 @@ class ManageOrders extends React.Component<IProps, IState>{
 
     constructor(props: IProps){
         super(props);
+        var temp = this.props.realData;
         this.state = {
             order: 'des',
             selected: 'status',
-            realData: [],
+            realData: temp,
         }
         this.handleClick = this.handleClick.bind(this);
     }
@@ -128,7 +129,7 @@ class ManageOrders extends React.Component<IProps, IState>{
         }
     }
 
-    async componentDidMount() {
+    async refresh() {
         const client = new Client();
         const queue: ItemList | null = await client.getListItem(1);
         const cooking: ItemList | null = await client.getListItem(2);
@@ -150,7 +151,6 @@ class ManageOrders extends React.Component<IProps, IState>{
         this.setState({
             realData: temp1,
         });
-        
     }
 
     printArrow(dataType: string){

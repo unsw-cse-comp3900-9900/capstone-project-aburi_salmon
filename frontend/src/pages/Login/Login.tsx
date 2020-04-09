@@ -1,8 +1,8 @@
 import React from 'react';
 import './../Login/LoginRegister.css';
 import backbut from './../../assets/backbut2.png';
-import { LoginForm } from './LoginForm';
-import { RegisterForm } from './RegisterForm';
+import { LoginForm } from './Components/LoginForm';
+import { RegisterForm } from './Components/RegisterForm';
 import history from '../../history';
 
 class PureLogin extends React.Component {

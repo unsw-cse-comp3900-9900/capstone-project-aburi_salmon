@@ -2,8 +2,8 @@ import React from 'react';
 import {  createStyles, withStyles, WithStyles, Theme, Link, Dialog, DialogTitle,DialogContent,  DialogActions,Button} from '@material-ui/core';
 import './../Assistance/Assistance.css';
 import TableInfo from './../Assistance/TableInfo';
-import { Tables as TableModel, AssistanceTables } from './../../../api/models';
-import { Client } from './../../../api/client';
+import { Tables as TableModel, AssistanceTables } from './../../../../api/models';
+import { Client } from './../../../../api/client';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 //https://material-ui.com/components/menus/#menus
 //https://stackoverflow.com/questions/58630490/how-to-convert-functional-componenet-to-class-component-in-react-in-material
@@ -48,7 +48,10 @@ const styles = (theme: Theme) =>
             paddingRight: '2.5%',
         },
     });
-export interface IProps extends WithStyles<typeof styles> {} 
+export interface IProps extends WithStyles<typeof styles> {
+    tables: TableModel | null,
+    assistance: Array<number>, 
+} 
 
 interface IState{
     numTables: number,
@@ -63,12 +66,14 @@ interface IState{
 class Assistance extends React.Component<IProps, IState>{
     constructor(props: IProps){
         super(props);
+        var temptables = this.props.tables;
+        var tempass = this.props.assistance;
         this.state = {
             numTables: 15,
             selectedTable: 0, //Selected table, 0 means none selected
             main: true, //main screen
-            tables: null,
-            assistance: [], //tables that require assistance
+            tables: temptables,
+            assistance: tempass,
             resetOpen: false,
         }
         this.needAssistance = this.needAssistance.bind(this);
@@ -82,7 +87,8 @@ class Assistance extends React.Component<IProps, IState>{
     }
 
 
-    async componentDidMount() {
+    
+    async update(){
         const client = new Client()
         const t: TableModel | null = await client.getTables();
         const a: AssistanceTables | null = await client.getAssistanceTable();
@@ -94,7 +100,7 @@ class Assistance extends React.Component<IProps, IState>{
             )
             this.setState({assistance: temp });
         }
-        this.setState({tables:t})
+            this.setState({tables:t});
     }
 
     createTables = () => {
@@ -109,23 +115,23 @@ class Assistance extends React.Component<IProps, IState>{
                     if (this.state.tables !== null && this.state.tables?.tables[tableNum].occupied){ 
                         if (this.state.assistance !== [] && this.state.assistance.some(it => tableNum === it)){
                             children.push(
-                                <div className="column" key={tableNum + 1} onClick={() => this.handleClick(tableNum)}>
-                                    <div className="redcard">{tableNum + 1}
+                                <div className="column" key={tableNum} onClick={() => this.handleClick(tableNum)}>
+                                    <div className="redcard">{tableNum}
                                     </div>
                                 </div>
                             )
                         } else {
                             children.push(
-                                <div className="column" key={tableNum + 1} onClick={() => this.handleClick(tableNum)}>
-                                    <div className="greencard">{tableNum + 1}
+                                <div className="column" key={tableNum} onClick={() => this.handleClick(tableNum)}>
+                                    <div className="greencard">{tableNum}
                                     </div>
                                 </div>
                             )
                         }
                     } else {
                         children.push(
-                            <div className="column" key={tableNum + 1} onClick={() => this.handleClick(tableNum)}>
-                                <div className="card">{tableNum + 1}</div>
+                            <div className="column" key={tableNum} onClick={() => this.handleClick(tableNum)}>
+                                <div className="card">{tableNum}</div>
                             </div>
                         )
                     }
@@ -147,9 +153,7 @@ class Assistance extends React.Component<IProps, IState>{
     }
 
     paid(){
-        this.setState({ selectedTable: 0 });
-        //this.setState({ main: true });
-        this.componentDidMount();
+        this.update();
     }
 
     tableKey(){
@@ -170,6 +174,7 @@ class Assistance extends React.Component<IProps, IState>{
         })
         return ret;
     }
+
     helpDialog() {
         return (
             <div>
@@ -209,7 +214,6 @@ class Assistance extends React.Component<IProps, IState>{
                     <Link onClick={()=>this.backToTables()} > Back to tables</Link>
                     <TableInfo tableNumber={this.state.selectedTable} assistance={this.needAssistance(this.state.selectedTable)}
                         isEmpty={this.state.tables?.tables[this.state.selectedTable].occupied} paidFunction={this.paid}/>
-        
                 </div>
             )
         };

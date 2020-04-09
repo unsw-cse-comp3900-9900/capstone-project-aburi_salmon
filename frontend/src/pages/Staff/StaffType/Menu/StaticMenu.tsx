@@ -13,10 +13,13 @@ import Icon from '@material-ui/core/Icon';
 import Checkbox from '@material-ui/core/Checkbox';
 
 import { styles } from './styles';
-import { Client } from '../../../api/client';
-import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel } from '../../../api/models';
+import { Client } from './../../../../api/client';
+import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel } from './../../../../api/models';
 
-interface IProps extends WithStyles<typeof styles> { }
+interface IProps extends WithStyles<typeof styles> {
+  menu: MenuModel | null;
+  value: string;
+}
 
 interface IState {
   menu: MenuModel | null;
@@ -26,13 +29,14 @@ interface IState {
 }
 
 class StaticMenuPage extends React.Component<IProps, IState> {
+
   constructor(props: IProps) {
     super(props);
+    var tempmenu = this.props.menu;
+    var tempvalue = this.props.value;
     this.state = {
-      // If menu is null, then nothing will be generated
-      menu: null,
-      // Even if initial value is an empty string, componentDidMount will fill in according to the first item on cats array
-      value: "",
+      menu: tempmenu,
+      value: tempvalue,
       openModal: false,
       modal: null,
     }
@@ -97,16 +101,6 @@ class StaticMenuPage extends React.Component<IProps, IState> {
     };
   }
 
-  // Component did mount gets called before render
-  async componentDidMount() {
-    const client = new Client();
-    const m: MenuModel | null = await client.getMenu();
-    this.setState({
-      menu: m,
-      value: m?.menu[0].name ? m?.menu[0].name : "",
-    });
-  }
-
   render() {
     const { classes } = this.props;
     return (
@@ -164,9 +158,10 @@ class StaticMenuPage extends React.Component<IProps, IState> {
                   <FormGroup>
                     {
                       this.state.modal && this.state.modal?.ingredients &&
-                      this.state.modal?.ingredients.map(ingredient => (<FormControlLabel
+                      this.state.modal?.ingredients.map((ingredient,index) => (<FormControlLabel
                         control={<Checkbox checked={true} />}
                         disabled
+                        key={index}
                         label={ingredient.name}
                       />))
                     }

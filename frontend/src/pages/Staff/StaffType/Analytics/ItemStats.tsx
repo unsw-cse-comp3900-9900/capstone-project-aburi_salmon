@@ -1,7 +1,7 @@
 import React from 'react';
 import { createStyles, WithStyles, withStyles, Paper, Theme, TableContainer,  TableHead, TableRow, Table, TableBody, TableCell } from '@material-ui/core';
-import {Client} from './../../../api/client';
-import {AllItemStats, ItemStats} from './../../../api/models';
+import {Client} from './../../../../api/client';
+import {AllItemStats, ItemStats} from './../../../../api/models';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 
@@ -30,8 +30,7 @@ const styles = (theme: Theme) =>
         },
 
     });
-export interface IProps extends WithStyles<typeof styles> {
-}
+
 
 const StyledTableCell = withStyles(theme => ({
     head: {
@@ -51,6 +50,11 @@ const StyledTableRow = withStyles(theme => ({
     },
 }))(TableRow);
 
+export interface IProps extends WithStyles<typeof styles> {
+    realData: Array<ItemStats>,
+    trevenue: number,
+}
+
 interface IState {
     order: string,
     selected: string,
@@ -63,14 +67,17 @@ class ItemStatsClass extends React.Component<IProps, IState>{
 
     constructor(props: IProps){
         super(props);
+        var tempdata = this.props.realData;
+        var temprev = this.props.trevenue;
         this.state = {
-            realData: [],
+            realData: tempdata,
             order: 'des',
             selected: 'itemId',
-            trevenue: 0,
+            trevenue: temprev,
         }
     }
 
+    /*
     async componentDidMount() {
         const client = new Client();
         const t: AllItemStats | null = await client.getAllStats();
@@ -80,7 +87,7 @@ class ItemStatsClass extends React.Component<IProps, IState>{
         if (t?.total_revenue !== undefined){
             this.setState({trevenue: t?.total_revenue})
         }
-    }
+    }*/
 
     sortData(dataType: string) {
         var temp = this.state.realData;
