@@ -17,7 +17,7 @@ class PureHome extends React.Component {
     return (
       <div className="wrapper">
         {/*<img src={restlogo} className="restlogo" alt="Logo" />*/}
-        <h1 className="restlogo">Restuarant Name</h1>
+        <h1 className="restlogo">Welcome!</h1>
         <button className="myButton" onClick={() => this.goToTable()}>
           Start Ordering
           </button>

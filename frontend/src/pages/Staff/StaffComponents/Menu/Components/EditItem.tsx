@@ -4,6 +4,7 @@ import {Item, Menu, ResponseMessage} from './../../../../../api/models';
 import {Client} from './../../../../../api/client';
 
 //renders the edit or create item dialog
+//error checking added
 
 export interface IProps{
     isOpen: boolean, //state of dialog
@@ -37,46 +38,48 @@ class EditItem extends React.Component<IProps, IState>{
     }
 
     submitCreate(){ //create new item
-        this.addEditItem(this.state.name, this.state.description, this.state.price, this.state.image_url);
-        this.componentDidMount();
+        if (this.state.name === ''){
+            this.props.alert(true, 'error', 'Item name required');
+        } else if (this.state.description === ''){
+            this.props.alert(true, 'error', 'Item description required');
+        } else if (isNaN(this.state.price)){
+            this.props.alert(true, 'error', 'Price needs to be a number');
+        } else {
+            this.addEditItem(this.state.name, this.state.description, this.state.price, this.state.image_url);
+        } 
     }
 
     submitEdit(){ //edit existing item
-        //had some problems with setState   
-        if (this.state.name === ''){
-            var tempname = this.props.item?.name;
+        if (this.state.name === '') {
+            this.props.alert(true, 'error', 'Item name required');
+        } else if (this.state.description === '') {
+            this.props.alert(true, 'error', 'Item description required');
+        } else if (isNaN(this.state.price)) {
+            this.props.alert(true, 'error', 'Price needs to be a number');
+        } else if (this.state.name === this.props.item?.name && this.state.description === this.props.item?.description &&
+           this.state.price === this.props.item?.price && this.state.image_url === this.props.item?.image_url){
+               this.props.alert(true, 'error', 'No change in item detected');
         } else {
-            var tempname = this.state.name;
+            this.addEditItem(this.state.name, this.state.description, this.state.price, this.state.image_url);
         }
-        if (this.state.description === ''){
-            var tempdes = this.props.item?.description;
-        } else {
-            var tempdes = this.state.description;
-        }
-        if (this.state.price === 0 ){
-            var tempprice = this.props.item?.price;
-        }else {
-            var tempprice = this.state.price;
-        }
-        if (this.state.description === ''){
-            var tempurl = this.props.item?.image_url;
-        } else {
-            var tempurl = this.state.image_url;
-        }
-
-        this.addEditItem(tempname, tempdes, tempprice, tempurl);
-        this.componentDidMount();
+        
     }
 
-    async componentDidMount(){ //reset values
+    initAdd(){
         this.setState({ name: '', description: '', price: 0, image_url: ''});
     }
 
+    initEdit(){
+        if (this.props.item !== null){
+            this.setState({ name: this.props.item?.name, description: this.props.item?.description});
+            this.setState({price: this.props.item?.price, image_url: this.props.item?.image_url });
+        }
+    }
+    
     async addEditItem(name: string, description: string, price: number, image_url: string) { //fetchs from server
         const client = new Client();
         if (this.props.isEdit) { //if editing existing item
             const r: ResponseMessage | null = await client.editItem(name, description, price, true ,this.props.item.id, image_url);
-            console.log(r);
             if (r === null) {
                 this.props.alert(true, 'error', "Something went wrong");
             } else if (r?.status === "success") {
@@ -88,7 +91,6 @@ class EditItem extends React.Component<IProps, IState>{
             }
         } else { //if adding item
             const r: ResponseMessage | null = await client.addItem(name, description, price, true, image_url);
-            console.log(r);
             if (r === null) {
                 this.props.alert(true, 'error', "Something went wrong");
             } else if (r?.status === "success") {
@@ -107,6 +109,7 @@ class EditItem extends React.Component<IProps, IState>{
                 <Dialog
                     open={this.props.isOpen}
                     onClose={() => this.props.setIsOpen(false)}
+                    onEnter={() => this.initEdit()}
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description">
                     <DialogTitle id="alert-dialog-title">{"Edit Item"}</DialogTitle>
@@ -167,6 +170,7 @@ class EditItem extends React.Component<IProps, IState>{
                 <Dialog
                     open={this.props.isOpen}
                     onClose={() => this.props.setIsOpen(false)}
+                    onEnter={() => this.initAdd()}
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description">
                     <DialogTitle id="alert-dialog-title">{"Create Item"}</DialogTitle>

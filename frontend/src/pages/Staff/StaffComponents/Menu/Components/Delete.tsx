@@ -4,6 +4,7 @@ import {Item, Categories, WholeItemList, ResponseMessage} from './../../../../..
 import {Client} from './../../../../../api/client';
 
 //Used to render the delete dialog to delete items from category or permanently
+//No error checking either
 
 export interface IProps{
     isOpen: boolean, //state of dialog
