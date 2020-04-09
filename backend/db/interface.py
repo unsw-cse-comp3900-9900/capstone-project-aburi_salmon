@@ -717,3 +717,12 @@ class DB:
         if (not rows):
             return None
         return rows[0]
+
+    def get_order_number(self, item_id):
+        print('finding order number')
+        print(item_id)
+        rows = self.__query('SELECT order_id FROM "item_order"  WHERE id = %s', [item_id])
+        if (not rows):
+            print('YEOLO')
+            return None
+        return rows[0]

@@ -36,7 +36,7 @@ export const connectToSocket = (App: App) => {
         console.log(`Table is requesting assistance`);
     });
 
-    socket.on('order', () => {
+    socket.on('order', (data : any) => {
         console.log(`Customer has ordered an item `);
     });
 

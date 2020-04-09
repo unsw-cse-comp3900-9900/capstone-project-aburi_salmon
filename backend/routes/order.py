@@ -2,7 +2,7 @@ from flask import request, jsonify
 from flask_restx import Resource, abort, reqparse, fields
 from flask_jwt_extended import get_jwt_claims, jwt_required
 
-from app import api, db
+from app import api, db, flask_app
 import model.response_model as response_model
 import model.request_model as request_model
 from util.socket import socket
@@ -15,7 +15,7 @@ class Order(Resource):
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
     def get(self):
-        socket.emit('order')
+        socket.emit('order', room='staff2')
 
         # Gets lists of ordered items and Total Bill
 
@@ -113,7 +113,7 @@ class Item(Resource):
         item_order_id = modify_order.get('id')
         quantity = modify_order.get('quantity')
         comment = modify_order.get('comment')
-        socket.emit('modify')
+        socket.emit('modify', room='staff2')
 
         if item_order_id is None:
             abort(400, 'No existing order with that item, please make a new order instead.')
@@ -130,11 +130,13 @@ class Item(Resource):
     @order.expect(request_model.delete_order_model)
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
-    def delete(self):
+    @jwt_required
 
+    def delete(self):
         delete_order = request.get_json()
         item_order_id = delete_order.get('id')
-        socket.emit('delete')
+        socket.emit('delete', room='staff2')
+
 
         if item_order_id is None:
             abort(400, 'No existing order with that item, please make a new order instead.')
@@ -166,11 +168,19 @@ class ModifyItemOrderStatus(Resource):
         
         if (not db.update_item_ordered_status(item_order_id, status)):
             abort(500, 'Something went wrong')
-        
+
+        order_id = get_jwt_claims().get('order')
+        customerRoom = 'customer' + str(order_id)
+  
+        # orderNumber = get_jwt_claims().get('order')
+        # room = 'customer' + str(orderNumber)
+        # print('room')
         if status == 2 :
-            socket.emit('cooking')
+            socket.emit('cooking', room=customerRoom)
+            print('we have emitted to ' + customerRoom)
         elif status == 3:
-            socket.emit('ready')
+            socket.emit('ready', room=customerRoom)
+            print('we have emitted to ' + customerRoom)
         
     
         return jsonify({ 'status': 'success'})
