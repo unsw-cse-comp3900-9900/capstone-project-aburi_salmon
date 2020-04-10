@@ -13,7 +13,6 @@ import Icon from '@material-ui/core/Icon';
 import Checkbox from '@material-ui/core/Checkbox';
 
 import { styles } from './styles';
-import { Client } from './../../../../api/client';
 import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel } from './../../../../api/models';
 
 interface IProps extends WithStyles<typeof styles> {

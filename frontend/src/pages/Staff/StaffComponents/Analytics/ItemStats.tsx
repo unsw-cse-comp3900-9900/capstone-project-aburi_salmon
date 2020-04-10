@@ -1,7 +1,6 @@
 import React from 'react';
-import { createStyles, WithStyles, withStyles, Paper, Theme, TableContainer,  TableHead, TableRow, Table, TableBody, TableCell } from '@material-ui/core';
-import {Client} from './../../../../api/client';
-import {AllItemStats, ItemStats} from './../../../../api/models';
+import { WithStyles, withStyles, Paper,TableContainer,  TableHead, TableRow, Table, TableBody, TableCell } from '@material-ui/core';
+import { ItemStats} from './../../../../api/models';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import {styles} from './styles';
@@ -28,74 +27,57 @@ const StyledTableRow = withStyles(theme => ({
 export interface IProps extends WithStyles<typeof styles> {
     realData: Array<ItemStats>,
     trevenue: number,
+    setRealdata: any,
+    order: string,
+    selected: string,
+    setOrder: any,
+    setSelected: any,
 }
 
 interface IState {
-    order: string,
-    selected: string,
-    realData: Array<ItemStats>,
-    trevenue: number,
+ 
 }
 
 class ItemStatsClass extends React.Component<IProps, IState>{
 
-    constructor(props: IProps){
-        super(props);
-        var tempdata = this.props.realData;
-        var temprev = this.props.trevenue;
-        this.state = {
-            realData: tempdata,
-            order: 'des',
-            selected: 'itemId',
-            trevenue: temprev,
-        }
-    }
 
     sortData(dataType: string) {
-        var temp = this.state.realData;
-        if (this.state.order === 'asc') {
+        var temp = this.props.realData;
+        var sorted = temp;
+        if (this.props.order === 'asc') {
             if (dataType === "itemId") {
-                const sorted = temp.sort((a, b) => a.id < b.id ? 1 : -1);
-                this.setState({ realData: sorted });
+                sorted = temp.sort((a, b) => a.id < b.id ? 1 : -1);
             } else if (dataType === "name") {
-                const sorted = temp.sort((a, b) => a.name < b.name ? 1 : -1);
-                this.setState({ realData: sorted });
+                sorted = temp.sort((a, b) => a.name < b.name ? 1 : -1);
             } else if (dataType === "sold") {
-                const sorted = temp.sort((a, b) => a.orders < b.orders ? 1 : -1);
-                this.setState({ realData: sorted });
+                sorted = temp.sort((a, b) => a.orders < b.orders ? 1 : -1);
             } else if (dataType === "price") {
-                const sorted = temp.sort((a, b) => a.price < b.price ? 1 : -1);
-                this.setState({ realData: sorted });
-            } else if (dataType === "revenue") {
-                const sorted = temp.sort((a, b) => a.revenue < b.revenue ? 1 : -1);
-                this.setState({ realData: sorted });
+                sorted = temp.sort((a, b) => a.price < b.price ? 1 : -1);
+            } else {
+                sorted = temp.sort((a, b) => a.revenue < b.revenue ? 1 : -1);
             }
-            this.setState({ order: 'des' });
+            this.props.setRealdata(sorted);
+            this.props.setOrder('des');
         } else {
             if (dataType === "itemId") {
-                const sorted = temp.sort((a, b) => a.id > b.id ? 1 : -1);
-                this.setState({ realData: sorted });
+                sorted = temp.sort((a, b) => a.id > b.id ? 1 : -1);
             } else if (dataType === "name") {
-                const sorted = temp.sort((a, b) => a.name > b.name ? 1 : -1);
-                this.setState({ realData: sorted });
+                sorted = temp.sort((a, b) => a.name > b.name ? 1 : -1);
             } else if (dataType === "sold") {
-                const sorted = temp.sort((a, b) => a.orders > b.orders ? 1 : -1);
-                this.setState({ realData: sorted });
+                sorted = temp.sort((a, b) => a.orders > b.orders ? 1 : -1);
             } else if (dataType === "price") {
-                const sorted = temp.sort((a, b) => a.price > b.price ? 1 : -1);
-                this.setState({ realData: sorted });
+                sorted = temp.sort((a, b) => a.price > b.price ? 1 : -1);
             } else if (dataType === "revenue") {
-                const sorted = temp.sort((a, b) => a.revenue > b.revenue ? 1 : -1);
-                this.setState({ realData: sorted });
+                sorted = temp.sort((a, b) => a.revenue > b.revenue ? 1 : -1);
             }
-
-            this.setState({ order: 'asc' });
+            this.props.setRealdata(sorted);
+            this.props.setOrder('asc');
         }
     }
 
     printArrow(dataType: string) {
-        if (dataType === this.state.selected) {
-            if (this.state.order === 'asc') {
+        if (dataType === this.props.selected) {
+            if (this.props.order === 'asc') {
                 return <ExpandLessIcon />
             } else {
                 return <ExpandMoreIcon />
@@ -105,7 +87,7 @@ class ItemStatsClass extends React.Component<IProps, IState>{
 
     handleClick(selected: string) { //sort data then re-renders
         this.sortData(selected);
-        this.setState({ selected: selected });
+        this.props.setSelected(selected);
     }
 
     printItemTable() {
@@ -123,7 +105,7 @@ class ItemStatsClass extends React.Component<IProps, IState>{
                         </TableRow>
                     </TableHead>
                     <TableBody >
-                        {this.state.realData.map(item => (
+                        {this.props.realData.map(item => (
                             <StyledTableRow key={item.id}>
                                 <StyledTableCell component="th" scope="row">
                                     {item.id}
@@ -147,7 +129,7 @@ class ItemStatsClass extends React.Component<IProps, IState>{
                 {this.printItemTable()}
                 </div>
                 <div className={this.props.classes.wrapper2}>
-                    <b>Total Revenue: ${this.state.trevenue.toFixed(2)}</b>
+                    <b>Total Revenue: ${this.props.trevenue.toFixed(2)}</b>
                 </div>
             </div>
         );

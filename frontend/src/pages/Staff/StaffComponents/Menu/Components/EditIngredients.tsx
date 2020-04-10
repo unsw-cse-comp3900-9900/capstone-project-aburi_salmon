@@ -1,9 +1,10 @@
 import React from 'react';
-import { Button, Dialog, DialogContent, Radio, DialogActions,TextField, DialogTitle, FormControl, FormLabel, FormGroup, FormControlLabel, Checkbox, RadioGroup} from '@material-ui/core';
-import {Categories, Ingredient, ResponseMessage} from './../../../../../api/models';
+import { Button, Dialog, DialogContent, Radio, DialogActions,TextField, DialogTitle, FormControl, FormControlLabel, RadioGroup} from '@material-ui/core';
+import { Ingredient, ResponseMessage} from './../../../../../api/models';
 import {Client} from './../../../../../api/client';
 
 //renders edit ingredients dialog (for adding and deleting)
+//error checking done
 
 export interface IProps{
     isOpen: boolean, //if dialog is open
@@ -23,7 +24,6 @@ class EditIngredients extends React.Component<IProps, IState>{
 
     constructor(props: IProps){
         super(props);
-        
         this.state = {
             isOpen: false,
             newIngred: '',
@@ -35,7 +35,8 @@ class EditIngredients extends React.Component<IProps, IState>{
         return(
         <Dialog
             open={this.state.isOpen}
-                onClose={() => this.setState({ isOpen: false })}
+            onClose={() => this.setState({ isOpen: false })}
+            onEnter={() => this.setState({ newIngred: '' })}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description">
             <DialogTitle id="alert-dialog-title">{"Add Ingredient"}</DialogTitle>
@@ -79,7 +80,7 @@ class EditIngredients extends React.Component<IProps, IState>{
         } else {
             this.props.alert(true, 'error', 'Please enter ingredient name');
         }
-        this.setState({ selected: null, newIngred:'' });
+        this.setState({ selected: null });
     }
 
     async handleDeleteIngred(){ //deletes ingredient from ingredient list
@@ -97,15 +98,15 @@ class EditIngredients extends React.Component<IProps, IState>{
         } else {
             this.props.alert(true, 'error', 'Please select an ingredient');
         }
-        
-        this.setState({selected: null, newIngred:''});
+        this.setState({selected: null});
     }
 
     render(){
         return (
             <Dialog
                 open={this.props.isOpen}
-                onClose={() => {this.props.setIsOpen(false); this.setState({selected: null, newIngred: ''})}}
+                onClose={() => this.props.setIsOpen(false)}
+                onEnter={() =>  this.setState({selected: null})}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description">
                 {this.addIngred()}
@@ -113,7 +114,7 @@ class EditIngredients extends React.Component<IProps, IState>{
                 <DialogContent>
 
                 <FormControl component="fieldset" >
-                    <RadioGroup row aria-label="position" name="position" value={this.state.selected?.name}>
+                        <RadioGroup row aria-label="position" name="position" value={this.state.selected?.name === undefined ? '' : this.state.selected?.name }>
                     {
                         this.props.ingredientsList && 
                             this.props.ingredientsList.map(ingredient => 

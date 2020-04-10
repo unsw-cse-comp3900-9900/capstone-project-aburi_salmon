@@ -4,6 +4,7 @@ import {Categories, Menu, ResponseMessage} from './../../../../../api/models';
 import {Client} from './../../../../../api/client';
 
 //renders edit category and add category dialog
+//error checking for empty fields
 
 export interface IProps{
     isOpen: boolean, //if dialog is open
@@ -31,24 +32,25 @@ class EditCategory extends React.Component<IProps, IState>{
     }
 
     async addEditCat(categoryName: string, isAdd: boolean) { //add or edit category
-        console.log(categoryName);
         if (isAdd) { //add category
             const client = new Client();
-            const r: ResponseMessage | null = await client.addCategory(categoryName);
-            console.log(r);
-            if (r === null) {
-                this.props.alert(true, 'error', "Something went wrong");
-            } else if (r?.status === "success") {
-                this.props.alert(true, 'success', 'Successfully added category.');
-                this.props.setIsOpen(false);
-                this.props.update();
+            if (categoryName === ''){
+                this.props.alert(true, 'error', "Category name required");
             } else {
-                this.props.alert(true, 'error', r.status);
+                const r: ResponseMessage | null = await client.addCategory(categoryName);
+                if (r === null) {
+                    this.props.alert(true, 'error', "Something went wrong");
+                } else if (r?.status === "success") {
+                    this.props.alert(true, 'success', 'Successfully added category.');
+                    this.props.setIsOpen(false);
+                    this.props.update();
+                } else {
+                    this.props.alert(true, 'error', r.status);
+                }
             }
         } else { //edit category
             const client = new Client();
             const r: ResponseMessage | null = await client.editCategory(categoryName, this.props.category?.position, this.props.category?.id);
-            console.log(r);
             if (r === null) {
                 this.props.alert(true, 'error', "Something went wrong");
             } else if (r?.status === "success") {
@@ -64,7 +66,6 @@ class EditCategory extends React.Component<IProps, IState>{
     async deleteFun(){ //delete category
         const client = new Client();
         const r: ResponseMessage | null = await client.deleteCat(this.props.category?.id);
-        console.log(r);
         if (r === null) {
             this.props.alert(true, 'error', "Something went wrong");
         } else if (r?.status === "success") {
@@ -78,21 +79,27 @@ class EditCategory extends React.Component<IProps, IState>{
 
     async handleClick(){ //for switching category positions
         //if name is different, send to server
-        if (this.state.catName !== this.props.category?.name && this.state.catName !== ''){
-            this.addEditCat(this.state.catName, false);
-        } //if wants to switch position
-        if (this.state.currCat !== -1){
-            const client = new Client();
-            const r: ResponseMessage | null= await client.catSwitch(this.state.currCat, this.props.category?.id)
-            console.log(r);
-            if (r === null) {
-                this.props.alert(true, 'error', "Something went wrong");
-            } else if (r?.status === "success") {
-                this.props.alert(true, 'success', 'Successfully switched category positions');
-                this.props.setIsOpen(false);
-                this.props.update();
-            } else {
-                this.props.alert(true, 'error', r.status);
+
+        if (this.state.catName === '') {
+            this.props.alert(true, 'error', "Category name required");
+        } else if (this.state.catName === this.props.category?.name && this.state.currCat === -1){
+            this.props.alert(true, 'error', "No change in name or position detected");
+        } else {
+            if (this.state.catName !== this.props.category?.name){
+                this.addEditCat(this.state.catName, false);
+            } //if wants to switch position
+            if (this.state.currCat !== -1){
+                const client = new Client();
+                const r: ResponseMessage | null= await client.catSwitch(this.state.currCat, this.props.category?.id)
+                if (r === null) {
+                    this.props.alert(true, 'error', "Something went wrong");
+                } else if (r?.status === "success") {
+                    this.props.alert(true, 'success', 'Successfully switched category positions');
+                    this.props.setIsOpen(false);
+                    this.props.update();
+                } else {
+                    this.props.alert(true, 'error', r.status);
+                }
             }
         }
     }
@@ -105,8 +112,16 @@ class EditCategory extends React.Component<IProps, IState>{
         }
     }
 
-    async componentDidMount(){ //reset
-        this.setState({ catName: '', currCat: -1 });
+    update(){ //reset
+        if (this.props.isEdit === true && this.props.category !== null){
+            this.setState({catName: this.props.category?.name, currCat: -1});
+        } else {
+            this.setState({ catName: '', currCat: -1 });
+        }
+    }
+
+    componentDidMount(){
+        this.update();
     }
 
     render(){
@@ -114,7 +129,8 @@ class EditCategory extends React.Component<IProps, IState>{
             return (
                 <Dialog
                     open={this.props.isOpen}
-                    onClose={() => this.props.setIsOpen(false)}
+                    onClose={() => {this.props.setIsOpen(false); this.update()}}
+                    onEnter={() => this.update()}
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
                 >
@@ -147,7 +163,7 @@ class EditCategory extends React.Component<IProps, IState>{
                     </DialogContent>
                     <DialogActions>
                         <div style={{width:'100%'}}>
-                            <Button onClick={() => { this.props.setIsOpen(false); this.componentDidMount()}} 
+                            <Button onClick={() => { this.props.setIsOpen(false); this.update()}} 
                                 color="primary" style={{float: 'left'}}>
                             Cancel
                         </Button>
@@ -166,7 +182,8 @@ class EditCategory extends React.Component<IProps, IState>{
             return(
                 <Dialog
                     open={this.props.isOpen}
-                    onClose={() => this.props.setIsOpen(false)}
+                    onClose={() => {this.props.setIsOpen(false); this.update()}}
+                    onEnter={() => this.update()}
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description">
                     <DialogTitle id="alert-dialog-title">{"Add Category"}</DialogTitle>
@@ -175,13 +192,14 @@ class EditCategory extends React.Component<IProps, IState>{
                                 autoFocus
                                 margin="dense"
                                 id="catName"
+                                required
                                 label="Enter Category Name"
                                 fullWidth
                                 onChange = {(e) => this.setState({catName: e.target.value})}
                             />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={() => {this.props.setIsOpen(false); this.componentDidMount()}} color="primary">
+                        <Button onClick={() => {this.props.setIsOpen(false); this.update()}} color="primary">
                             Nevermind
                         </Button>
                         <Button onClick={() => this.addEditCat(this.state.catName,true)} color="primary" autoFocus>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { createStyles, withStyles, WithStyles, Theme, MenuList, Paper, MenuItem, Box} from '@material-ui/core';
+import { withStyles, WithStyles, MenuList, Paper, MenuItem, Box} from '@material-ui/core';
 import { ItemList, Menu, Categories, WholeItemList, Ingredient, Tables, AssistanceTables, ListItem, AllStaff, AllItemStats, ItemStats as ItemStatsModel} from './../../../api/models';
 import { Client } from './../../../api/client';
 import Assistance from './Assistance/AssistanceMain';
@@ -37,6 +37,12 @@ interface IState {
     currCat:Categories | null,
     allItems: WholeItemList | null,
     ingredientsList: Array<Ingredient> | null,
+
+    //for sorting
+    selectedItem: string,
+    selectedOrders: string,
+    itemSort: string,
+    orderSort: string,
 }
 
 class Manage extends React.Component<IProps, IState>{
@@ -64,6 +70,11 @@ class Manage extends React.Component<IProps, IState>{
             currCat: null,
             allItems: null,
             ingredientsList: null,
+
+            selectedItem: 'itemId',
+            selectedOrders: 'status',
+            itemSort: 'des',
+            orderSort: 'des'
         }
         this.updateAssist = this.updateAssist.bind(this);
         this.updateStaff = this.updateStaff.bind(this);
@@ -71,6 +82,15 @@ class Manage extends React.Component<IProps, IState>{
         this.forceUpdateItemlist = this.forceUpdateItemlist.bind(this);
         this.forceUpdateMenu = this.forceUpdateMenu.bind(this);
         this.changeMenuValue = this.changeMenuValue.bind(this);
+
+        this.changeOrders = this.changeOrders.bind(this);
+        this.changeItemStats = this.changeItemStats.bind(this);
+
+        this.changeItemSelected = this.changeItemSelected.bind(this);
+        this.changeItemOrder = this.changeItemOrder.bind(this);
+        this.changeOrderSelected = this.changeOrderSelected.bind(this);
+        this.changeOrderOrder = this.changeOrderOrder.bind(this);
+        
     }
 
     async componentDidMount() {
@@ -84,9 +104,9 @@ class Manage extends React.Component<IProps, IState>{
         const a: AssistanceTables | null = await client.getAssistanceTable();
         var temp: Array<number> = [];
         if (a?.tables !== undefined) {
-            a?.tables.map(it => {
-                temp.push(it.table_id);
-            }
+            a?.tables.forEach(it => {
+                    temp.push(it.table_id);
+                }
             )
             this.setState({ assistance: temp });
         }
@@ -119,6 +139,15 @@ class Manage extends React.Component<IProps, IState>{
             this.setState({ trevenue: itemStats?.total_revenue })
         }
 
+        this.setState({
+            queueList: queue,
+            cookingList: cooking,
+            readyList: ready,
+            tables: t,
+            orderRealData: temp1,
+            staffRealData: allStaff,
+        });
+
         //menu
         const menu: Menu | null = await client.getMenu();
         if (menu !== null && menu?.menu.length !== undefined) {
@@ -128,21 +157,13 @@ class Manage extends React.Component<IProps, IState>{
                 currCat: menu.menu[0],
             });
         }
+
         const i: WholeItemList | null = await client.getAllItems();
         if (i !== null) {
             this.setState({ allItems: i });
         }
         const ingred: Array<Ingredient> | null = await client.getIngredients();
         this.setState({ ingredientsList: ingred });
-
-        this.setState({
-            queueList: queue,
-            cookingList: cooking,
-            readyList: ready,
-            tables: t,
-            orderRealData: temp1,
-            staffRealData: allStaff,
-        });
     }
 
     async updateAssist() {
@@ -151,7 +172,7 @@ class Manage extends React.Component<IProps, IState>{
         const a: AssistanceTables | null = await client.getAssistanceTable();
         var temp: Array<number> = [];
         if (a?.tables !== undefined) {
-            a?.tables.map(it => {
+            a?.tables.forEach(it => {
                 temp.push(it.table_id);
             }
             )
@@ -190,12 +211,38 @@ class Manage extends React.Component<IProps, IState>{
         this.setState({ menuvalue: newValue })
     }
 
+    changeItemStats(realData: Array<ItemStatsModel>){
+        this.setState({ itemRealData: realData});
+    }
+
+    changeOrders(realData: Array<ListItem> ){
+        this.setState({ orderRealData: realData});
+    }
+
+    changeItemSelected(selected: string){
+        this.setState({selectedItem: selected});
+    }
+
+    changeItemOrder(order: string){
+        this.setState({ itemSort: order });
+    }
+
+    changeOrderSelected(selected: string){
+        this.setState({ selectedOrders: selected });
+    }
+
+    changeOrderOrder(order:string){
+        this.setState({ orderSort: order });
+    }
+
     displayCont() {
         const { classes } = this.props;
         if (this.state.currPage === "Orders"){
             return (
                 <Box className={classes.staffContainer}>
-                    <ManageOrders realData={this.state.orderRealData}/>
+                    <ManageOrders realData={this.state.orderRealData} changeRealdata={this.changeOrders}
+                    changeOrder={this.changeOrderOrder} changeSelected={this.changeOrderSelected}
+                    order={this.state.orderSort} selected={this.state.selectedOrders}/>
                 </Box>
             );
         } else if (this.state.currPage === "Tables") {
@@ -214,7 +261,9 @@ class Manage extends React.Component<IProps, IState>{
         } else if (this.state.currPage === "ItemStats") {
             return (
                 <Box className={classes.staffContainer}>
-                    <ItemStats realData={this.state.itemRealData} trevenue={this.state.trevenue}/>
+                    <ItemStats realData={this.state.itemRealData} trevenue={this.state.trevenue} 
+                    setRealdata={this.changeItemStats} setOrder={this.changeItemOrder} order={this.state.itemSort}
+                     setSelected={this.changeItemSelected} selected={this.state.selectedItem}/>
                 </Box>
             );
         } 

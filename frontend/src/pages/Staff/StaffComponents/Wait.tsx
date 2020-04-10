@@ -1,5 +1,5 @@
 import React from 'react';
-import { createStyles,  withStyles, WithStyles, Theme, MenuList, Paper, MenuItem, Box, Snackbar, Button, Dialog, DialogTitle, DialogContent,DialogActions } from '@material-ui/core';
+import { withStyles, WithStyles, MenuList, Paper, MenuItem, Box, Snackbar, Button, Dialog, DialogTitle, DialogContent,DialogActions } from '@material-ui/core';
 import Assistance from './Assistance/AssistanceMain';
 import ToServe from './Orders/Components/ToServeList';
 import Served from './Orders/Components/ServedList';
@@ -88,7 +88,7 @@ class Wait extends React.Component<IProps, IState>{
         var temp: Array<number> = [];
 
         if (a?.tables !== undefined) {
-            a?.tables.map(it => {
+            a?.tables.forEach(it => {
                 temp.push(it.table_id);
             }
             )
@@ -137,7 +137,7 @@ class Wait extends React.Component<IProps, IState>{
         const a: AssistanceTables | null = await client.getAssistanceTable();
         var temp: Array<number> = [];
         if (a?.tables !== undefined) {
-            a?.tables.map(it => {
+            a?.tables.forEach(it => {
                 temp.push(it.table_id);
             }
             )

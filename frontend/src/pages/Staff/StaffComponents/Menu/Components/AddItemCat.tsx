@@ -4,6 +4,7 @@ import {Menu, WholeItemList, ResponseMessage} from './../../../../../api/models'
 import {Client} from './../../../../../api/client';
 
 //Class that renders dialog for adding an item to a category
+//No error checking since it uses dropboxes
 
 //What needs to be passed in
 export interface IProps{
@@ -35,7 +36,6 @@ class AddItemCat extends React.Component<IProps, IState>{
     async handleClick(){
         const client = new Client();
         const r: ResponseMessage | null= await client.addItemToCat(0,this.state.currCat, this.state.currItem);
-        console.log(r);
         if (r === null) {
             this.props.alert(true, 'error', "Something went wrong");
         } else if (r?.status === "success") {
@@ -45,15 +45,6 @@ class AddItemCat extends React.Component<IProps, IState>{
         } else {
             this.props.alert(true, 'error', r.status);
         }
-        /*
-            if (msg.status === 200) {
-                this.props.alert(true,'success', 'Successful');
-                this.props.setIsOpen(false);
-                this.props.update();
-            } else {
-                this.props.alert(true, 'error', msg.statusText);
-            }*/
-        
     }
 
     render() {

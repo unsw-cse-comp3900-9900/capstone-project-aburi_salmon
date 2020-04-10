@@ -2,7 +2,7 @@ import React from 'react';
 import { WithStyles,withStyles, Button, Snackbar,TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper} from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {Client} from './../../../../api/client';
-import { AllStaff, StaffInfo, ResponseMessage } from './../../../../api/models';
+import { AllStaff, StaffInfo} from './../../../../api/models';
 import { Alert } from '@material-ui/lab';
 import DeleteDialog from './Components/DeleteDialog';
 import ChangeStaffType from './Components/ChangeStaffType';
