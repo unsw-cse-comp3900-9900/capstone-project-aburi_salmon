@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Dialog, DialogContent, DialogActions, DialogTitle, FormControl, FormGroup, FormControlLabel, Checkbox} from '@material-ui/core';
 import {Ingredient, Item} from './../../../../../api/models';
+import { Client} from './../../../../../api/client';
 
 //renders the dialog for adding ingredients to an item
 
@@ -21,6 +22,7 @@ interface IState{
 }
 class Ingredients extends React.Component<IProps, IState>{
 
+    
     constructor(props: IProps){
         super(props);
         this.state = {
@@ -30,8 +32,8 @@ class Ingredients extends React.Component<IProps, IState>{
     }
 
     printIngred(ingredient: Ingredient, index: number){ //print the checkbox
-
-        return(
+        if (this.state.selected !== []){
+            return(
             <FormControlLabel
                 control={<Checkbox color="primary" checked={this.state.selected[index]}
                     onChange={(e) => this.handleCheck(parseInt(e.target.value))}
@@ -39,39 +41,40 @@ class Ingredients extends React.Component<IProps, IState>{
                 label={ingredient.name}
                 key={ingredient.id}
             />
-        );
-
+            );
+        } else {
+            return (
+                <FormControlLabel
+                    control={<Checkbox color="primary"
+                        onChange={(e) => this.handleCheck(parseInt(e.target.value))}
+                        value={index} />}
+                    label={ingredient.name}
+                    key={ingredient.id}
+                />
+            );
+        }
+        
     }
 
-    updateIngredients(){ //update ingredient in an item
-
-
-
-        /*
-        console.log(this.state.selectedIngredients);
-        var i = 0;
+    async addAll(){
         const client = new Client();
-        var temp = this.props.itemIngredients;
-
-        while (i < this.state.selectedIngredients.length){
-            // if ingredient is not already an ingredient, add
-            if (temp.indexOf(this.state.selectedIngredients[i]) === -1){
-                client.addIngredToItem(this.props.currItem.id, this.state.selectedIngredients[i]);
-                temp.splice(temp.indexOf(this.state.selectedIngredients[i]), 1);
+        var r;
+        this.state.ingredientsId.forEach(async (id, index) => {
+            if (this.state.selected[index] === true && this.props.itemIngredients.indexOf(id) === -1){
+                r = client.addIngredToItem(this.props.currItem.id, id);
+            } else if (this.props.itemIngredients.indexOf(id) !== -1 && this.state.selected[index] === false){
+                r = client.removeIngredFromItem(this.props.currItem.id, id);
             }
-            i++;
-            console.log(temp);
-        }
-        i = 0;
-        while(i < temp.length){ //delete ingredients that are no longer needed from item
-            client.removeIngredFromItem(this.props.currItem.id, temp[i]);
-            i++;
-        }
+        });
+        return r;
+    }
+
+    async updateIngredients(){ //update ingredient in an item
+        const r = await this.addAll();
         this.props.alert(true, 'success', 'Success');
         this.props.update();
         this.props.setIsOpen(false);
-        this.props.setModalIsOpen(false);*/
-
+        this.props.setModalIsOpen(false);
     }
 
     handleCheck(value: number){
@@ -84,41 +87,32 @@ class Ingredients extends React.Component<IProps, IState>{
         this.setState({selected: temp});
     }
 
-    //if checkbox is clicked, add to array if it isn't already.
-    //if it is in array, remove it from array
-    /*
-    handleCheck(value: string) { 
-        var temp = this.state.selectedIngredients;
-        var num = this.state.selectedIngredients.indexOf(parseInt(value));
-        if (num !== -1){
-            temp.splice(num, 1);
-        } else {
-            temp.push(parseInt(value));
-        }
-        this.setState({selectedIngredients: temp});
-    }*/
-    componentDidUpdate(prevProps: any, prevState: any){
-        if (prevState.selected !== this.state.selected){
-            this.render();
-        }
-
-    }
-
     whenOpened(){
         this.setState({ ingredientsId: [], selected: [] });
         var temp: Array<boolean> = [];
         var temp2: Array<number> = [];
-        this.props.ingredientsList?.map(ingredient =>{
+        this.props.ingredientsList?.forEach(ingredient =>{
             if (this.props.itemIngredients.indexOf(ingredient.id) !== -1) {
                 temp.push(true);
             } else {
                 temp.push(false);
             }
             temp2.push(ingredient.id);
-            console.log(temp);
-            console.log(temp2);
         });
-        this.setState({ selected: temp, ingredientsId: temp2 }, () => this.render());
+        console.log('entered when opened');
+        console.log(this.props.itemIngredients);
+        this.setState({ selected: temp, ingredientsId: temp2 });
+    }
+
+    componentDidUpdate( prevProps: any,prevState: any){
+        console.log(prevProps.itemIngredients);
+        console.log(this.props.itemIngredients);
+        if (prevProps.itemIngredients !== this.props.itemIngredients){
+            if (this.props.itemIngredients.length !== 0 ){
+                this.whenOpened();
+                this.forceUpdate();
+            }
+        }
     }
 
     render(){

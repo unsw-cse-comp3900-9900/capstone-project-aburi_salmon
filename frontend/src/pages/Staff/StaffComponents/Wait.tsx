@@ -88,7 +88,7 @@ class Wait extends React.Component<IProps, IState>{
         var temp: Array<number> = [];
 
         if (a?.tables !== undefined) {
-            a?.tables.map(it => {
+            a?.tables.forEach(it => {
                 temp.push(it.table_id);
             }
             )
@@ -137,7 +137,7 @@ class Wait extends React.Component<IProps, IState>{
         const a: AssistanceTables | null = await client.getAssistanceTable();
         var temp: Array<number> = [];
         if (a?.tables !== undefined) {
-            a?.tables.map(it => {
+            a?.tables.forEach(it => {
                 temp.push(it.table_id);
             }
             )

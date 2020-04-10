@@ -104,9 +104,9 @@ class Manage extends React.Component<IProps, IState>{
         const a: AssistanceTables | null = await client.getAssistanceTable();
         var temp: Array<number> = [];
         if (a?.tables !== undefined) {
-            a?.tables.map(it => {
-                temp.push(it.table_id);
-            }
+            a?.tables.forEach(it => {
+                    temp.push(it.table_id);
+                }
             )
             this.setState({ assistance: temp });
         }
@@ -172,7 +172,7 @@ class Manage extends React.Component<IProps, IState>{
         const a: AssistanceTables | null = await client.getAssistanceTable();
         var temp: Array<number> = [];
         if (a?.tables !== undefined) {
-            a?.tables.map(it => {
+            a?.tables.forEach(it => {
                 temp.push(it.table_id);
             }
             )
