@@ -6,6 +6,9 @@ from app import api, db, flask_app
 import model.response_model as response_model
 import model.request_model as request_model
 from util.socket import socket
+from flask_socketio import SocketIO, emit, join_room, leave_room
+
+socket = SocketIO(flask_app, cors_allowed_origins="*")
 
 order = api.namespace('order', description='Order Route')
 
@@ -135,7 +138,7 @@ class Item(Resource):
     def delete(self):
         delete_order = request.get_json()
         item_order_id = delete_order.get('id')
-        socket.emit('delete', room='staff2')
+        socket.emit('delete', {'data': data})
 
 
         if item_order_id is None:

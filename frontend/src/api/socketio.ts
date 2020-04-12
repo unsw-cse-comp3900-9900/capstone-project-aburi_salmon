@@ -5,7 +5,10 @@ export let socket: any;
 
 interface RoomObject {
     room: string;
-    table: string
+}
+
+interface TableOjbect {
+    table: string;
 }
 
 export const connectToSocket = (App: App) => {
@@ -36,16 +39,16 @@ export const connectToSocket = (App: App) => {
         console.log(`Table is requesting assistance`);
     });
 
-    socket.on('order', (data : any) => {
-        console.log(`Customer has ordered an item `);
+    socket.on('order',()  => {
+        console.log(`Customer has ordered an item`);
     });
 
     socket.on('modify', () => {
         console.log(`Customer has modified an item`);
     });
 
-    socket.on('delete', () => {
-        console.log(`Customer has deleted an item`);
+    socket.on('delete', (table: TableOjbect) => {
+        console.log(`Customer from table ${table}  has deleted an item`);
     });
 
     socket.on('cooking', () => {
