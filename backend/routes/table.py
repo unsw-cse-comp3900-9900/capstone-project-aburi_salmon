@@ -124,7 +124,8 @@ class Assistance(Resource):
         if (not db.set_assistance(table_id, assistance)):
             abort(400, 'Something went wrong')
 
-        socket.emit('assistance', room='staff3')
+        socket.emit('assistance', { 'table': table_id }, room='staff1')
+        #socket.emit('assistance', room='staff3')
         return jsonify({ 'status': 'success' })
     
         

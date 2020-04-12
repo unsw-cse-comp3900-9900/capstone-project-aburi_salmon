@@ -61,7 +61,8 @@ class PureLogin extends React.Component<{}, IState> {
         this.setState({ severity: 'success' });
         console.log(`${localStorage.getItem('username')} just logged in`);
         console.log('attempting to join room');
-        socket.emit('join');
+        socket.emit('delete');
+        console.log('we here');
     }
 
     setError(message: string) {

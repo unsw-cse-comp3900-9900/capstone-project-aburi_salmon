@@ -2,13 +2,10 @@ from flask import request, jsonify
 from flask_restx import Resource, abort, reqparse, fields
 from flask_jwt_extended import get_jwt_claims, jwt_required
 
-from app import api, db, flask_app
+from app import api, db
 import model.response_model as response_model
 import model.request_model as request_model
 from util.socket import socket
-from flask_socketio import SocketIO, emit, join_room, leave_room
-
-socket = SocketIO(flask_app, cors_allowed_origins="*")
 
 order = api.namespace('order', description='Order Route')
 
@@ -18,7 +15,6 @@ class Order(Resource):
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
     def get(self):
-        socket.emit('order', room='staff2')
 
         # Gets lists of ordered items and Total Bill
 
@@ -56,6 +52,11 @@ class Order(Resource):
             order_id = db.insert_order(table_id)
 
         print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+
+        order_id = get_jwt_claims().get('order')
+        table_id = db.get_table_id(order_id)
+
+        socket.emit('order', { 'table': table_id }, room='staff2')
 
         for i in range(0, num_of_orders):
             item_id = new_order.get('order')[i].get('item_id')
@@ -107,6 +108,7 @@ class Item(Resource):
         
 
     #@jwt_required
+    @jwt_required
     @order.expect(request_model.modify_order_model)
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
@@ -116,12 +118,19 @@ class Item(Resource):
         item_order_id = modify_order.get('id')
         quantity = modify_order.get('quantity')
         comment = modify_order.get('comment')
-        socket.emit('modify', room='staff2')
+
+        order_id = get_jwt_claims().get('order')
+        table_id = db.get_table_id(order_id)
+
+        modifications = 'Table ' + str(table_id) + ' has modified order ' + str(item_order_id)
+        print(modifications)
+        socket.emit('modify', { 'modifications': modifications}, room='staff2')
 
         if item_order_id is None:
             abort(400, 'No existing order with that item, please make a new order instead.')
         
         new = db.modify_item_order(item_order_id, comment, quantity)
+        print(new)
         if new == 5:
             abort(400, 'New quantity has to be >= 1 OR order has left the QUEUE status, please make a NEW order instead.')
         
@@ -138,7 +147,13 @@ class Item(Resource):
     def delete(self):
         delete_order = request.get_json()
         item_order_id = delete_order.get('id')
-        socket.emit('delete', {'data': data})
+
+        order_id = get_jwt_claims().get('order')
+        table_id = db.get_table_id(order_id)
+
+        deletions = 'Table ' + str(table_id) + ' has deleted order ' + str(item_order_id)
+        print(deletions)
+        socket.emit('delete', { 'deletions': deletions }, room='staff2')
 
 
         if item_order_id is None:

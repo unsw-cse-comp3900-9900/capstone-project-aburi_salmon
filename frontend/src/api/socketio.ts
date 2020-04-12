@@ -7,9 +7,14 @@ interface RoomObject {
     room: string;
 }
 
-interface TableOjbect {
+interface TableObject {
     table: string;
+    itemNo: string;
+    modifications: string;
+    deletions: string;
+
 }
+
 
 export const connectToSocket = (App: App) => {
     socket = io('http://localhost:5000');
@@ -35,21 +40,22 @@ export const connectToSocket = (App: App) => {
         App.setState({ room: false });
     });
 
-    socket.on('assistance', () => {
-        console.log(`Table is requesting assistance`);
+    socket.on('assistance', ({table}:TableObject) => {
+        console.log(`Table ${table} is requesting assistance`);
     });
 
-    socket.on('order',()  => {
-        console.log(`Customer has ordered an item`);
+    socket.on('order', ({table}:TableObject)  => {
+        console.log(`Table ${table} has placed an order`);
     });
 
-    socket.on('modify', () => {
-        console.log(`Customer has modified an item`);
+    socket.on('modify', ({modifications}:TableObject) => {
+        console.log(`${modifications}`);
     });
 
-    socket.on('delete', (table: TableOjbect) => {
-        console.log(`Customer from table ${table}  has deleted an item`);
+    socket.on('delete', ({deletions}:TableObject) => {
+        console.log(`${deletions}`);
     });
+
 
     socket.on('cooking', () => {
         console.log(`Your item is cooking`);
