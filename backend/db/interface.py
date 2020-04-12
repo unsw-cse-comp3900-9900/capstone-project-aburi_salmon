@@ -176,9 +176,14 @@ class DB:
         return category
         
     def create_item(self, item):
+        image_url = item.get('image_url')
+
+        if image_url is None:
+            image_url = ""
+
         rows = self.__query(
-            'INSERT INTO item (name, description, price, visible) VALUES (%s, %s, %s, %s) RETURNING id',
-            [item.get('name'), item.get('description'), item.get('price'), item.get('visible')]
+            'INSERT INTO item (name, description, price, visible, image_url) VALUES (%s, %s, %s, %s, %s) RETURNING id',
+            [item.get('name'), item.get('description'), item.get('price'), item.get('visible'), image_url]
         )
         if not rows or not rows[0]:
             return None
@@ -187,7 +192,7 @@ class DB:
 
     def get_all_menu_items(self):
         rows = self.__query(
-            'SELECT * FROM item'
+            'SELECT id, name, description, price, visible, image_url FROM item'
         )
         if (not rows):
             return []
@@ -198,11 +203,12 @@ class DB:
             'description': row[2],
             'price': row[3],
             'visible': row[4],
+            'image_url': row[5],
             'ingredients': self.get_item_ingredients(row[0])
         } for row in rows]
 
     def get_item_by_id(self, id):
-        rows = self.__query('SELECT * FROM item WHERE id = %s', [id])
+        rows = self.__query('SELECT id, name, description, price, visible, image_url FROM item WHERE id = %s', [id])
         if (not rows):
             return None
         
@@ -213,12 +219,13 @@ class DB:
             'description': itemRow[2],
             'price': itemRow[3],
             'visible': itemRow[4],
+            'image_url': itemRow[5],
             'ingredients': self.get_item_ingredients(id)
         }
 
     def get_items_by_category(self, category_id):
         rows = self.__query(
-            'SELECT * FROM item i JOIN category_item ci on (i.id = ci.item_id) WHERE ci.category_id = %s',
+            'SELECT id, name, description, price, visible, image_url FROM item i JOIN category_item ci on (i.id = ci.item_id) WHERE ci.category_id = %s',
             [category_id]
         )
 
@@ -231,6 +238,7 @@ class DB:
             'description': row[2],
             'price': row[3],
             'visible': row[4],
+            'image_url': row[5],
             'ingredients': self.get_item_ingredients(row[0])
         } for row in rows]
 
@@ -287,6 +295,17 @@ class DB:
         )
 
     def add_item_to_category(self, category_id, item_id):
+        # Check if the item not in category already
+        rows = self.__query(
+            'SELECT * FROM category_item WHERE category_id = %s AND item_id = %s',
+            [category_id, item_id]
+        )
+        
+        if (rows != None):
+            # Item already in category
+            return False
+
+        # Add item to category
         self.__insert(
             'INSERT INTO category_item (item_id, category_id) VALUES (%s, %s)',
             [item_id, category_id]
@@ -392,18 +411,17 @@ class DB:
             ingredient.append(row[0])
         return ingredient
 
-    def get_ordered_items_customer(self, table_id):
+    def get_ordered_items_customer(self, order_id):
         rows = self.__query("""SELECT io.id as item_order_id, io.order_id, i.name, i.id as item_id, io.quantity,
-        i.price, s.id as status_id, s.status_name
+        i.price, s.id as status_id, s.status_name, io.comment
         FROM item_order io, item i, status s, "order" o
         WHERE s.id = io.status_id
         AND i.id = io.item_id
         AND io.order_id = o.id
-        AND o.id = (SELECT id from "order" WHERE table_id = %s ORDER BY id DESC LIMIT 1);""", [table_id])
+        AND o.id = %s;""", [order_id])
 
         if (not rows):
-            return None
-
+            return []
 
         item_order = []
         for row in rows:
@@ -414,6 +432,7 @@ class DB:
                 'item_id': row[3],
                 'quantity': row[4],
                 'price': row[5],
+                'comment': row[8],
                 'status': {
                     'id': row[6],
                     'name': row[7]
@@ -477,8 +496,17 @@ class DB:
     def set_table_free(self, id):
         return self.__update('UPDATE "table" SET state = %s WHERE id = %s', [False, id])
 
+    def set_table_free_order_id(self, id):
+        return self.__update('UPDATE "table" t SET state = %s WHERE id = (SELECT table_id FROM "order" WHERE id = %s)', [False, id])
+
     def set_assistance(self, table_id, assistance):
         return self.__update('UPDATE "order" SET assistance = %s WHERE table_id = %s', [assistance, table_id])
+
+    def set_paid(self, table_id, paid):
+        return self.__update('UPDATE "order" SET paid = %s WHERE table_id = %s', [paid, table_id])
+
+    def set_bill(self, table_id, bill):
+        return self.__update('UPDATE "order" SET bill_request = %s WHERE table_id = %s', [bill, table_id])
 
     def get_assistance_tables(self):
         rows = self.__query(
@@ -492,6 +520,26 @@ class DB:
             'table_id': row[0],
             'occupied': row[1]
         } for row in rows]
+
+    def get_paid_tables(self):
+        rows = self.__query(
+            'SELECT distinct t.id, t.state FROM "table" t JOIN "order" o on (t.id = o.table_id) WHERE o.paid = True AND t.state = True'
+        )
+
+        if (not rows or not rows[0]):
+            return []
+
+        return [row[0] for row in rows]
+    
+    def get_bill_tables(self):
+        rows = self.__query(
+            'SELECT distinct t.id, t.state FROM "table" t JOIN "order" o on (t.id = o.table_id) WHERE o.bill_request = True AND t.state = True'
+        )
+
+        if (not rows or not rows[0]):
+            return []
+
+        return [row[0] for row in rows]
 
     def beginCooking(self, id):
         return self.__update("UPDATE item_order SET status_id = 1 WHERE id = %s", [id])

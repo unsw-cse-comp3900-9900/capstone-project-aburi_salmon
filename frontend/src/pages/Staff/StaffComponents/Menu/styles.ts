@@ -3,8 +3,9 @@ import { createStyles, Theme, fade } from "@material-ui/core";
 export const styles = (theme: Theme) =>
   createStyles({
     menupage: {
-      height: '97vh',
+      height: '100%',
       width: '100%',
+      
     },
     title: {
       margin: '30px',
@@ -50,7 +51,7 @@ export const styles = (theme: Theme) =>
       left: '50%',
       position: 'fixed',
       flexGrow: 1,
-      minWidth: '60%',
+      minWidth: '70%',
       width: 'auto',
       height: 'auto',
       backgroundColor: theme.palette.background.paper,
@@ -73,14 +74,45 @@ export const styles = (theme: Theme) =>
       padding: theme.spacing(2, 4, 3),
       transform: `translate(-50%,-50%)`,
     },
-    imageboxmodaldiv: {
-      height: 450,
-      width: 600,
+    overflow: {
+      overflow: 'auto',
+      height: '90%',
+      position: 'static',
     },
-    imageboxmodal: {
-      height: '100%',
-      maxHeight: '100%',
-      width: 'auto',
-      maxWidth: '100%',
-    },
+     wrapper: {
+       height: '92%',
+     },
+     wrapper2: {
+       width:'100%',
+     },
+     wrapper3: {
+      height: "8%",
+      width: '100%',
+     },
+     floatRight: {
+       float: 'right',
+     },
+     addFloatRight: {
+       float: 'right',
+       margin: '10px',
+     },
+     floatLeft: {
+       float: 'left',
+     },
+     editIcon: {
+       display: 'flex',
+       alignItems: 'center',
+       textAlign: 'center',
+     },
+     imageboxmodaldiv: {
+       height: 450,
+       width: 600,
+     },
+     imageboxmodal: {
+       height: '100%',
+       maxHeight: '100%',
+       width: 'auto',
+       maxWidth: '100%',
+     },
+
   });

@@ -17,10 +17,7 @@ import { LeftBox, RightBar } from '../../components';
 
 import { styles } from './styles';
 import { Client } from '../../api/client';
-//import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel } from '../../api/models';
-import { socket } from '../../api/socketio';
-
-import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel, ResponseMessage as ResponseMessageModel, ItemQuantityPair as ItemQuantityPairModel } from '../../api/models';
+import { Menu as MenuModel, Item as ItemModel, Order as OrderModel, Categories as CategoriesModel, ResponseMessage as ResponseMessageModel, ItemQuantityPair as ItemQuantityPairModel } from '../../api/models';
 
 interface IProps extends WithStyles<typeof styles> { }
 
@@ -109,8 +106,17 @@ class MenuPage extends React.Component<IProps, IState> {
     )
   }
 
-  goToTable() {
-    history.push('/table');
+  async goBack() {
+    // Check current order. if empty, logout and go to table
+    const client = new Client();
+    const o: OrderModel | null = await client.getCurrentOrder();
+
+    if (o && o?.item_order.length !== 0) {
+      history.push('/waiting');
+    } else {
+      const r = await client.customerLogout();
+      if (r) history.push('/table');
+    }
   }
 
   handleTabChange(event: React.ChangeEvent<{}>, newValue: string) {
@@ -121,10 +127,12 @@ class MenuPage extends React.Component<IProps, IState> {
 
   openModal(item: ItemModel) {
     let quantity = 0;
+    let comment = "";
 
     this.state.orders.forEach((it: OrderItemState) => {
       if (it.item.id === item.id) {
         quantity = it.quantity;
+        comment = it.comment;
       }
     })
 
@@ -138,6 +146,7 @@ class MenuPage extends React.Component<IProps, IState> {
       // Set quantity to 0 for new item. Might need to change this if entry exists
       modalQuantity: quantity,
       modalOriginalQuantity: quantity,
+      modalComment: comment,
 
       // Set second button to modify order if quantity is not 0
       modalSecondButton: quantity === 0 ? "Add to order" : "Modify order",
@@ -169,6 +178,13 @@ class MenuPage extends React.Component<IProps, IState> {
         modalSecondButtonDisable: pq === prevState.modalOriginalQuantity,
       }
     })
+  }
+
+  modifyModalComment(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    this.setState({
+      modalComment: event.target.value,
+      modalSecondButtonDisable: false
+    });
   }
 
   handleCloseModal(event: React.ChangeEvent<{}>) {
@@ -232,10 +248,9 @@ class MenuPage extends React.Component<IProps, IState> {
       s.push(t);
     });
 
-    socket.emit('order');
     const client = new Client();
     const m: ResponseMessageModel | null = await client.createOrder(s);
-    
+
     if (m) {
       history.push('/waiting');
     }
@@ -250,6 +265,7 @@ class MenuPage extends React.Component<IProps, IState> {
       value: m?.menu[0].name ? m?.menu[0].name : "",
     });
   }
+  
 
   // This will be called when there is a state change
   componentDidUpdate() {
@@ -267,7 +283,7 @@ class MenuPage extends React.Component<IProps, IState> {
             </div>
           }
           second={
-            <div style={{maxHeight: '100%', overflow: 'auto'}}>
+            <div style={{ maxHeight: '100%', overflow: 'auto' }}>
               <AppBar position="static">
                 <Tabs
                   value={this.state.value}
@@ -293,7 +309,7 @@ class MenuPage extends React.Component<IProps, IState> {
           first={
             <div>
               <Button className={classes.assistancebutton} variant="contained" color="primary">Help</Button>
-              <Button className={classes.gobackbutton} variant="contained" color="secondary" onClick={() => this.goToTable()}>Go back</Button>
+              <Button className={classes.gobackbutton} variant="contained" color="secondary" onClick={() => this.goBack()}>Go back</Button>
             </div>
           }
           second={
@@ -312,6 +328,9 @@ class MenuPage extends React.Component<IProps, IState> {
                           </Typography>
                           <Typography variant="body2" component="p">
                             ${order.item.price} x {order.quantity} = <b>${order.item.price * order.quantity}</b>
+                          </Typography>
+                          <Typography variant="body2" component="p">
+                            {order.comment}
                           </Typography>
                         </CardContent>
                       </Card>
@@ -353,8 +372,10 @@ class MenuPage extends React.Component<IProps, IState> {
 
               {/* Second col */}
               <Grid item xs={8}>
-                insert image here
-                    </Grid>
+                <div className={classes.imageboxmodaldiv}>
+                    <img src={this.state.modal?.image_url} className={classes.imageboxmodal} />
+                </div>
+              </Grid>
               <Grid item xs={4}>
                 <Typography variant="h6">Ingredients</Typography>
                 <FormControl>
@@ -389,7 +410,7 @@ class MenuPage extends React.Component<IProps, IState> {
 
               {/* Last col */}
               <Grid item xs={7}>
-                <TextField id="standard-basic" label="Comment" />
+                <TextField id="standard-basic" label="Comment" onChange={(e) => this.modifyModalComment(e)} defaultValue={this.state.modalComment} />
               </Grid>
               <Grid item xs={5}>
                 <Button variant="contained" onClick={this.handleCloseModal}>Cancel</Button>
@@ -426,6 +447,7 @@ class MenuPage extends React.Component<IProps, IState> {
                         <TableCell>Name</TableCell>
                         <TableCell>Quantity x Price</TableCell>
                         <TableCell>Price</TableCell>
+                        <TableCell>Comment</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -437,6 +459,7 @@ class MenuPage extends React.Component<IProps, IState> {
                               <TableCell>{it.item.name}</TableCell>
                               <TableCell>{it.item.price} x {it.quantity}</TableCell>
                               <TableCell>{it.quantity * it.item.price}</TableCell>
+                              <TableCell>{it.comment}</TableCell>
                             </TableRow>
                           )
                         })

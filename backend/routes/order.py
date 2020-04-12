@@ -19,8 +19,8 @@ class Order(Resource):
         # Gets lists of ordered items and Total Bill
 
         order_id = get_jwt_claims().get('order')
-        table_id = db.get_table_id(order_id)
-        item_order = db.get_ordered_items_customer(table_id)
+
+        item_order = db.get_ordered_items_customer(order_id)
 
         total = 0
 
@@ -47,14 +47,13 @@ class Order(Resource):
         num_of_orders = len(new_order.get('order'))
 
         order_id = get_jwt_claims().get('order')
+        table_id = db.get_table_id(order_id)
 
         if(order_id is None):
             order_id = db.insert_order(table_id)
 
         print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
-        order_id = get_jwt_claims().get('order')
-        table_id = db.get_table_id(order_id)
 
         socket.emit('order', { 'table': table_id }, room='staff2')
 

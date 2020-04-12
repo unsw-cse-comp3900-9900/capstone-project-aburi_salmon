@@ -27,6 +27,7 @@ export type Item = {
   ingredients: Array<Ingredient>,
   price: number,
   visible: boolean,
+  image_url: string,
 }
 
 export type Categories = {
@@ -65,7 +66,8 @@ export type ItemOrder = {
   item_id: number,
   quantity: number,
   price: number,
-  status: Status
+  status: Status,
+  comment: string,
 }
 
 export type Order = {
@@ -144,4 +146,8 @@ export type ItemId = {
 
 export type IngredientList = {
   ingredients: Array<Ingredient>
+}
+
+export type WholeItemList = {
+  items: Array<Item>
 }

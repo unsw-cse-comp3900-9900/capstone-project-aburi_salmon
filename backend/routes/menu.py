@@ -73,6 +73,9 @@ class MenuItem(Resource):
         if (edit.get('visible')):
             editStatement += "visible = %s, "
             editArr.append(edit.get('visible'))
+        if (edit.get('image_url')):
+            editStatement += "image_url = %s, "
+            editArr.append(edit.get('image_url'))
 
         editStatement = editStatement.strip(', ') + ' WHERE id = %s'
         editArr.append(id)

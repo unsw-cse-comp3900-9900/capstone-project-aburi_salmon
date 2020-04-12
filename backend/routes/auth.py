@@ -213,10 +213,16 @@ class CustomerLogoutSession(Resource):
         
         # From the order_id, check if there is any ongoing order
         # If there is an active order (unpaid), can't delete
-        order = db.get_order_id(order_id)
+        item_order = db.get_ordered_items_customer(order_id)
 
-        # I don't know about this. but this is absolutely terrible
-        # the user won't be able to tell whether the current order is paid or not
-        # based on order_id solely
-        pass
+        if len(item_order) != 0:
+            abort(400, 'Existing order is not paid')
+        
+        db.set_table_free_order_id(order_id)
+
+        response = jsonify({
+            'status': 'success'
+        })
+        unset_jwt_cookies(response)
+        return response
 
