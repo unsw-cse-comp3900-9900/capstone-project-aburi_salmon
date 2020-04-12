@@ -5,7 +5,7 @@ from flask_jwt_extended import get_jwt_claims, jwt_required
 from app import api, db
 import model.response_model as response_model
 import model.request_model as request_model
-
+from util.socket import socket
 
 table = api.namespace('table', description='Order Route')
 
@@ -124,6 +124,8 @@ class Assistance(Resource):
         if (not db.set_assistance(table_id, assistance)):
             abort(400, 'Something went wrong')
 
+        socket.emit('assistance', { 'table': table_id }, room='staff1')
+        #socket.emit('assistance', room='staff3')
         return jsonify({ 'status': 'success' })
 
         

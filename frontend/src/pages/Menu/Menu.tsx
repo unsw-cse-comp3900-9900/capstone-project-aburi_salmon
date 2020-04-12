@@ -265,6 +265,7 @@ class MenuPage extends React.Component<IProps, IState> {
       value: m?.menu[0].name ? m?.menu[0].name : "",
     });
   }
+  
 
   // This will be called when there is a state change
   componentDidUpdate() {

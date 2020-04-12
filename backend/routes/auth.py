@@ -4,6 +4,8 @@ import re
 from uuid import uuid4
 from flask import request, jsonify
 from flask_restx import Resource, abort, reqparse, fields
+from flask_socketio import join_room, leave_room
+from util.socket import socket
 from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies, jwt_required, get_jwt_identity, get_jwt_claims
 
 import config
@@ -44,6 +46,7 @@ class Login(Resource):
             'status': 'success'
         })
         set_access_cookies(response, access_token)
+
         return response
 
 @auth.route("/logout", strict_slashes=False)
@@ -189,7 +192,8 @@ class CustomerSession(Resource):
 
         identity = User('Customer', None, order_id)
         access_token = create_access_token(identity=identity)
-
+        socket.emit('table')
+        
         response = jsonify({
             'status': 'success'
         })

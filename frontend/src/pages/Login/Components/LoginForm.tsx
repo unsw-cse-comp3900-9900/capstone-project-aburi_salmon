@@ -56,6 +56,8 @@ class PureLogin extends React.Component<{}, IState> {
         this.setState({ isOpen: true });
         this.setState({ alertMessage: "You have successfully logged in" });
         this.setState({ severity: 'success' });
+        console.log(`${localStorage.getItem('username')} just logged in`);
+        console.log('attempting to join room');
     }
 
     setError(message: string) {

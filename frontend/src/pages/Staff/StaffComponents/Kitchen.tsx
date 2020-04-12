@@ -7,6 +7,7 @@ import { ListItem, Menu, ItemList, ResponseMessage } from './../../../api/models
 import { Client } from './../../../api/client';
 import { StaticMenu} from './Menu/StaticMenu';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import { socket } from '../../../api/socketio';
 import {styles} from './styles';
 
 export interface IProps extends WithStyles<typeof styles> { }
@@ -133,6 +134,7 @@ class Kitchen extends React.Component<IProps, IState>{
             }
         }   
         this.removeItem(itemId, 1);
+        socket.emit('cooking');
     }
 
     async moveToReady(itemId: number, item: ListItem){

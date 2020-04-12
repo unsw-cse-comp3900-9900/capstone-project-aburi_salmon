@@ -2,12 +2,16 @@ import React from 'react';
 import { Route, Router, Switch } from "react-router-dom";
 import './App.css';
 import { MuiThemeProvider } from "@material-ui/core/styles";
-
 import history from './history';
 import { Home, Login, Staff, Table, Menu, Waiting } from "./pages";
 import { theme } from './theme/theme';
+import { connectToSocket } from './api/socketio';
 
 class App extends React.Component {
+  componentDidMount() {
+    connectToSocket(this);
+  }
+
   render() {
     // I couldn't put MuiThemeProvider if this file is moved to a .tsx file
     return (

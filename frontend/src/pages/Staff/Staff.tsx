@@ -5,6 +5,8 @@ import { KitchenStaff } from './../Staff/StaffComponents/Kitchen';
 import { WaitStaff } from './../Staff/StaffComponents/Wait';
 import { ManageStaff } from './../Staff/StaffComponents/Manage';
 import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
+import { socket } from '../../api/socketio';
+//import { PopupState } from 'material-ui-popup-state/core';
 import {styles} from './styles';
 
 
@@ -23,10 +25,11 @@ class StaffPage extends React.Component<IProps, IState>{
         };
     }
 
-    logOut() {
+    async logOut() {
+        socket.emit('leave');
         localStorage.setItem('username', "");
         localStorage.setItem('staff', 'false');
-        fetch("http://localhost:5000/auth/logout", {
+        await fetch("http://localhost:5000/auth/logout", {
             method: 'POST',
             credentials: 'include',
             mode: 'cors'
