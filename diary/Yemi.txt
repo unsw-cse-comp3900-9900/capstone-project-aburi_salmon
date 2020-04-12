@@ -61,7 +61,7 @@ fixing all issues and I'll be finishing off the edit menu epic.
 I finished edit menu and started working on testing and debugging, and cleaning code.
 
 Week 9
-
+Notifications started working.
 
 
 

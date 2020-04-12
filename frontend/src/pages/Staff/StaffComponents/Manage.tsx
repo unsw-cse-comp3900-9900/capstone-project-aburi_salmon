@@ -50,7 +50,7 @@ class Manage extends React.Component<IProps, IState>{
     constructor(props: any) {
         super(props);
         this.state = {
-            currPage: "Menu",
+            currPage: "Tables",
             queueList: null, //listType === 1
             cookingList: null, //listType === 2
             readyList: null, //listType === 3
@@ -98,6 +98,11 @@ class Manage extends React.Component<IProps, IState>{
         const queue: ItemList | null = await client.getListItem(1);
         const cooking: ItemList | null = await client.getListItem(2);
         const ready: ItemList | null = await client.getListItem(3);
+        this.setState({
+            queueList: queue,
+            cookingList: cooking,
+            readyList: ready,
+        });
 
         //assistance
         const t: Tables | null = await client.getTables();
@@ -110,6 +115,7 @@ class Manage extends React.Component<IProps, IState>{
             )
             this.setState({ assistance: temp });
         }
+        this.setState({tables: t});
 
         //manage orders
         const served: ItemList | null = await client.getListItem(4);
@@ -127,8 +133,11 @@ class Manage extends React.Component<IProps, IState>{
             temp1 = temp1.concat(served?.itemList);
         }
 
+        this.setState({orderRealData: temp1});
+
         //manage staff
         const allStaff: AllStaff | null = await client.getStaff();
+        this.setState({staffRealData: allStaff});
 
         //item stats
         const itemStats: AllItemStats | null = await client.getAllStats();
@@ -138,15 +147,6 @@ class Manage extends React.Component<IProps, IState>{
         if (itemStats?.total_revenue !== undefined) {
             this.setState({ trevenue: itemStats?.total_revenue })
         }
-
-        this.setState({
-            queueList: queue,
-            cookingList: cooking,
-            readyList: ready,
-            tables: t,
-            orderRealData: temp1,
-            staffRealData: allStaff,
-        });
 
         //menu
         const menu: Menu | null = await client.getMenu();
@@ -166,8 +166,36 @@ class Manage extends React.Component<IProps, IState>{
         this.setState({ ingredientsList: ingred });
     }
 
+    async updateOrders(){
+        const client = new Client();
+        const queue: ItemList | null = await client.getListItem(1);
+        const cooking: ItemList | null = await client.getListItem(2);
+        const ready: ItemList | null = await client.getListItem(3);
+        const served: ItemList | null = await client.getListItem(4);
+        var temp1: Array<ListItem> = [];
+        if (queue?.itemList !== undefined) {
+            temp1 = temp1.concat(queue?.itemList);
+        }
+        if (cooking?.itemList !== undefined) {
+            temp1 = temp1.concat(cooking?.itemList);
+        }
+        if (ready?.itemList !== undefined) {
+            temp1 = temp1.concat(ready?.itemList);
+        }
+        if (served?.itemList !== undefined) {
+            temp1 = temp1.concat(served?.itemList);
+        }
+        this.setState({
+            orderRealData: temp1,
+            queueList: queue,
+            cookingList: cooking,
+            readyList: ready,
+        });
+
+    }
+
     async updateAssist() {
-        const client = new Client()
+        const client = new Client();
         const t: Tables | null = await client.getTables();
         const a: AssistanceTables | null = await client.getAssistanceTable();
         var temp: Array<number> = [];
@@ -205,6 +233,14 @@ class Manage extends React.Component<IProps, IState>{
         const client = new Client();
         const ingred: Array<Ingredient> | null = await client.getIngredients();
         this.setState({ ingredientsList: ingred });
+    }
+
+    async updateStaff(){
+        const client = new Client();
+        const temp: AllStaff | null = await client.getStaff();
+        this.setState({
+            staffRealData: temp,
+        });
     }
 
     changeMenuValue(newValue: string) {
@@ -279,13 +315,6 @@ class Manage extends React.Component<IProps, IState>{
         }
     }
 
-    async updateStaff(){
-        const client = new Client();
-        const temp: AllStaff | null = await client.getStaff();
-        this.setState({
-            staffRealData: temp,
-        });
-    }
 
     displayNav() {
         return (

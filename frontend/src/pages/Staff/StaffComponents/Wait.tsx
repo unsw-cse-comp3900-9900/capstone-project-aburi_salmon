@@ -20,6 +20,7 @@ interface IState{
     isOpen: boolean,
     lastClicked: number,
     resetOpen: boolean,
+    preventDups: ListItem | null,
 
     //initialise menu
     menu: Menu | null;
@@ -42,6 +43,7 @@ class Wait extends React.Component<IProps, IState>{
             isOpen: false,
             lastClicked: -1,
             resetOpen: false,
+            preventDups: null,
 
             menu: null,
             menuvalue: '',
@@ -104,6 +106,32 @@ class Wait extends React.Component<IProps, IState>{
         });
     }
 
+    async updateTables(){
+        const client = new Client();
+        const t: Tables | null = await client.getTables();
+        const a: AssistanceTables | null = await client.getAssistanceTable();
+        var temp: Array<number> = [];
+
+        if (a?.tables !== undefined) {
+            a?.tables.forEach(it => {
+                temp.push(it.table_id);
+            }
+            )
+            this.setState({ assistance: temp });
+        }
+        this.setState({tables: t});
+    }
+
+    async updateOrders(){
+        const client = new Client();
+        const toServe: ItemList | null = await client.getListItem(3);
+        const served: ItemList | null = await client.getListItem(4);
+        this.setState({
+            toServeList: toServe,
+            servedList: served,
+        });
+    }
+
     displayCont(){
         const { classes } = this.props;
         if (this.state.currPage === "Orders") {
@@ -152,8 +180,9 @@ class Wait extends React.Component<IProps, IState>{
 
     async moveToServed(itemId: number, item: ListItem) {
         var tempList = this.state.servedList;
-        if (tempList !== null) {
+        if (tempList !== null && this.state.preventDups !== item) {
             const tempArray = tempList?.itemList.concat(item);
+            this.setState({preventDups: item});
             var ret: ItemList = {
                 itemList: tempArray,
             }
@@ -169,8 +198,9 @@ class Wait extends React.Component<IProps, IState>{
 
     async moveToToServe(itemId: number, item: ListItem){
         var tempList = this.state.toServeList;
-        if (tempList !== null) {
+        if (tempList !== null && item !== this.state.preventDups) {
             const tempArray = tempList?.itemList.concat(item);
+            this.setState({preventDups: item});
             var ret: ItemList = {
                 itemList: tempArray,
             }
