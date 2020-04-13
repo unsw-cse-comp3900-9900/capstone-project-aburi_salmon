@@ -348,6 +348,29 @@ export class Client {
 
   }
 
+  async requestBill() {
+    try {
+      const r: Response = await fetch(apiUrl + '/table/bill', {
+        method: 'PUT',
+        credentials: 'include',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(
+          {
+            bill: true,
+          }
+        ),
+      });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
   async updateOrderStatus(itemId: number, newStatus: number) {
     try {
       const r: Response = await fetch(apiUrl + '/order/item/status/' + itemId, {
