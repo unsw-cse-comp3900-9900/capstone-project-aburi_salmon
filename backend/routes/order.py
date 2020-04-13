@@ -233,3 +233,22 @@ class OrdersByStatus(Resource):
             abort(400, 'Invalid request')
 
         return jsonify({'itemList' : itemlist})
+
+@order.route('/time', strict_slashes=False)
+class OrderTime(Resource):
+    @jwt_required
+    @order.response(200, 'Success')
+    @order.response(400, 'Invalid request')
+    @order.expect(request_model.order_time_model)
+    def post(self):
+
+        # Gets estimated order time
+        # Input = order_id
+
+        order_id = request.get_json().get('order_id')
+
+        time = db.get_order_time(order_id)
+
+        return { 
+            'estimated_time': time
+        }
