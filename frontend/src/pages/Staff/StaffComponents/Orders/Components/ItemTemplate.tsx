@@ -16,6 +16,12 @@ export interface IProps extends WithStyles<typeof styles> {
 
 class ItemCont extends React.Component<IProps, {}>{
 
+    displayComment(){
+        if (this.props.item?.comment !== ''){
+            return <div><b>Comment:</b> {this.props.item?.comment}</div>
+        }
+    }
+
     render() {
         const { classes } = this.props;
         if (this.props.realId === this.props.lastClicked){
@@ -24,7 +30,8 @@ class ItemCont extends React.Component<IProps, {}>{
                     <b>ItemID:</b> {this.props.item.id} <br></br>
                     <b>Item Name:</b> {this.props.item.itemName} <br></br>
                     <b>Amount:</b> {this.props.item.quantity} <br></br>
-                    <b>Table Number:</b> {this.props.item.table + 1}
+                    <b>Table Number:</b> {this.props.item.table + 1} <br></br>
+                    {this.displayComment()}
                 </button>
             );
         } else {
@@ -33,7 +40,8 @@ class ItemCont extends React.Component<IProps, {}>{
                     <b>ItemID:</b> {this.props.item.id} <br></br>
                     <b>Item Name:</b> {this.props.item.itemName} <br></br>
                     <b>Amount:</b> {this.props.item.quantity} <br></br>
-                    <b>Table Number:</b> {this.props.item.table + 1}
+                    <b>Table Number:</b> {this.props.item.table + 1} <br></br>
+                    {this.displayComment()}
                 </button>
             );
         }

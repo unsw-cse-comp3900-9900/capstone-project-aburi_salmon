@@ -53,6 +53,7 @@ export type ListItem = {
   id: number,
   status_id: number,
   table: number,
+  comment: string,
 }
 
 export type ItemList = {
