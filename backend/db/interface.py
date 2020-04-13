@@ -150,7 +150,7 @@ class DB:
         return dict(
             username=rows[0][0],
             name=rows[0][1],
-            staff_type_id=rows[0][2]
+            staff_type_id=rows[0][2],
         )
 
     def update_staff(self, username, name, staff_type_id):
@@ -774,3 +774,5 @@ class DB:
             print('YEOLO')
             return None
         return rows[0]
+
+    
