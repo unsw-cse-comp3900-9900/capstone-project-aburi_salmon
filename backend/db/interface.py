@@ -630,6 +630,7 @@ class DB:
             FROM item_order io JOIN item ON (io.item_id = item.id)
                                JOIN "order" o ON (o.id = io.order_id)
             WHERE io.status_id = %s
+            ORDER BY io.id
             """,
             [status])
 
