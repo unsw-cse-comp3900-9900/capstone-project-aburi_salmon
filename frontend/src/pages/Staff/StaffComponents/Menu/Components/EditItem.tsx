@@ -82,24 +82,24 @@ class EditItem extends React.Component<IProps, IState>{
             const r: ResponseMessage | null = await client.editItem(name, description, price, true ,this.props.item.id, image_url);
             if (r === null) {
                 this.props.alert(true, 'error', "Something went wrong");
-            } else if (r?.status === "success") {
+            } else {//if (r?.status === "success") {
                 this.props.alert(true, 'success', 'Successfully edited item');
                 this.props.setIsOpen(false);
                 this.props.updatemenu();
-            } else {
+            }/* else {
                 this.props.alert(true, 'error', r.status);
-            }
+            }*/
         } else { //if adding item
             const r: ResponseMessage | null = await client.addItem(name, description, price, true, image_url);
             if (r === null) {
                 this.props.alert(true, 'error', "Something went wrong");
-            } else if (r?.status === "success") {
+            } else {//if (r?.status === "success") {
                 this.props.alert(true, 'success', 'Successfully added item');
                 this.props.setIsOpen(false);
                 this.props.updateitems();
-            } else {
+            } /*else {
                 this.props.alert(true, 'error', r.status);
-            }
+            }*/
         }
     }
 

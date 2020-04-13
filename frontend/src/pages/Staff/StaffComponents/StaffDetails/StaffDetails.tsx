@@ -148,7 +148,7 @@ class StaffDetails extends React.Component<IProps, IState>{
             <TableContainer component={Paper} className={classes.tableCont}>
                 <DeleteDialog isOpen={this.state.deleteOpen} setIsOpen={this.deleteIsOpen} deleteStaff={this.deleteStaff} />
                 <ChangeStaffType isOpen={this.state.resetOpen} setIsOpen={this.resetIsOpen} changeStaffType={this.changeStaffType} username={this.state.selectedStaff.username}/>
-                <ChangeTableNo isOpen={this.state.tableOpen} setIsOpen={this.tableNoIsOpen} />
+                {/*<ChangeTableNo isOpen={this.state.tableOpen} setIsOpen={this.tableNoIsOpen} />*/}
                 <ResetRegist isOpen={this.state.resetKeyOpen} setIsOpen={this.resetKeyOpen} />
                 <Table className={classes.table} aria-label="customized table" size="small" stickyHeader={true}>
                     <TableHead>
@@ -205,7 +205,7 @@ class StaffDetails extends React.Component<IProps, IState>{
                 </div>
                 <div className={this.props.classes.wrapper2}>
                     <Button color="primary" className={this.props.classes.registBut} onClick={() => this.setState({ resetKeyOpen: true })}>Change Registration Key</Button>
-                    <Button color="primary" className={this.props.classes.tableBut} onClick={() => this.setState({ tableOpen: true })}>Change No. of Tables</Button>
+        {/*<Button color="primary" className={this.props.classes.tableBut} onClick={() => this.setState({ tableOpen: true })}>Change No. of Tables</Button>*/}
                 </div>
             </div>
         );
