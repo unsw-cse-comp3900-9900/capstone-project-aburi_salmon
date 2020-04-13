@@ -1,22 +1,31 @@
-import { Tables, Menu, ItemList, Order, Item,  ItemQuantityPair, CreateOrder, ResponseMessage, AddItemToOrderResponseMessage, OrderItemQuantityPair, TableInfo, AssistanceTables, AllStaff, AllItemStats, Ingredient, WholeItemList } from "./models";
+import { Tables, Menu, ItemList, Order, Item, StaffLogin,  ItemQuantityPair, CreateOrder, ResponseMessage, AddItemToOrderResponseMessage, OrderItemQuantityPair, TableInfo, AssistanceTables, AllStaff, AllItemStats, Ingredient, WholeItemList, StaffInfo } from "./models";
 
 const apiUrl = "http://localhost:5000";
 
 export class Client {
 
-  login(username: string, password: string) {
-    return fetch(apiUrl + '/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({
-        username: username,
-        password: password
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      credentials: 'include',
-      mode: 'cors'
+  async login(username: string, password: string) {
+    try{
+      const r: Response = await fetch(apiUrl + '/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({
+          username: username,
+          password: password
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        mode: 'cors'
     });
+
+      const m: StaffLogin | null = await r.json();  
+      return m;
+
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   }
 
   async selectTable(table: number) {
