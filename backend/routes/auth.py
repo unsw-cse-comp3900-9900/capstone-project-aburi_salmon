@@ -40,10 +40,14 @@ class Login(Resource):
         # Create identity for session, by using User object with role = 1 and table = None
         # Change this so that the role follows the staff_type_id of the user
         identity = User(username, db.get_profile(username).get('staff_type_id'), None)
+        staff_type =  db.get_profile(username).get('staff_type_id')
         access_token = create_access_token(identity=identity)
-
+        
+        print('the username is ' + username)
+        print('stafftype is ' + str(staff_type))
         response = jsonify({
-            'status': 'success'
+            'status': 'success', 
+            'staffype' : staff_type
         })
         set_access_cookies(response, access_token)
 
