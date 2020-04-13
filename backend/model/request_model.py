@@ -132,3 +132,7 @@ recommendations_model = api.schema_model('recommendations_model', {
         }
     }
 })
+
+order_time_model = api.model('order_time_model', {
+    "order_id": fields.Integer(description="order_id")
+})

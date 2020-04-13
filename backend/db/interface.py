@@ -786,3 +786,23 @@ class DB:
         return rows[0]
 
     
+    def get_order_time(self, order_id):
+
+        # Calculate estimated order time
+        # Assume time taken is the sum of cooking time of each item,
+        # ignoring quantity, assuming the kitchen staff cooks same items all at the same time.
+        print('Getting time')
+        rows = self.__query('SELECT io.quantity, i.time FROM "order" o, item i, item_order io WHERE o.id = io.order_id AND io.item_id = i.id AND o.id = %s', [order_id])
+        
+        if (not rows):
+            return None
+
+        total_time = 0
+        time = 0
+        for row in rows:
+            time = row[1]
+            total_time = total_time + time
+
+        print(total_time)
+
+        return total_time
