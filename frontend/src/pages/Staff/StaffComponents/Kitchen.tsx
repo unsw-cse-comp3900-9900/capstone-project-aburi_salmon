@@ -7,7 +7,7 @@ import { ListItem, Menu, ItemList, ResponseMessage } from './../../../api/models
 import { Client } from './../../../api/client';
 import { StaticMenu} from './Menu/StaticMenu';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
-import { socket, connectToSocket } from '../../../api/socketio';
+import { socket, kitchenSocket } from '../../../api/socketio';
 import {styles} from './styles';
 
 export interface IProps extends WithStyles<typeof styles> { }
@@ -49,7 +49,7 @@ class Kitchen extends React.Component<IProps, IState>{
 
     async componentDidMount() {
         this.updateOrders();
-        connectToSocket(this);
+        kitchenSocket(this);
     }
 
     async updateOrders(){

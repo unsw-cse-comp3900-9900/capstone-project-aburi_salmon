@@ -9,6 +9,7 @@ import { Alert } from '@material-ui/lab';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import {StaticMenu } from './Menu/StaticMenu';
 import {styles} from './styles';
+import { manageWaitSocket } from '../../../api/socketio';
 
 export interface IProps extends WithStyles<typeof styles> { }
 
@@ -79,6 +80,7 @@ class Wait extends React.Component<IProps, IState>{
     }
 
     async componentDidMount() {
+        manageWaitSocket(this);
         const client = new Client();
         const toServe: ItemList | null = await client.getListItem(3);
         const served: ItemList | null = await client.getListItem(4);

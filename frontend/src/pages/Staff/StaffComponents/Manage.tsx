@@ -8,6 +8,7 @@ import ManageOrders from './Orders/ManageOrders';
 import ItemStats from './Analytics/ItemStats';
 import {EditMenu} from './Menu/EditMenu';
 import {styles} from './styles';
+import { manageWaitSocket } from '../../../api/socketio';
 
 export interface IProps extends WithStyles<typeof styles> { }
 
@@ -94,6 +95,7 @@ class Manage extends React.Component<IProps, IState>{
     }
 
     async componentDidMount() {
+        manageWaitSocket(this);
         const client = new Client();
         const queue: ItemList | null = await client.getListItem(1);
         const cooking: ItemList | null = await client.getListItem(2);
@@ -150,7 +152,7 @@ class Manage extends React.Component<IProps, IState>{
 
         //menu
         const menu: Menu | null = await client.getMenu();
-        if (menu !== null && menu?.menu.length !== undefined) {
+        if (menu !== null && menu?.menu !== undefined && menu?.menu.length !== undefined) {
             this.setState({
                 menu: menu,
                 menuvalue: menu?.menu[0].name ? menu?.menu[0].name : "",
