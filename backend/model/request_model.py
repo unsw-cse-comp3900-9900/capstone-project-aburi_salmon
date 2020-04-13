@@ -66,7 +66,8 @@ delete_order_model = api.model('delete_order_model', {
 })
 
 registration_model = api.model('registration_model', {
-    "type": fields.Integer(description='staff_type id')
+    "type": fields.String(description='Name of staff type'),
+    "key": fields.String(description='new registration key for that staff type')
 })
 
 menu_item_model = api.model('menu_item_model', {

@@ -102,21 +102,27 @@ class DB:
 
         return rows[0][1]
         
-    def add_registration_key(self, registration_key, staff_type):
-        self.__insert(
-            'INSERT INTO staff_registration (registration_key, staff_type, used) VALUES (%s, %s, %s);',
-            [registration_key, staff_type, False]
+    def set_registration_key(self, registration_key, staff_type):
+
+        self.__update(
+            """
+                UPDATE staff_registration
+                SET registration_key = %s
+                FROM staff_type
+                WHERE staff_type.id = staff_registration.staff_type AND staff_type.title = %s;
+            """,
+            [registration_key, staff_type]
         )
         return True
 
     def get_registration_keys(self, staff_type):
         if (staff_type):
             keys = self.__query(
-                'SELECT * FROM staff_registration WHERE staff_type = %s',
+                'SELECT registration_key, title, id FROM staff_registration sr JOIN staff_type st ON (sr.staff_type = st.id) WHERE st.id = %s',
                 [staff_type]
             )
         else:
-           keys = self.__query('SELECT * FROM staff_registration', [])
+           keys = self.__query('SELECT registration_key, title, id FROM staff_registration sr JOIN staff_type st ON (sr.staff_type = st.id)')
 
         if keys is None:
             return []
@@ -124,8 +130,8 @@ class DB:
         return [
             {
                 'key': key[0],
-                'active': key[2],
-                'staff_type': key[1]
+                'staff_name': key[1],
+                'staff_id': key[2]
             } for key in keys
         ]
 

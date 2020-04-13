@@ -28,6 +28,30 @@ export class Client {
     }
   }
 
+  async changeRegistrationKey(type: string, key: string) {
+    try {
+      const r: Response = await fetch(apiUrl + '/auth/registration', {
+        method: 'PUT',
+        body: JSON.stringify({
+          type,
+          key,
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        mode: 'cors'
+      });
+
+      const m: ResponseMessage = await r.json();
+
+      return m;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
   async selectTable(table: number) {
     try {
       const r: Response = await fetch(apiUrl + '/auth/customer/login', {
