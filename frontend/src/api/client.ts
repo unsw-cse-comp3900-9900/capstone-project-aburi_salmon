@@ -692,7 +692,7 @@ export class Client {
     }
   }
 
-  async removeItemFromCat(catId: number | undefined, itemId: number | undefined){
+  async removeItemFromCat(itemId: number | undefined, catId: number | undefined){
     try {
       const r: Response = await fetch(apiUrl + '/menu/category/' + catId + '/item/' + itemId, {
       method: 'DELETE',

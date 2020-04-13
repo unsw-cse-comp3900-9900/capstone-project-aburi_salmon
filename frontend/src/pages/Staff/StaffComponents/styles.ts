@@ -40,6 +40,7 @@ export const styles = (theme: Theme) =>
       marginRight: theme.spacing(2),
       marginBottom: theme.spacing(2),
       //width: '100%'
+      overflow: 'auto',
       minWidth: '800px',
     },
     helpIcon: {

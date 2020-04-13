@@ -21,6 +21,7 @@ import EditItem from './Components/EditItem';
 import Delete from './Components/Delete';
 import Ingredients from './Components/Ingredients';
 import EditIngredients from './Components/EditIngredients';
+import Help from './Components/Help';
 import AddItemCat from './Components/AddItemCat';
 import AlertSnackbar from './../../../AlertSnackbar';
 
@@ -49,6 +50,7 @@ interface IState {
   ingredDialog: boolean,
   editIngredDialog: boolean,
   addItemCatDialog: boolean,
+  helpDialog: boolean,
 
   currItem: ItemModel,
   currCat: CategoriesModel | null,
@@ -76,6 +78,12 @@ class EditMenuPage extends React.Component<IProps, IState> {
       visible: true,
       image_url: '',
     }
+    if (this.props.menu !== null){
+      var tempCurCat: CategoriesModel | null = this.props.menu?.menu[0];
+    } else {
+      var tempCurCat: CategoriesModel | null = null;
+    }
+    
     this.state = {
       //displaying menu
       openModal: false,
@@ -88,9 +96,10 @@ class EditMenuPage extends React.Component<IProps, IState> {
       ingredDialog: false,
       editIngredDialog: false,
       addItemCatDialog: false,
+      helpDialog: false,
 
       currItem: temp,
-      currCat: null,
+      currCat: tempCurCat,
       isEdit: false,
       isCat: false,
       isDel: false,
@@ -102,6 +111,10 @@ class EditMenuPage extends React.Component<IProps, IState> {
       alertMessage: "What???"
 
     }
+
+    if (this.props.menu !== null){
+    }
+
 
     // Displaying menu
     this.handleTabChange = this.handleTabChange.bind(this);
@@ -116,6 +129,7 @@ class EditMenuPage extends React.Component<IProps, IState> {
     this.editIngredDialogIsOpen = this.editIngredDialogIsOpen.bind(this);
     this.addItemCatIsOpen = this.addItemCatIsOpen.bind(this);
     this.modalIsOpen = this.modalIsOpen.bind(this);
+    this.helpDialogIsOpen = this.helpDialogIsOpen.bind(this);
 
     //alert
     this.alertDialogIsOpen = this.alertDialogIsOpen.bind(this);
@@ -154,9 +168,14 @@ class EditMenuPage extends React.Component<IProps, IState> {
     this.setState({ alertDialog: isOpen });
   }
 
+  helpDialogIsOpen(isOpen: boolean){
+    this.setState({helpDialog: isOpen});
+  }
+
   setAlert(isOpen: boolean, severity: "success" | "error", alertMessage: string) {
     this.setState({ alertDialog: isOpen, severity: severity, alertMessage: alertMessage });
   }
+
 
   createItemIngredients(item: Item) {
     var temp: Array<number> = [];
@@ -252,6 +271,8 @@ class EditMenuPage extends React.Component<IProps, IState> {
         <AlertSnackbar isOpen={this.state.alertDialog} severity={this.state.severity} alertMessage={this.state.alertMessage}
           changeState={this.alertDialogIsOpen} />
 
+          <Help isOpen={this.state.helpDialog} setIsOpen={this.helpDialogIsOpen} />
+
         <div className={classes.wrapper}>
           <AppBar position="static">
             <Tabs
@@ -293,6 +314,9 @@ class EditMenuPage extends React.Component<IProps, IState> {
 
           <Button variant='outlined' color='secondary' onClick={() => { this.setState({ deleteDialog: true, isDel: true }) }}
             className={classes.addFloatRight}>Delete Item</Button>
+          <Button variant='outlined' onClick={() => { this.setState({ helpDialog: true }) }}
+            className={classes.addFloatRight}>Help</Button>
+
 
         </div>
 

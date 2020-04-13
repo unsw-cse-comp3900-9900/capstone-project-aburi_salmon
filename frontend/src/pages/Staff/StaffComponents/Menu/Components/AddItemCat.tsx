@@ -35,6 +35,8 @@ class AddItemCat extends React.Component<IProps, IState>{
     //sends info to server
     async handleClick(){
         const client = new Client();
+        console.log(this.state.currCat);
+        console.log(this.state.currItem);
         const r: ResponseMessage | null= await client.addItemToCat(0,this.state.currCat, this.state.currItem);
         if (r === null) {
             this.props.alert(true, 'error', "Something went wrong");
@@ -47,10 +49,20 @@ class AddItemCat extends React.Component<IProps, IState>{
         }
     }
 
+    whenOpened(){
+        if (this.props.wholemenu !== null){
+            this.setState({currCat: this.props.wholemenu.menu[0].id});
+        }
+        if (this.props.allItems !== null) {
+            this.setState({currItem: this.props.allItems.items[0].id});
+        }
+    }
+
     render() {
         return (
             <Dialog
                 open={this.props.isOpen}
+                onEnter={() => this.whenOpened()}
                 onClose={() => this.props.setIsOpen(false)}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
