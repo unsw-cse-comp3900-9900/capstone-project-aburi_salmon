@@ -105,8 +105,8 @@ class Ingredients extends React.Component<IProps, IState>{
     }
 
     componentDidUpdate( prevProps: any,prevState: any){
-        console.log(prevProps.itemIngredients);
-        console.log(this.props.itemIngredients);
+        //console.log(prevProps.itemIngredients);
+        //console.log(this.props.itemIngredients);
         if (prevProps.itemIngredients !== this.props.itemIngredients){
             if (this.props.itemIngredients.length !== 0 ){
                 this.whenOpened();

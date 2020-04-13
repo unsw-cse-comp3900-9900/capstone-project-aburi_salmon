@@ -66,3 +66,110 @@ export const connectToSocket = (App: App) => {
     });
 
 };
+
+export const kitchenSocket = (App: any) => {
+    socket = io('http://localhost:5000');
+
+    socket.on('connect', () => {
+        console.log('Connected to socket');
+        console.log('Attempting to join a room...');
+        socket.emit('join');
+    });
+
+    socket.on('join', ({ room }: RoomObject) => {
+        console.log(`Joined room ${room}`);
+    });
+
+    socket.on('leave', () => {
+        console.log(`Left room ${App.state.room}`);
+    });
+
+    socket.on('order', ({ table }: TableObject) => {
+        console.log(`Table ${table} has placed an order`);
+        App.updateOrders();
+    });
+
+    socket.on('modify', ({ modifications }: TableObject) => {
+        console.log(`${modifications}`);
+        App.updateOrders();
+    });
+
+    socket.on('delete', ({ deletions }: TableObject) => {
+        console.log(`${deletions}`);
+        App.updateOrders();
+    });
+
+
+    socket.on('cooking', () => {
+        console.log(`Item is cooking`);
+        App.updateOrders();
+    });
+
+    socket.on('ready', () => {
+        console.log(`Item is ready to serve`);
+        App.updateOrders();
+    });
+
+    socket.on('served', () => {
+        console.log(`Item has been served`);
+        App.updateOrders();
+    })
+
+};
+
+export const manageWaitSocket = (App: any) => {
+    socket = io('http://localhost:5000');
+
+    socket.on('connect', () => {
+        console.log('Connected to socket');
+        console.log('Attempting to join a room...');
+        socket.emit('join');
+    });
+
+    socket.on('join', ({ room }: RoomObject) => {
+        console.log(`Joined room ${room}`);
+        App.updateAssist();
+    });
+
+    socket.on('leave', () => {
+        console.log(`Left room ${App.state.room}`);
+        App.updateAssist();
+    });
+
+    socket.on('assistance', ({ table }: TableObject) => {
+        console.log(`Table ${table} is requesting assistance`);
+        App.updateAssist();
+    });
+
+    socket.on('order', ({ table }: TableObject) => {
+        console.log(`Table ${table} has placed an order`);
+        App.updateOrders();
+        App.updateAssist();
+    });
+
+    socket.on('modify', ({ modifications }: TableObject) => {
+        console.log(`${modifications}`);
+        App.updateOrders();
+    });
+
+    socket.on('delete', ({ deletions }: TableObject) => {
+        console.log(`${deletions}`);
+        App.updateOrders();
+    });
+
+
+    socket.on('cooking', () => {
+        console.log(`Your item is cooking`);
+        App.updateOrders();
+    });
+
+    socket.on('ready', () => {
+        console.log(`Your item is ready to serve`);
+        App.updateOrders();
+    });
+
+    socket.on('served', () => {
+        console.log(`Item has been served`);
+        App.updateOrders();
+    })
+};
