@@ -5,6 +5,7 @@ import './../LoginRegister.css';
 import history from './../../../history';
 import { Alert } from '@material-ui/lab';
 import { Client } from './../../../api/client';
+import {StaffLogin } from './../../../api/models';
 
 interface IState {
     username: string;
@@ -31,24 +32,25 @@ class PureLogin extends React.Component<{}, IState> {
         }
     }
 
-    checkLogin() {
+    async checkLogin() {
         const client = new Client();
-        client.login(this.state.username, this.state.password)
-            .then((msg) => {
-                //alert(msg.status);
-                if (msg.status === 200) {
-
-                    alert('you have successfully logged on');
-                    localStorage.setItem('username', this.state.username);
-                    localStorage.setItem('staff', 'true');
-                    this.loginSuccess();
-                    history.push('/staff');
-                } else {
-                    this.setError(msg.statusText);
-                }
-            }).catch((status) => {
-                console.log(status);
-            });
+        const r: StaffLogin | null = await client.login(this.state.username, this.state.password);
+        if (r !== null && r.status === 'success'){
+            alert('you have successfully logged on');
+            localStorage.setItem('username', this.state.username);
+            localStorage.setItem('staff', 'true');
+            if (r.staffype === 1){
+                localStorage.setItem('stafftype', 'waiter');
+            } else if (r.staffype === 2){
+                localStorage.setItem('stafftype', 'kitchen');
+            } else if (r.staffype === 3){
+                localStorage.setItem('stafftype', 'admin');
+            }
+            this.loginSuccess();
+            history.push('/staff');
+        } else {
+            this.setError('Incorrect username/password');
+        }
     }
 
     loginSuccess() {

@@ -51,7 +51,9 @@ class Manage extends React.Component<IProps, IState>{
     constructor(props: any) {
         super(props);
         this.state = {
-            currPage: "Tables",
+
+            currPage: "ItemStats",
+
             queueList: null, //listType === 1
             cookingList: null, //listType === 2
             readyList: null, //listType === 3

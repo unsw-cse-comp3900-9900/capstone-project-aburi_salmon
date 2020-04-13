@@ -6,6 +6,11 @@ export interface AddItemToOrderResponseMessage extends ResponseMessage {
   id: number; 
 }
 
+export type StaffLogin = {
+  staffype: number,
+  status: string,
+}
+
 export type Table = {
   occupied: boolean,
   table_id: number
