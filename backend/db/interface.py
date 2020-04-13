@@ -444,6 +444,15 @@ class DB:
 
         return item_order
 
+    def get_order_status(self, order_id):
+        rows = self.__query('SELECT bill_request FROM "order" o WHERE o.id = %s', [order_id])
+
+        if (not rows):
+            return False
+        
+        return rows[0][0]
+
+
     def get_ordered_items(self, order_id):
         rows = self.__query(
             'SELECT i.name, io.quantity, i.price, io.id, io.status_id FROM "order" o JOIN item_order io on (o.id = io.order_id) JOIN item i on (i.id = io.item_id) WHERE o.id = %s',
@@ -602,7 +611,7 @@ class DB:
         return rows[0][0]
 
 
-    def get_order_status(self, item_order_id):
+    def get_item_order_status(self, item_order_id):
         status = self.__query('SELECT status_id FROM item_order WHERE id = %s', [item_order_id,])
 
         if (not status):

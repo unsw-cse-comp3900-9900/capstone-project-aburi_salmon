@@ -21,7 +21,7 @@ class Order(Resource):
         order_id = get_jwt_claims().get('order')
 
         item_order = db.get_ordered_items_customer(order_id)
-
+        bill_request = db.get_order_status(order_id)
         total = 0
 
         if item_order is None:
@@ -32,7 +32,8 @@ class Order(Resource):
 
         return { 
             'item_order': item_order,
-            'total_bill': total
+            'total_bill': total,
+            'bill_request': bill_request
         }
 
     @jwt_required
@@ -158,7 +159,7 @@ class Item(Resource):
         if item_order_id is None:
             abort(400, 'No existing order with that item, please make a new order instead.')
         
-        order_status = db.get_order_status(item_order_id)
+        order_status = db.get_item_order_status(item_order_id)
         if order_status != 1:
             abort(400, 'Cannot modify order since order has left the QUEUE status.')
         else:

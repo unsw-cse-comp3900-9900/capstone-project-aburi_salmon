@@ -28,6 +28,7 @@ interface IState {
   modalSecondButtonDisable: boolean;
   disableBill: boolean;
   billButton: string;
+  addItemButtonDisabled: boolean;
 }
 
 class WaitingPage extends React.Component<IProps, IState> {
@@ -44,6 +45,7 @@ class WaitingPage extends React.Component<IProps, IState> {
       modalSecondButtonDisable: true,
       disableBill: true,
       billButton: "Pay bill",
+      addItemButtonDisabled: false,
     }
     this.openModal = this.openModal.bind(this);
     this.handleCloseModal = this.handleCloseModal.bind(this);
@@ -163,9 +165,20 @@ class WaitingPage extends React.Component<IProps, IState> {
       }
     })
 
+    let billButtonString: string = "Pay bill";
+    let addItemButtonDisabled: boolean = false;
+
+    if (o?.bill_request === true) {
+      disableBillButton = true;
+      billButtonString = "Bill has been requested";
+      addItemButtonDisabled = true;
+    }
+
     this.setState({
       order: o,
       disableBill: disableBillButton,
+      billButton: billButtonString,
+      addItemButtonDisabled: addItemButtonDisabled,
     });
   }
 
@@ -220,7 +233,7 @@ class WaitingPage extends React.Component<IProps, IState> {
           first={
             <div className={classes.rightdiv}>
               <Button className={classes.assistancebutton} variant="contained" color="primary">Request assistance</Button>
-              <Button className={classes.additembutton} variant="contained" color="primary" onClick={() => history.push('/menu')}>Add item to order</Button>
+              <Button className={classes.additembutton} variant="contained" color="primary" disabled={this.state.addItemButtonDisabled} onClick={() => history.push('/menu')}>Add item to order</Button>
             </div>
           }
           second={

@@ -79,6 +79,7 @@ export type ItemOrder = {
 export type Order = {
   item_order: Array<ItemOrder>,
   total_bill: number,
+  bill_request: boolean,
 }
 
 export type ItemQuantityPair = {
