@@ -144,31 +144,32 @@ class Registration(Resource):
     @auth.response(200, 'Success')
     @auth.response(400, 'Invalid request')
     @auth.response(500, 'Something went wrong')
-    def post(self):
-        # Create a new registration key for a given type of staff
+    def put(self):
+        # Change the registration key of a staff type
         body = request.get_json()
-        staff_type = body.get('type')
+        staff = body.get('type')
+        key = body.get('key')
 
-        if (not staff_type):
+        if (not staff or not key):
             abort(400, 'Invalid request')
 
-        registration_key = uuid4().hex
-
-        if (db.add_registration_key(registration_key, staff_type) is None):
+        if (db.set_registration_key(key, staff) is None):
             abort(500, 'Something went wrong.')
 
         return jsonify({ 'status': 'success' })
 
-@auth.route("/registration/<int:id>", strict_slashes=False)
+@auth.route("/registration/<int:staff_type>", strict_slashes=False)
 @auth.param('id', 'staff_type identifier')
 class RegistrationList(Resource):
     @jwt_required
     @auth.response(200, 'Success')
     @auth.response(500, 'User is not a manager')
-    def get(self, id):
+    def get(self, staff_type):
         # Get a list of all registration keys of type 'id'
-        keys = db.get_registration_keys(id)
-        return jsonify({ 'registration_keys': keys })
+        keys = db.get_registration_keys(staff_type)
+        if (not keys[0]):
+            abort(500, 'Something went wrong')
+        return jsonify(keys[0])
 
 @auth.route("/customer/login", strict_slashes=False)
 class CustomerSession(Resource):

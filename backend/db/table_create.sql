@@ -66,10 +66,9 @@ CREATE TABLE "staff_type" (
 );
 
 CREATE TABLE "staff_registration" (
-  "registration_key" varchar NOT NULL,
   "staff_type" int NOT NULL,
-  "used" boolean NOT NULL,
-  PRIMARY KEY ("registration_key"),
+  "registration_key" varchar NOT NULL,
+  PRIMARY KEY ("staff_type"),
   FOREIGN KEY ("staff_type") REFERENCES staff_type("id")
 );
 
