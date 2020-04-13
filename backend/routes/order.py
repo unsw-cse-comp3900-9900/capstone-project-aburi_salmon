@@ -198,6 +198,9 @@ class ModifyItemOrderStatus(Resource):
         elif status == 3:
             socket.emit('ready', room=customerRoom)
             print('we have emitted to ' + customerRoom)
+        elif status == 4:
+            socket.emit('served', room=customerRoom)
+            print('we have emitted to ' + customerRoom)
         
     
         return jsonify({ 'status': 'success'})

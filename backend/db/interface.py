@@ -277,7 +277,9 @@ class DB:
         return self.__update(editStatement, editArr)
 
     def delete_category(self, id):
+        self.__delete('DELETE FROM category_item WHERE category_id = %s', [id])
         return self.__delete('DELETE FROM category WHERE id = %s', [id])
+
     
     def swapCategoryPositions(self, id1, id2):
         print('Swapping categories {} and {}'.format(id1, id2))
@@ -626,10 +628,11 @@ class DB:
     def get_order_list(self, status):
         rows = self.__query(
             """
-            SELECT item.name, io.quantity, item.price, io.id, io.status_id, o.table_id
+            SELECT item.name, io.quantity, item.price, io.id, io.status_id, o.table_id, io.comment
             FROM item_order io JOIN item ON (io.item_id = item.id)
                                JOIN "order" o ON (o.id = io.order_id)
             WHERE io.status_id = %s
+            ORDER BY io.id
             """,
             [status])
 
@@ -642,7 +645,8 @@ class DB:
             'price': row[2],
             'id': row[3],
             'status_id': row[4],
-            'table': row[5]
+            'table': row[5],
+            'comment': row[6]
         } for row in rows]
 
         return orders

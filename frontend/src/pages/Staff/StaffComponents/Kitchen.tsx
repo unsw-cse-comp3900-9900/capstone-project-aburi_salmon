@@ -7,7 +7,7 @@ import { ListItem, Menu, ItemList, ResponseMessage } from './../../../api/models
 import { Client } from './../../../api/client';
 import { StaticMenu} from './Menu/StaticMenu';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
-import { socket } from '../../../api/socketio';
+import { socket, kitchenSocket } from '../../../api/socketio';
 import {styles} from './styles';
 
 export interface IProps extends WithStyles<typeof styles> { }
@@ -19,6 +19,7 @@ interface IState {
     readyList: ItemList | null,
     lastClicked: number,
     resetOpen: boolean,
+    preventDups: ListItem | null,
     //initialise menu
     menu: Menu | null;
     menuvalue: string;
@@ -35,6 +36,7 @@ class Kitchen extends React.Component<IProps, IState>{
             readyList: null, //listType === 3
             lastClicked: -1,
             resetOpen: false,
+            preventDups: null,
 
             menu: null,
             menuvalue: '',
@@ -46,6 +48,11 @@ class Kitchen extends React.Component<IProps, IState>{
     }
 
     async componentDidMount() {
+        this.updateOrders();
+        kitchenSocket(this);
+    }
+
+    async updateOrders(){
         const client = new Client();
         const queue: ItemList | null = await client.getListItem(1);
         const cooking: ItemList | null = await client.getListItem(2);
@@ -120,8 +127,9 @@ class Kitchen extends React.Component<IProps, IState>{
 
     async moveToCooking(itemId:number, item: ListItem){
         var tempList = this.state.cookingList;
-        if (tempList !== null) {
+        if (tempList !== null && this.state.preventDups !== item) {
             const tempArray = tempList?.itemList.concat(item);
+            this.setState({preventDups: item});
             var ret: ItemList = {
                 itemList: tempArray,
             }
@@ -139,8 +147,9 @@ class Kitchen extends React.Component<IProps, IState>{
 
     async moveToReady(itemId: number, item: ListItem){
         var tempList = this.state.readyList;
-        if (tempList !== null){
+        if (tempList !== null && this.state.preventDups !== item ){
             const tempArray= tempList?.itemList.concat(item);
+            this.setState({preventDups: item});
             var ret: ItemList = {
                 itemList: tempArray,
             }
@@ -157,8 +166,9 @@ class Kitchen extends React.Component<IProps, IState>{
 
     async moveToQueue(itemId: number, item: ListItem){
         var tempList = this.state.queueList;
-        if (tempList !== null) {
+        if (tempList !== null && this.state.preventDups !== item) {
             const tempArray = tempList?.itemList.concat(item);
+            this.setState({preventDups: item});
             var ret: ItemList = {
                 itemList: tempArray,
             }
