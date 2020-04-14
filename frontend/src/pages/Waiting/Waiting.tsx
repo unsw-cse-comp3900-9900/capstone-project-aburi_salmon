@@ -27,6 +27,8 @@ interface IState {
   modalOriginalQuantity: number;
   modalSecondButtonDisable: boolean;
   disableBill: boolean;
+  billButton: string;
+  addItemButtonDisabled: boolean;
 }
 
 class WaitingPage extends React.Component<IProps, IState> {
@@ -42,6 +44,8 @@ class WaitingPage extends React.Component<IProps, IState> {
       modalOriginalQuantity: 0,
       modalSecondButtonDisable: true,
       disableBill: true,
+      billButton: "Pay bill",
+      addItemButtonDisabled: false,
     }
     this.openModal = this.openModal.bind(this);
     this.handleCloseModal = this.handleCloseModal.bind(this);
@@ -135,19 +139,52 @@ class WaitingPage extends React.Component<IProps, IState> {
     });
   }
 
+  async payBill() {
+    const client = new Client();
+
+    const r: ResponseMessageModel | null = await client.requestBill();
+
+    if (r) {
+      this.setState({
+        disableBill: true,
+        billButton: "Bill has been requested",
+      })
+    }
+  }
+
   async componentDidMount() {
     const client = new Client();
     const o: OrderModel | null = await client.getCurrentOrder();
 
     // Doesn't matter if null
+    let disableBillButton: boolean = false;
+
+    o?.item_order.forEach((it) => {
+      if (it.status.id !== 4) {
+        disableBillButton = true;
+      }
+    })
+
+    let billButtonString: string = "Pay bill";
+    let addItemButtonDisabled: boolean = false;
+
+    if (o?.bill_request === true) {
+      disableBillButton = true;
+      billButtonString = "Bill has been requested";
+      addItemButtonDisabled = true;
+    }
+
     this.setState({
-      order: o
+      order: o,
+      disableBill: disableBillButton,
+      billButton: billButtonString,
+      addItemButtonDisabled: addItemButtonDisabled,
     });
   }
 
   // This will be called when there is a state change
   componentDidUpdate() {
-
+    
   }
 
   render() {
@@ -195,17 +232,17 @@ class WaitingPage extends React.Component<IProps, IState> {
         <RightBar
           first={
             <div className={classes.rightdiv}>
-              <Button variant="contained" color="primary">Request assistance</Button>
+              <Button className={classes.assistancebutton} variant="contained" color="primary">Request assistance</Button>
+              <Button className={classes.additembutton} variant="contained" color="primary" disabled={this.state.addItemButtonDisabled} onClick={() => history.push('/menu')}>Add item to order</Button>
             </div>
           }
           second={
             <div className={classes.rightdiv}>
-              <Button variant="contained" color="primary" onClick={() => history.push('/menu')}>Add item to order</Button>
             </div>
           }
           third={
             <div className={classes.rightdiv}>
-              <Button variant="contained" color="primary" disabled={this.state.disableBill}>Pay bill</Button>
+              <Button className={classes.paybillbutton} variant="contained" color="primary" disabled={this.state.disableBill} onClick={() => this.payBill()}>{this.state.billButton}</Button>
             </div>
           }
         />
