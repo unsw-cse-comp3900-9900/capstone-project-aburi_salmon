@@ -25,6 +25,20 @@ import Help from './Components/Help';
 import AddItemCat from './Components/AddItemCat';
 import AlertSnackbar from './../../../AlertSnackbar';
 
+/*This displays the page that allows the user to edit the menu
+It's so long because it has many functionalities on this one page
+This file is the brain when rendering the page
+It is responsible for keeping track of most states
+For each functionality, the main functions should be in the files in:
+src/pages/Staff/StaffComponenets/Menu/Components/
+Functionalities:
+- Adding/editing items  
+- Adding/editing categories
+- Adding/deleting ingredients
+- Adding/removing items to/from categories
+- Help dialog
+*/
+
 interface IProps extends WithStyles<typeof styles> {
   menu: MenuModel | null;
   value: string;
@@ -52,8 +66,8 @@ interface IState {
   addItemCatDialog: boolean,
   helpDialog: boolean,
 
-  currItem: ItemModel,
-  currCat: CategoriesModel | null,
+  currItem: ItemModel,  //current item
+  currCat: CategoriesModel | null, //current category
   isEdit: boolean, //1 if is edit, 0 if is modify
   isCat: boolean, //1 if is category, 0 if item
   isDel: boolean,

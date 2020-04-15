@@ -6,6 +6,9 @@ import {styles} from './styles';
 //Props is what is passed in {declare in interface}
 //state is what you store {decalre in react component}
 
+//Renders each item in the item list for viewing orders
+//Just a button container displaying information on item given by parent container
+
 export interface IProps extends WithStyles<typeof styles> {
     item: ListItem,
     itemId: number,

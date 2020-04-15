@@ -9,7 +9,8 @@ import { socket } from '../../api/socketio';
 //import { PopupState } from 'material-ui-popup-state/core';
 import {styles} from './styles';
 
-//Login form
+//Just a container to display staff pages
+//Depending on which type of staff is one, it will render which component
 
 export interface IProps extends WithStyles<typeof styles> { }
 

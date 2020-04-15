@@ -16,6 +16,7 @@ import {styles} from './styles';
 //https://codesandbox.io/s/6r757
 //https://material-ui.com/components/dialogs/
 
+//Renders page for staff details 
 
 const StyledTableCell = withStyles(theme => ({
     head: {
@@ -75,6 +76,8 @@ class StaffDetails extends React.Component<IProps, IState>{
             selectedStaffType: 1,
             severity: 'error',
         }
+
+        //for changing states
         this.deleteIsOpen = this.deleteIsOpen.bind(this);
         this.resetIsOpen = this.resetIsOpen.bind(this);
         this.tableNoIsOpen = this.tableNoIsOpen.bind(this);
@@ -98,11 +101,11 @@ class StaffDetails extends React.Component<IProps, IState>{
         this.setState({resetKeyOpen: isOpen});
     }
 
+    //changing staff type
     async changeStaffType(staffType: number){
         this.setState({ resetOpen: false });
         const client = new Client();
         const r: number | null = await client.changeStaffType(this.state.selectedStaff.id, this.state.selectedStaff.name, this.state.selectedStaff.username, staffType);
-        console.log(r);
         if (r !== 200) {
             this.setState({ isOpen: true, alertMessage: "Something went wrong", severity: 'error' });
         } else {
@@ -111,6 +114,7 @@ class StaffDetails extends React.Component<IProps, IState>{
         }
     }
 
+    //shows alert
     showAlert() {
         return (
             <Snackbar
@@ -129,11 +133,11 @@ class StaffDetails extends React.Component<IProps, IState>{
         );
     }
 
+    //delete staff
     async deleteStaff(){
         this.setState({ deleteOpen: false });
         const client = new Client();
         const r: number | null = await client.deleteStaff(this.state.selectedStaff.id);
-        console.log(r);
         if (r !== 200) {
             this.setState({ isOpen: true, alertMessage: 'Something went wrong', severity: 'error' });
         } else {

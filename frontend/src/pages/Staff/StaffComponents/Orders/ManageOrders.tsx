@@ -9,6 +9,8 @@ import {styles} from './styles';
 //sorting mostly copied from 
 //https://stackoverflow.com/questions/40541710/reactjs-with-material-ui-how-to-sort-an-array-of-material-uis-tablerow-alpha
 
+//Renders the page that manage staff/admin see for orders
+//Just a table with a list of all orders of all statuses
 
 const StyledTableCell = withStyles(theme => ({
     head: {
