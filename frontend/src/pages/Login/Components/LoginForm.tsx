@@ -140,8 +140,7 @@ class PureLogin extends React.Component<{}, IState> {
                     onChange={(e) => this.setState({ password: e.target.value })}
                 />
                 <br></br>
-                <br></br>
-                <br></br>
+
                 <button className=" loginbut "
                     onClick={() => { this.handleLogin() }}
                 >Login</button>

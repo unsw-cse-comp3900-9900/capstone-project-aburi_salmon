@@ -200,7 +200,7 @@ class EditCategory extends React.Component<IProps, IState>{
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={() => {this.props.setIsOpen(false); this.update()}} color="primary">
-                            Nevermind
+                            Cancel
                         </Button>
                         <Button onClick={() => this.addEditCat(this.state.catName,true)} color="primary" autoFocus>
                             Create Category

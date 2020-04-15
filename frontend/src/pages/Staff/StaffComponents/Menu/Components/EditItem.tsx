@@ -179,7 +179,7 @@ class EditItem extends React.Component<IProps, IState>{
                                 autoFocus
                                 margin="dense"
                                 id="name"
-                                label="Enter Name"
+                                label="Enter Name*"
                                 fullWidth
                             onChange={(e) => this.setState({ name: e.target.value })}
                                 
@@ -188,7 +188,7 @@ class EditItem extends React.Component<IProps, IState>{
                                 autoFocus
                                 margin="dense"
                                 id="des"
-                                label="Description"
+                                label="Description*"
                                 fullWidth
                                 multiline = {true}
                             onChange={(e) => this.setState({ description: e.target.value })}
@@ -197,7 +197,7 @@ class EditItem extends React.Component<IProps, IState>{
                                 autoFocus
                                 margin="dense"
                                 id="price"
-                                label="Price"
+                                label="Price*"
                                 fullWidth
                             onChange={(e) => this.setState({ price: parseInt(e.target.value) })}
                             />

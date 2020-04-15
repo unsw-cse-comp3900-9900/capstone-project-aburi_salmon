@@ -10,7 +10,7 @@
 
 .loginbox {
     position: absolute;
-    padding: 45px 10px;
+    padding: 35px 10px;
     text-align: center;
     
     border-radius: 20px;
@@ -38,7 +38,7 @@
     -webkit-align-items: center;
     -ms-flex-align: center;
     align-items: center;
-    
+    overflow: auto;
 
 
 }
@@ -74,6 +74,7 @@
     -webkit-align-items: center;
     -ms-flex-align: center;
     align-items: center;
+    overflow: auto;
 }
 
 .logoimage {

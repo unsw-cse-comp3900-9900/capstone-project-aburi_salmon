@@ -28,7 +28,7 @@ class ItemCont extends React.Component<IProps, {}>{
             return(
                 <button className={classes.currContainer} onClick={() => this.props.update(this.props.itemId, this.props.item)}>
                     <b>ItemID:</b> {this.props.item.id} <br></br>
-                    <b>Item Name:</b> {this.props.item.itemName} <br></br>
+                    <b>Name:</b> {this.props.item.itemName} <br></br>
                     <b>Amount:</b> {this.props.item.quantity} <br></br>
                     <b>Table Number:</b> {this.props.item.table + 1} <br></br>
                     {this.displayComment()}
@@ -38,7 +38,7 @@ class ItemCont extends React.Component<IProps, {}>{
             return (
                 <button className={classes.itemContainer} onClick={() => this.props.update(this.props.itemId, this.props.item)}>
                     <b>ItemID:</b> {this.props.item.id} <br></br>
-                    <b>Item Name:</b> {this.props.item.itemName} <br></br>
+                    <b>Name:</b> {this.props.item.itemName} <br></br>
                     <b>Amount:</b> {this.props.item.quantity} <br></br>
                     <b>Table Number:</b> {this.props.item.table + 1} <br></br>
                     {this.displayComment()}

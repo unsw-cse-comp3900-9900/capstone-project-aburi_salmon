@@ -11,6 +11,11 @@ import {StaticMenu } from './Menu/StaticMenu';
 import {styles} from './styles';
 import { manageWaitSocket } from '../../../api/socketio';
 
+// This loads all the pages that the kitchen staff sees
+// This includes the menu, list of orders, and info on tables
+// It is the brain of the system, it keeps track of all the states
+// It is responsible for communicating with the server as well
+
 export interface IProps extends WithStyles<typeof styles> { }
 
 interface IState{
@@ -21,7 +26,12 @@ interface IState{
     isOpen: boolean,
     lastClicked: number,
     resetOpen: boolean,
+
+    //prevent duplicates in lists
+    noDups: 'none' | 'served' | 'toBeServed'  //last entered list
     preventDups: ListItem | null,
+
+    //for alert messages
     alertMessage: string,
 
     //initialise menu
@@ -46,7 +56,10 @@ class Wait extends React.Component<IProps, IState>{
             isOpen: false,
             lastClicked: -1,
             resetOpen: false,
+
+            noDups: 'none',
             preventDups: null,
+
             alertMessage: 'Something went wrong',
 
             menu: null,
@@ -60,12 +73,16 @@ class Wait extends React.Component<IProps, IState>{
         this.moveToToServe = this.moveToToServe.bind(this);
         this.changeMenuValue = this.changeMenuValue.bind(this);
         this.updateAssist = this.updateAssist.bind(this);
+        this.updateOrders = this.updateOrders.bind(this);
+
+        this.billrequestAlert = this.billrequestAlert.bind(this);
+        this.assistanceAlert = this.assistanceAlert.bind(this);
         
     }
 
     billrequestAlert(){
         this.setState({alertMessage: 'Bill was requested!!'});
-        this.updateTables();
+        this.updateAssist();
         this.showAlert();
     }
 
@@ -74,80 +91,21 @@ class Wait extends React.Component<IProps, IState>{
         this.showAlert();
     }
 
-    helpDialog() {
-        return (
-            <div>
-                <Dialog open={this.state.resetOpen} onClose={() => this.setState({ resetOpen: false })} aria-labelledby="form-dialog-title">
-                    <DialogTitle id="form-dialog-title">Help</DialogTitle>
-                    <DialogContent>
-                        Tap on item in each list to move it between lists. If item has successfully changed list, the item will appear in the new list with a bold
-                        outline.
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={() => this.setState({ resetOpen: false })} color="primary">
-                            Ok, I get it
-                        </Button>
-
-                    </DialogActions>
-                </Dialog>
-            </div>
-        );
+    async componentDidMount() {
+        //connect to socket for real time data
+        manageWaitSocket(this);
+        //initialise orders and assistance page
+        this.updateOrders();
+        this.updateAssist();
     }
 
-    async componentDidMount() {
-        manageWaitSocket(this);
+    async updateMenu(){
         const client = new Client();
-        const toServe: ItemList | null = await client.getListItem(3);
-        const served: ItemList | null = await client.getListItem(4);
-        //menu
         const m: Menu | null = await client.getMenu();
-        //assistance
-        const t: Tables | null = await client.getTables();
-        const a: AssistanceTables | null = await client.getAssistanceTable();
-        var temp: Array<number> = [];
-
-        const b: Bill | null = await client.getBill();
-
-        if (a?.tables !== undefined) {
-            a?.tables.forEach(it => {
-                temp.push(it.table_id);
-            }
-            )
-            this.setState({ assistance: temp });
-        }
-
-        if (b !== null) {
-            this.setState({ bill: b.tables });
-        }
-
         this.setState({
-            toServeList: toServe,
-            servedList: served,
             menu: m,
             menuvalue: m?.menu[0].name ? m?.menu[0].name : "",
-            tables: t,
         });
-    }
-
-    async updateTables(){
-        const client = new Client();
-        const t: Tables | null = await client.getTables();
-        const a: AssistanceTables | null = await client.getAssistanceTable();
-        const b: Bill | null = await client.getBill();
-        var temp: Array<number> = [];
-
-        if (a?.tables !== undefined) {
-            a?.tables.forEach(it => {
-                temp.push(it.table_id);
-            }
-            )
-            this.setState({ assistance: temp });
-        }
-        if (b !== null){
-            this.setState({bill: b.tables});
-        }
-        
-        this.setState({tables: t});
     }
 
     async updateOrders(){
@@ -158,33 +116,6 @@ class Wait extends React.Component<IProps, IState>{
             toServeList: toServe,
             servedList: served,
         });
-    }
-
-    displayCont(){
-        const { classes } = this.props;
-        if (this.state.currPage === "Orders") {
-            return (
-                <Box className={classes.staffContainer}>
-                    {this.helpDialog()}
-                    <ToServe update={this.moveToServed} someList={this.state.toServeList} lastClicked={this.state.lastClicked}/>
-                    <Served update={this.moveToToServe} someList={this.state.servedList} lastClicked={this.state.lastClicked}/>
-                    <div className={this.props.classes.helpIcon} onClick={() => this.setState({ resetOpen: true })}><HelpOutlineIcon /></div>
-                </Box>
-            );
-        } else if (this.state.currPage === "Assistance"){
-            return (
-                <Box className={classes.staffContainer}>
-                    <Assistance tables={this.state.tables} assistance={this.state.assistance}
-                    update={this.updateAssist} billRequest={this.state.bill}/>
-                </Box>
-            );
-        } else {
-            return(
-                <Box className={classes.menuContainer}>
-                    <StaticMenu menu={this.state.menu} value={this.state.menuvalue} changeValue={this.changeMenuValue}/>
-                </Box>
-            );
-        }
     }
 
     async updateAssist(){
@@ -206,47 +137,57 @@ class Wait extends React.Component<IProps, IState>{
         this.setState({ tables: t });
     }
 
+    //for loading menu
     changeMenuValue(newValue: string) {
         this.setState({ menuvalue: newValue })
     }
 
+    //move item from to be served to served
     async moveToServed(itemId: number, item: ListItem) {
         var tempList = this.state.servedList;
-        if (tempList !== null && this.state.preventDups !== item) {
-            const tempArray = tempList?.itemList.concat(item);
-            this.setState({preventDups: item});
-            var ret: ItemList = {
-                itemList: tempArray,
-            }
-            this.setState({ servedList: ret });
-            const client = new Client();
-            const r: ResponseMessage | null = await client.updateOrderStatus(item.id, 4);
-            if (r?.status === "success") {
-                this.setState({ lastClicked: item.id });
+        if (tempList !== null) {
+            if (!(this.state.preventDups === item && this.state.noDups === 'served')) {
+                this.setState({ noDups: 'served' });
+                const tempArray = tempList?.itemList.concat(item);
+                this.setState({preventDups: item});
+                var ret: ItemList = {
+                    itemList: tempArray,
+                }
+                this.setState({ servedList: ret });
+                const client = new Client();
+                const r: ResponseMessage | null = await client.updateOrderStatus(item.id, 4);
+                if (r?.status === "success") {
+                    this.setState({ lastClicked: item.id });
+                }
             }
         }
         this.removeItem(itemId, 1);
     }
 
+    //move item from served to, to be served
     async moveToToServe(itemId: number, item: ListItem){
         var tempList = this.state.toServeList;
-        if (tempList !== null && item !== this.state.preventDups) {
-            const tempArray = tempList?.itemList.concat(item);
-            this.setState({preventDups: item});
-            var ret: ItemList = {
-                itemList: tempArray,
-            }
-            this.setState({ toServeList: ret });
-            
-            const client = new Client();
-            const r: ResponseMessage | null = await client.updateOrderStatus(item.id, 3);
-            if (r?.status === "success") {
-                this.setState({ lastClicked: item.id });
+        if (tempList !== null && item) {
+            if (!(this.state.preventDups === item && this.state.noDups === 'toBeServed')) {
+                this.setState({ noDups: 'toBeServed' });
+                const tempArray = tempList?.itemList.concat(item);
+                this.setState({preventDups: item});
+                var ret: ItemList = {
+                    itemList: tempArray,
+                }
+                this.setState({ toServeList: ret });
+                
+                const client = new Client();
+                const r: ResponseMessage | null = await client.updateOrderStatus(item.id, 3);
+                if (r?.status === "success") {
+                    this.setState({ lastClicked: item.id });
+                }
             }
         }
         this.removeItem(itemId, 2);
     }
 
+    //remove item from list
     removeItem(itemKey: number, listType: number): void {
         if (listType === 1) {
             var array1 = this.state.toServeList;
@@ -259,24 +200,80 @@ class Wait extends React.Component<IProps, IState>{
         }
     }
 
+    // shows help dialog
+    helpDialog() {
+        return (
+            <div>
+                <Dialog open={this.state.resetOpen} onClose={() => this.setState({ resetOpen: false })} aria-labelledby="form-dialog-title">
+                    <DialogTitle id="form-dialog-title">Help</DialogTitle>
+                    <DialogContent>
+                        Tap on item in each list to move it between lists. If item has successfully changed list, the item will appear in the new list with a bold
+                        outline.
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => this.setState({ resetOpen: false })} color="primary">
+                            Ok, I get it
+                        </Button>
+
+                    </DialogActions>
+                </Dialog>
+            </div>
+        );
+    }
+
+    //shows the alert
     showAlert(){
         return(
             <Snackbar
                 open={this.state.isOpen}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            >
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
                 <Alert
                     severity="error"
                     action={
-                        <Button color="inherit" size="small" onClick={() => this.setState({ isOpen: false })}>
-                            OK
-                            </Button>
-                    }
-                >{this.state.alertMessage}</Alert>
+                    <Button color="inherit" size="small" onClick={() => this.setState({ isOpen: false })}>
+                        OK
+                    </Button>
+                    }>{this.state.alertMessage}</Alert>
             </Snackbar>
         );
     }
 
+    //diplays the pages
+    displayCont(){
+        const { classes } = this.props;
+        if (this.state.currPage === "Orders") {
+            return (
+                <Box className={classes.staffContainer}>
+                    {this.helpDialog()}
+                    <ToServe update={this.moveToServed} someList={this.state.toServeList} lastClicked={this.state.lastClicked}/>
+                    <Served update={this.moveToToServe} someList={this.state.servedList} lastClicked={this.state.lastClicked}/>
+                    <div className={this.props.classes.helpIcon} onClick={() => this.setState({ resetOpen: true })}><HelpOutlineIcon /></div>
+                </Box>
+            );
+        } else if (this.state.currPage === "Assistance"){
+            return (
+                <Box className={classes.staffContainer}>
+                    <Assistance tables={this.state.tables} assistance={this.state.assistance}
+                    update={this.updateAssist} billRequest={this.state.bill}/>
+                </Box>
+            );
+        } else {
+            if (this.state.menu === null) {
+                this.updateMenu();
+                var tempMenu: Menu = {
+                    menu: [],
+                }
+                this.setState({ menu: tempMenu });
+            }
+            return(
+                <Box className={classes.menuContainer}>
+                    <StaticMenu menu={this.state.menu} value={this.state.menuvalue} changeValue={this.changeMenuValue}/>
+                </Box>
+            );
+        }
+    }
+
+    // displays the navigation bar
     displayNav(){
         return(
             <div className={this.props.classes.root}>
