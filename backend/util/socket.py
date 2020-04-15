@@ -93,3 +93,8 @@ def staff_finished():
 @jwt_required
 def request_assistance():
     print("Customer from table X is requesting assistance")
+
+@socket.on('Bill Request')
+@jwt_required
+def bill_request():
+    print("Bill requested")

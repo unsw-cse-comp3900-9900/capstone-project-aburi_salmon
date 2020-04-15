@@ -1,4 +1,4 @@
-import { Tables, Menu, ItemList, Order, Item, StaffLogin,  ItemQuantityPair, CreateOrder, ResponseMessage, AddItemToOrderResponseMessage, OrderItemQuantityPair, TableInfo, AssistanceTables, AllStaff, AllItemStats, Ingredient, WholeItemList, StaffInfo } from "./models";
+import { Tables, Menu, ItemList, Order, Item, StaffLogin,  ItemQuantityPair, CreateOrder, ResponseMessage, AddItemToOrderResponseMessage, OrderItemQuantityPair, TableInfo, AssistanceTables, AllStaff, AllItemStats, Ingredient, WholeItemList, StaffInfo, Bill } from "./models";
 
 const apiUrl = "http://localhost:5000";
 
@@ -792,6 +792,21 @@ export class Client {
       mode: 'cors',
       });
       const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async getBill(){
+    try {
+      const r: Response = await fetch(apiUrl + '/table/bill', {
+        method: 'GET',
+        credentials: 'include',
+        mode: 'cors',
+      });
+      const j: Bill = await r.json();
       return j;
     } catch (e) {
       console.error(e);

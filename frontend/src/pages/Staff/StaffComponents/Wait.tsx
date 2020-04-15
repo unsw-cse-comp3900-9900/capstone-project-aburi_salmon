@@ -3,7 +3,7 @@ import { withStyles, WithStyles, MenuList, Paper, MenuItem, Box, Snackbar, Butto
 import Assistance from './Assistance/AssistanceMain';
 import ToServe from './Orders/Components/ToServeList';
 import Served from './Orders/Components/ServedList';
-import { ListItem, Menu, Tables, AssistanceTables, ItemList, ResponseMessage} from './../../../api/models';
+import { ListItem, Menu, Tables, AssistanceTables, ItemList, ResponseMessage, Bill} from './../../../api/models';
 import { Client } from './../../../api/client';
 import { Alert } from '@material-ui/lab';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
@@ -22,6 +22,7 @@ interface IState{
     lastClicked: number,
     resetOpen: boolean,
     preventDups: ListItem | null,
+    alertMessage: string,
 
     //initialise menu
     menu: Menu | null;
@@ -30,6 +31,7 @@ interface IState{
     //initialise assistance
     tables: Tables | null,
     assistance: Array<number>, 
+    bill: Array<number>
 }
 
 class Wait extends React.Component<IProps, IState>{
@@ -45,18 +47,31 @@ class Wait extends React.Component<IProps, IState>{
             lastClicked: -1,
             resetOpen: false,
             preventDups: null,
+            alertMessage: 'Something went wrong',
 
             menu: null,
             menuvalue: '',
 
             tables: null,
             assistance: [],
+            bill: [],
         }
         this.moveToServed = this.moveToServed.bind(this);
         this.moveToToServe = this.moveToToServe.bind(this);
         this.changeMenuValue = this.changeMenuValue.bind(this);
         this.updateAssist = this.updateAssist.bind(this);
         
+    }
+
+    billrequestAlert(){
+        this.setState({alertMessage: 'Bill was requested!!'});
+        this.updateTables();
+        this.showAlert();
+    }
+
+    assistanceAlert(){
+        this.setState({ alertMessage: 'Assistance was requested!!'});
+        this.showAlert();
     }
 
     helpDialog() {
@@ -91,12 +106,18 @@ class Wait extends React.Component<IProps, IState>{
         const a: AssistanceTables | null = await client.getAssistanceTable();
         var temp: Array<number> = [];
 
+        const b: Bill | null = await client.getBill();
+
         if (a?.tables !== undefined) {
             a?.tables.forEach(it => {
                 temp.push(it.table_id);
             }
             )
             this.setState({ assistance: temp });
+        }
+
+        if (b !== null) {
+            this.setState({ bill: b.tables });
         }
 
         this.setState({
@@ -112,6 +133,7 @@ class Wait extends React.Component<IProps, IState>{
         const client = new Client();
         const t: Tables | null = await client.getTables();
         const a: AssistanceTables | null = await client.getAssistanceTable();
+        const b: Bill | null = await client.getBill();
         var temp: Array<number> = [];
 
         if (a?.tables !== undefined) {
@@ -121,6 +143,10 @@ class Wait extends React.Component<IProps, IState>{
             )
             this.setState({ assistance: temp });
         }
+        if (b !== null){
+            this.setState({bill: b.tables});
+        }
+        
         this.setState({tables: t});
     }
 
@@ -149,7 +175,7 @@ class Wait extends React.Component<IProps, IState>{
             return (
                 <Box className={classes.staffContainer}>
                     <Assistance tables={this.state.tables} assistance={this.state.assistance}
-                    update={this.updateAssist}/>
+                    update={this.updateAssist} billRequest={this.state.bill}/>
                 </Box>
             );
         } else {
@@ -165,6 +191,7 @@ class Wait extends React.Component<IProps, IState>{
         const client = new Client()
         const t: Tables| null = await client.getTables();
         const a: AssistanceTables | null = await client.getAssistanceTable();
+        const b: Bill | null = await client.getBill();
         var temp: Array<number> = [];
         if (a?.tables !== undefined) {
             a?.tables.forEach(it => {
@@ -172,6 +199,9 @@ class Wait extends React.Component<IProps, IState>{
             }
             )
             this.setState({ assistance: temp });
+        }
+        if (b !== null) {
+            this.setState({ bill: b.tables });
         }
         this.setState({ tables: t });
     }
@@ -233,7 +263,7 @@ class Wait extends React.Component<IProps, IState>{
         return(
             <Snackbar
                 open={this.state.isOpen}
-                anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
             >
                 <Alert
                     severity="error"
@@ -242,7 +272,7 @@ class Wait extends React.Component<IProps, IState>{
                             OK
                             </Button>
                     }
-                >Assistance Required!!!</Alert>
+                >{this.state.alertMessage}</Alert>
             </Snackbar>
         );
     }

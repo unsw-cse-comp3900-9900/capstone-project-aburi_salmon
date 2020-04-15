@@ -195,12 +195,18 @@ class ModifyItemOrderStatus(Resource):
         # print('room')
         if status == 2 :
             socket.emit('cooking', room=customerRoom)
+            socket.emit('cooking', room='staff1')
+            socket.emit('cooking', room='staff2')
             print('we have emitted to ' + customerRoom)
         elif status == 3:
             socket.emit('ready', room=customerRoom)
+            socket.emit('cooking', room='staff1')
+            socket.emit('cooking', room='staff2')
             print('we have emitted to ' + customerRoom)
         elif status == 4:
             socket.emit('served', room=customerRoom)
+            socket.emit('cooking', room='staff1')
+            socket.emit('cooking', room='staff2')
             print('we have emitted to ' + customerRoom)
         
     

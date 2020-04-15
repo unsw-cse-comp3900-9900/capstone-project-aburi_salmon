@@ -170,6 +170,14 @@ class Manage extends React.Component<IProps, IState>{
         this.setState({ ingredientsList: ingred });
     }
 
+    billrequestAlert() {
+
+    }
+
+    assistanceAlert() {
+
+    }
+
     async updateOrders(){
         const client = new Client();
         const queue: ItemList | null = await client.getListItem(1);
@@ -289,7 +297,7 @@ class Manage extends React.Component<IProps, IState>{
             return (
                 <Box className={classes.staffContainer}>
                     <Assistance tables={this.state.tables} assistance={this.state.assistance}
-                        update={this.updateAssist}/>
+                        update={this.updateAssist} billRequest={[]}/>
                 </Box>
             );
         } else if (this.state.currPage === "Manage"){

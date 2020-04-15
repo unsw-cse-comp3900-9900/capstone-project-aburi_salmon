@@ -204,5 +204,6 @@ class TableBill(Resource):
         if (db.set_bill(table_id, bill) == None):
             abort(500, 'Something went wrong.')
         
+        socket.emit('billrequest', room='staff1')
         return jsonify({ 'success': 'success' })
 
