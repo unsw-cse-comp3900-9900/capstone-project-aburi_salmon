@@ -18,6 +18,9 @@ interface IState {
     alertMessage: string;
 }
 
+// Renders the register box
+// Basically the same format as LoginForm.tsx
+
 class PureRegister extends React.Component<{}, IState> {
     // If Props is specified, use React.Component<IProps, IState>
     constructor(props: any) {

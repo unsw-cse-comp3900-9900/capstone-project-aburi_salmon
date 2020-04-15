@@ -4,6 +4,8 @@ import './../Home/Homepage.css';
 import history from '../../history';
 import { socket } from '../../api/socketio';
 
+//Renders the home page
+
 class PureHome extends React.Component {
   goToTable() {
     history.push('/table');
@@ -16,7 +18,6 @@ class PureHome extends React.Component {
   render() {
     return (
       <div className="wrapper">
-        {/*<img src={restlogo} className="restlogo" alt="Logo" />*/}
         <h1 className="restlogo">Welcome!</h1>
         <button className="myButton" onClick={() => this.goToTable()}>
           Start Ordering
@@ -28,6 +29,7 @@ class PureHome extends React.Component {
   }
 }
 
+//logs staff out
 const logOut = async () => {
   socket.emit('leave')
   localStorage.setItem('username', "");
@@ -48,8 +50,7 @@ const logOut = async () => {
   history.push('/');
 }
 
-
-
+//checks if is logged in
 const isLoggedIn = () => {
   if (localStorage.getItem('staff') !== 'true') {
     return (

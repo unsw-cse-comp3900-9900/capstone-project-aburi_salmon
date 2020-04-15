@@ -1,6 +1,6 @@
 import React from 'react';
 import { withStyles, WithStyles, MenuList, Paper, MenuItem, Box} from '@material-ui/core';
-import { ItemList, Menu, Categories, WholeItemList, Ingredient, Tables, AssistanceTables, ListItem, AllStaff, AllItemStats, ItemStats as ItemStatsModel} from './../../../api/models';
+import { ItemList, Menu, Categories, WholeItemList, Ingredient, Tables, AssistanceTables, ListItem, AllStaff, AllItemStats, ItemStats as ItemStatsModel, Bill} from './../../../api/models';
 import { Client } from './../../../api/client';
 import Assistance from './Assistance/AssistanceMain';
 import StaffDetails from './StaffDetails/StaffDetails';
@@ -10,29 +10,35 @@ import {EditMenu} from './Menu/EditMenu';
 import {styles} from './styles';
 import { manageWaitSocket } from '../../../api/socketio';
 
+// This loads all the pages that the staff sees
+// It is the brain of the system, it keeps track of all the states
+// It is responsible for communicating with the server as well
+
 export interface IProps extends WithStyles<typeof styles> { }
 
 interface IState {
+    //current page
     currPage: string,
+    
+    //assist
+    tables: Tables | null,
+    assistance: Array<number>, 
+    bill: Array<number>,
+
+    //orders
+    orderRealData: Array<ListItem>,
     queueList: ItemList | null,
     cookingList: ItemList | null,
     readyList: ItemList | null,
 
-    //initialise assist
-    tables: Tables | null,
-    assistance: Array<number>, 
-
-    //initialise orders
-    orderRealData: Array<ListItem>,
-
-    //initialise manage staff
+    //staff details
     staffRealData: AllStaff | null,
 
-    //initialise item stats
+    //item stats
     itemRealData: Array<ItemStatsModel>,
     trevenue: number,
 
-    //initialise menu
+    //menu
     menu: Menu | null, 
     menuvalue:string,
     currCat:Categories | null,
@@ -54,14 +60,14 @@ class Manage extends React.Component<IProps, IState>{
 
             currPage: "ItemStats",
 
+            tables: null,
+            assistance: [],
+            bill: [],
+
+            orderRealData: [],
             queueList: null, //listType === 1
             cookingList: null, //listType === 2
             readyList: null, //listType === 3
-
-            tables: null,
-            assistance: [],
-
-            orderRealData: [],
 
             staffRealData: null,
 
@@ -74,11 +80,12 @@ class Manage extends React.Component<IProps, IState>{
             allItems: null,
             ingredientsList: null,
 
-            selectedItem: 'itemId',
-            selectedOrders: 'status',
-            itemSort: 'des',
+            selectedItem: 'itemId', //order in terms of itemId
+            selectedOrders: 'status',  //order in terms of status
+            itemSort: 'des', //order in descending order
             orderSort: 'des'
         }
+        //update state functions
         this.updateAssist = this.updateAssist.bind(this);
         this.updateStaff = this.updateStaff.bind(this);
         this.forceUpdateIngredList = this.forceUpdateIngredList.bind(this);
@@ -93,51 +100,23 @@ class Manage extends React.Component<IProps, IState>{
         this.changeItemOrder = this.changeItemOrder.bind(this);
         this.changeOrderSelected = this.changeOrderSelected.bind(this);
         this.changeOrderOrder = this.changeOrderOrder.bind(this);
-        
+
+        this.billrequestAlert = this.billrequestAlert.bind(this);
+        this.assistanceAlert = this.assistanceAlert.bind(this);
     }
 
+    //initialising everything but menu
     async componentDidMount() {
+        //create socket for real time updates
         manageWaitSocket(this);
-        const client = new Client();
-        const queue: ItemList | null = await client.getListItem(1);
-        const cooking: ItemList | null = await client.getListItem(2);
-        const ready: ItemList | null = await client.getListItem(3);
-        this.setState({
-            queueList: queue,
-            cookingList: cooking,
-            readyList: ready,
-        });
 
+        const client = new Client();
+    
         //assistance
-        const t: Tables | null = await client.getTables();
-        const a: AssistanceTables | null = await client.getAssistanceTable();
-        var temp: Array<number> = [];
-        if (a?.tables !== undefined) {
-            a?.tables.forEach(it => {
-                    temp.push(it.table_id);
-                }
-            )
-            this.setState({ assistance: temp });
-        }
-        this.setState({tables: t});
+        this.updateAssist();
 
         //manage orders
-        const served: ItemList | null = await client.getListItem(4);
-        var temp1: Array<ListItem> = [];
-        if (queue?.itemList !== undefined) {
-            temp1 = temp1.concat(queue?.itemList);
-        }
-        if (cooking?.itemList !== undefined) {
-            temp1 = temp1.concat(cooking?.itemList);
-        }
-        if (ready?.itemList !== undefined) {
-            temp1 = temp1.concat(ready?.itemList);
-        }
-        if (served?.itemList !== undefined) {
-            temp1 = temp1.concat(served?.itemList);
-        }
-
-        this.setState({orderRealData: temp1});
+        this.updateOrders();
 
         //manage staff
         const allStaff: AllStaff | null = await client.getStaff();
@@ -151,23 +130,14 @@ class Manage extends React.Component<IProps, IState>{
         if (itemStats?.total_revenue !== undefined) {
             this.setState({ trevenue: itemStats?.total_revenue })
         }
+    }
 
-        //menu
-        const menu: Menu | null = await client.getMenu();
-        if (menu !== null && menu?.menu !== undefined && menu?.menu.length !== undefined) {
-            this.setState({
-                menu: menu,
-                menuvalue: menu?.menu[0].name ? menu?.menu[0].name : "",
-                currCat: menu.menu[0],
-            });
-        }
+    billrequestAlert() {
+       this.updateAssist()
+    }
 
-        const i: WholeItemList | null = await client.getAllItems();
-        if (i !== null) {
-            this.setState({ allItems: i });
-        }
-        const ingred: Array<Ingredient> | null = await client.getIngredients();
-        this.setState({ ingredientsList: ingred });
+    assistanceAlert() {
+        //dummy function
     }
 
     async updateOrders(){
@@ -195,13 +165,13 @@ class Manage extends React.Component<IProps, IState>{
             cookingList: cooking,
             readyList: ready,
         });
-
     }
 
     async updateAssist() {
         const client = new Client();
         const t: Tables | null = await client.getTables();
         const a: AssistanceTables | null = await client.getAssistanceTable();
+        const b: Bill | null = await client.getBill();
         var temp: Array<number> = [];
         if (a?.tables !== undefined) {
             a?.tables.forEach(it => {
@@ -210,7 +180,11 @@ class Manage extends React.Component<IProps, IState>{
             )
             this.setState({ assistance: temp });
         }
+        if (b !== null) {
+            this.setState({ bill: b.tables });
+        }
         this.setState({ tables: t });
+        
     }
 
     async forceUpdateMenu() {
@@ -275,6 +249,7 @@ class Manage extends React.Component<IProps, IState>{
         this.setState({ orderSort: order });
     }
 
+    //displaying the pages
     displayCont() {
         const { classes } = this.props;
         if (this.state.currPage === "Orders"){
@@ -289,7 +264,7 @@ class Manage extends React.Component<IProps, IState>{
             return (
                 <Box className={classes.staffContainer}>
                     <Assistance tables={this.state.tables} assistance={this.state.assistance}
-                        update={this.updateAssist}/>
+                        update={this.updateAssist} billRequest={this.state.bill}/>
                 </Box>
             );
         } else if (this.state.currPage === "Manage"){
@@ -306,8 +281,17 @@ class Manage extends React.Component<IProps, IState>{
                      setSelected={this.changeItemSelected} selected={this.state.selectedItem}/>
                 </Box>
             );
-        } 
-        else {
+        } else {
+            //so that it only fetches menu once when opened
+            if (this.state.menu === null){
+                this.forceUpdateMenu();
+                this.forceUpdateItemlist();
+                this.forceUpdateIngredList();
+                var tempMenu: Menu = {
+                    menu: [],
+                }
+                this.setState({menu: tempMenu});
+            }
             return (
                 <Box className={classes.menuContainer}>
                     <EditMenu menu={this.state.menu} value={this.state.menuvalue}
@@ -319,7 +303,7 @@ class Manage extends React.Component<IProps, IState>{
         }
     }
 
-
+    //displays navigation bar
     displayNav() {
         return (
             <div className={this.props.classes.root}>

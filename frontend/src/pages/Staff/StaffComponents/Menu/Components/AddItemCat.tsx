@@ -59,55 +59,77 @@ class AddItemCat extends React.Component<IProps, IState>{
     }
 
     render() {
-        return (
-            <Dialog
-                open={this.props.isOpen}
-                onEnter={() => this.whenOpened()}
-                onClose={() => this.props.setIsOpen(false)}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">{"Add Item to Category"}</DialogTitle>
-                <DialogContent>
+        if (this.props.wholemenu !== null && this.props.wholemenu.menu[0] !== undefined){
+            return (
+                <Dialog
+                    open={this.props.isOpen}
+                    onEnter={() => this.whenOpened()}
+                    onClose={() => this.props.setIsOpen(false)}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">{"Add Item to Category"}</DialogTitle>
+                    <DialogContent>
+                            <FormControl style={{ minWidth: 150, margin: '10px' }}>
+                            <InputLabel htmlFor="uncontrolled-native">Item</InputLabel>
+                            <NativeSelect
+                                defaultValue={this.props.allItems?.items[0].id}
+                                onChange={(e) => this.setState({currItem:parseInt(e.target.value) })}
+                            >
+                                {this.props.allItems && this.props.allItems?.items &&
+                                    this.props.allItems?.items.map(item =>
+                                        <option value={item.id} key={item.id}>{item.name}</option>
+                                    )
+                                }
+                            </NativeSelect>
+                        </FormControl>
                         <FormControl style={{ minWidth: 150, margin: '10px' }}>
-                        <InputLabel htmlFor="uncontrolled-native">Item</InputLabel>
-                        <NativeSelect
-                            defaultValue={this.props.allItems?.items[0].id}
-                            onChange={(e) => this.setState({currItem:parseInt(e.target.value) })}
-                        >
-                            {this.props.allItems && this.props.allItems?.items &&
-                                this.props.allItems?.items.map(item =>
-                                    <option value={item.id} key={item.id}>{item.name}</option>
-                                )
-                            }
-                        </NativeSelect>
-                    </FormControl>
-                    <FormControl style={{ minWidth: 150, margin: '10px' }}>
-                        <InputLabel htmlFor="uncontrolled-native">Category</InputLabel>
-                        <NativeSelect
-                            defaultValue={this.props.wholemenu?.menu[0].id}
-                            onChange={(e) => this.setState({ currCat:parseInt(e.target.value) })}
-                        >
-                            {this.props.wholemenu && this.props.wholemenu?.menu &&
-                                this.props.wholemenu?.menu.map(category =>
-                                    <option value={category.id} key={category.id}>{category.name}</option>
-                                )
-                            }
-                        </NativeSelect>
-                    </FormControl>  
-                </DialogContent>
-                <DialogActions>
-                    <div style={{width: '100%'}}>
-                        <Button onClick={() => this.props.setIsOpen(false) } style={{float:'left'}} color="primary">
-                            Cancel
-                        </Button>
-                        <Button style={{float:'right'}} color="primary" autoFocus onClick={() => this.handleClick()}> 
-                            Add
-                        </Button>
-                    </div>
-                </DialogActions>
-            </Dialog>  
-        );
+                            <InputLabel htmlFor="uncontrolled-native">Category</InputLabel>
+                            <NativeSelect
+                                defaultValue={this.props.wholemenu?.menu[0].id}
+                                onChange={(e) => this.setState({ currCat:parseInt(e.target.value) })}
+                            >
+                                {this.props.wholemenu && this.props.wholemenu?.menu &&
+                                    this.props.wholemenu?.menu.map(category =>
+                                        <option value={category.id} key={category.id}>{category.name}</option>
+                                    )
+                                }
+                            </NativeSelect>
+                        </FormControl>  
+                    </DialogContent>
+                    <DialogActions>
+                        <div style={{width: '100%'}}>
+                            <Button onClick={() => this.props.setIsOpen(false) } style={{float:'left'}} color="primary">
+                                Cancel
+                            </Button>
+                            <Button style={{float:'right'}} color="primary" autoFocus onClick={() => this.handleClick()}> 
+                                Add
+                            </Button>
+                        </div>
+                    </DialogActions>
+                </Dialog>  
+            );
+        } else {
+            return (
+                <Dialog
+                    open={this.props.isOpen}
+                    onEnter={() => this.whenOpened()}
+                    onClose={() => this.props.setIsOpen(false)}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">{"Menu not loaded"}</DialogTitle>
+
+                    <DialogActions>
+                        <div style={{ width: '100%' }}>
+                            <Button onClick={() => this.props.setIsOpen(false)} style={{ float: 'left' }} color="primary">
+                                Cancel
+                            </Button>
+                        </div>
+                    </DialogActions>
+                </Dialog>  
+            );
+        }
     }
 }
 

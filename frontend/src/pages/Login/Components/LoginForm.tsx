@@ -17,6 +17,7 @@ interface IState {
     alertMessage: string;
 }
 
+//Renders the login form
 class PureLogin extends React.Component<{}, IState> {
 
     constructor(props: any) {
@@ -32,6 +33,7 @@ class PureLogin extends React.Component<{}, IState> {
         }
     }
 
+    //logs user in
     async checkLogin() {
         const client = new Client();
         const r: StaffLogin | null = await client.login(this.state.username, this.state.password);
@@ -53,6 +55,7 @@ class PureLogin extends React.Component<{}, IState> {
         }
     }
 
+    //Tried to make a login success alert (doesn't work)
     loginSuccess() {
         //return (<Alert severity="success">This is a success message!</Alert>);
         this.setState({ isOpen: true });
@@ -62,10 +65,19 @@ class PureLogin extends React.Component<{}, IState> {
         console.log('attempting to join room');
     }
 
+    //create the alert message
     setError(message: string) {
         this.setState({ isOpen: true });
         this.setState({ alertMessage: message });
         this.setState({ severity: 'error' });
+    }
+
+    
+
+    //reset current stored username and password
+    resetError() {
+        this.setState({ passerror: false });
+        this.setState({ usererror: false });
     }
 
     /*
@@ -73,12 +85,7 @@ class PureLogin extends React.Component<{}, IState> {
     - Username and password aren't empty
     - Username consist of only letters or spaces
     */
-
-    resetError() {
-        this.setState({ passerror: false });
-        this.setState({ usererror: false });
-    }
-
+    //error checking
     handleLogin() {
         this.resetError();
         if (this.state.username === '' && this.state.password === '') {
@@ -140,8 +147,7 @@ class PureLogin extends React.Component<{}, IState> {
                     onChange={(e) => this.setState({ password: e.target.value })}
                 />
                 <br></br>
-                <br></br>
-                <br></br>
+
                 <button className=" loginbut "
                     onClick={() => { this.handleLogin() }}
                 >Login</button>

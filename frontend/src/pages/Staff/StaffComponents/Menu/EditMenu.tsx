@@ -245,6 +245,11 @@ class EditMenuPage extends React.Component<IProps, IState> {
 
   render() {
     const { classes } = this.props;
+    if (this.props.menu === null || this.props.menu.menu.length === 0) {
+      return (
+        <h1>Menu should be loading...</h1>
+      )
+    } else {
     return (
       <div className={classes.menupage}>
         <EditCategory isOpen={this.state.editCatDialog} setIsOpen={this.catDialogIsOpen} update={this.props.forceUpdateMenu}
@@ -381,6 +386,7 @@ class EditMenuPage extends React.Component<IProps, IState> {
 
       </div >
     );
+    }
   }
 }
 

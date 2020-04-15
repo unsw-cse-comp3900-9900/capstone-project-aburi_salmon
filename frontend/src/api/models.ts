@@ -158,3 +158,7 @@ export type IngredientList = {
 export type WholeItemList = {
   items: Array<Item>
 }
+
+export type Bill = {
+  tables: Array<number>
+}

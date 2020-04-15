@@ -139,6 +139,12 @@ export const manageWaitSocket = (App: any) => {
     socket.on('assistance', ({ table }: TableObject) => {
         console.log(`Table ${table} is requesting assistance`);
         App.updateAssist();
+        App.assistanceAlert();
+    });
+
+    socket.on('billrequest', () => {
+        console.log(`Table is requesting bill`);
+        App.billrequestAlert();
     });
 
     socket.on('order', ({ table }: TableObject) => {

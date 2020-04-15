@@ -78,7 +78,7 @@ class StaffPage extends React.Component<IProps, IState>{
             return 'Waiter'
         } else if (localStorage.getItem('stafftype') === 'kitchen') {
             return 'Kitchen Staff'
-        } else if (localStorage.getItem('stafftype') === 'kitchen') {
+        } else if (localStorage.getItem('stafftype') === 'admin') {
             return 'Admin'
         }
     }

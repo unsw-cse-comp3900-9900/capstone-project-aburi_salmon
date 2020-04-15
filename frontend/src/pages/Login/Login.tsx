@@ -5,6 +5,8 @@ import { LoginForm } from './Components/LoginForm';
 import { RegisterForm } from './Components/RegisterForm';
 import history from '../../history';
 
+// Renders the login and sign up form
+
 class PureLogin extends React.Component {
 
   loggedIn(){
