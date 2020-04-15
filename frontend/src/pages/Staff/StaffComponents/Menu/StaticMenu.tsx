@@ -99,6 +99,13 @@ class StaticMenuPage extends React.Component<IProps, IState> {
 
   render() {
     const { classes } = this.props;
+    if (this.props.menu === null || this.props.menu.menu.length === 0){
+      return(
+        <h1>Menu should be loading...</h1>
+      )
+    } else {
+
+    
     return (
       <div className={classes.menupage}>
             <div className={classes.wrapper}>
@@ -177,6 +184,7 @@ class StaticMenuPage extends React.Component<IProps, IState> {
         </Modal>
       </div >
     );
+                  }
   }
 }
 

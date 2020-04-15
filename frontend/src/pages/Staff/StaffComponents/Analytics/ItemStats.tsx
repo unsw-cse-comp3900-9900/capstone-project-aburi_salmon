@@ -5,6 +5,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import {styles} from './styles';
 
+//display a table containing information on item statistics
 
 const StyledTableCell = withStyles(theme => ({
     head: {
@@ -34,11 +35,7 @@ export interface IProps extends WithStyles<typeof styles> {
     setSelected: any,
 }
 
-interface IState {
- 
-}
-
-class ItemStatsClass extends React.Component<IProps, IState>{
+class ItemStatsClass extends React.Component<IProps, {}>{
 
 
     sortData(dataType: string) {

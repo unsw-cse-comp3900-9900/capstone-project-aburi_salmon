@@ -5,7 +5,7 @@ import TableInfo from './../Assistance/TableInfo';
 import { Tables as TableModel } from './../../../../api/models';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import {styles} from './styles';
-import PaymentIcon from '@material-ui/icons/Payment';
+
 //https://material-ui.com/components/menus/#menus
 //https://stackoverflow.com/questions/58630490/how-to-convert-functional-componenet-to-class-component-in-react-in-material
 
@@ -44,7 +44,6 @@ class Assistance extends React.Component<IProps, IState>{
     }
 
     createTables = () => {
-        console.log(this.props.billRequest);
         let table = [];
         let i = 0;
         let j = 0;
@@ -62,7 +61,6 @@ class Assistance extends React.Component<IProps, IState>{
                                 </div>
                             )
                         } else if (this.props.billRequest !== [] && this.props.billRequest.some(it => tableNum === it)){
-                            console.log('Bill');
                             children.push(
                                 <div className="column" key={tableNum} onClick={() => this.handleClick(tableNum)}>
                                     <div className="billcard"> {'!!! ' + tableNum + ' !!!'}

@@ -9,6 +9,8 @@ export interface IProps {
     changeState: any,
 }
 
+//An alert snackbar for everyone to use
+
 class AlertSnackbar extends React.Component<IProps, {}> {
     render(){
         return(
