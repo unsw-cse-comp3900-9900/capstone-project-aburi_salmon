@@ -4,6 +4,9 @@ import ItemCont from './ItemTemplate';
 import { ItemList } from './../../../../../api/models';
 import {styles }from './styles';
 
+//just for styling purposes
+//renders the table list for served
+
 export interface IProps extends WithStyles<typeof styles> {
     update: any;
     someList: ItemList | null;

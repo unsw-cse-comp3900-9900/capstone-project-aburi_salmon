@@ -5,20 +5,23 @@ import { TableInfo, ResponseMessage as ResponseMessageModel } from './../../../.
 import AlertSnackbar from './../../../AlertSnackbar';
 import {styles} from './styles';
 
+//displays table info given table number
+
+
 export interface IProps extends WithStyles<typeof styles> {
     tableNumber: number,
-    assistance: boolean,
-    isEmpty: boolean | undefined,
+    assistance: boolean,  //whether table requires assistance
+    isEmpty: boolean | undefined, //if true... table is not empty
     paidFunction: any,
 
 }
 
 interface IState {
-    tableInfo: TableInfo | null,
-    hide: string,
-    itemsOrdered: number | undefined,
-    order_id: number,
-    isOpen: boolean,
+    tableInfo: TableInfo | null, 
+    hide: string,  //for hiding the problem 'resolved' button
+    itemsOrdered: number | undefined, //no of items ordered
+    order_id: number, //was once used to free table... not anymore
+    isOpen: boolean, //for fancy alert
     alertMessage: string,
     alertSeverity: "error" | "success" ,
 }
@@ -97,6 +100,7 @@ class TableInfoClass extends React.Component<IProps, IState>{
         }
     }
 
+    //if no items ordered
     noItemsOrdered(){
         if (this.state.itemsOrdered === 0){
             return (

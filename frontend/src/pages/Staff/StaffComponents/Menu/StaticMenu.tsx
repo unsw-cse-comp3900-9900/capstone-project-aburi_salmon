@@ -15,6 +15,9 @@ import Checkbox from '@material-ui/core/Checkbox';
 import { styles } from './styles';
 import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel } from './../../../../api/models';
 
+//Just displays the menu as is (code copied from src/pages/Menu/Menu.tsx but
+//with many functions removed)
+
 interface IProps extends WithStyles<typeof styles> {
   menu: MenuModel | null;
   value: string;

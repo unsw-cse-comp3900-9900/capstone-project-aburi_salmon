@@ -15,7 +15,6 @@ interface TableObject {
 
 }
 
-
 export const connectToSocket = (App: App) => {
     socket = io('http://localhost:5000');
 

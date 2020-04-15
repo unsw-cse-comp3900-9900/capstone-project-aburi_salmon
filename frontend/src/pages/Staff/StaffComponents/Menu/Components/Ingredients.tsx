@@ -56,12 +56,17 @@ class Ingredients extends React.Component<IProps, IState>{
         
     }
 
+    //adding/removing ingredients from an item
+    //should hopefully work...
     async addAll(){
         const client = new Client();
         var r;
+        //for each ingredient (in ingredient pool)
         this.state.ingredientsId.forEach(async (id, index) => {
+            //if ingredient is selected and not already in the item, add it
             if (this.state.selected[index] === true && this.props.itemIngredients.indexOf(id) === -1){
                 r = client.addIngredToItem(this.props.currItem.id, id);
+            //else if ingredient is not selected but is in the item, remove it
             } else if (this.props.itemIngredients.indexOf(id) !== -1 && this.state.selected[index] === false){
                 r = client.removeIngredFromItem(this.props.currItem.id, id);
             }
@@ -87,6 +92,8 @@ class Ingredients extends React.Component<IProps, IState>{
         this.setState({selected: temp});
     }
 
+
+    //when dialog is opened, initialise everything needed
     whenOpened(){
         this.setState({ ingredientsId: [], selected: [] });
         var temp: Array<boolean> = [];
@@ -104,6 +111,7 @@ class Ingredients extends React.Component<IProps, IState>{
         this.setState({ selected: temp, ingredientsId: temp2 });
     }
 
+    //so that when item ingredients is opened, the current ingredients are selected
     componentDidUpdate( prevProps: any,prevState: any){
         //console.log(prevProps.itemIngredients);
         //console.log(this.props.itemIngredients);

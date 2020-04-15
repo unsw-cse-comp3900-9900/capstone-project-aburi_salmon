@@ -1,6 +1,8 @@
 import React from 'react';
 import { Button, Dialog, DialogContent, DialogContentText, DialogActions, DialogTitle, FormControl, InputLabel, NativeSelect} from '@material-ui/core';
 
+
+// renders a Help dialog
 export interface IProps {
     isOpen: boolean, //state of dialog
     setIsOpen: any, //function to change state of is open

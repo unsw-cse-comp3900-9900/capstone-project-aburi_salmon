@@ -7,7 +7,7 @@ import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import {styles} from './styles';
 
 //https://material-ui.com/components/menus/#menus
-//https://stackoverflow.com/questions/58630490/how-to-convert-functional-componenet-to-class-component-in-react-in-material
+//Renders the assistance page (which displays the tables)
 
 export interface IProps extends WithStyles<typeof styles> {
     tables: TableModel | null,
@@ -19,10 +19,11 @@ export interface IProps extends WithStyles<typeof styles> {
 interface IState{
     numTables: number,
     selectedTable: number,
-    main: boolean,
-    resetOpen: boolean,
+    main: boolean,  //is main assistance page displayed or tables info page displayed
+    helpOpen: boolean, //if help dialog is open
 
 }
+
 
 class Assistance extends React.Component<IProps, IState>{
     constructor(props: IProps){
@@ -31,7 +32,7 @@ class Assistance extends React.Component<IProps, IState>{
             numTables: 15,
             selectedTable: 0, //Selected table, 0 means none selected
             main: true, //main screen
-            resetOpen: false,
+            helpOpen: false,
         }
         this.needAssistance = this.needAssistance.bind(this);
         this.paid = this.paid.bind(this);
@@ -43,6 +44,7 @@ class Assistance extends React.Component<IProps, IState>{
         this.setState({main: false});
     }
 
+    //printing the tables
     createTables = () => {
         let table = [];
         let i = 0;
@@ -99,6 +101,7 @@ class Assistance extends React.Component<IProps, IState>{
         this.setState({ main: true });
     }
 
+    //paid function is passed in from props
     paid(){
         this.props.update();
     }
@@ -113,6 +116,7 @@ class Assistance extends React.Component<IProps, IState>{
         );
     }
 
+    //check if tables needs assistance
     needAssistance(tablenum: number):boolean{
         var ret = false;
         this.props.assistance.forEach((item: number) =>{
@@ -123,16 +127,17 @@ class Assistance extends React.Component<IProps, IState>{
         return ret;
     }
 
+    //renders help dialog
     helpDialog() {
         return (
             <div>
-                <Dialog open={this.state.resetOpen} onClose={() => this.setState({ resetOpen: false })} aria-labelledby="form-dialog-title">
+                <Dialog open={this.state.helpOpen} onClose={() => this.setState({ helpOpen: false })} aria-labelledby="form-dialog-title">
                     <DialogTitle id="form-dialog-title">Help</DialogTitle>
                     <DialogContent>
                         Each rectangle represents a table with the table number in the middle. Tap on a rectangle to view information about that table.
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={() => this.setState({ resetOpen: false })} color="primary">
+                        <Button onClick={() => this.setState({ helpOpen: false })} color="primary">
                             Ok, I get it
                         </Button>
                         
@@ -148,7 +153,7 @@ class Assistance extends React.Component<IProps, IState>{
                 <div className={this.props.classes.container3}>
                     <div className={this.props.classes.container}>
                         {this.helpDialog()}
-                        <h1>Tables <div className={this.props.classes.helpIcon} onClick={() => this.setState({resetOpen: true})}><HelpOutlineIcon /></div></h1>
+                        <h1>Tables <div className={this.props.classes.helpIcon} onClick={() => this.setState({helpOpen: true})}><HelpOutlineIcon /></div></h1>
                         {this.createTables()}
                     </div>
                     <div className={this.props.classes.container2}>

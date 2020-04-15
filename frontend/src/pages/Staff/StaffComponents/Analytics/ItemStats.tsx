@@ -37,7 +37,7 @@ export interface IProps extends WithStyles<typeof styles> {
 
 class ItemStatsClass extends React.Component<IProps, {}>{
 
-
+    //for sorting table if arrow is clicked
     sortData(dataType: string) {
         var temp = this.props.realData;
         var sorted = temp;
