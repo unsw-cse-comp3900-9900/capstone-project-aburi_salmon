@@ -815,3 +815,16 @@ class DB:
         print(total_time)
 
         return total_time
+
+
+    def get_orderId(self, item_id):
+        rows = self.__query(
+            'SELECT order_id FROM "item_order" WHERE id = %s',
+            [item_id]
+        )
+
+        if (not rows or not rows[0]):
+            return None
+
+        return rows[0][0]
+
