@@ -6,6 +6,7 @@ import { Client } from './../../../../../api/client';
 export interface IProps extends WithStyles<typeof styles>{
     isOpen: boolean,
     setIsOpen: any, //function to change state of is open
+    setAlert: any,
 }
 
 interface IState {
@@ -28,11 +29,13 @@ class ResetRegist extends React.Component<IProps, IState>{
     async resetKey(dialog: any) {
         if (this.state.key !== this.state.keyRepeat) {
             console.warn('New key does not match the retyped value');
+            this.props.setAlert(true, 'error', 'New key does not match the retyped value');
             return;
         }
 
         if (!this.state.key) {
             console.warn('New key must have a value');
+            this.props.setAlert(true, 'error', 'New key must have a value');
             return;
         }
 
@@ -40,11 +43,15 @@ class ResetRegist extends React.Component<IProps, IState>{
 
         if (!await client.changeRegistrationKey(this.state.staffType, this.state.key)) {
             console.error('Failed to change registration key');
+            this.props.setAlert(true, 'error', 'Failed to change registration key');
             return;
         }
 
+        this.props.setAlert(true, 'success', 'Resgistration Key Successfully Changed');
         dialog.props.setIsOpen(false);
     }
+
+
 
     render() {
         return (
