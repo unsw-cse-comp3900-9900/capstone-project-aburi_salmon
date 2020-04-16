@@ -2,7 +2,8 @@ from flask import request, jsonify
 from flask_restx import Resource, abort, reqparse, fields
 from flask_jwt_extended import get_jwt_claims, jwt_required
 
-from app import api, db
+from app import api, db, order_db
+#from db import order_db
 import model.response_model as response_model
 import model.request_model as request_model
 from util.socket import socket
@@ -189,7 +190,8 @@ class ModifyItemOrderStatus(Resource):
             abort(500, 'Something went wrong')
         print('item_id is ' + str(item_order_id))
         #order_id = get_jwt_claims().get('order')
-        order_id = db.get_orderId(item_order_id)
+        order_id = order_db.get_orderId(item_order_id)
+        print('item_id is ' + str(order_id))
         customerRoom = 'customer' + str(order_id)
   
         # orderNumber = get_jwt_claims().get('order')

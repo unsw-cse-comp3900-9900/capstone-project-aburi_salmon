@@ -8,6 +8,7 @@ from flask_jwt_extended import JWTManager
 
 from model.dbconfig import DbConfig
 from db.interface import DB
+from db.order_db import order_DB
 import config
 
 # Init Flask object
@@ -31,6 +32,7 @@ flask_app.config['JWT_SECRET_KEY'] = config.JWT_SECRET_KEY
 ## Exported variables to routes
 api = Api(flask_app)
 db = DB(dbConfig)
+order_db = order_DB(dbConfig)
 jwt = JWTManager(flask_app)
 
 def run_app(host, port):
