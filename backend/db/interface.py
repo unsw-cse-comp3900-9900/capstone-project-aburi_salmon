@@ -4,6 +4,8 @@ import psycopg2
 
 from model.dbconfig import DbConfig
 
+
+
 class DB:
     def __init__(self, dbConfig=DbConfig):
         self.__conn = psycopg2.connect(dbConfig.config())
