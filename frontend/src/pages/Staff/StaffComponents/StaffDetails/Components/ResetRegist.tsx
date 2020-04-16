@@ -40,7 +40,7 @@ class ResetRegist extends React.Component<IProps, IState>{
         }
 
         const client = new Client();
-
+        console.log(this.state.staffType);
         if (!await client.changeRegistrationKey(this.state.staffType, this.state.key)) {
             console.error('Failed to change registration key');
             this.props.setAlert(true, 'error', 'Failed to change registration key');
@@ -56,7 +56,8 @@ class ResetRegist extends React.Component<IProps, IState>{
     render() {
         return (
             <div>
-                <Dialog open={this.props.isOpen} onClose={() => this.props.setIsOpen(false)} aria-labelledby="form-dialog-title">
+                <Dialog open={this.props.isOpen} onClose={() => this.props.setIsOpen(false)} 
+                aria-labelledby="form-dialog-title" onEnter={() => this.setState({staffType: 'Manage'})}>
                     <DialogTitle id="form-dialog-title">Change Registration Key</DialogTitle>
                     <DialogContent>
                         <form>
