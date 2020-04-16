@@ -65,7 +65,7 @@ class Assistance extends React.Component<IProps, IState>{
                         } else if (this.props.billRequest !== [] && this.props.billRequest.some(it => tableNum === it)){
                             children.push(
                                 <div className="column" key={tableNum} onClick={() => this.handleClick(tableNum)}>
-                                    <div className="billcard"> {'!!! ' + tableNum + ' !!!'}
+                                    <div className="billcard"> {tableNum}
                                     </div>
                                 </div>
                             )

@@ -9,9 +9,10 @@ export const styles = (theme: Theme) =>
     wrapper: {
       height: '100%',
       width: '100%',
+      overflow: 'auto',
     },
     wrapper1: {
-      height: '94%',
+      height: '93%',
       width: '100%',
       overflow: 'auto',
     },
@@ -22,5 +23,8 @@ export const styles = (theme: Theme) =>
     icon: {
       display: 'flex',
       alignItems: 'center',
+    },
+    tableCont: {
+      maxHeight: '95%',
     },
   });

@@ -90,8 +90,8 @@ class ItemStatsClass extends React.Component<IProps, {}>{
     printItemTable() {
         const { classes } = this.props;
         return (
-            <TableContainer component={Paper}>
-                <Table className={classes.table} aria-label="customized table" size="small">
+            <TableContainer component={Paper} className={classes.tableCont}>
+                <Table stickyHeader={true} className={classes.table} aria-label="customized table" size="small">
                     <TableHead>
                         <TableRow>
                             <StyledTableCell onClick={() => this.handleClick("itemId")}><div className={classes.icon}>Item ID {this.printArrow("itemId")}</div></StyledTableCell>
