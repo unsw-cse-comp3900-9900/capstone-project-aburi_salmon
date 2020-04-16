@@ -93,12 +93,9 @@ class DB:
 
     def validate_key(self, key):
         # Check if valid key
-        rows = self.__query("SELECT registration_key, staff_type FROM staff_registration WHERE registration_key = %s AND not used;", [key])
-        if (rows == None):
+        rows = self.__query("SELECT registration_key, staff_type FROM staff_registration WHERE registration_key = %s;", [key])
+        if (rows == None or not rows[0]):
             return False
-
-        # Set used to true
-        self.__update("UPDATE staff_registration SET used = %s WHERE registration_key = %s", [True, key])
 
         return rows[0][1]
         
