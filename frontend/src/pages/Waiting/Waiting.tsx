@@ -215,6 +215,16 @@ class WaitingPage extends React.Component<IProps, IState> {
     });
   }
 
+  async requestAssistance() {
+    this.socket.emit('assistance');
+    const client = new Client();
+    const r = await client.assistance(null, true);
+
+    if (r) {
+      console.log("Assistance has been requested");
+    }
+  }
+
   async componentDidMount() {
     await this.updateOrders();
   }
@@ -269,7 +279,7 @@ class WaitingPage extends React.Component<IProps, IState> {
         <RightBar
           first={
             <div className={classes.rightdiv}>
-              <Button className={classes.assistancebutton} variant="contained" color="primary" disabled={this.state.assistanceButtonDisabled}>Request assistance</Button>
+              <Button className={classes.assistancebutton} variant="contained" color="primary" disabled={this.state.assistanceButtonDisabled} onClick={()=> this.requestAssistance()}>Request assistance</Button>
               <Button className={classes.additembutton} variant="contained" color="primary" disabled={this.state.addItemButtonDisabled} onClick={() => history.push('/menu')}>Add item to order</Button>
             </div>
           }

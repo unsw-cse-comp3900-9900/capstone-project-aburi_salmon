@@ -347,7 +347,7 @@ export class Client {
     }
   }
 
-  async assistance(table: number, assistance: boolean) {
+  async assistance(table: number | null, assistance: boolean) {
     try {
       const r: Response = await fetch(apiUrl + '/table/assistance', {
         method: 'PUT',
