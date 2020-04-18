@@ -562,7 +562,7 @@ export class Client {
         credentials: 'include',
         mode: 'cors',
       });
-      const j: ResponseMessage = await r.json();
+      const j = await r.json();
       return j;
     } catch (e) {
       console.error(e);
