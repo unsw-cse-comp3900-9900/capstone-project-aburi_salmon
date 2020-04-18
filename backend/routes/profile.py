@@ -18,21 +18,19 @@ profile = api.namespace('profile', description='Profile route')
 class GetProfile(Resource):
     @jwt_required
     def get(self):
-        # Gets username from JWT
-        curr_user = get_jwt_identity()   #username
-        
+
+        # Get current user's details (staff)
+        curr_user = get_jwt_identity()              # get username from JWT
         profile_dict = db.get_profile(curr_user)
         curr_name = profile_dict['name']
         curr_staff_type_id =profile_dict['staff_type_id']
-
-        print(curr_user)
-        print(curr_name)
-        print(curr_staff_type_id)
 
         return profile_dict
 
     @profile.expect(edit_profile_model)
     def post(self):
+
+        # Edit staff details
         profile_dict = self.get()
         curr_name = profile_dict['name']
         curr_staff_type_id =profile_dict['staff_type_id']
