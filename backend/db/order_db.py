@@ -1,81 +1,12 @@
-import hmac
-
-import psycopg2
-
-from model.dbconfig import DbConfig
-
-from app import db
-
 class order_DB:
-    '''
-    def __init__(self, dbConfig=DbConfig):
-        self.__conn = psycopg2.connect(dbConfig.config())
 
-    def __query(self, query, params=[]):
-        c = self.__conn.cursor()
-        try:
-            c.execute(query, params)
-        except Exception as e:
-            c.execute("ROLLBACK")
-            self.__conn.commit()
-            print(e)
-            c.close()
-            return None
+    def __init__(self, db):
+        self.db = db
 
-        rows = c.fetchall()
-        
-        c.close()
-        print(rows)
-        return rows if len(rows) else None
 
-    def __update(self, update, params):
-        c = self.__conn.cursor()
-        try:
-            # This might be different, depending on your table and column name
-            c.execute(update, params)
-        except Exception as e:
-            c.execute("ROLLBACK")
-            self.__conn.commit()
-            print(e)
-            c.close()
-            return False
-
-        c.close()
-        self.__conn.commit()
-        return True
-
-    def __insert(self, insert, params):
-        c = self.__conn.cursor()
-
-        try:
-            c.execute(insert, params)
-        except Exception as e:
-            c.execute("ROLLBACK")
-            self.__conn.commit()
-            print(e)
-            c.close()
-            raise e
-
-        c.close()
-        self.__conn.commit()
-
-    def __delete(self, delete, params=[]):
-        c = self.__conn.cursor()
-        try:
-            c.execute(delete, params)
-        except Exception as e:
-            c.execute("ROLLBACK")
-            self.__conn.commit()
-            print(e)
-            c.close()
-            return False
-
-        c.close()
-        self.__conn.commit()
-        return True
-        '''
-    def get_ordered_items_customer(order_id):
-        rows = db.__query("""SELECT io.id as item_order_id, io.order_id, i.name, i.id as item_id, io.quantity,
+    # Get a list of all the items a customer has ordered
+    def get_ordered_items_customer(self, order_id):
+        rows = self.db.query("""SELECT io.id as item_order_id, io.order_id, i.name, i.id as item_id, io.quantity,
         i.price, s.id as status_id, s.status_name, io.comment
         FROM item_order io, item i, status s, "order" o
         WHERE s.id = io.status_id
@@ -105,16 +36,18 @@ class order_DB:
 
         return item_order
 
-    def get_order_status(order_id):
-        rows = db.__query('SELECT bill_request FROM "order" o WHERE o.id = %s', [order_id])
+    # Get the status of an order, given the order_id
+    def get_order_status(self, order_id):
+        rows = self.db.query('SELECT bill_request FROM "order" o WHERE o.id = %s', [order_id])
 
         if (not rows):
             return False
         
         return rows[0][0]
 
-    def get_table_id(order_id):
-        rows = db.__query(
+    # Get the table ID of an order, given an order id
+    def get_table_id(self, order_id):
+        rows = self.db.query(
             '''
             SELECT o.table_id FROM "order" o WHERE o.id = %s
             ''',
@@ -130,54 +63,41 @@ class order_DB:
         return rows[0][0]
 
 
-
-    def insert_order(table_id):
-        db.insert('INSERT INTO "order" (table_id) VALUES (%s);', [table_id,])
-        order_id = db.__query('SELECT id FROM "order" ORDER BY id DESC LIMIT %s', [1,])[0][0]
+    # Insert an order, provided a table number
+    def insert_order(self, table_id):
+        self.db.insert('INSERT INTO "order" (table_id) VALUES (%s);', [table_id,])
+        order_id = self.db.query('SELECT id FROM "order" ORDER BY id DESC LIMIT %s', [1,])[0][0]
         
         return order_id  
 
-    def insert_item_order(order_id, item_id, quantity, comment):
-        db.__insert("INSERT INTO item_order (item_id, order_id, quantity, status_id, comment) VALUES (%s, %s, %s, %s, %s);", [item_id, order_id, quantity, 1, comment])
+
+    # Insert an item into an order
+    def insert_item_order(self, order_id, item_id, quantity, comment):
+        self.db.insert("INSERT INTO item_order (item_id, order_id, quantity, status_id, comment) VALUES (%s, %s, %s, %s, %s);", [item_id, order_id, quantity, 1, comment])
         return True
 
 
-    def add_order(order_id, item_id, quantity, comment):
-        io_id = db.__query("INSERT INTO item_order (item_id, order_id, quantity, status_id, comment) VALUES (%s, %s, %s, %s, %s) RETURNING id;", [item_id, order_id, quantity, 1, comment])
+    # Add an item to an order ID
+    def add_order(self, order_id, item_id, quantity, comment):
+        io_id = self.db.query("INSERT INTO item_order (item_id, order_id, quantity, status_id, comment) VALUES (%s, %s, %s, %s, %s) RETURNING id;", [item_id, order_id, quantity, 1, comment])
 
         if (not io_id):
             return None
 
         return io_id[0][0]
 
-
-    def modify_item_order(item_order_id, comment, quantity):
+    # Modify an item order
+    def modify_item_order(self, item_order_id, comment, quantity):
         new_quantity = quantity
-        return db.__update("UPDATE item_order SET quantity = %s, status_id = 1, comment = %s WHERE id = %s", [new_quantity, comment, item_order_id])
+        return self.db.update("UPDATE item_order SET quantity = %s, status_id = 1, comment = %s WHERE id = %s", [new_quantity, comment, item_order_id])
 
+    # Delete an item order
+    def delete_item_order(self, item_order_id):
+        return self.db.delete("DELETE FROM item_order WHERE id = %s", [item_order_id,])
 
-    def get_table_id(order_id):
-        rows = db.__query(
-            '''
-            SELECT o.table_id FROM "order" o WHERE o.id = %s
-            ''',
-            [order_id]
-        )
-
-        print('Getting table id')
-        print(rows)
-
-        if (not rows or not rows[0]):
-            return None
-
-        return rows[0][0]
-
-    def delete_item_order(item_order_id):
-        return db.__delete("DELETE FROM item_order WHERE id = %s", [item_order_id,])
-
-
-    def get_orderId(item_id):
-        rows = db.__query(
+    # Get the order ID given the item ID
+    def get_orderId(self, item_id):
+        rows = self.db.query(
             'SELECT order_id FROM "item_order" WHERE id = %s',
             [item_id]
         )
@@ -188,8 +108,9 @@ class order_DB:
         return rows[0][0]
 
 
-    def get_item_order_status(item_order_id):
-        status = db.__query('SELECT status_id FROM item_order WHERE id = %s', [item_order_id,])
+    # The the order status of an item, given the item order id
+    def get_item_order_status(self, item_order_id):
+        status = self.db.query('SELECT status_id FROM item_order WHERE id = %s', [item_order_id,])
 
         if (not status):
             return None
@@ -197,13 +118,14 @@ class order_DB:
         return status[0][0]
 
 
-    def update_item_ordered_status(id, status):
-        return db.__update("UPDATE item_order SET status_id = %s WHERE id = %s", [status, id])
+    # Update the status of an item, given it's id
+    def update_item_ordered_status(self, id, status):
+        return self.db.update("UPDATE item_order SET status_id = %s WHERE id = %s", [status, id])
 
 
-
-    def get_ordered_items(order_id):
-        rows = db.__query(
+    # Get the order ID of an item
+    def get_ordered_items(self, order_id):
+        rows = self.db.query(
             'SELECT i.name, io.quantity, i.price, io.id, io.status_id FROM "order" o JOIN item_order io on (o.id = io.order_id) JOIN item i on (i.id = io.item_id) WHERE o.id = %s',
             [order_id]
         )
@@ -221,8 +143,9 @@ class order_DB:
         return orders
 
 
-    def get_order_list(status):
-        rows = db.__query(
+    # Get a list of orders with a specific status
+    def get_order_list(self, status):
+        rows = self.db.query(
             """
             SELECT item.name, io.quantity, item.price, io.id, io.status_id, o.table_id, io.comment
             FROM item_order io JOIN item ON (io.item_id = item.id)
@@ -248,13 +171,12 @@ class order_DB:
         return orders
 
 
-    def get_order_time(order_id):
-
-        # Calculate estimated order time
-        # Assume time taken is the sum of cooking time of each item,
-        # ignoring quantity, assuming the kitchen staff cooks same items all at the same time.
+    # Calculate estimated order time
+    # Assume time taken is the sum of cooking time of each item,
+    # ignoring quantity, assuming the kitchen staff cooks same items all at the same time.
+    def get_order_time(self, order_id):
         print('Getting time')
-        rows = db.__query('SELECT io.quantity, i.time FROM "order" o, item i, item_order io WHERE o.id = io.order_id AND io.item_id = i.id AND o.id = %s', [order_id])
+        rows = self.db.query('SELECT io.quantity, i.time FROM "order" o, item i, item_order io WHERE o.id = io.order_id AND io.item_id = i.id AND o.id = %s', [order_id])
         
         if (not rows):
             return None
