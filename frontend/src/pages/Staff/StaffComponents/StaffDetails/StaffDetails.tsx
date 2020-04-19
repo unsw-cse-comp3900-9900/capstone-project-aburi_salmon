@@ -84,6 +84,7 @@ class StaffDetails extends React.Component<IProps, IState>{
         this.resetKeyOpen = this.resetKeyOpen.bind(this);
         this.deleteStaff = this.deleteStaff.bind(this);
         this.changeStaffType = this.changeStaffType.bind(this);
+        this.setAlert = this.setAlert.bind(this);
     }
 
     deleteIsOpen(isOpen: boolean){
@@ -99,6 +100,10 @@ class StaffDetails extends React.Component<IProps, IState>{
 
     resetKeyOpen(isOpen: boolean){
         this.setState({resetKeyOpen: isOpen});
+    }
+
+    setAlert(isOpen: boolean, severity: 'success' | 'error', alertMessage: string){
+        this.setState({isOpen: isOpen, severity: severity, alertMessage: alertMessage});
     }
 
     //changing staff type
@@ -153,7 +158,7 @@ class StaffDetails extends React.Component<IProps, IState>{
                 <DeleteDialog isOpen={this.state.deleteOpen} setIsOpen={this.deleteIsOpen} deleteStaff={this.deleteStaff} />
                 <ChangeStaffType isOpen={this.state.resetOpen} setIsOpen={this.resetIsOpen} changeStaffType={this.changeStaffType} username={this.state.selectedStaff.username}/>
                 {/*<ChangeTableNo isOpen={this.state.tableOpen} setIsOpen={this.tableNoIsOpen} />*/}
-                <ResetRegist isOpen={this.state.resetKeyOpen} setIsOpen={this.resetKeyOpen} />
+                <ResetRegist isOpen={this.state.resetKeyOpen} setIsOpen={this.resetKeyOpen} setAlert={this.setAlert}/>
                 <Table className={classes.table} aria-label="customized table" size="small" stickyHeader={true}>
                     <TableHead>
                         <TableRow>

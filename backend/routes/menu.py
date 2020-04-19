@@ -173,14 +173,13 @@ class MenuCategory(Resource):
     @menu.response(400, 'Invalid Request')
     def delete(self, id):
         items = db.get_items_by_category(id)
-        if (len(items) < 1):
+        if (len(items) > 0):
             abort(400, 'Can only delete empty category')
 
         # Delete a category
         if (not db.delete_category(id)):
             abort(400, 'Invalid request')
 
-        db.delete_category(id)
 
         return jsonify({ 'status': 'success' })
 
