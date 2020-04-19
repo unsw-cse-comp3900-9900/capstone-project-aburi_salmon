@@ -7,8 +7,8 @@ from model.dbconfig import DbConfig
 class DB:
     def __init__(self, dbConfig=DbConfig):
         self.__conn = psycopg2.connect(dbConfig.config())
-
-    def __query(self, query, params=[]):
+    
+    def query(self, query, params=[]):
         c = self.__conn.cursor()
         try:
             c.execute(query, params)
@@ -25,7 +25,13 @@ class DB:
         print(rows)
         return rows if len(rows) else None
 
+    def __query(self, query, params=[]):
+        return self.query(query, params)
+
     def __update(self, update, params):
+        return self.update(update, params)
+
+    def update(self, update, params):
         c = self.__conn.cursor()
         try:
             # This might be different, depending on your table and column name
@@ -42,6 +48,9 @@ class DB:
         return True
 
     def __insert(self, insert, params):
+        return self.insert(insert, params)
+
+    def insert(self, insert, params):
         c = self.__conn.cursor()
 
         try:
@@ -57,6 +66,9 @@ class DB:
         self.__conn.commit()
 
     def __delete(self, delete, params=[]):
+        return self.delete(delete, params)
+    
+    def delete(self, delete, params=[]):
         c = self.__conn.cursor()
         try:
             c.execute(delete, params)
@@ -161,245 +173,6 @@ class DB:
 
     def update_item_ordered_status(self, id, status):
         return self.__update("UPDATE item_order SET status_id = %s WHERE id = %s", [status, id])
-
-
-    def get_category(self, id):
-        rows = self.__query('SELECT * FROM category WHERE id = %s', [id])
-
-        if (not rows or not rows[0]):
-            return
-        
-        category = {
-            'id': id,
-            'name': rows[0][1],
-            'position': rows[0][2],
-            'items': self.get_items_by_category(id)
-        }
-
-        return category
-        
-    def create_item(self, item):
-        image_url = item.get('image_url')
-
-        if image_url is None:
-            image_url = ""
-
-        rows = self.__query(
-            'INSERT INTO item (name, description, price, visible, image_url) VALUES (%s, %s, %s, %s, %s) RETURNING id',
-            [item.get('name'), item.get('description'), item.get('price'), item.get('visible'), image_url]
-        )
-        if not rows or not rows[0]:
-            return None
-
-        return rows[0][0]
-
-    def get_all_menu_items(self):
-        rows = self.__query(
-            'SELECT id, name, description, price, visible, image_url FROM item'
-        )
-        if (not rows):
-            return []
-
-        return [{
-            'id': row[0],
-            'name': row[1],
-            'description': row[2],
-            'price': row[3],
-            'visible': row[4],
-            'image_url': row[5],
-            'ingredients': self.get_item_ingredients(row[0])
-        } for row in rows]
-
-    def get_item_by_id(self, id):
-        rows = self.__query('SELECT id, name, description, price, visible, image_url FROM item WHERE id = %s', [id])
-        if (not rows):
-            return None
-        
-        itemRow = rows[0]
-        return {
-            'id': itemRow[0],
-            'name': itemRow[1],
-            'description': itemRow[2],
-            'price': itemRow[3],
-            'visible': itemRow[4],
-            'image_url': itemRow[5],
-            'ingredients': self.get_item_ingredients(id)
-        }
-
-    def get_items_by_category(self, category_id):
-        rows = self.__query(
-            'SELECT id, name, description, price, visible, image_url FROM item i JOIN category_item ci on (i.id = ci.item_id) WHERE ci.category_id = %s',
-            [category_id]
-        )
-
-        if (not rows):
-            return []
-        
-        return [{
-            'id': row[0],
-            'name': row[1],
-            'description': row[2],
-            'price': row[3],
-            'visible': row[4],
-            'image_url': row[5],
-            'ingredients': self.get_item_ingredients(row[0])
-        } for row in rows]
-
-    def edit_item(self, editStatement, editArr):
-        return self.__update(editStatement, editArr)
-
-    def delete_item(self, id):
-        return (
-            self.__delete('DELETE FROM category_item WHERE item_id = %s', [id]) and
-            self.__delete("DELETE FROM item WHERE id = %s", [id])
-        )
-
-    def create_category(self, name):
-        # Set the postion to the current highest position + 1 
-        rows = self.__query('SELECT max(position) FROM category')
-        position = rows[0][0] + 1
-
-        self.__insert(
-            'INSERT INTO category (name, position) VALUES (%s, %s)',
-            [name, position]
-        )
-        return True
-
-    def get_categories(self):
-        rows = self.__query('SELECT * FROM category ORDER BY position')
-        if (not rows):
-            return None
-        
-        return [{
-            'id': row[0],
-            'name': row[1],
-            'position': row[2]
-        } for row in rows]
-
-    def edit_category(self, editStatement, editArr):
-        return self.__update(editStatement, editArr)
-
-    def delete_category(self, id):
-        self.__delete('DELETE FROM category_item WHERE category_id = %s', [id])
-        return self.__delete('DELETE FROM category WHERE id = %s', [id])
-
-    
-    def swapCategoryPositions(self, id1, id2):
-        print('Swapping categories {} and {}'.format(id1, id2))
-        # Get positions
-        rows = self.__query('SELECT position FROM category WHERE id in (%s, %s) ORDER BY id', [id1, id2])
-        position1 = rows[0][0]
-        position2 = rows[1][0]
-
-        print(position1, position2)
-        # Update position 1 and position 2
-        return (
-            self.__update('UPDATE category SET position = %s WHERE id = %s', [0, id1]) and
-            self.__update('UPDATE category SET position = %s WHERE id = %s', [position1, id2]) and
-            self.__update('UPDATE category SET position = %s WHERE id = %s', [position2, id1])
-        )
-
-    def add_item_to_category(self, category_id, item_id):
-        # Check if the item not in category already
-        rows = self.__query(
-            'SELECT * FROM category_item WHERE category_id = %s AND item_id = %s',
-            [category_id, item_id]
-        )
-        
-        if (rows != None):
-            # Item already in category
-            return False
-
-        # Add item to category
-        self.__insert(
-            'INSERT INTO category_item (item_id, category_id) VALUES (%s, %s)',
-            [item_id, category_id]
-        )
-        return True
-
-    def remove_item_from_category(self, category_id, item_id):
-        return self.__delete(
-            'DELETE FROM category_item WHERE category_id = %s AND item_id = %s',
-            [category_id, item_id]
-        )
-
-    def get_all_ingredients(self):
-        rows = self.__query('SELECT * FROM ingredient')
-        if (not rows):
-            return []
-        
-        return [{
-            'id': row[0],
-            'name': row[1]
-        } for row in rows]
-
-    def create_ingredient(self, name):
-        self.__insert(
-            'INSERT INTO ingredient (name) VALUES (%s)',
-            [name]
-        )
-        return True
-
-    def get_ingredient_by_id(self, id):
-        rows = self.__query(
-            'SELECT * FROM ingredient WHERE id = %s',
-            [id]
-        )
-
-        if (not rows or not rows[0]):
-            return None
-
-        ingredient = rows[0]
-        return {
-            'id': ingredient[0],
-            'name': ingredient[1]
-        }
-
-    def get_item_ingredients(self, id):
-        rows = self.__query(
-            'SELECT * FROM ingredient i JOIN item_ingredient ii on (i.id = ii.ingredient_id) WHERE ii.item_id = %s',
-            [id]
-        )
-        
-        if (not rows):
-            return []
-
-        return [{
-            'id': row[0],
-            'name': row[1]
-        } for row in rows]
-
-    def edit_ingredient(self, editStatement, editArr):
-        self.__update(editStatement, editArr)
-        return True
-
-    def delete_ingredient(self, id):
-        rows = self.__query(
-            'SELECT count(item_id) FROM item_ingredient WHERE ingredient_id = %s',
-            [id]
-        )
-
-        if (rows[0][0]):
-            return False
-        
-        return self.__delete(
-            'DELETE FROM ingredient WHERE id = %s',
-            [id]
-        )
-
-    def add_ingredient_to_item(self, item_id, ingredient_id):
-        self.__insert(
-            'INSERT INTO item_ingredient (item_id, ingredient_id) VALUES (%s, %s)',
-            [item_id, ingredient_id]
-        )
-
-        return True
-
-    def remove_ingredient_from_item(self, item_id, ingredient_id):
-        return self.__delete(
-            'DELETE FROM item_ingredient WHERE item_id = %s AND ingredient_id = %s',
-            [item_id, ingredient_id]
-        )
 
     def get_quantity(self, item_order_id):
         quantity = self.__query('SELECT quantity FROM item_order WHERE id = %s', [item_order_id])

@@ -46,11 +46,6 @@ def run_app(host, port):
     import routes.staff_profiles
     import routes.stats
 
-
-    ## When SocketIO is enabled, comment this
-    # flask_app.run(host=host, port=port, debug=True)
-
-    ## and uncomment these
     from util.socket import socket
     socket.run(flask_app, host=host, port=port, debug=True)
 
