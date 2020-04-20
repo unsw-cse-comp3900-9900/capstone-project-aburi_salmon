@@ -260,3 +260,15 @@ class OrderTime(Resource):
         return { 
             'estimated_time': time
         }
+
+    @jwt_required
+    @order.response(200, 'Success')
+    @order.response(400, 'Invalid request')
+    def get(self):
+        order_id = get_jwt_claims().get('order')
+
+        time = db.get_order_time(order_id)
+
+        return { 
+            'estimated_time': time
+        }
