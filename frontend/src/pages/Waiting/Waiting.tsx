@@ -214,7 +214,7 @@ class WaitingPage extends React.Component<IProps, IState> {
       }
     })
 
-    const time = t ? t.estimated_time : 0;
+    const time = t?.estimated_time ? t.estimated_time : 0;
 
     let billButtonString: string = "Pay bill";
     let addItemButtonDisabled: boolean = false;
@@ -305,7 +305,7 @@ class WaitingPage extends React.Component<IProps, IState> {
           second={
             <div className={classes.rightdiv}>
               <Typography variant="h4">{this.state.estimatedTime !== 0 ? "Estimated time" : ""}</Typography>
-              <Typography variant="h4">{this.state.estimatedTime !== 0 ? this.state.estimatedTime : ""} minutes</Typography>
+              <Typography variant="h4">{this.state.estimatedTime !== 0 ? this.state.estimatedTime + " minutes": ""}</Typography>
             </div>
           }
           third={
