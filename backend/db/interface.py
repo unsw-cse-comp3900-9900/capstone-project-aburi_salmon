@@ -290,6 +290,16 @@ class DB:
 
         return rows[0][0]
 
+    def get_last_order_id(self, table_id):
+        rows = self.__query(
+            'SELECT max(o.id) FROM "order" o JOIN "table" t on (o.table_id = t.id) WHERE o.table_id = %s', [table_id]
+        )
+
+        if (not rows or not rows[0]):
+            return None
+
+        return rows[0][0]
+
     def get_table_id(self, order_id):
         rows = self.__query(
             '''
