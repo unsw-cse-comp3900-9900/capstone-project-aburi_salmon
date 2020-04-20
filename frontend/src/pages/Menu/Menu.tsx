@@ -17,7 +17,7 @@ import { LeftBox, RightBar } from '../../components';
 
 import { styles } from './styles';
 import { Client } from '../../api/client';
-import { Menu as MenuModel, Item as ItemModel, Order as OrderModel, Categories as CategoriesModel, ResponseMessage as ResponseMessageModel, ItemQuantityPair as ItemQuantityPairModel } from '../../api/models';
+import { Menu as MenuModel, Item as ItemModel, Order as OrderModel, Categories as CategoriesModel, ResponseMessage as ResponseMessageModel, ItemQuantityPair as ItemQuantityPairModel, RecommendationsResult } from '../../api/models';
 
 interface IProps extends WithStyles<typeof styles> { }
 
@@ -46,9 +46,11 @@ interface IState {
   modalSecondButtonDisable: boolean;
 
   openConfirmModal: boolean;
+
 }
 
 class MenuPage extends React.Component<IProps, IState> {
+  private recommended: Array<number>;
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -77,6 +79,7 @@ class MenuPage extends React.Component<IProps, IState> {
     this.addToOrder = this.addToOrder.bind(this);
 
     this.handleCloseConfirmModal = this.handleCloseConfirmModal.bind(this);
+    this.recommended = new Array<number>();
   }
 
   generateItemsInCategory(category: CategoriesModel) {
@@ -85,7 +88,9 @@ class MenuPage extends React.Component<IProps, IState> {
     return (
       <div hidden={this.state.value !== categoryName} id={`tabpanel-${category.id}`} key={category.id} aria-labelledby={`tab-${category.id}`}>
         {
-          category.items.map(item => (
+          category.items.map(item => {
+            const recommended = categoryName === "Recommended" ? true : false;
+            return (
             // If there is an item with multiple categories, this will break.
             <Card className={classes.itemcard} key={`${category.id}-${item.id}`}>
               <CardContent>
@@ -95,12 +100,16 @@ class MenuPage extends React.Component<IProps, IState> {
                 <Typography variant="body2" component="p">
                   {item.description}
                 </Typography>
+                {
+                  recommended && <Typography variant="body2" component="p">This item is recommended for you</Typography>
+                }
               </CardContent>
               <CardActions>
                 <Button size="small" onClick={() => this.openModal(item)}>Add item</Button>
               </CardActions>
             </Card>
-          ))
+          )
+        })
         }
       </div>
     )
@@ -199,7 +208,7 @@ class MenuPage extends React.Component<IProps, IState> {
     })
   }
 
-  addToOrder(event: React.ChangeEvent<{}>) {
+  async addToOrder(event: React.ChangeEvent<{}>) {
     const item = this.state.modal!;
     const quantity = this.state.modalQuantity;
     const comment = this.state.modalComment;
@@ -215,6 +224,47 @@ class MenuPage extends React.Component<IProps, IState> {
     if (quantity !== 0) {
       orders.push(r);
     }
+
+    const orderid: Array<number> = [];
+    orders.forEach(it => {
+      orderid.push(it.item.id);
+    });
+
+    const c = new Client();
+    const rec: RecommendationsResult | null = await c.getRecommendations(orderid);
+
+    if (rec) {
+      this.recommended = new Array<number>();
+      rec.recommendations.forEach(it => {
+        this.recommended.push(it.item_id);
+      });
+
+      this.setState(prevState => {
+        const nm = prevState.menu!;
+
+        if (nm?.menu[0].name !== "Recommended") {
+          const nc = {
+            id: -1,
+            name: "Recommended",
+            position: -1,
+            items: new Array<ItemModel>(),
+          };
+          nm?.menu.unshift(nc);
+        }
+        // Refresh element every single time
+        nm.menu[0].items = new Array<ItemModel>();
+        prevState.menu?.menu.map(cats => {
+          cats.items.map(it => {
+            if (this.recommended.findIndex((e) => e === it.id) !== -1) {
+              nm.menu[0].items.push(it);
+            }
+          })
+        })
+
+        return {menu: nm};
+      });
+    }
+
     this.setState({
       openModal: false,
       orders: orders,
@@ -259,7 +309,37 @@ class MenuPage extends React.Component<IProps, IState> {
   // Component did mount gets called before render
   async componentDidMount() {
     const client = new Client();
-    const m: MenuModel | null = await client.getMenu();
+    const [m, o] = await Promise.all([client.getMenu(), client.getCurrentOrder()]);
+
+    // Comment if statement below if recommendation needs to be disabled before adding 
+    // item to the queue
+    if (o?.item_order.length !== 0) {
+      const nc = {
+        id: -1,
+        name: "Recommended",
+        position: -1,
+        items: new Array<ItemModel>(),
+      };
+      m?.menu.unshift(nc);
+
+      const itemid = o?.item_order.map(it => it.item_id);
+      const rec: RecommendationsResult | null = await client.getRecommendations(itemid!);
+
+      this.recommended = new Array<number>();
+      rec?.recommendations.forEach(it => {
+        this.recommended.push(it.item_id);
+      });
+
+      m?.menu.map(cats => {
+        cats.items.map(it => {
+          if (this.recommended.findIndex((e) => e === it.id) !== -1) {
+            m.menu[0].items.push(it);
+          }
+        })
+      })
+    }
+
+
     this.setState({
       menu: m,
       value: m?.menu[0].name ? m?.menu[0].name : "",

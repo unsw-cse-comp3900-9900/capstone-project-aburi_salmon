@@ -75,13 +75,17 @@ class WaitingPage extends React.Component<IProps, IState> {
       console.log(`Joined room ${room}`);
     });
     socket.on('cooking', async () => {
-      await this.updateOrders()
+      await this.updateOrders();
     });
     socket.on('ready', async () => {
-      await this.updateOrders()
+      await this.updateOrders();
     });
     socket.on('served', async () => {
-      await this.updateOrders()
+      await this.updateOrders();
+    });
+    socket.on('paid', async () => {
+      console.log('paid');
+      await this.customerLogout();
     });
   }
 
@@ -182,6 +186,18 @@ class WaitingPage extends React.Component<IProps, IState> {
         disableBill: true,
         billButton: "Bill has been requested",
       })
+    }
+  }
+  
+  async customerLogout() {
+    // Show that bill has been paid
+    alert("You have paid your bill");
+
+    const c = new Client();
+    const r = await c.customerLogout();
+
+    if (r) {
+      history.push('/');
     }
   }
 

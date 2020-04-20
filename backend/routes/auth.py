@@ -215,15 +215,8 @@ class CustomerLogoutSession(Resource):
         user = get_jwt_identity()
 
         order_id = get_jwt_claims().get('order')
-        
-        # From the order_id, check if there is any ongoing order
-        # If there is an active order (unpaid), can't delete
-        item_order = db.get_ordered_items_customer(order_id)
 
-        if len(item_order) != 0:
-            abort(400, 'Existing order is not paid')
-        
-        db.set_table_free_order_id(order_id)
+        # Table is freed somewhere else
 
         response = jsonify({
             'status': 'success'

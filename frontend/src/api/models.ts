@@ -162,3 +162,13 @@ export type WholeItemList = {
 export type Bill = {
   tables: Array<number>
 }
+
+export type Recommendation = {
+  count: number,
+  item_id: number,
+  name: string,
+}
+
+export type RecommendationsResult = {
+  recommendations: Array<Recommendation>,
+}
