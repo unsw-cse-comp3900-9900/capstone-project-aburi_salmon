@@ -1,5 +1,3 @@
-import hmac
-
 import psycopg2
 
 from model.dbconfig import DbConfig
@@ -92,70 +90,38 @@ class DB:
         return rows[0][0]
 
 
-    # NOTE: Take these functions as example since you might have different implementations
-    
-    def login(self, username, password):
-        rows = self.__query("SELECT password FROM staff WHERE username = %s;", [username])
-        if (not rows):
-            return False
-
-        # This compares two strings to prevent timing attack
-        result = hmac.compare_digest(rows[0][0], password)
-        return result
-
-    def validate_key(self, key):
-        # Check if valid key
-        rows = self.__query("SELECT registration_key, staff_type FROM staff_registration WHERE registration_key = %s;", [key])
-        if (rows == None or not rows[0]):
-            return False
-
-        return rows[0][1]
-        
-    def set_registration_key(self, registration_key, staff_type):
-
-        self.__update(
+    def get_ordered_items_customer(self, order_id):
+        rows = self.db.query(
             """
-                UPDATE staff_registration
-                SET registration_key = %s
-                FROM staff_type
-                WHERE staff_type.id = staff_registration.staff_type AND staff_type.title = %s;
+            SELECT io.id as item_order_id, io.order_id, i.name, i.id as item_id, io.quantity,
+                i.price, s.id as status_id, s.status_name, io.comment
+            FROM item_order io, item i, status s, "order" o
+            WHERE s.id = io.status_id AND i.id = io.item_id AND io.order_id = o.id AND o.id = %s;
             """,
-            [registration_key, staff_type]
+            [order_id]
         )
-        return True
 
-    def get_registration_keys(self, staff_type):
-        if (staff_type):
-            keys = self.__query(
-                'SELECT registration_key, title, id FROM staff_registration sr JOIN staff_type st ON (sr.staff_type = st.id) WHERE st.id = %s',
-                [staff_type]
-            )
-        else:
-           keys = self.__query('SELECT registration_key, title, id FROM staff_registration sr JOIN staff_type st ON (sr.staff_type = st.id)')
-
-        if keys is None:
+        if (not rows):
             return []
 
-        return [
-            {
-                'key': key[0],
-                'staff_name': key[1],
-                'staff_id': key[2]
-            } for key in keys
-        ]
+        item_order = []
+        for row in rows:
+            myDict = {
+                'id': row[0],
+                'order_id': row[1],
+                'item': row[2],
+                'item_id': row[3],
+                'quantity': row[4],
+                'price': row[5],
+                'comment': row[8],
+                'status': {
+                    'id': row[6],
+                    'name': row[7]
+                }
+            }
+            item_order.append(myDict)
 
-    def register(self, username, password, name, staff_type_id):
-        self.__insert("INSERT INTO staff (username, password, name, staff_type_id) VALUES (%s, %s, %s, %s);",
-                      [username, password, name, staff_type_id])
-        return True
-
-    def available_username(self, username):
-        rows = self.__query("SELECT COUNT(*) FROM staff WHERE username = %s;", [username])
-        if (not rows):
-            return False
-
-        rlen = rows[0][0]
-        return (rlen == 0)
+        return item_order
 
     def get_profile(self, username):
         rows = self.__query("SELECT username, name, staff_type_id FROM staff WHERE username = %s;", [username])    
@@ -189,37 +155,6 @@ class DB:
             ingredient.append(row[0])
         return ingredient
 
-    def get_ordered_items_customer(self, order_id):
-        rows = self.__query("""SELECT io.id as item_order_id, io.order_id, i.name, i.id as item_id, io.quantity,
-        i.price, s.id as status_id, s.status_name, io.comment
-        FROM item_order io, item i, status s, "order" o
-        WHERE s.id = io.status_id
-        AND i.id = io.item_id
-        AND io.order_id = o.id
-        AND o.id = %s;""", [order_id])
-
-        if (not rows):
-            return []
-
-        item_order = []
-        for row in rows:
-            myDict = {
-                'id': row[0],
-                'order_id': row[1],
-                'item': row[2],
-                'item_id': row[3],
-                'quantity': row[4],
-                'price': row[5],
-                'comment': row[8],
-                'status': {
-                    'id': row[6],
-                    'name': row[7]
-                }
-            }
-            item_order.append(myDict)
-
-        return item_order
-
     def get_order_status(self, order_id):
         rows = self.__query('SELECT bill_request FROM "order" o WHERE o.id = %s', [order_id])
 
@@ -246,12 +181,6 @@ class DB:
             'status_id': row[4]
         } for row in rows]
         return orders
-      
-    def insert_order(self, table_id):
-        self.__insert('INSERT INTO "order" (table_id) VALUES (%s);', [table_id,])
-        order_id = self.__query('SELECT id FROM "order" ORDER BY id DESC LIMIT %s', [1,])[0][0]
-        
-        return order_id  
 
     def insert_item_order(self, order_id, item_id, quantity, comment):
         self.__insert("INSERT INTO item_order (item_id, order_id, quantity, status_id, comment) VALUES (%s, %s, %s, %s, %s);", [item_id, order_id, quantity, 1, comment])
@@ -282,9 +211,6 @@ class DB:
 
     def set_table_free(self, id):
         return self.__update('UPDATE "table" SET state = %s WHERE id = %s', [False, id])
-
-    def set_table_free_order_id(self, id):
-        return self.__update('UPDATE "table" t SET state = %s WHERE id = (SELECT table_id FROM "order" WHERE id = %s)', [False, id])
 
     def set_assistance(self, table_id, assistance):
         return self.__update('UPDATE "order" SET assistance = %s WHERE table_id = %s', [assistance, table_id])
@@ -344,20 +270,14 @@ class DB:
         else:
             return True
 
-    def selectTable(self, table_id):
-        rows = self.__query('SELECT state FROM "table" WHERE id = %s;', [table_id])
-
-        if (not rows):
-            print('Something went wrong')
-            return False
-
-        # 1 means the table is unavailable 
-        if (rows[0][0]):
-            print('table is taken!')
-            return False
-        else:
-            self.__update('UPDATE "table" SET state = %s WHERE id = %s', [True, table_id])
-            return True
+    # Insert a new order into the order table. This is done when a customer selects a table.
+    def insert_order(self, table_id):
+        rows = self.db.insert('INSERT INTO "order" (table_id) VALUES (%s) RETURNING id;', [table_id,])
+        if not rows or not rows[0]:
+            return None
+        
+        order_id = rows[0][0]
+        return order_id
 
     def get_order_id(self, table_id):
         rows = self.__query(
