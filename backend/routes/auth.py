@@ -172,7 +172,9 @@ class CustomerSession(Resource):
     def post(self):
         table = request.get_json().get('table')
 
-        if (not table):
+        print('Table is {}'.format(table))
+
+        if (table is None):
             abort(400, 'Table number not provided')
 
         print('Select table ' + str(table))
@@ -196,6 +198,8 @@ class CustomerSession(Resource):
         response = jsonify({
             'status': 'success'
         })
+
+        print(access_token)
 
         set_access_cookies(response, access_token)
 

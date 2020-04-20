@@ -76,7 +76,7 @@ class auth_DB:
 
     # Insert a new order into the order table. This is done when a customer selects a table.
     def insert_order(self, table_id):
-        rows = self.db.insert('INSERT INTO "order" (table_id) VALUES (%s) RETURNING id;', [table_id,])
+        rows = self.db.query('INSERT INTO "order" (table_id) VALUES (%s) RETURNING id;', [table_id,])
         if not rows or not rows[0]:
             return None
         
