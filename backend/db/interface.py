@@ -160,21 +160,6 @@ class DB:
         rlen = rows[0][0]
         return (rlen == 0)
 
-    # return a dictionary of staff's profile from the inputed username
-    def get_profile(self, username):
-        rows = self.__query("SELECT username, name, staff_type_id FROM staff WHERE username = %s;", [username])    
-        if (not rows):
-            return None
-
-        return dict(
-            username = rows[0][0],
-            name = rows[0][1],
-            staff_type_id = rows[0][2],
-        )
-
-    def update_staff(self, username, name, staff_type_id):
-        return self.__update("UPDATE staff SET name = %s, staff_type_id = %s WHERE username = %s", [name, staff_type_id, username])
-
     def update_item_ordered_status(self, id, status):
         return self.__update("UPDATE item_order SET status_id = %s WHERE id = %s", [status, id])
 
