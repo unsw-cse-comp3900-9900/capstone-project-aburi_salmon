@@ -304,8 +304,8 @@ class WaitingPage extends React.Component<IProps, IState> {
           }
           second={
             <div className={classes.rightdiv}>
-              <Typography variant="h4">Estimated time:</Typography>
-              <Typography variant="h4">{this.state.estimatedTime} minutes</Typography>
+              <Typography variant="h4">{this.state.estimatedTime !== 0 ? "Estimated time" : ""}</Typography>
+              <Typography variant="h4">{this.state.estimatedTime !== 0 ? this.state.estimatedTime : ""} minutes</Typography>
             </div>
           }
           third={
