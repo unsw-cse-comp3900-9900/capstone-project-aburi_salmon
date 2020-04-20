@@ -44,7 +44,7 @@ interface IState {
   // For second button of the order
   modalSecondButton: string;
   modalSecondButtonDisable: boolean;
-
+  
   openConfirmModal: boolean;
 
 }
@@ -470,6 +470,7 @@ class MenuPage extends React.Component<IProps, IState> {
                     }
                   </FormGroup>
                 </FormControl>
+                <Typography variant="h6">{this.state.modal?.time}</Typography>
               </Grid>
 
               {/* Third col */}
