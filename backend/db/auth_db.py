@@ -99,22 +99,6 @@ class auth_DB:
             self.db.update('UPDATE "table" SET state = %s WHERE id = %s', [True, table_id])
             return True
 
-    # Return the number items ordered for an order_id
-    def get_ordered_items_count(self, order_id):
-        rows = self.db.query(
-            """
-            SELECT count(*)
-            FROM item_order io JOIN "order" o ON (io.order_id = o.id)
-            WHERE o.id = %s
-            """,
-            [order_id]
-        )
-
-        if (not rows):
-            return 0
-
-        return rows[0][0]
-
     # Set a table free given an order_id
     def set_table_free_order_id(self, id):
         return self.db.update('UPDATE "table" t SET state = %s WHERE id = (SELECT table_id FROM "order" WHERE id = %s)', [False, id])
