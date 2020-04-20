@@ -68,9 +68,6 @@ class StaffPage extends React.Component<IProps, IState>{
             return (
                 <ManageStaff />
             );
-        } else {
-            alert('You are not a valid staff');
-            history.push('/');
         }
     }
 

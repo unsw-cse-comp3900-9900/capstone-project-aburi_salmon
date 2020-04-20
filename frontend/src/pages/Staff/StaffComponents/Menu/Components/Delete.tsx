@@ -43,7 +43,7 @@ class Delete extends React.Component<IProps, {currItem: number}>{
     async handleClick(){
         const client = new Client();
         if (this.props.isDel){  //permanent delete
-            const r: ResponseMessage | null= await client.deleteItem(this.state.currItem);
+            const r: any = await client.deleteItem(this.state.currItem);
             console.log(r);
             if (r === null) {
                 this.props.alert(true, 'error', "Something went wrong");
@@ -53,14 +53,14 @@ class Delete extends React.Component<IProps, {currItem: number}>{
                 this.props.updatemenu();
                 this.props.updateitems();
             } else {
-                this.props.alert(true, 'error', r.status);
+                this.props.alert(true, 'error', r.message);
             }
         } else { // delete item from category
             console.log(this.props.item?.id);
             console.log(this.props.cat?.id);
             var itemname = this.props.item?.name;
             var catname = this.props.cat?.name;
-            const r: ResponseMessage | null = await client.removeItemFromCat(this.props.item?.id, this.props.cat?.id);
+            const r: any = await client.removeItemFromCat(this.props.item?.id, this.props.cat?.id);
             console.log(r);
             if (r === null) {
                 this.props.alert(true, 'error', "Something went wrong");
@@ -69,7 +69,7 @@ class Delete extends React.Component<IProps, {currItem: number}>{
                 this.props.setIsOpen(false);
                 this.props.updatemenu();
             } else {
-                this.props.alert(true, 'error', r.status);
+                this.props.alert(true, 'error', r.message);
             }
         } 
     }

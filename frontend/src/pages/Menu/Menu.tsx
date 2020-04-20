@@ -379,11 +379,13 @@ class MenuPage extends React.Component<IProps, IState> {
             </div>
           }
           second={
-            <div style={{ maxHeight: '100%', overflow: 'auto' }}>
+            <div style={{ height: '100%', overflow: 'auto' , position:'static'}}>
               <AppBar position="static">
                 <Tabs
                   value={this.state.value}
                   onChange={this.handleTabChange}
+                  scrollButtons="auto"
+                  variant="scrollable"
                 >
                   {
                     this.state.menu && this.state.menu?.menu &&
@@ -393,10 +395,12 @@ class MenuPage extends React.Component<IProps, IState> {
                   }
                 </Tabs>
               </AppBar>
+              <div className={classes.overflow}>
               {
                 this.state.menu && this.state.menu?.menu &&
                 this.state.menu?.menu.map(category => this.generateItemsInCategory(category))
               }
+              </div>
             </div>
           }
         />
@@ -486,7 +490,7 @@ class MenuPage extends React.Component<IProps, IState> {
                     }
                   </FormGroup>
                 </FormControl>
-                <Typography variant="h6">{this.state.modal?.time}</Typography>
+                <Typography variant="subtitle1">Est time: {this.state.modal?.time} mins</Typography>
               </Grid>
 
               {/* Third col */}
