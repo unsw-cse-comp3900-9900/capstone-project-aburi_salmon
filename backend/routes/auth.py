@@ -199,8 +199,6 @@ class CustomerSession(Resource):
             'status': 'success'
         })
 
-        print(access_token)
-
         set_access_cookies(response, access_token)
 
         return response

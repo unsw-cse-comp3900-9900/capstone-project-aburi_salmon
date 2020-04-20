@@ -91,7 +91,7 @@ class DB:
 
 
     def get_ordered_items_customer(self, order_id):
-        rows = self.db.query(
+        rows = self.__query(
             """
             SELECT io.id as item_order_id, io.order_id, i.name, i.id as item_id, io.quantity,
                 i.price, s.id as status_id, s.status_name, io.comment
@@ -272,7 +272,7 @@ class DB:
 
     # Insert a new order into the order table. This is done when a customer selects a table.
     def insert_order(self, table_id):
-        rows = self.db.insert('INSERT INTO "order" (table_id) VALUES (%s) RETURNING id;', [table_id,])
+        rows = self.__insert('INSERT INTO "order" (table_id) VALUES (%s) RETURNING id;', [table_id,])
         if not rows or not rows[0]:
             return None
         
