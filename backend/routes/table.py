@@ -160,6 +160,9 @@ class TablePaid(Resource):
         
         if (db.set_paid(table, paid) == None):
             abort(500, 'Something went wrong.')
+
+        customerRoom = 'customer'+ str(table)
+        socket.emit('paid', room=customerRoom)
         
         return jsonify({ 'success': 'success' })
 

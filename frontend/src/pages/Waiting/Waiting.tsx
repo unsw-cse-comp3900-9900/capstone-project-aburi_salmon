@@ -83,6 +83,9 @@ class WaitingPage extends React.Component<IProps, IState> {
     socket.on('served', async () => {
       await this.updateOrders()
     });
+    socket.on('paid', async () => {
+      
+    });
   }
 
   renderFirstButton(it: ItemOrderModel) {
@@ -182,6 +185,18 @@ class WaitingPage extends React.Component<IProps, IState> {
         disableBill: true,
         billButton: "Bill has been requested",
       })
+    }
+  }
+  
+  async customerLogout() {
+    // Show that bill has been paid
+    alert("You have paid your bill");
+
+    const c = new Client();
+    const r = await c.customerLogout();
+
+    if (r) {
+      history.push('/');
     }
   }
 

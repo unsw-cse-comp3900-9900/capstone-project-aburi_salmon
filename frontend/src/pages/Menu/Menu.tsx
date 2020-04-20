@@ -17,7 +17,7 @@ import { LeftBox, RightBar } from '../../components';
 
 import { styles } from './styles';
 import { Client } from '../../api/client';
-import { Menu as MenuModel, Item as ItemModel, Order as OrderModel, Categories as CategoriesModel, ResponseMessage as ResponseMessageModel, ItemQuantityPair as ItemQuantityPairModel } from '../../api/models';
+import { Menu as MenuModel, Item as ItemModel, Order as OrderModel, Categories as CategoriesModel, ResponseMessage as ResponseMessageModel, ItemQuantityPair as ItemQuantityPairModel, RecommendationsResult } from '../../api/models';
 
 interface IProps extends WithStyles<typeof styles> { }
 
@@ -46,6 +46,8 @@ interface IState {
   modalSecondButtonDisable: boolean;
 
   openConfirmModal: boolean;
+
+  recommended: Map<number, string>;
 }
 
 class MenuPage extends React.Component<IProps, IState> {
@@ -65,6 +67,7 @@ class MenuPage extends React.Component<IProps, IState> {
       modalSecondButton: "Add to order",
       modalSecondButtonDisable: true,
       openConfirmModal: false,
+      recommended: new Map<number, string>(),
     }
     // To bind the tab change
     this.handleTabChange = this.handleTabChange.bind(this);
@@ -85,7 +88,9 @@ class MenuPage extends React.Component<IProps, IState> {
     return (
       <div hidden={this.state.value !== categoryName} id={`tabpanel-${category.id}`} key={category.id} aria-labelledby={`tab-${category.id}`}>
         {
-          category.items.map(item => (
+          category.items.map(item => {
+            this.state.recommended.set(item.id, "");
+            return (
             // If there is an item with multiple categories, this will break.
             <Card className={classes.itemcard} key={`${category.id}-${item.id}`}>
               <CardContent>
@@ -95,12 +100,16 @@ class MenuPage extends React.Component<IProps, IState> {
                 <Typography variant="body2" component="p">
                   {item.description}
                 </Typography>
+                <Typography variant="body2" component="p">
+                  {this.state.recommended.get(item.id)}
+                </Typography>
               </CardContent>
               <CardActions>
                 <Button size="small" onClick={() => this.openModal(item)}>Add item</Button>
               </CardActions>
             </Card>
-          ))
+          )
+        })
         }
       </div>
     )
@@ -199,7 +208,7 @@ class MenuPage extends React.Component<IProps, IState> {
     })
   }
 
-  addToOrder(event: React.ChangeEvent<{}>) {
+  async addToOrder(event: React.ChangeEvent<{}>) {
     const item = this.state.modal!;
     const quantity = this.state.modalQuantity;
     const comment = this.state.modalComment;
@@ -214,6 +223,28 @@ class MenuPage extends React.Component<IProps, IState> {
     orders = orders.filter(x => x.item.id !== item.id);
     if (quantity !== 0) {
       orders.push(r);
+    }
+
+    const orderid: Array<number> = [];
+    orders.forEach(it => {
+      orderid.push(it.item.id);
+    });
+
+    const c = new Client();
+    const rec: RecommendationsResult | null = await c.getRecommendations(orderid);
+
+    if (rec) {
+      this.setState(prevState => {
+        const m = new Map<number, string>();
+        rec.recommendations.forEach(r => {
+          m.set(r.item_id, "Recommended for you");
+        });
+        prevState.recommended.forEach((v, k) => {
+          if (!m.get(k)) m.set(k, v);
+        });
+        return { recommended: m }
+      });
+
     }
     this.setState({
       openModal: false,
