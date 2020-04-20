@@ -8,6 +8,7 @@ from app import api, db
 from db.profile_db import profile_DB
 from model.request_model import edit_staff_model, delete_staff_model
 
+profile_db = profile_DB(db)
 staff_profile = api.namespace('staff_profile', description='Staff''s Profile Route')
 
 @staff_profile.route('/staff_list')
@@ -18,7 +19,7 @@ class Staff_list(Resource):
     def get(self):
 
         # Gets lists of staffs and all their details
-        staff_list = profile_DB.get_all_staff()
+        staff_list = profile_db.get_all_staff()
         return { 'staff_list': staff_list }
 
 
@@ -37,7 +38,7 @@ class Staff_edit(Resource):
         username_new = edit_staff_input.get('username')
         staff_type_id_new = edit_staff_input.get('staff_type_id')
 
-        staff_curr = profile_DB.get_staff_detail(staff_id)  # get the current staff's details
+        staff_curr = profile_db.get_staff_detail(staff_id)  # get the current staff's details
         curr_name = staff_curr['name']
         curr_username = staff_curr['username']
         curr_staff_type_id = staff_curr['staff_type']
@@ -65,7 +66,7 @@ class Staff_edit(Resource):
         else:
             staff_type = staff_type_id_new
         
-        edit = profile_DB.modify_staff(staff_id, name, username, staff_type)
+        edit = profile_db.modify_staff(staff_id, name, username, staff_type)
     
         if edit != 1:
             abort(400, 'Something is wrong.')
@@ -87,7 +88,7 @@ class Staff_edit(Resource):
         if staff_id == 0:
             abort(400, 'Please insert staff id.')
 
-        delete = profile_DB.delete_staff(staff_id)
+        delete = profile_db.delete_staff(staff_id)
 
         if delete != 1:
             abort(400, 'Something is wrong.')

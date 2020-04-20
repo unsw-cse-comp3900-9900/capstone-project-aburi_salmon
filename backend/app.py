@@ -8,7 +8,6 @@ from flask_jwt_extended import JWTManager
 
 from model.dbconfig import DbConfig
 from db.interface import DB
-#from db.profile_db import profile_DB
 import config
 
 # Init Flask object
@@ -32,13 +31,10 @@ flask_app.config['JWT_SECRET_KEY'] = config.JWT_SECRET_KEY
 ## Exported variables to routes
 api = Api(flask_app)
 db = DB(dbConfig)
-#profile_db = profile_DB(dbConfig)
 jwt = JWTManager(flask_app)
 
 def run_app(host, port):
     ## This is where routes are imported, and then app is run here
-    ## Example routes
-    # import routes.example
     import routes.auth
     import routes.session
     import routes.profile

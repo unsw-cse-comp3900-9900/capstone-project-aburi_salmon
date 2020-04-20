@@ -8,7 +8,7 @@ class DB:
     def __init__(self, dbConfig=DbConfig):
         self.__conn = psycopg2.connect(dbConfig.config())
 
-    def __query(self, query, params=[]):
+    def query(self, query, params=[]):
         c = self.__conn.cursor()
         try:
             c.execute(query, params)
@@ -25,7 +25,13 @@ class DB:
         print(rows)
         return rows if len(rows) else None
 
+    def __query(self, query, params=[]):
+        return self.query(query, params)
+
     def __update(self, update, params):
+        return self.update(update, params)
+
+    def update(self, update, params):
         c = self.__conn.cursor()
         try:
             # This might be different, depending on your table and column name
@@ -42,6 +48,9 @@ class DB:
         return True
 
     def __insert(self, insert, params):
+        return self.insert(insert, params)
+
+    def insert(self, insert, params):
         c = self.__conn.cursor()
 
         try:
@@ -57,6 +66,9 @@ class DB:
         self.__conn.commit()
 
     def __delete(self, delete, params=[]):
+        return self.delete(delete, params)
+
+    def delete(self, delete, params=[]):
         c = self.__conn.cursor()
         try:
             c.execute(delete, params)
