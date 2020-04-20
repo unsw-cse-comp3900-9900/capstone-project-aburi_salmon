@@ -80,6 +80,13 @@ class FreeTable(Resource):
             abort(400, 'Something went wrong')
 
         print('Table #' + str(table) + ' set occupied as false')
+
+        # get the latest orderid of table
+        order_id = db.get_last_order_id(table)
+        customerRoom = 'customer' + str(order_id)
+        print(customerRoom)
+        socket.emit('paid', room=customerRoom)
+        
         return jsonify({ 'status': 'success' })
 
 @table.route('/assistance')

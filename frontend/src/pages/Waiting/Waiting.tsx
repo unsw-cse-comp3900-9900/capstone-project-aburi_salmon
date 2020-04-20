@@ -75,16 +75,17 @@ class WaitingPage extends React.Component<IProps, IState> {
       console.log(`Joined room ${room}`);
     });
     socket.on('cooking', async () => {
-      await this.updateOrders()
+      await this.updateOrders();
     });
     socket.on('ready', async () => {
-      await this.updateOrders()
+      await this.updateOrders();
     });
     socket.on('served', async () => {
-      await this.updateOrders()
+      await this.updateOrders();
     });
     socket.on('paid', async () => {
-      
+      console.log('paid');
+      await this.customerLogout();
     });
   }
 
