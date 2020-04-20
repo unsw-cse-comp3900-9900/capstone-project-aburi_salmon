@@ -91,6 +91,7 @@ class EditMenuPage extends React.Component<IProps, IState> {
       price: 0,
       visible: true,
       image_url: '',
+      time: 10,
     }
     if (this.props.menu !== null){
       var tempCurCat: CategoriesModel | null = this.props.menu?.menu[0];

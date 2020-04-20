@@ -33,6 +33,7 @@ export type Item = {
   price: number,
   visible: boolean,
   image_url: string,
+  time: number,
 }
 
 export type Categories = {

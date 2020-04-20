@@ -432,7 +432,7 @@ class DB:
         # Assume time taken is the sum of cooking time of each item,
         # ignoring quantity, assuming the kitchen staff cooks same items all at the same time.
         print('Getting time')
-        rows = self.__query('SELECT io.quantity, i.time FROM "order" o, item i, item_order io WHERE o.id = io.order_id AND io.item_id = i.id AND o.id = %s', [order_id])
+        rows = self.__query('SELECT io.quantity, i.time FROM "order" o, item i, item_order io WHERE o.id = io.order_id AND io.item_id = i.id AND o.id = %s AND io.status_id <> 4', [order_id])
         
         if (not rows):
             return None
