@@ -172,3 +172,7 @@ export type Recommendation = {
 export type RecommendationsResult = {
   recommendations: Array<Recommendation>,
 }
+
+export type Time = {
+  estimated_time: number,
+}
