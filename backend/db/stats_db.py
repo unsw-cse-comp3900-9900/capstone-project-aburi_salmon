@@ -3,6 +3,7 @@ class stats_DB:
     def __init__(self, db):
         self.db = db
 
+    # Return simple stats about the sales of each menu item
     def get_menu_item_sales(self, item_id = None):
         if item_id is None:
             rows = self.db.query(
@@ -25,6 +26,7 @@ class stats_DB:
             'revenue': row[2] * row[3]
         } for row in rows]
 
+    # Return sales stats for each category in the menu
     def get_category_sales(self):
         rows = self.db.query(
             '''
@@ -46,10 +48,16 @@ class stats_DB:
             'revenue': row[3]
         } for row in rows]
 
+    # Given a list of items, return recommendations of other items
     def get_recommendation(self, items=[]):
         # Orders where item appears
         rows = self.db.query(
-            'SELECT distinct o.id FROM item i JOIN item_order io on (i.id = io.item_id) JOIN "order" o on (o.id = io.order_id) WHERE i.id in %s',
+            """
+            SELECT distinct o.id
+            FROM item i JOIN item_order io on (i.id = io.item_id)
+                        JOIN "order" o on (o.id = io.order_id)
+            WHERE i.id in %s
+            """,
             [tuple(i for i in items)]
         )
 
@@ -60,7 +68,13 @@ class stats_DB:
 
         # Get count of other items in these orders
         rows = self.db.query(
-            'SELECT distinct i.id, i.name, count(i.id) as seen FROM item i JOIN item_order io on (i.id = io.item_id) JOIN "order" o on (o.id = io.order_id) WHERE i.id not in %s AND o.id in %s GROUP BY i.id ORDER BY seen DESC',
+            """
+            SELECT distinct i.id, i.name, count(i.id) as seen
+            FROM item i JOIN item_order io on (i.id = io.item_id) JOIN "order" o on (o.id = io.order_id)
+            WHERE i.id not in %s AND o.id in %s
+            GROUP BY i.id
+            ORDER BY seen DESC
+            """,
             [tuple(i for i in items), orders]
         )
 
