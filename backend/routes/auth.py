@@ -10,10 +10,12 @@ from flask_jwt_extended import create_access_token, set_access_cookies, unset_jw
 
 import config
 from app import api, db
+from db.auth_db import auth_DB
 from model.request_model import login_model, signup_model, registration_model, customer_session_model
 from util.hasher import hash_password
 from util.user import User
 
+auth_db = auth_DB(db)
 auth = api.namespace('auth', description='Authentication route')
 
 @auth.route("/login", strict_slashes=False)
@@ -27,20 +29,17 @@ class Login(Resource):
 
         if username is None or payload_password is None:
             abort(400, 'Malformed request, email and password is not supplied')
-
-        # Use plain password as example
-        db_password = payload_password
-
+        
         # Hash the password when everything works fine with plain password. This is how you hash the password, in a simple way:
-        # db_password = hash_password(payload_password)
+        db_password = hash_password(payload_password)
 
-        if db.login(username, db_password) == False:
+        if auth_db.login(username, db_password) == False:
             abort(401, 'Invalid email/password combination')
 
         # Create identity for session, by using User object with role = 1 and table = None
         # Change this so that the role follows the staff_type_id of the user
-        identity = User(username, db.get_profile(username).get('staff_type_id'), None)
-        staff_type =  db.get_profile(username).get('staff_type_id')
+        identity = User(username, auth_db.get_profile(username).get('staff_type_id'), None)
+        staff_type =  auth_db.get_profile(username).get('staff_type_id')
         access_token = create_access_token(identity=identity)
         
         print('the username is ' + username)
@@ -88,7 +87,7 @@ class Signup(Resource):
         if username is None or payload_password is None or name is None:
             abort(400, 'Malformed request, username or password or name is not supplied')
         
-        if not db.available_username(username):
+        if not auth_db.available_username(username):
             abort(409, 'Username \'{}\' is taken'.format(username))
 
         if(regex_name.search(name) != None): 
@@ -103,21 +102,12 @@ class Signup(Resource):
         if len(payload_password) < 8:
             abort(400, 'Minimum length of password is 8')
 
-        if registration_key == "staff1":
-            staff_type_id = 1
-        elif registration_key == "staff2":
-            staff_type_id = 2
-        elif registration_key == "staff3":
-            staff_type_id = 3
-        else:
-            staff_type_id = db.validate_key(registration_key)
-            if (not staff_type_id):
-                abort(403, 'Invalid registration key')
+        staff_type_id = auth_db.validate_key(registration_key)
+        if (not staff_type_id):
+            abort(403, 'Invalid registration key')
 
-        # db_password = hash_password(payload_password)
-        db_password = payload_password
-
-        reg = db.register(username, db_password, name, staff_type_id)
+        db_password = hash_password(payload_password)
+        reg = auth_db.register(username, db_password, name, staff_type_id)
 
         if reg is None:
             abort(400, 'Backend is not working as intended or the supplied information was malformed. Make sure that your username is unique.')
@@ -135,7 +125,7 @@ class Registration(Resource):
     @auth.response(500, 'User is not a manager')
     def get(self):
         # Get a list of all registration keys
-        keys = db.get_registration_keys(None)
+        keys = auth_db.get_registration_keys(None)
         return jsonify({ 'registration_keys': keys })
 
 
@@ -153,7 +143,7 @@ class Registration(Resource):
         if (not staff or not key):
             abort(400, 'Invalid request')
 
-        if (db.set_registration_key(key, staff) is None):
+        if (auth_db.set_registration_key(key, staff) is None):
             abort(500, 'Something went wrong.')
 
         return jsonify({ 'status': 'success' })
@@ -166,7 +156,7 @@ class RegistrationList(Resource):
     @auth.response(500, 'User is not a manager')
     def get(self, staff_type):
         # Get a list of all registration keys of type 'id'
-        keys = db.get_registration_keys(staff_type)
+        keys = auth_db.get_registration_keys(staff_type)
         if (not keys[0]):
             abort(500, 'Something went wrong')
         return jsonify(keys[0])
@@ -182,18 +172,24 @@ class CustomerSession(Resource):
     def post(self):
         table = request.get_json().get('table')
 
-        if (not table):
+        print('Table is {}'.format(table))
+
+        if (table is None):
             abort(400, 'Table number not provided')
-        
-        print('Creating order item')
-        order_id = db.insert_order(table)
-        print('Order id = ' + str(order_id))
 
         print('Select table ' + str(table))
-        if (not db.selectTable(table)):
+        if (not auth_db.selectTable(table)):
             print('Table ' + str(table) + ' is taken')
             abort(400, 'Table is taken')
         print('Table selected')
+
+        print('Creating order item')
+        order_id = auth_db.insert_order(table)
+        print('Order id = ' + str(order_id))
+
+        if not order_id:
+            print("Failed to create order item for new customer")
+            abort(500, "Something went wrong")
 
         identity = User('Customer', None, order_id)
         access_token = create_access_token(identity=identity)

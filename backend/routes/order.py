@@ -53,11 +53,9 @@ class Order(Resource):
         if(order_id is None):
             order_id = db.insert_order(table_id)
 
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-
-
         socket.emit('order', { 'table': table_id }, room='staff2')
 
+        print("order_id is: {}".format(order_id))
         for i in range(0, num_of_orders):
             item_id = new_order.get('order')[i].get('item_id')
             quantity = new_order.get('order')[i].get('quantity')

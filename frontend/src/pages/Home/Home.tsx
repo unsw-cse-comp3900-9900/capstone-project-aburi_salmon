@@ -60,11 +60,7 @@ const isLoggedIn = () => {
     );
   }
   else {
-    return (
-      <Link to='/' className="stafflogin" onClick={() => logOut()}>
-        Log Out
-      </Link>
-    );
+    history.push('/staff');
   }
 
 }
