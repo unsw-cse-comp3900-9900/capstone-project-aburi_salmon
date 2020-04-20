@@ -3,9 +3,12 @@ from flask_restx import Resource, abort, reqparse, fields
 from flask_jwt_extended import get_jwt_claims, jwt_required
 
 from app import api, db
+from db.stats_db import stats_DB
+
 import model.request_model as request_model
 import model.response_model as response_model
 
+stats_db = stats_DB(db)
 stats = api.namespace('stats', description='Stats Route')
 
 @stats.route('/sales')
@@ -15,7 +18,7 @@ class Sales(Resource):
     @stats.response(500, 'Something went wrong')
     def get(self):
         # Amount of sales for each item
-        item_sales = db.get_menu_item_sales()
+        item_sales = stats_db.get_menu_item_sales()
         if (item_sales is None):
             abort(500, 'Something went wrong')
 
@@ -31,7 +34,7 @@ class SalesItem(Resource):
     @stats.response(500, 'Something went wrong')
     def get(self, item_id):
         # Amount of sales for each item
-        item_sales = db.get_menu_item_sales(item_id)[0]
+        item_sales = stats_db.get_menu_item_sales(item_id)[0]
         if (item_sales is None):
             abort(500, 'Something went wrong')
 
@@ -44,7 +47,7 @@ class SalesCategory(Resource):
     @stats.response(500, 'Something went wrong')
     def get(self):
         # Amount of sales for each category
-        category_sales = db.get_category_sales()
+        category_sales = stats_db.get_category_sales()
         if (category_sales is None):
             abort(500, 'Something went wrong')
         
@@ -62,7 +65,7 @@ class Reccomend(Resource):
         if (not items):
             abort(400, 'Invalid request. Missing field \'items\'')
         
-        recommendations = db.get_recommendation(items)
+        recommendations = stats_db.get_recommendation(items)
 
         if (recommendations is None):
             abort(500, 'Something went wrong')

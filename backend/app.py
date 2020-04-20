@@ -35,8 +35,6 @@ jwt = JWTManager(flask_app)
 
 def run_app(host, port):
     ## This is where routes are imported, and then app is run here
-    ## Example routes
-    # import routes.example
     import routes.auth
     import routes.session
     import routes.profile
