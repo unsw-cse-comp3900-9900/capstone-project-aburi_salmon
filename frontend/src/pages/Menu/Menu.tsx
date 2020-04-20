@@ -47,10 +47,10 @@ interface IState {
 
   openConfirmModal: boolean;
 
-  recommended: Map<number, string>;
 }
 
 class MenuPage extends React.Component<IProps, IState> {
+  private recommended: Array<number>;
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -67,7 +67,6 @@ class MenuPage extends React.Component<IProps, IState> {
       modalSecondButton: "Add to order",
       modalSecondButtonDisable: true,
       openConfirmModal: false,
-      recommended: new Map<number, string>(),
     }
     // To bind the tab change
     this.handleTabChange = this.handleTabChange.bind(this);
@@ -80,6 +79,7 @@ class MenuPage extends React.Component<IProps, IState> {
     this.addToOrder = this.addToOrder.bind(this);
 
     this.handleCloseConfirmModal = this.handleCloseConfirmModal.bind(this);
+    this.recommended = new Array<number>();
   }
 
   generateItemsInCategory(category: CategoriesModel) {
@@ -89,7 +89,7 @@ class MenuPage extends React.Component<IProps, IState> {
       <div hidden={this.state.value !== categoryName} id={`tabpanel-${category.id}`} key={category.id} aria-labelledby={`tab-${category.id}`}>
         {
           category.items.map(item => {
-            this.state.recommended.set(item.id, "");
+            const recommended = categoryName === "Recommended" ? true : false;
             return (
             // If there is an item with multiple categories, this will break.
             <Card className={classes.itemcard} key={`${category.id}-${item.id}`}>
@@ -100,9 +100,9 @@ class MenuPage extends React.Component<IProps, IState> {
                 <Typography variant="body2" component="p">
                   {item.description}
                 </Typography>
-                <Typography variant="body2" component="p">
-                  {this.state.recommended.get(item.id)}
-                </Typography>
+                {
+                  recommended && <Typography variant="body2" component="p">This item is recommended for you</Typography>
+                }
               </CardContent>
               <CardActions>
                 <Button size="small" onClick={() => this.openModal(item)}>Add item</Button>
@@ -234,18 +234,37 @@ class MenuPage extends React.Component<IProps, IState> {
     const rec: RecommendationsResult | null = await c.getRecommendations(orderid);
 
     if (rec) {
-      this.setState(prevState => {
-        const m = new Map<number, string>();
-        rec.recommendations.forEach(r => {
-          m.set(r.item_id, "Recommended for you");
-        });
-        prevState.recommended.forEach((v, k) => {
-          if (!m.get(k)) m.set(k, v);
-        });
-        return { recommended: m }
+      this.recommended = new Array<number>();
+      rec.recommendations.forEach(it => {
+        this.recommended.push(it.item_id);
       });
 
+      this.setState(prevState => {
+        const nm = prevState.menu!;
+
+        if (nm?.menu[0].name !== "Recommended") {
+          const nc = {
+            id: -1,
+            name: "Recommended",
+            position: -1,
+            items: new Array<ItemModel>(),
+          };
+          nm?.menu.unshift(nc);
+        }
+        // Refresh element every single time
+        nm.menu[0].items = new Array<ItemModel>();
+        prevState.menu?.menu.map(cats => {
+          cats.items.map(it => {
+            if (this.recommended.findIndex((e) => e === it.id) !== -1) {
+              nm.menu[0].items.push(it);
+            }
+          })
+        })
+
+        return {menu: nm};
+      });
     }
+
     this.setState({
       openModal: false,
       orders: orders,
@@ -291,6 +310,8 @@ class MenuPage extends React.Component<IProps, IState> {
   async componentDidMount() {
     const client = new Client();
     const m: MenuModel | null = await client.getMenu();
+    // const o: OrderModel | null = await client.getCurrentOrder();
+    
     this.setState({
       menu: m,
       value: m?.menu[0].name ? m?.menu[0].name : "",
