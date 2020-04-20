@@ -37,6 +37,7 @@ interface IState {
   modalQuantity: number;
   modalOriginalQuantity: number;
   modalComment: string;
+  modalRecommendations: string;
 
   // For list of items that user wants to order
   orders: Array<OrderItemState>;
@@ -63,6 +64,7 @@ class MenuPage extends React.Component<IProps, IState> {
       modalQuantity: 0,
       modalOriginalQuantity: 0,
       modalComment: "",
+      modalRecommendations: "",
       orders: new Array<OrderItemState>(),
       modalSecondButton: "Add to order",
       modalSecondButtonDisable: true,
@@ -134,9 +136,23 @@ class MenuPage extends React.Component<IProps, IState> {
     });
   }
 
-  openModal(item: ItemModel) {
+  async openModal(item: ItemModel) {
     let quantity = 0;
     let comment = "";
+
+    const c = new Client();
+    const r = await c.getRecommendations([item.id]);
+
+    if (r) {
+      const rec = r.recommendations[0].name;
+      this.setState({
+        modalRecommendations: "Customer who orders this also order: " + rec,
+      });
+    } else {
+      this.setState({
+        modalRecommendations: "",
+      });
+    }
 
     this.state.orders.forEach((it: OrderItemState) => {
       if (it.item.id === item.id) {
@@ -475,6 +491,7 @@ class MenuPage extends React.Component<IProps, IState> {
               {/* Third col */}
               <Grid item xs={8}>
                 <Typography variant="subtitle1">{this.state.modal?.description}</Typography>
+                <Typography variant="subtitle1">{this.state.modalRecommendations}</Typography>
               </Grid>
               <Grid item xs={4}>
                 <Typography variant="subtitle1">$ {this.state.modal?.price.toString()}</Typography>
