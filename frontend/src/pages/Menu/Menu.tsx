@@ -309,9 +309,37 @@ class MenuPage extends React.Component<IProps, IState> {
   // Component did mount gets called before render
   async componentDidMount() {
     const client = new Client();
-    const m: MenuModel | null = await client.getMenu();
-    // const o: OrderModel | null = await client.getCurrentOrder();
-    
+    const [m, o] = await Promise.all([client.getMenu(), client.getCurrentOrder()]);
+
+    // Comment if statement below if recommendation needs to be disabled before adding 
+    // item to the queue
+    if (o?.item_order.length !== 0) {
+      const nc = {
+        id: -1,
+        name: "Recommended",
+        position: -1,
+        items: new Array<ItemModel>(),
+      };
+      m?.menu.unshift(nc);
+
+      const itemid = o?.item_order.map(it => it.item_id);
+      const rec: RecommendationsResult | null = await client.getRecommendations(itemid!);
+
+      this.recommended = new Array<number>();
+      rec?.recommendations.forEach(it => {
+        this.recommended.push(it.item_id);
+      });
+
+      m?.menu.map(cats => {
+        cats.items.map(it => {
+          if (this.recommended.findIndex((e) => e === it.id) !== -1) {
+            m.menu[0].items.push(it);
+          }
+        })
+      })
+    }
+
+
     this.setState({
       menu: m,
       value: m?.menu[0].name ? m?.menu[0].name : "",
