@@ -29,12 +29,9 @@ class Login(Resource):
 
         if username is None or payload_password is None:
             abort(400, 'Malformed request, email and password is not supplied')
-
-        # Use plain password as example
-        db_password = payload_password
-
+        
         # Hash the password when everything works fine with plain password. This is how you hash the password, in a simple way:
-        # db_password = hash_password(payload_password)
+        db_password = hash_password(payload_password)
 
         if auth_db.login(username, db_password) == False:
             abort(401, 'Invalid email/password combination')
@@ -109,9 +106,7 @@ class Signup(Resource):
         if (not staff_type_id):
             abort(403, 'Invalid registration key')
 
-        # db_password = hash_password(payload_password)
-        db_password = payload_password
-
+        db_password = hash_password(payload_password)
         reg = auth_db.register(username, db_password, name, staff_type_id)
 
         if reg is None:
