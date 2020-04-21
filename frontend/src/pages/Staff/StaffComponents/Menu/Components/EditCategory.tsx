@@ -65,7 +65,7 @@ class EditCategory extends React.Component<IProps, IState>{
 
     async deleteFun(){ //delete category
         const client = new Client();
-        const r: ResponseMessage | null = await client.deleteCat(this.props.category?.id);
+        const r = await client.deleteCat(this.props.category?.id);
         if (r === null) {
             this.props.alert(true, 'error', "Something went wrong");
         } else if (r?.status === "success") {
@@ -73,7 +73,7 @@ class EditCategory extends React.Component<IProps, IState>{
             this.props.setIsOpen(false);
             this.props.update();
         } else {
-            this.props.alert(true, 'error', r.status);
+            this.props.alert(true, 'error', r.message);
         }
     }
 

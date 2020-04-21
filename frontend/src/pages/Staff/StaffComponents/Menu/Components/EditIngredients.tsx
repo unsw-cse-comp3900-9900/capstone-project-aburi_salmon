@@ -86,14 +86,14 @@ class EditIngredients extends React.Component<IProps, IState>{
     async handleDeleteIngred(){ //deletes ingredient from ingredient list
         const client = new Client();
         if (this.state.selected !== null){
-            const r: ResponseMessage | null = await client.deleteIngredient(this.state.selected?.id);
+            const r: any = await client.deleteIngredient(this.state.selected?.id);
             if (r === null) {
                 this.props.alert(true, 'error', "Something went wrong");
             } else if (r?.status === "success") {
                 this.props.alert(true, 'success', 'Successfully deleted ingredient');
                 this.props.update();
             } else {
-                this.props.alert(true, 'error', r.status);
+                this.props.alert(true, 'error', r.message);
             }
         } else {
             this.props.alert(true, 'error', 'Please select an ingredient');

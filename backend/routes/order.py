@@ -53,11 +53,9 @@ class Order(Resource):
         if(order_id is None):
             order_id = db.insert_order(table_id)
 
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-
-
         socket.emit('order', { 'table': table_id }, room='staff2')
 
+        print("order_id is: {}".format(order_id))
         for i in range(0, num_of_orders):
             item_id = new_order.get('order')[i].get('item_id')
             quantity = new_order.get('order')[i].get('quantity')
@@ -181,32 +179,35 @@ class ModifyItemOrderStatus(Resource):
 
     def put(self, item_order_id):
         status = request.get_json().get('status')
+        print('the status is ' + str(status))
         if (not status):
             abort(400, 'Invalid request. Missing required field \'status\'')
         
         if (not db.update_item_ordered_status(item_order_id, status)):
             abort(500, 'Something went wrong')
-
-        order_id = get_jwt_claims().get('order')
+        print('item_id is ' + str(item_order_id))
+        #order_id = get_jwt_claims().get('order')
+        order_id = db.get_orderId(item_order_id)
         customerRoom = 'customer' + str(order_id)
   
         # orderNumber = get_jwt_claims().get('order')
         # room = 'customer' + str(orderNumber)
         # print('room')
         if status == 2 :
+            print('customer room is ' + customerRoom)
             socket.emit('cooking', room=customerRoom)
             socket.emit('cooking', room='staff1')
             socket.emit('cooking', room='staff2')
             print('we have emitted to ' + customerRoom)
         elif status == 3:
             socket.emit('ready', room=customerRoom)
-            socket.emit('cooking', room='staff1')
-            socket.emit('cooking', room='staff2')
+            socket.emit('ready', room='staff1')
+            socket.emit('ready', room='staff2')
             print('we have emitted to ' + customerRoom)
         elif status == 4:
             socket.emit('served', room=customerRoom)
-            socket.emit('cooking', room='staff1')
-            socket.emit('cooking', room='staff2')
+            socket.emit('served', room='staff1')
+            socket.emit('served', room='staff2')
             print('we have emitted to ' + customerRoom)
         
     
@@ -253,6 +254,18 @@ class OrderTime(Resource):
         # Input = order_id
 
         order_id = request.get_json().get('order_id')
+
+        time = db.get_order_time(order_id)
+
+        return { 
+            'estimated_time': time
+        }
+
+    @jwt_required
+    @order.response(200, 'Success')
+    @order.response(400, 'Invalid request')
+    def get(self):
+        order_id = get_jwt_claims().get('order')
 
         time = db.get_order_time(order_id)
 

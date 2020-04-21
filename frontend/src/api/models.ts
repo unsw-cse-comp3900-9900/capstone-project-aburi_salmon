@@ -33,6 +33,7 @@ export type Item = {
   price: number,
   visible: boolean,
   image_url: string,
+  time: number,
 }
 
 export type Categories = {
@@ -161,4 +162,18 @@ export type WholeItemList = {
 
 export type Bill = {
   tables: Array<number>
+}
+
+export type Recommendation = {
+  count: number,
+  item_id: number,
+  name: string,
+}
+
+export type RecommendationsResult = {
+  recommendations: Array<Recommendation>,
+}
+
+export type Time = {
+  estimated_time: number,
 }

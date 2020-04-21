@@ -81,14 +81,13 @@ class Wait extends React.Component<IProps, IState>{
     }
 
     billrequestAlert(){
-        this.setState({alertMessage: 'Bill was requested!!'});
+        this.setState({alertMessage: 'Bill was requested!!', isOpen: true});
         this.updateAssist();
-        this.showAlert();
     }
 
     assistanceAlert(){
-        this.setState({ alertMessage: 'Assistance was requested!!'});
-        this.showAlert();
+        this.setState({ alertMessage: 'Assistance was requested!!', isOpen: true});
+        this.updateAssist();
     }
 
     async componentDidMount() {

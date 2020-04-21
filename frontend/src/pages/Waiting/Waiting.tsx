@@ -13,7 +13,10 @@ import { styles } from './styles';
 import { LeftBox, RightBar } from "../../components";
 import { Order as OrderModel, ItemOrder as ItemOrderModel, Item } from "../../api/models";
 import { Client } from "../../api/client";
-import { Item as ItemModel, ItemQuantityPair as ItemQuantityPairModel, OrderItemQuantityPair as OrderItemQuantityPairModel, ResponseMessage as ResponseMessageModel } from '../../api/models';
+import { Item as ItemModel, ItemQuantityPair as ItemQuantityPairModel, OrderItemQuantityPair as OrderItemQuantityPairModel, ResponseMessage as ResponseMessageModel, Time as TimeModel } from '../../api/models';
+
+// I don't care. Socketio client should be separated instead of all together in one
+import io from 'socket.io-client';
 
 interface IProps extends WithStyles<typeof styles> { }
 
@@ -29,9 +32,12 @@ interface IState {
   disableBill: boolean;
   billButton: string;
   addItemButtonDisabled: boolean;
+  assistanceButtonDisabled: boolean;
+  estimatedTime: number;
 }
 
 class WaitingPage extends React.Component<IProps, IState> {
+  private socket: SocketIOClient.Socket;
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -46,10 +52,43 @@ class WaitingPage extends React.Component<IProps, IState> {
       disableBill: true,
       billButton: "Pay bill",
       addItemButtonDisabled: false,
+      assistanceButtonDisabled: true,
+      estimatedTime: 0,
     }
     this.openModal = this.openModal.bind(this);
     this.handleCloseModal = this.handleCloseModal.bind(this);
     this.addToOrder = this.addToOrder.bind(this);
+
+    this.socket = io('http://localhost:5000');
+    this.listen();
+  }
+
+  async listen() {
+    const socket = this.socket;
+
+    socket.on('connect', () => {
+      console.log('Connected to socket');
+      socket.emit('join');
+      this.setState({
+        assistanceButtonDisabled: false
+      });
+    });
+    socket.on('join', ({ room }: {room: string}) => {
+      console.log(`Joined room ${room}`);
+    });
+    socket.on('cooking', async () => {
+      await this.updateOrders();
+    });
+    socket.on('ready', async () => {
+      await this.updateOrders();
+    });
+    socket.on('served', async () => {
+      await this.updateOrders();
+    });
+    socket.on('paid', async () => {
+      console.log('paid');
+      await this.customerLogout();
+    });
   }
 
   renderFirstButton(it: ItemOrderModel) {
@@ -128,9 +167,7 @@ class WaitingPage extends React.Component<IProps, IState> {
   async cancelOrder(it: ItemOrderModel) {
     const client = new Client();
 
-    const r: ResponseMessageModel | null = await client.deleteItemOrder(it.id);
-
-    const o: OrderModel | null = await client.getCurrentOrder();
+    const [r, o] = await Promise.all([client.deleteItemOrder(it.id), client.getCurrentOrder()]);
 
     // Doesn't matter if null
     this.setState({
@@ -151,10 +188,22 @@ class WaitingPage extends React.Component<IProps, IState> {
       })
     }
   }
+  
+  async customerLogout() {
+    // Show that bill has been paid
+    alert("You have paid your bill");
 
-  async componentDidMount() {
+    const c = new Client();
+    const r = await c.customerLogout();
+
+    if (r) {
+      history.push('/');
+    }
+  }
+
+  async updateOrders() {
     const client = new Client();
-    const o: OrderModel | null = await client.getCurrentOrder();
+    const [o, t] = await Promise.all([client.getCurrentOrder(), client.getTime()]);
 
     // Doesn't matter if null
     let disableBillButton: boolean = false;
@@ -164,6 +213,8 @@ class WaitingPage extends React.Component<IProps, IState> {
         disableBillButton = true;
       }
     })
+
+    const time = t?.estimated_time ? t.estimated_time : 0;
 
     let billButtonString: string = "Pay bill";
     let addItemButtonDisabled: boolean = false;
@@ -179,7 +230,22 @@ class WaitingPage extends React.Component<IProps, IState> {
       disableBill: disableBillButton,
       billButton: billButtonString,
       addItemButtonDisabled: addItemButtonDisabled,
+      estimatedTime: time,
     });
+  }
+
+  async requestAssistance() {
+    this.socket.emit('assistance');
+    const client = new Client();
+    const r = await client.assistance(null, true);
+
+    if (r) {
+      console.log("Assistance has been requested");
+    }
+  }
+
+  async componentDidMount() {
+    await this.updateOrders();
   }
 
   // This will be called when there is a state change
@@ -232,12 +298,14 @@ class WaitingPage extends React.Component<IProps, IState> {
         <RightBar
           first={
             <div className={classes.rightdiv}>
-              <Button className={classes.assistancebutton} variant="contained" color="primary">Request assistance</Button>
+              <Button className={classes.assistancebutton} variant="contained" color="primary" disabled={this.state.assistanceButtonDisabled} onClick={()=> this.requestAssistance()}>Request assistance</Button>
               <Button className={classes.additembutton} variant="contained" color="primary" disabled={this.state.addItemButtonDisabled} onClick={() => history.push('/menu')}>Add item to order</Button>
             </div>
           }
           second={
             <div className={classes.rightdiv}>
+              <Typography variant="h4">{this.state.estimatedTime !== 0 ? "Estimated time" : ""}</Typography>
+              <Typography variant="h4">{this.state.estimatedTime !== 0 ? this.state.estimatedTime + " minutes": ""}</Typography>
             </div>
           }
           third={

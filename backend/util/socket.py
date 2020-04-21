@@ -64,14 +64,6 @@ def select_table():
     emit('table', room=None, include_self=True, namespace=None, callback=None)
 '''
 
-@socket.on('chosentable')
-@jwt_required
-def chosen_table():
-    orderNumber = get_jwt_claims().get('order')
-    table = db.get_table_number(orderNumber)
-    print('The customer is sitting at table ' + str(table))
-    emit('table', { 'table': table })
-
 @socket.on('order')
 @jwt_required
 def order_item():
@@ -92,7 +84,10 @@ def staff_finished():
 @socket.on('assistance')
 @jwt_required
 def request_assistance():
-    print("Customer from table X is requesting assistance")
+    orderNumber = get_jwt_claims().get('order')
+    table = db.get_table_number(orderNumber)
+    print("Customer from table %d is requesting assistance" % (table))
+    emit('assistance', { 'table': table })
 
 @socket.on('Bill Request')
 @jwt_required

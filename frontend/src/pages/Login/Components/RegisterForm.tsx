@@ -106,8 +106,8 @@ class PureRegister extends React.Component<{}, IState> {
         } else if (this.state.repassword !== this.state.password) {
             this.setError('Passwords not consistent');
             this.setState({ passerror: true });
-        } else if (!/^[a-zA-Z/s]+$/.test(this.state.name)) {
-            this.setError('Username can only be letters')
+        } else if (!/^[a-zA-Z\s]+$/.test(this.state.name)) {
+            this.setError('Name can only be letters')
             this.setState({ error: true });
             this.setState({ passerror: true });
         } else if (/^[a-zA-Z/s]+$/.test(this.state.password)) {
