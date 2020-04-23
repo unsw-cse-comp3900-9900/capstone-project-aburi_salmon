@@ -50,15 +50,16 @@ class EditCategory extends React.Component<IProps, IState>{
             }
         } else { //edit category
             const client = new Client();
-            const r: ResponseMessage | null = await client.editCategory(categoryName, this.props.category?.position, this.props.category?.id);
+            const r: any = await client.editCategory(categoryName, this.props.category?.position, this.props.category?.id);
             if (r === null) {
+                console.log("received null")
                 this.props.alert(true, 'error', "Something went wrong");
             } else if (r?.status === "success") {
                 this.props.alert(true, 'success', 'Category successfully modified.');
                 this.props.setIsOpen(false);
                 this.props.update();
             } else {
-                this.props.alert(true, 'error', r.status);
+                this.props.alert(true, 'error', r.message);
             }
         }
     }

@@ -11,15 +11,18 @@ export interface IProps extends WithStyles<typeof styles> {
     update: any;
     someList: ItemList | null;
     lastClicked: number;
+    headingStyle: any;
+    boxStyle: any;
+    name: string;
  }
 
-class Cooking extends React.Component<IProps, {}>{
+class OrderContainer extends React.Component<IProps, {}>{
     getHeading(){
         return (
             <thead>
-                <tr className={this.props.classes.headingToBeServed}>
-                    <th className={this.props.classes.headingToBeServed}>
-                        Cooking
+                <tr className={this.props.headingStyle}>
+                    <th className={this.props.headingStyle}>
+                        {this.props.name}
                     </th>
                 </tr>
             </thead>
@@ -29,7 +32,7 @@ class Cooking extends React.Component<IProps, {}>{
     getBox(){
         if (this.props.someList !== null && this.props.someList.itemList !== undefined){
             return (
-                <td className={this.props.classes.boxToBeServed}>
+                <td className={this.props.boxStyle}>
                     {this.props.someList?.itemList.map((item, index) => (
                         <ItemCont key={index} itemId={index} item={item} realId={item.id}
                             update={this.props.update} lastClicked={this.props.lastClicked}/>
@@ -38,7 +41,7 @@ class Cooking extends React.Component<IProps, {}>{
             );
         } else {
             return(
-                <td className={this.props.classes.boxToBeServed}>
+                <td className={this.props.boxStyle}>
                     No orders here...
                 </td >
             );
@@ -68,4 +71,4 @@ class Cooking extends React.Component<IProps, {}>{
     }
 }
 
-export default withStyles(styles)(Cooking);
+export default withStyles(styles)(OrderContainer);

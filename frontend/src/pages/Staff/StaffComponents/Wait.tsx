@@ -1,8 +1,6 @@
 import React from 'react';
 import { withStyles, WithStyles, MenuList, Paper, MenuItem, Box, Snackbar, Button, Dialog, DialogTitle, DialogContent,DialogActions } from '@material-ui/core';
 import Assistance from './Assistance/AssistanceMain';
-import ToServe from './Orders/Components/ToServeList';
-import Served from './Orders/Components/ServedList';
 import { ListItem, Menu, Tables, AssistanceTables, ItemList, ResponseMessage, Bill} from './../../../api/models';
 import { Client } from './../../../api/client';
 import { Alert } from '@material-ui/lab';
@@ -10,6 +8,7 @@ import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import {StaticMenu } from './Menu/StaticMenu';
 import {styles} from './styles';
 import { manageWaitSocket } from '../../../api/socketio';
+import OrderContainer from './Orders/Components/OrderContainer';
 
 // This loads all the pages that the kitchen staff sees
 // This includes the menu, list of orders, and info on tables
@@ -244,8 +243,10 @@ class Wait extends React.Component<IProps, IState>{
             return (
                 <Box className={classes.staffContainer}>
                     {this.helpDialog()}
-                    <ToServe update={this.moveToServed} someList={this.state.toServeList} lastClicked={this.state.lastClicked}/>
-                    <Served update={this.moveToToServe} someList={this.state.servedList} lastClicked={this.state.lastClicked}/>
+                    <OrderContainer update={this.moveToServed} someList={this.state.toServeList} lastClicked={this.state.lastClicked}
+                            headingStyle={this.props.classes.headingToBeServed} boxStyle={this.props.classes.boxToBeServed} name="To Be Served"/>
+                    <OrderContainer update={this.moveToToServe} someList={this.state.servedList} lastClicked={this.state.lastClicked} 
+                            headingStyle={this.props.classes.headingServed} boxStyle={this.props.classes.boxServed} name="Served" />
                     <div className={this.props.classes.helpIcon} onClick={() => this.setState({ resetOpen: true })}><HelpOutlineIcon /></div>
                 </Box>
             );

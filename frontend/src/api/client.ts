@@ -532,18 +532,18 @@ export class Client {
   async editCategory(categoryName: string, position: number | undefined, id: number | undefined) {
     try {
       const r: Response = await fetch(apiUrl + '/menu/category/' + id, {
-      method: 'PUT',
-      credentials: 'include',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(
-        {
-          name: categoryName,
-          position: position,
-        }
-      ),
+        method: 'PUT',
+        credentials: 'include',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(
+          {
+            name: categoryName,
+            position: position,
+          }
+        ),
     });
       const j: ResponseMessage = await r.json();
       return j;

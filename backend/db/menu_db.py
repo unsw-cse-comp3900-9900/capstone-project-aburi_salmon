@@ -164,18 +164,20 @@ class menu_DB:
         return True
     
     # Update a category in the menu
-    def edit_category(self, edit, category_id):
-        editArr = []
-        editStatement = 'UPDATE category SET '
+    def edit_category(self, editStatement, editArr):
+        
+        #editArr = []
+        #editStatement = 'UPDATE category SET '
 
-        if (edit.get('name')):
-            editStatement += "name = %s, "
-            editArr.append(edit.get('name'))
-        else:
-            abort(400, 'Missing required field \'name\'')
+        #if (edit.get('name')):
+        #    editStatement += "name = %s, "
+        #    editArr.append(edit.get('name'))
+        #else:
+        #    abort(400, 'Missing required field \'name\'')
 
-        editStatement = editStatement.strip(', ') + ' WHERE id = %s'
-        editArr.append(category_id)
+        #editStatement = editStatement.strip(', ') + ' WHERE id = %s'
+        #editArr.append(category_id)
+
         return self.db.update(editStatement, editArr)
 
     # Delete a category from the menu

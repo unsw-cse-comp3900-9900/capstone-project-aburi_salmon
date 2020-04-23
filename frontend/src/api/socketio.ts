@@ -137,7 +137,6 @@ export const manageWaitSocket = (App: any) => {
 
     socket1.on('assistance', ({ table }: TableObject) => {
         console.log(`Table ${table} is requesting assistance`);
-        App.updateAssist();
         App.assistanceAlert();
     });
 
