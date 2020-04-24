@@ -21,21 +21,20 @@ interface IState{
     currPage: string,
     toServeList: ItemList | null,
     servedList: ItemList | null,
-    listName: string,
     isOpen: boolean,
     lastClicked: number,
-    resetOpen: boolean,
+    helpOpen: boolean,
 
     //prevent duplicates in lists
-    noDups: 'none' | 'served' | 'toBeServed'  //last entered list
+    noDups: 'none' | 'served' | 'toBeServed',  //last entered list
     preventDups: ListItem | null,
 
     //for alert messages
     alertMessage: string,
 
     //initialise menu
-    menu: Menu | null;
-    menuvalue: string;
+    menu: Menu | null,
+    menuvalue: string,
 
     //initialise assistance
     tables: Tables | null,
@@ -49,12 +48,11 @@ class Wait extends React.Component<IProps, IState>{
         super(props);
         this.state = {
             currPage: "Orders",
-            listName: "none",
             toServeList: null,
             servedList: null,
             isOpen: false,
             lastClicked: -1,
-            resetOpen: false,
+            helpOpen: false,
 
             noDups: 'none',
             preventDups: null,
@@ -202,14 +200,14 @@ class Wait extends React.Component<IProps, IState>{
     helpDialog() {
         return (
             <div>
-                <Dialog open={this.state.resetOpen} onClose={() => this.setState({ resetOpen: false })} aria-labelledby="form-dialog-title">
+                <Dialog open={this.state.helpOpen} onClose={() => this.setState({ helpOpen: false })} aria-labelledby="form-dialog-title">
                     <DialogTitle id="form-dialog-title">Help</DialogTitle>
                     <DialogContent>
                         Tap on item in each list to move it between lists. If item has successfully changed list, the item will appear in the new list with a bold
                         outline.
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={() => this.setState({ resetOpen: false })} color="primary">
+                        <Button onClick={() => this.setState({ helpOpen: false })} color="primary">
                             Ok, I get it
                         </Button>
 
@@ -247,7 +245,7 @@ class Wait extends React.Component<IProps, IState>{
                             headingStyle={this.props.classes.headingToBeServed} boxStyle={this.props.classes.boxToBeServed} name="To Be Served"/>
                     <OrderContainer update={this.moveToToServe} someList={this.state.servedList} lastClicked={this.state.lastClicked} 
                             headingStyle={this.props.classes.headingServed} boxStyle={this.props.classes.boxServed} name="Served" />
-                    <div className={this.props.classes.helpIcon} onClick={() => this.setState({ resetOpen: true })}><HelpOutlineIcon /></div>
+                    <div className={this.props.classes.helpIcon} onClick={() => this.setState({ helpOpen: true })}><HelpOutlineIcon /></div>
                 </Box>
             );
         } else if (this.state.currPage === "Assistance"){
