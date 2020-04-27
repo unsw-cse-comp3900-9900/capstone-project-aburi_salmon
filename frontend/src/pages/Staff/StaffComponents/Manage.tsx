@@ -27,9 +27,6 @@ interface IState {
 
     //orders
     orderRealData: Array<ListItem>,
-    queueList: ItemList | null,
-    cookingList: ItemList | null,
-    readyList: ItemList | null,
 
     //staff details
     staffRealData: AllStaff | null,
@@ -65,9 +62,9 @@ class Manage extends React.Component<IProps, IState>{
             bill: [],
 
             orderRealData: [],
-            queueList: null, //listType === 1
-            cookingList: null, //listType === 2
-            readyList: null, //listType === 3
+            //queueList: null, listType === 1
+            //cookingList: null, listType === 2
+            //readyList: null, listType === 3
 
             staffRealData: null,
 
@@ -161,9 +158,6 @@ class Manage extends React.Component<IProps, IState>{
         }
         this.setState({
             orderRealData: temp1,
-            queueList: queue,
-            cookingList: cooking,
-            readyList: ready,
         });
     }
 

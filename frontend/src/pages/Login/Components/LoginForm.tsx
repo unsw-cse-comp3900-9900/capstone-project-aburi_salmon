@@ -35,6 +35,7 @@ class PureLogin extends React.Component<{}, IState> {
 
     //logs user in
     async checkLogin() {
+        
         const client = new Client();
         const r: StaffLogin | null = await client.login(this.state.username, this.state.password);
         if (r !== null && r.status === 'success'){

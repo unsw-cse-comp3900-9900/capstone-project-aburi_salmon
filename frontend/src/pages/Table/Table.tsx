@@ -43,13 +43,11 @@ class TablePage extends React.Component<IProps, IState> {
   async goToOrder(table_id: number) {
     await client.selectTable(table_id)
     history.push('/menu');
-    socket.emit('chosentable');
   }
 
   // Component did mount gets called before render
   async componentDidMount() {
     const t: TableModel | null = await client.getTables();
-
     // Doesn't matter if null
     this.setState({ tables: t });
     socket.emit('table');

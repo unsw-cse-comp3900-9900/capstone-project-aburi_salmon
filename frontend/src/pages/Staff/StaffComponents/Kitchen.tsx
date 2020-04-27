@@ -1,14 +1,12 @@
 import React from 'react';
 import {  withStyles, WithStyles, MenuList, Paper, MenuItem, Box, Dialog, DialogTitle, DialogContent,DialogActions,Button} from '@material-ui/core';
-import Queue from './Orders/Components/QueueList';
-import Cooking from './Orders/Components/CookingList';
-import Ready from './Orders/Components/ReadyList';
 import { ListItem, Menu, ItemList, ResponseMessage } from './../../../api/models';
 import { Client } from './../../../api/client';
 import { StaticMenu} from './Menu/StaticMenu';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import { socket, kitchenSocket } from '../../../api/socketio';
 import {styles} from './styles';
+import OrderContainer from './Orders/Components/OrderContainer';
 
 // This loads all the pages that the kitchen staff sees
 // This includes the menu and list of orders
@@ -103,9 +101,12 @@ class Kitchen extends React.Component<IProps, IState>{
             return (
                 <Box className={classes.staffContainer}>
                     {this.helpDialog()}
-                    <Queue update={this.moveToCooking} someList={this.state.queueList} lastClicked={this.state.lastClicked}/>
-                    <Cooking update={this.moveToReady} someList={this.state.cookingList} lastClicked={this.state.lastClicked}/>
-                    <Ready update={this.moveToQueue} someList={this.state.readyList} lastClicked={this.state.lastClicked}/>
+                    <OrderContainer update={this.moveToCooking} someList={this.state.queueList} lastClicked={this.state.lastClicked}
+                            headingStyle={this.props.classes.headingQueue} boxStyle={this.props.classes.boxQueue} name="Queue"/>
+                    <OrderContainer update={this.moveToReady} someList={this.state.cookingList} lastClicked={this.state.lastClicked}
+                        headingStyle={this.props.classes.headingToBeServed} boxStyle={this.props.classes.boxToBeServed} name="Cooking"/>
+                    <OrderContainer update={this.moveToQueue} someList={this.state.readyList} lastClicked={this.state.lastClicked}
+                        headingStyle={this.props.classes.headingServed} boxStyle={this.props.classes.boxServed} name="Ready"/>
                     <div className={this.props.classes.helpIcon} onClick={() => this.setState({ helpOpen: true })}><HelpOutlineIcon /></div>
                 </Box>
             );

@@ -83,6 +83,13 @@ class FreeTable(Resource):
             abort(400, 'Something went wrong')
 
         print('Table #' + str(table) + ' set occupied as false')
+
+        # get the latest orderid of table
+        order_id = db.get_last_order_id(table)
+        customerRoom = 'customer' + str(order_id)
+        print(customerRoom)
+        socket.emit('paid', room=customerRoom)
+        
         return jsonify({ 'status': 'success' })
 
 @table.route('/assistance')
@@ -127,7 +134,8 @@ class Assistance(Resource):
         if (not table_db.set_assistance(table_id, assistance)):
             abort(400, 'Something went wrong')
 
-        socket.emit('assistance', { 'table': table_id }, room='staff1')
+        if (assistance):
+            socket.emit('assistance', { 'table': table_id }, room='staff1')
         #socket.emit('assistance', room='staff3')
         return jsonify({ 'status': 'success' })
 
@@ -163,6 +171,9 @@ class TablePaid(Resource):
         
         if (table_db.set_paid(table, paid) == None):
             abort(500, 'Something went wrong.')
+
+        customerRoom = 'customer'+ str(table)
+        socket.emit('paid', room=customerRoom)
         
         return jsonify({ 'success': 'success' })
 

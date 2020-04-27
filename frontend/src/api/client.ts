@@ -1,4 +1,4 @@
-import { Tables, Menu, ItemList, Order, Item, StaffLogin,  ItemQuantityPair, CreateOrder, ResponseMessage, AddItemToOrderResponseMessage, OrderItemQuantityPair, TableInfo, AssistanceTables, AllStaff, AllItemStats, Ingredient, WholeItemList, StaffInfo, Bill } from "./models";
+import { Tables, Menu, ItemList, Order, Item, StaffLogin,  ItemQuantityPair, CreateOrder, ResponseMessage, AddItemToOrderResponseMessage, OrderItemQuantityPair, TableInfo, AssistanceTables, AllStaff, AllItemStats, Ingredient, WholeItemList, StaffInfo, Bill, RecommendationsResult, Time } from "./models";
 
 const apiUrl = "http://localhost:5000";
 
@@ -532,18 +532,18 @@ export class Client {
   async editCategory(categoryName: string, position: number | undefined, id: number | undefined) {
     try {
       const r: Response = await fetch(apiUrl + '/menu/category/' + id, {
-      method: 'PUT',
-      credentials: 'include',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(
-        {
-          name: categoryName,
-          position: position,
-        }
-      ),
+        method: 'PUT',
+        credentials: 'include',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(
+          {
+            name: categoryName,
+            position: position,
+          }
+        ),
     });
       const j: ResponseMessage = await r.json();
       return j;
@@ -814,4 +814,43 @@ export class Client {
     }
   }
 
+  async getRecommendations(items: Array<Number>) {
+    try {
+      const r: Response = await fetch(apiUrl + '/stats/recommend', {
+        method: 'POST',
+        credentials: 'include',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(
+          {
+            items: items,
+          }
+        ),
+      });
+      const j: RecommendationsResult = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async getTime() {
+    try {
+      const r: Response = await fetch(apiUrl + '/order/time', {
+        method: 'GET',
+        credentials: 'include',
+        mode: 'cors'
+      });
+
+      const j: Time = await r.json();
+
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
 }

@@ -5,7 +5,7 @@ class auth_DB:
     def __init__(self, db):
         self.db = db
 
-    
+    # Compare the given password with the one in the database
     def login(self, username, password):
         rows = self.db.query("SELECT password FROM staff WHERE username = %s;", [username])
         if (not rows):
@@ -14,20 +14,8 @@ class auth_DB:
         # This compares two strings to prevent timing attack
         result = hmac.compare_digest(rows[0][0], password)
         return result
-
-
-    def get_profile(self, username):
-        rows = self.db.query("SELECT username, name, staff_type_id FROM staff WHERE username = %s;", [username])    
-        if (not rows):
-            return None
-
-        return dict(
-            username=rows[0][0],
-            name=rows[0][1],
-            staff_type_id=rows[0][2],
-        )
-
-
+    
+    # Check if a username is already taken
     def available_username(self, username):
         rows = self.db.query("SELECT COUNT(*) FROM staff WHERE username = %s;", [username])
         if (not rows):
@@ -37,21 +25,21 @@ class auth_DB:
         return (rlen == 0)
 
 
+    # Check if valid registration key
     def validate_key(self, key):
-        # Check if valid key
         rows = self.db.query("SELECT registration_key, staff_type FROM staff_registration WHERE registration_key = %s;", [key])
         if (rows == None or not rows[0]):
             return False
 
         return rows[0][1]
 
-
+    # Insert a new user into the database
     def register(self, username, password, name, staff_type_id):
         self.db.insert("INSERT INTO staff (username, password, name, staff_type_id) VALUES (%s, %s, %s, %s);",
                       [username, password, name, staff_type_id])
         return True
 
-
+    # Get a list of staff types and the associated registration key
     def get_registration_keys(self, staff_type):
         if (staff_type):
             keys = self.db.query(
@@ -72,7 +60,7 @@ class auth_DB:
             } for key in keys
         ]
 
-
+    # Change the registration key for a staff type
     def set_registration_key(self, registration_key, staff_type):
 
         self.db.update(
@@ -86,13 +74,16 @@ class auth_DB:
         )
         return True
 
-
+    # Insert a new order into the order table. This is done when a customer selects a table.
     def insert_order(self, table_id):
-        self.db.insert('INSERT INTO "order" (table_id) VALUES (%s);', [table_id,])
-        order_id = self.db.query('SELECT id FROM "order" ORDER BY id DESC LIMIT %s', [1,])[0][0]
+        rows = self.db.query('INSERT INTO "order" (table_id) VALUES (%s) RETURNING id;', [table_id,])
+        if not rows or not rows[0]:
+            return None
         
-        return order_id  
+        order_id = rows[0][0]
+        return order_id
 
+    # Set the state of a given table to True. This will signify that it is occupied.
     def selectTable(self, table_id):
         rows = self.db.query('SELECT state FROM "table" WHERE id = %s;', [table_id])
 
@@ -100,7 +91,7 @@ class auth_DB:
             print('Something went wrong')
             return False
 
-        # 1 means the table is unavailable 
+        # Check if the table is already taken 
         if (rows[0][0]):
             print('table is taken!')
             return False
@@ -108,38 +99,18 @@ class auth_DB:
             self.db.update('UPDATE "table" SET state = %s WHERE id = %s', [True, table_id])
             return True
 
-
-    def get_ordered_items_customer(self, order_id):
-        rows = self.db.query("""SELECT io.id as item_order_id, io.order_id, i.name, i.id as item_id, io.quantity,
-        i.price, s.id as status_id, s.status_name, io.comment
-        FROM item_order io, item i, status s, "order" o
-        WHERE s.id = io.status_id
-        AND i.id = io.item_id
-        AND io.order_id = o.id
-        AND o.id = %s;""", [order_id])
-
-        if (not rows):
-            return []
-
-        item_order = []
-        for row in rows:
-            myDict = {
-                'id': row[0],
-                'order_id': row[1],
-                'item': row[2],
-                'item_id': row[3],
-                'quantity': row[4],
-                'price': row[5],
-                'comment': row[8],
-                'status': {
-                    'id': row[6],
-                    'name': row[7]
-                }
-            }
-            item_order.append(myDict)
-
-        return item_order
-
-
+    # Set a table free given an order_id
     def set_table_free_order_id(self, id):
         return self.db.update('UPDATE "table" t SET state = %s WHERE id = (SELECT table_id FROM "order" WHERE id = %s)', [False, id])
+
+    # Get staff user details given a username
+    def get_profile(self, username):
+        rows = self.db.query("SELECT username, name, staff_type_id FROM staff WHERE username = %s;", [username])    
+        if (not rows):
+            return None
+
+        return dict(
+            username=rows[0][0],
+            name=rows[0][1],
+            staff_type_id=rows[0][2],
+        )

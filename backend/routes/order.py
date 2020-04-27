@@ -56,11 +56,9 @@ class Order(Resource):
         if(order_id is None):
             order_id = order_db.insert_order(table_id)
 
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-
-
         socket.emit('order', { 'table': table_id }, room='staff2')
 
+        print("order_id is: {}".format(order_id))
         for i in range(0, num_of_orders):
             item_id = new_order.get('order')[i].get('item_id')
             quantity = new_order.get('order')[i].get('quantity')
@@ -262,6 +260,18 @@ class OrderTime(Resource):
         order_id = request.get_json().get('order_id')
 
         time = order_db.get_order_time(order_id)
+
+        return { 
+            'estimated_time': time
+        }
+
+    @jwt_required
+    @order.response(200, 'Success')
+    @order.response(400, 'Invalid request')
+    def get(self):
+        order_id = get_jwt_claims().get('order')
+
+        time = db.get_order_time(order_id)
 
         return { 
             'estimated_time': time

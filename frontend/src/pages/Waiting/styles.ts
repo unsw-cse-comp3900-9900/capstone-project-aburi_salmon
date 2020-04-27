@@ -49,12 +49,12 @@ export const styles = (theme: Theme) =>
     assistancebutton: {
       marginTop: '12px',
       margin: '5px',
-      fontSize: '18px',
+      fontSize: '15px',
     },
     additembutton: {
       marginTop: '12px',
       margin: '5px',
-      fontSize: '18px',
+      fontSize: '15px',
     },
     paybillbutton: {
       marginTop: '12px',

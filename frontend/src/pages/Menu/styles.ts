@@ -83,4 +83,9 @@ export const styles = (theme: Theme) =>
       width: 'auto',
       maxWidth: '100%',
     },
+    overflow: {
+      overflow: 'auto',
+      height: '90%',
+      position: 'static',
+    },
   });

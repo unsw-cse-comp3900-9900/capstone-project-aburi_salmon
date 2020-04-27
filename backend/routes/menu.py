@@ -124,6 +124,20 @@ class MenuCategory(Resource):
     @menu.response(400, 'Invalid Request')
     @menu.expect(request_model.category_model)
     def put(self, category_id):
+
+        edit = request.get_json()
+        editArr = []
+        editStatement = 'UPDATE category SET '
+
+        if (edit.get('name')):
+            editStatement += "name = %s, "
+            editArr.append(edit.get('name'))
+        if (edit.get('position')):
+            editStatement += "position = %s, "
+            editArr.append(edit.get('position'))
+
+        editStatement = editStatement.strip(', ') + ' WHERE id = %s'
+        editArr.append(category_id)
         if (not menu_db.edit_category(editStatement, editArr)):
             abort(400, 'Something went wrong')
         

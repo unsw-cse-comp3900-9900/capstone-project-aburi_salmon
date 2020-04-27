@@ -13,7 +13,7 @@ import { styles } from './styles';
 import { LeftBox, RightBar } from "../../components";
 import { Order as OrderModel, ItemOrder as ItemOrderModel, Item } from "../../api/models";
 import { Client } from "../../api/client";
-import { Item as ItemModel, ItemQuantityPair as ItemQuantityPairModel, OrderItemQuantityPair as OrderItemQuantityPairModel, ResponseMessage as ResponseMessageModel } from '../../api/models';
+import { Item as ItemModel, ItemQuantityPair as ItemQuantityPairModel, OrderItemQuantityPair as OrderItemQuantityPairModel, ResponseMessage as ResponseMessageModel, Time as TimeModel } from '../../api/models';
 
 // I don't care. Socketio client should be separated instead of all together in one
 import io from 'socket.io-client';
@@ -33,6 +33,7 @@ interface IState {
   billButton: string;
   addItemButtonDisabled: boolean;
   assistanceButtonDisabled: boolean;
+  estimatedTime: number;
 }
 
 class WaitingPage extends React.Component<IProps, IState> {
@@ -52,6 +53,7 @@ class WaitingPage extends React.Component<IProps, IState> {
       billButton: "Pay bill",
       addItemButtonDisabled: false,
       assistanceButtonDisabled: true,
+      estimatedTime: 0,
     }
     this.openModal = this.openModal.bind(this);
     this.handleCloseModal = this.handleCloseModal.bind(this);
@@ -75,13 +77,17 @@ class WaitingPage extends React.Component<IProps, IState> {
       console.log(`Joined room ${room}`);
     });
     socket.on('cooking', async () => {
-      await this.updateOrders()
+      await this.updateOrders();
     });
     socket.on('ready', async () => {
-      await this.updateOrders()
+      await this.updateOrders();
     });
     socket.on('served', async () => {
-      await this.updateOrders()
+      await this.updateOrders();
+    });
+    socket.on('paid', async () => {
+      console.log('paid');
+      await this.customerLogout();
     });
   }
 
@@ -161,9 +167,7 @@ class WaitingPage extends React.Component<IProps, IState> {
   async cancelOrder(it: ItemOrderModel) {
     const client = new Client();
 
-    const r: ResponseMessageModel | null = await client.deleteItemOrder(it.id);
-
-    const o: OrderModel | null = await client.getCurrentOrder();
+    const [r, o] = await Promise.all([client.deleteItemOrder(it.id), client.getCurrentOrder()]);
 
     // Doesn't matter if null
     this.setState({
@@ -184,10 +188,22 @@ class WaitingPage extends React.Component<IProps, IState> {
       })
     }
   }
+  
+  async customerLogout() {
+    // Show that bill has been paid
+    alert("You have paid your bill");
+
+    const c = new Client();
+    const r = await c.customerLogout();
+
+    if (r) {
+      history.push('/');
+    }
+  }
 
   async updateOrders() {
     const client = new Client();
-    const o: OrderModel | null = await client.getCurrentOrder();
+    const [o, t] = await Promise.all([client.getCurrentOrder(), client.getTime()]);
 
     // Doesn't matter if null
     let disableBillButton: boolean = false;
@@ -197,6 +213,8 @@ class WaitingPage extends React.Component<IProps, IState> {
         disableBillButton = true;
       }
     })
+
+    const time = t?.estimated_time ? t.estimated_time : 0;
 
     let billButtonString: string = "Pay bill";
     let addItemButtonDisabled: boolean = false;
@@ -212,6 +230,7 @@ class WaitingPage extends React.Component<IProps, IState> {
       disableBill: disableBillButton,
       billButton: billButtonString,
       addItemButtonDisabled: addItemButtonDisabled,
+      estimatedTime: time,
     });
   }
 
@@ -285,6 +304,8 @@ class WaitingPage extends React.Component<IProps, IState> {
           }
           second={
             <div className={classes.rightdiv}>
+              <Typography variant="h4">{this.state.estimatedTime !== 0 ? "Estimated time" : ""}</Typography>
+              <Typography variant="h4">{this.state.estimatedTime !== 0 ? this.state.estimatedTime + " minutes": ""}</Typography>
             </div>
           }
           third={

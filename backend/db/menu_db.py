@@ -34,7 +34,7 @@ class menu_DB:
     # Given a category id, return a list of items (and their ingredients) in the category 
     def get_items_by_category(self, category_id):
         rows = self.db.query(
-            'SELECT id, name, description, price, visible, image_url FROM item i JOIN category_item ci on (i.id = ci.item_id) WHERE ci.category_id = %s',
+            'SELECT id, name, description, price, visible, image_url, time FROM item i JOIN category_item ci on (i.id = ci.item_id) WHERE ci.category_id = %s',
             [category_id]
         )
 
@@ -48,6 +48,7 @@ class menu_DB:
             'price': row[3],
             'visible': row[4],
             'image_url': row[5],
+            'time': row[6],
             'ingredients': self.get_item_ingredients(row[0])
         } for row in rows]
     
@@ -163,18 +164,20 @@ class menu_DB:
         return True
     
     # Update a category in the menu
-    def edit_category(self, edit, category_id):
-        editArr = []
-        editStatement = 'UPDATE category SET '
+    def edit_category(self, editStatement, editArr):
+        
+        #editArr = []
+        #editStatement = 'UPDATE category SET '
 
-        if (edit.get('name')):
-            editStatement += "name = %s, "
-            editArr.append(edit.get('name'))
-        else:
-            abort(400, 'Missing required field \'name\'')
+        #if (edit.get('name')):
+        #    editStatement += "name = %s, "
+        #    editArr.append(edit.get('name'))
+        #else:
+        #    abort(400, 'Missing required field \'name\'')
 
-        editStatement = editStatement.strip(', ') + ' WHERE id = %s'
-        editArr.append(category_id)
+        #editStatement = editStatement.strip(', ') + ' WHERE id = %s'
+        #editArr.append(category_id)
+
         return self.db.update(editStatement, editArr)
 
     # Delete a category from the menu

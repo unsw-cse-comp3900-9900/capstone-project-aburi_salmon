@@ -29,12 +29,9 @@ class Login(Resource):
 
         if username is None or payload_password is None:
             abort(400, 'Malformed request, email and password is not supplied')
-
-        # Use plain password as example
-        db_password = payload_password
-
+        
         # Hash the password when everything works fine with plain password. This is how you hash the password, in a simple way:
-        # db_password = hash_password(payload_password)
+        db_password = hash_password(payload_password)
 
         if auth_db.login(username, db_password) == False:
             abort(401, 'Invalid email/password combination')
@@ -105,20 +102,11 @@ class Signup(Resource):
         if len(payload_password) < 8:
             abort(400, 'Minimum length of password is 8')
 
-        if registration_key == "staff1":
-            staff_type_id = 1
-        elif registration_key == "staff2":
-            staff_type_id = 2
-        elif registration_key == "staff3":
-            staff_type_id = 3
-        else:
-            staff_type_id = auth_db.validate_key(registration_key)
-            if (not staff_type_id):
-                abort(403, 'Invalid registration key')
+        staff_type_id = auth_db.validate_key(registration_key)
+        if (not staff_type_id):
+            abort(403, 'Invalid registration key')
 
-        # db_password = hash_password(payload_password)
-        db_password = payload_password
-
+        db_password = hash_password(payload_password)
         reg = auth_db.register(username, db_password, name, staff_type_id)
 
         if reg is None:
@@ -184,18 +172,24 @@ class CustomerSession(Resource):
     def post(self):
         table = request.get_json().get('table')
 
-        if (not table):
+        print('Table is {}'.format(table))
+
+        if (table is None):
             abort(400, 'Table number not provided')
-        
-        print('Creating order item')
-        order_id = auth_db.insert_order(table)
-        print('Order id = ' + str(order_id))
 
         print('Select table ' + str(table))
         if (not auth_db.selectTable(table)):
             print('Table ' + str(table) + ' is taken')
             abort(400, 'Table is taken')
         print('Table selected')
+
+        print('Creating order item')
+        order_id = auth_db.insert_order(table)
+        print('Order id = ' + str(order_id))
+
+        if not order_id:
+            print("Failed to create order item for new customer")
+            abort(500, "Something went wrong")
 
         identity = User('Customer', None, order_id)
         access_token = create_access_token(identity=identity)
@@ -217,15 +211,8 @@ class CustomerLogoutSession(Resource):
         user = get_jwt_identity()
 
         order_id = get_jwt_claims().get('order')
-        
-        # From the order_id, check if there is any ongoing order
-        # If there is an active order (unpaid), can't delete
-        item_order = auth_db.get_ordered_items_customer(order_id)
 
-        if len(item_order) != 0:
-            abort(400, 'Existing order is not paid')
-        
-        auth_db.set_table_free_order_id(order_id)
+        # Table is freed somewhere else
 
         response = jsonify({
             'status': 'success'

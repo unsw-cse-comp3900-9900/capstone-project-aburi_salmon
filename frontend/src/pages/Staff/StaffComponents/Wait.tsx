@@ -1,8 +1,6 @@
 import React from 'react';
 import { withStyles, WithStyles, MenuList, Paper, MenuItem, Box, Snackbar, Button, Dialog, DialogTitle, DialogContent,DialogActions } from '@material-ui/core';
 import Assistance from './Assistance/AssistanceMain';
-import ToServe from './Orders/Components/ToServeList';
-import Served from './Orders/Components/ServedList';
 import { ListItem, Menu, Tables, AssistanceTables, ItemList, ResponseMessage, Bill} from './../../../api/models';
 import { Client } from './../../../api/client';
 import { Alert } from '@material-ui/lab';
@@ -10,6 +8,7 @@ import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import {StaticMenu } from './Menu/StaticMenu';
 import {styles} from './styles';
 import { manageWaitSocket } from '../../../api/socketio';
+import OrderContainer from './Orders/Components/OrderContainer';
 
 // This loads all the pages that the kitchen staff sees
 // This includes the menu, list of orders, and info on tables
@@ -22,21 +21,20 @@ interface IState{
     currPage: string,
     toServeList: ItemList | null,
     servedList: ItemList | null,
-    listName: string,
     isOpen: boolean,
     lastClicked: number,
-    resetOpen: boolean,
+    helpOpen: boolean,
 
     //prevent duplicates in lists
-    noDups: 'none' | 'served' | 'toBeServed'  //last entered list
+    noDups: 'none' | 'served' | 'toBeServed',  //last entered list
     preventDups: ListItem | null,
 
     //for alert messages
     alertMessage: string,
 
     //initialise menu
-    menu: Menu | null;
-    menuvalue: string;
+    menu: Menu | null,
+    menuvalue: string,
 
     //initialise assistance
     tables: Tables | null,
@@ -50,12 +48,11 @@ class Wait extends React.Component<IProps, IState>{
         super(props);
         this.state = {
             currPage: "Orders",
-            listName: "none",
             toServeList: null,
             servedList: null,
             isOpen: false,
             lastClicked: -1,
-            resetOpen: false,
+            helpOpen: false,
 
             noDups: 'none',
             preventDups: null,
@@ -81,14 +78,13 @@ class Wait extends React.Component<IProps, IState>{
     }
 
     billrequestAlert(){
-        this.setState({alertMessage: 'Bill was requested!!'});
+        this.setState({alertMessage: 'Bill was requested!!', isOpen: true});
         this.updateAssist();
-        this.showAlert();
     }
 
     assistanceAlert(){
-        this.setState({ alertMessage: 'Assistance was requested!!'});
-        this.showAlert();
+        this.setState({ alertMessage: 'Assistance was requested!!', isOpen: true});
+        this.updateAssist();
     }
 
     async componentDidMount() {
@@ -204,14 +200,14 @@ class Wait extends React.Component<IProps, IState>{
     helpDialog() {
         return (
             <div>
-                <Dialog open={this.state.resetOpen} onClose={() => this.setState({ resetOpen: false })} aria-labelledby="form-dialog-title">
+                <Dialog open={this.state.helpOpen} onClose={() => this.setState({ helpOpen: false })} aria-labelledby="form-dialog-title">
                     <DialogTitle id="form-dialog-title">Help</DialogTitle>
                     <DialogContent>
                         Tap on item in each list to move it between lists. If item has successfully changed list, the item will appear in the new list with a bold
                         outline.
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={() => this.setState({ resetOpen: false })} color="primary">
+                        <Button onClick={() => this.setState({ helpOpen: false })} color="primary">
                             Ok, I get it
                         </Button>
 
@@ -245,9 +241,11 @@ class Wait extends React.Component<IProps, IState>{
             return (
                 <Box className={classes.staffContainer}>
                     {this.helpDialog()}
-                    <ToServe update={this.moveToServed} someList={this.state.toServeList} lastClicked={this.state.lastClicked}/>
-                    <Served update={this.moveToToServe} someList={this.state.servedList} lastClicked={this.state.lastClicked}/>
-                    <div className={this.props.classes.helpIcon} onClick={() => this.setState({ resetOpen: true })}><HelpOutlineIcon /></div>
+                    <OrderContainer update={this.moveToServed} someList={this.state.toServeList} lastClicked={this.state.lastClicked}
+                            headingStyle={this.props.classes.headingToBeServed} boxStyle={this.props.classes.boxToBeServed} name="To Be Served"/>
+                    <OrderContainer update={this.moveToToServe} someList={this.state.servedList} lastClicked={this.state.lastClicked} 
+                            headingStyle={this.props.classes.headingServed} boxStyle={this.props.classes.boxServed} name="Served" />
+                    <div className={this.props.classes.helpIcon} onClick={() => this.setState({ helpOpen: true })}><HelpOutlineIcon /></div>
                 </Box>
             );
         } else if (this.state.currPage === "Assistance"){

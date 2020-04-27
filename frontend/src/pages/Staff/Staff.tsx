@@ -6,7 +6,6 @@ import { WaitStaff } from './../Staff/StaffComponents/Wait';
 import { ManageStaff } from './../Staff/StaffComponents/Manage';
 //import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import { socket } from '../../api/socketio';
-//import { PopupState } from 'material-ui-popup-state/core';
 import {styles} from './styles';
 
 //Just a container to display staff pages
@@ -23,7 +22,7 @@ class StaffPage extends React.Component<IProps, IState>{
     constructor(props: any){
         super(props);
         this.state = {
-            staffType: "Manage",
+            staffType: "",
         };
     }
 
@@ -68,9 +67,6 @@ class StaffPage extends React.Component<IProps, IState>{
             return (
                 <ManageStaff />
             );
-        } else {
-            alert('You are not a valid staff');
-            history.push('/');
         }
     }
 

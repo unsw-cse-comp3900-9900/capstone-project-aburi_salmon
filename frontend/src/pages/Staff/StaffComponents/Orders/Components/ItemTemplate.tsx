@@ -33,7 +33,7 @@ class ItemCont extends React.Component<IProps, {}>{
                     <b>ItemID:</b> {this.props.item.id} <br></br>
                     <b>Name:</b> {this.props.item.itemName} <br></br>
                     <b>Amount:</b> {this.props.item.quantity} <br></br>
-                    <b>Table Number:</b> {this.props.item.table + 1} <br></br>
+                    <b>Table Number:</b> {this.props.item.table} <br></br>
                     {this.displayComment()}
                 </button>
             );
@@ -43,7 +43,7 @@ class ItemCont extends React.Component<IProps, {}>{
                     <b>ItemID:</b> {this.props.item.id} <br></br>
                     <b>Name:</b> {this.props.item.itemName} <br></br>
                     <b>Amount:</b> {this.props.item.quantity} <br></br>
-                    <b>Table Number:</b> {this.props.item.table + 1} <br></br>
+                    <b>Table Number:</b> {this.props.item.table} <br></br>
                     {this.displayComment()}
                 </button>
             );
