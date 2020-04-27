@@ -3,10 +3,13 @@ from flask_restx import Resource, abort, reqparse, fields
 from flask_jwt_extended import get_jwt_claims, jwt_required
 
 from app import api, db
+from db.order_db import order_DB
+#from db import order_db
 import model.response_model as response_model
 import model.request_model as request_model
 from util.socket import socket
 
+order_db = order_DB(db)
 order = api.namespace('order', description='Order Route')
 
 @order.route('/', strict_slashes=False)
@@ -20,8 +23,8 @@ class Order(Resource):
 
         order_id = get_jwt_claims().get('order')
 
-        item_order = db.get_ordered_items_customer(order_id)
-        bill_request = db.get_order_status(order_id)
+        item_order = order_db.get_ordered_items_customer(order_id)
+        bill_request = order_db.get_order_status(order_id)
         total = 0
 
         if item_order is None:
@@ -48,10 +51,10 @@ class Order(Resource):
         num_of_orders = len(new_order.get('order'))
 
         order_id = get_jwt_claims().get('order')
-        table_id = db.get_table_id(order_id)
+        table_id = order_db.get_table_id(order_id)
 
         if(order_id is None):
-            order_id = db.insert_order(table_id)
+            order_id = order_db.insert_order(table_id)
 
         socket.emit('order', { 'table': table_id }, room='staff2')
 
@@ -64,7 +67,7 @@ class Order(Resource):
             if not comment:
                 comment = ""
 
-            new = db.insert_item_order(order_id, item_id, quantity, comment)
+            new = order_db.insert_item_order(order_id, item_id, quantity, comment)
             if new is None:
                 abort(400, 'Backend is not working as intended or the supplied information was malformed. Make sure that your username is unique.')
 
@@ -94,7 +97,7 @@ class Item(Resource):
         if quantity is None or quantity == 0 or item_id is None:
             abort(400, 'Quantity or item_id missing')
         
-        new = db.add_order(order_id, item_id, quantity, comment)
+        new = order_db.add_order(order_id, item_id, quantity, comment)
 
         if new is None:
             abort(400, 'Could not create entry')
@@ -118,7 +121,7 @@ class Item(Resource):
         comment = modify_order.get('comment')
 
         order_id = get_jwt_claims().get('order')
-        table_id = db.get_table_id(order_id)
+        table_id = order_db.get_table_id(order_id)
 
         modifications = 'Table ' + str(table_id) + ' has modified order ' + str(item_order_id)
         print(modifications)
@@ -127,7 +130,7 @@ class Item(Resource):
         if item_order_id is None:
             abort(400, 'No existing order with that item, please make a new order instead.')
         
-        new = db.modify_item_order(item_order_id, comment, quantity)
+        new = order_db.modify_item_order(item_order_id, comment, quantity)
         print(new)
         if new == 5:
             abort(400, 'New quantity has to be >= 1 OR order has left the QUEUE status, please make a NEW order instead.')
@@ -147,7 +150,7 @@ class Item(Resource):
         item_order_id = delete_order.get('id')
 
         order_id = get_jwt_claims().get('order')
-        table_id = db.get_table_id(order_id)
+        table_id = order_db.get_table_id(order_id)
 
         deletions = 'Table ' + str(table_id) + ' has deleted order ' + str(item_order_id)
         print(deletions)
@@ -157,11 +160,11 @@ class Item(Resource):
         if item_order_id is None:
             abort(400, 'No existing order with that item, please make a new order instead.')
         
-        order_status = db.get_item_order_status(item_order_id)
+        order_status = order_db.get_item_order_status(item_order_id)
         if order_status != 1:
             abort(400, 'Cannot modify order since order has left the QUEUE status.')
         else:
-            new = db.delete_item_order(item_order_id)
+            new = order_db.delete_item_order(item_order_id)
 
         response = jsonify({
             'status': 'success'
@@ -183,11 +186,12 @@ class ModifyItemOrderStatus(Resource):
         if (not status):
             abort(400, 'Invalid request. Missing required field \'status\'')
         
-        if (not db.update_item_ordered_status(item_order_id, status)):
+        if (not order_db.update_item_ordered_status(item_order_id, status)):
             abort(500, 'Something went wrong')
         print('item_id is ' + str(item_order_id))
         #order_id = get_jwt_claims().get('order')
-        order_id = db.get_orderId(item_order_id)
+        order_id = order_db.get_orderId(item_order_id)
+        print('item_id is ' + str(order_id))
         customerRoom = 'customer' + str(order_id)
   
         # orderNumber = get_jwt_claims().get('order')
@@ -224,8 +228,8 @@ class ItemOrderById(Resource):
     @order.response(200, 'Success', model=response_model.item_order_response_model)
     @order.response(500, 'Internal Error')
     def get(self, order_id):
-        itemList = db.get_ordered_items(order_id)
-        table = db.get_table_id(order_id)
+        itemList = order_db.get_ordered_items(order_id)
+        table = order_db.get_table_id(order_id)
         if (itemList is None or table is None):
             abort(500, 'Something went wrong')
         return jsonify({ 'itemList': itemList, 'table': table })
@@ -236,7 +240,7 @@ class OrdersByStatus(Resource):
     @order.response(200, 'Success', model=response_model.item_order_status_response_model)
     @order.response(400, 'Invalid Request')
     def get(self, status_id):
-        itemlist = db.get_order_list(status_id)
+        itemlist = order_db.get_order_list(status_id)
         if (not itemlist):
             abort(400, 'Invalid request')
 
@@ -255,7 +259,7 @@ class OrderTime(Resource):
 
         order_id = request.get_json().get('order_id')
 
-        time = db.get_order_time(order_id)
+        time = order_db.get_order_time(order_id)
 
         return { 
             'estimated_time': time

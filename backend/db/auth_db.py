@@ -102,7 +102,7 @@ class auth_DB:
     # Set a table free given an order_id
     def set_table_free_order_id(self, id):
         return self.db.update('UPDATE "table" t SET state = %s WHERE id = (SELECT table_id FROM "order" WHERE id = %s)', [False, id])
-    
+
     # Get staff user details given a username
     def get_profile(self, username):
         rows = self.db.query("SELECT username, name, staff_type_id FROM staff WHERE username = %s;", [username])    
