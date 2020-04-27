@@ -6,6 +6,11 @@ export interface AddItemToOrderResponseMessage extends ResponseMessage {
   id: number; 
 }
 
+export type StaffLogin = {
+  staffype: number,
+  status: string,
+}
+
 export type Table = {
   occupied: boolean,
   table_id: number
@@ -27,6 +32,8 @@ export type Item = {
   ingredients: Array<Ingredient>,
   price: number,
   visible: boolean,
+  image_url: string,
+  time: number,
 }
 
 export type Categories = {
@@ -47,6 +54,7 @@ export type ListItem = {
   id: number,
   status_id: number,
   table: number,
+  comment: string,
 }
 
 export type ItemList = {
@@ -65,12 +73,14 @@ export type ItemOrder = {
   item_id: number,
   quantity: number,
   price: number,
-  status: Status
+  status: Status,
+  comment: string,
 }
 
 export type Order = {
   item_order: Array<ItemOrder>,
   total_bill: number,
+  bill_request: boolean,
 }
 
 export type ItemQuantityPair = {
@@ -144,4 +154,26 @@ export type ItemId = {
 
 export type IngredientList = {
   ingredients: Array<Ingredient>
+}
+
+export type WholeItemList = {
+  items: Array<Item>
+}
+
+export type Bill = {
+  tables: Array<number>
+}
+
+export type Recommendation = {
+  count: number,
+  item_id: number,
+  name: string,
+}
+
+export type RecommendationsResult = {
+  recommendations: Array<Recommendation>,
+}
+
+export type Time = {
+  estimated_time: number,
 }

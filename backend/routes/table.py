@@ -3,10 +3,13 @@ from flask_restx import Resource, abort, reqparse, fields
 from flask_jwt_extended import get_jwt_claims, jwt_required
 
 from app import api, db
+from db.table_db import table_DB
+
 import model.response_model as response_model
 import model.request_model as request_model
+from util.socket import socket
 
-
+table_db = table_DB(db)
 table = api.namespace('table', description='Order Route')
 
 @table.route('/')
@@ -15,7 +18,7 @@ class Table(Resource):
     @table.response(400, 'Invalid request')
     @table.doc(description="Get a list of tables and their status (occupied or not?)")
     def get(self):
-        tables = db.get_tables()
+        tables = table_db.get_tables()
         return jsonify({ 'tables': tables })
 
     @jwt_required
@@ -27,7 +30,7 @@ class Table(Resource):
         table = request.get_json().get('table')
         if (not table):
             abort(400, 'Table number not provided')
-        if (not db.create_table(table)):
+        if (not table_db.create_table(table)):
             abort(400, 'Something went wrong')
 
         return jsonify({ 'status': 'success' })
@@ -37,7 +40,7 @@ class Table(Resource):
     @table.response(400, 'Invalid request')
     @table.doc(description="Delete the highest numbered table")
     def delete(self):
-        if (not db.delete_table()):
+        if (not table_db.delete_table()):
             abort(400, 'Something went wrong')
 
         return jsonify({ 'status': 'success' })
@@ -49,12 +52,12 @@ class TableOrders(Resource):
     @table.response(400, 'Invalid request')
     @table.doc(description="Get the order of the table")
     def get(self, table):
-        order_id = db.get_order_id(table)
+        order_id = table_db.get_order_id(table)
 
         if (not order_id):
             abort(400, 'No orders for this table')
 
-        order_items = db.get_ordered_items(order_id)
+        order_items = table_db.get_ordered_items(order_id)
         if (order_items is None):
             abort(400, 'Something went wrong')
 
@@ -76,10 +79,17 @@ class FreeTable(Resource):
     @table.response(200, 'Success')
     @table.response(400, 'Invalid request')
     def post(self, table):
-        if (not db.set_table_free(table)):
+        if (not table_db.set_table_free(table)):
             abort(400, 'Something went wrong')
 
         print('Table #' + str(table) + ' set occupied as false')
+
+        # get the latest orderid of table
+        order_id = db.get_last_order_id(table)
+        customerRoom = 'customer' + str(order_id)
+        print(customerRoom)
+        socket.emit('paid', room=customerRoom)
+        
         return jsonify({ 'status': 'success' })
 
 @table.route('/assistance')
@@ -88,8 +98,8 @@ class Assistance(Resource):
     @table.response(200, 'Success')
     @table.response(400, 'Invalid request')
     def get(self):
-        tables = db.get_assistance_tables()
-        if (not tables):
+        tables = table_db.get_assistance_tables()
+        if (tables is None):
             abort(400, 'Something went wrong')
 
         return jsonify({'tables': tables})
@@ -110,9 +120,9 @@ class Assistance(Resource):
         if (not order_id and not table_id):
             abort(400, 'Invalid request')
         elif (not order_id):
-            order_id = db.get_order_id(table_id)
+            order_id = table_db.get_order_id(table_id)
         elif (not table_id):
-            table_id = db.get_table_id(order_id)
+            table_id = table_db.get_table_id(order_id)
 
         if (not order_id or not table_id):
             abort(401, 'Unauthorised')
@@ -121,9 +131,93 @@ class Assistance(Resource):
             abort(400, 'Invalid request')
 
 
-        if (not db.set_assistance(table_id, assistance)):
+        if (not table_db.set_assistance(table_id, assistance)):
             abort(400, 'Something went wrong')
 
+        if (assistance):
+            socket.emit('assistance', { 'table': table_id }, room='staff1')
+        #socket.emit('assistance', room='staff3')
         return jsonify({ 'status': 'success' })
-    
+
         
+@table.route('/paid')
+class TablePaid(Resource):
+    @jwt_required
+    @table.response(200, 'Success', model=response_model.table_paid_response_model)
+    @table.response(400, 'Invalid request')
+    @table.response(401, 'Unauthorised')
+    def get(self):
+        # Return a list of tables that have paid
+        paid = table_db.get_paid_tables()
+        if (paid == None):
+            abort(500, 'Something went wrong')
+        
+        return jsonify({ 'tables': paid })
+
+    @jwt_required
+    @table.response(200, 'Success')
+    @table.response(400, 'Invalid request')
+    @table.response(401, 'Unauthorised')
+    @table.expect(request_model.table_paid_model)
+    def put(self):
+        # Set the payment status of an order as true/false
+        body = request.get_json()
+
+        paid = body.get('paid')
+        table = body.get('table')
+
+        if (paid == None or table == None):
+            abort(400, "Invalid request. Missing required field")
+        
+        if (table_db.set_paid(table, paid) == None):
+            abort(500, 'Something went wrong.')
+
+        customerRoom = 'customer'+ str(table)
+        socket.emit('paid', room=customerRoom)
+        
+        return jsonify({ 'success': 'success' })
+
+@table.route('/bill')
+class TableBill(Resource):
+    @jwt_required
+    @table.response(200, 'Success', model=response_model.table_bill_response_model)
+    @table.response(400, 'Invalid request')
+    @table.response(401, 'Unauthorised')
+    def get(self):
+        # Return a list of tables that have paid
+        paid = table_db.get_bill_tables()
+        if (paid == None):
+            abort(500, 'Something went wrong')
+        
+        return jsonify({ 'tables': paid })
+
+    @jwt_required
+    @table.response(200, 'Success')
+    @table.response(400, 'Invalid request')
+    @table.response(401, 'Unauthorised')
+    @table.expect(request_model.table_bill_model)
+    def put(self):
+        # Set the request bill status of an order as true/false
+        body = request.get_json()
+
+        bill = body.get('bill')
+        order_id = get_jwt_claims().get('order')
+        table_id = body.get('table')
+
+
+        if (not order_id and not table_id):
+            abort(400, 'Invalid request')
+        elif (not order_id):
+            order_id = table_db.get_order_id(table_id)
+        elif (not table_id):
+            table_id = table_db.get_table_id(order_id)
+
+        if (bill == None or table_id == None):
+            abort(400, "Invalid request. Missing required field")
+        
+        if (table_db.set_bill(table_id, bill) == None):
+            abort(500, 'Something went wrong.')
+        
+        socket.emit('billrequest', room='staff1')
+        return jsonify({ 'success': 'success' })
+

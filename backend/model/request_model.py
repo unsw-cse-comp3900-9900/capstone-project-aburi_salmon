@@ -66,7 +66,8 @@ delete_order_model = api.model('delete_order_model', {
 })
 
 registration_model = api.model('registration_model', {
-    "type": fields.Integer(description='staff_type id')
+    "type": fields.String(description='Name of staff type'),
+    "key": fields.String(description='new registration key for that staff type')
 })
 
 menu_item_model = api.model('menu_item_model', {
@@ -97,6 +98,16 @@ table_assistance_model = api.model('table_assistance_model', {
     'table': fields.Integer(description='Optional field for table')
 })
 
+table_paid_model = api.model('table_paid_mdoel', {
+    'paid': fields.Boolean(description='The payment status of a table session'),
+    'table': fields.Integer(description='Table number')
+})
+
+table_bill_model = api.model('table_paid_mdoel', {
+    'bill': fields.Boolean(description='The payment status of a table session'),
+    'table': fields.Integer(description='Optional field for table')
+})
+
 
 edit_staff_model = api.model('edit_staff_model', {
     "staff_id": fields.Integer(description="staff_id"),
@@ -120,4 +131,8 @@ recommendations_model = api.schema_model('recommendations_model', {
             }
         }
     }
+})
+
+order_time_model = api.model('order_time_model', {
+    "order_id": fields.Integer(description="order_id")
 })

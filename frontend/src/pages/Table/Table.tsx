@@ -7,6 +7,7 @@ import { LeftBox, RightBar } from '../../components';
 import { styles } from './styles';
 import { Client } from '../../api/client';
 import { Tables as TableModel } from '../../api/models';
+import { socket } from '../../api/socketio';
 
 const client = new Client();
 
@@ -47,9 +48,9 @@ class TablePage extends React.Component<IProps, IState> {
   // Component did mount gets called before render
   async componentDidMount() {
     const t: TableModel | null = await client.getTables();
-
     // Doesn't matter if null
     this.setState({ tables: t });
+    socket.emit('table');
   }
 
   render() {

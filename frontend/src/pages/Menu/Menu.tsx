@@ -17,7 +17,7 @@ import { LeftBox, RightBar } from '../../components';
 
 import { styles } from './styles';
 import { Client } from '../../api/client';
-import { Menu as MenuModel, Item as ItemModel, Categories as CategoriesModel, ResponseMessage as ResponseMessageModel, ItemQuantityPair as ItemQuantityPairModel } from '../../api/models';
+import { Menu as MenuModel, Item as ItemModel, Order as OrderModel, Categories as CategoriesModel, ResponseMessage as ResponseMessageModel, ItemQuantityPair as ItemQuantityPairModel, RecommendationsResult } from '../../api/models';
 
 interface IProps extends WithStyles<typeof styles> { }
 
@@ -37,6 +37,7 @@ interface IState {
   modalQuantity: number;
   modalOriginalQuantity: number;
   modalComment: string;
+  modalRecommendations: string;
 
   // For list of items that user wants to order
   orders: Array<OrderItemState>;
@@ -44,11 +45,13 @@ interface IState {
   // For second button of the order
   modalSecondButton: string;
   modalSecondButtonDisable: boolean;
-
+  
   openConfirmModal: boolean;
+
 }
 
 class MenuPage extends React.Component<IProps, IState> {
+  private recommended: Array<number>;
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -61,6 +64,7 @@ class MenuPage extends React.Component<IProps, IState> {
       modalQuantity: 0,
       modalOriginalQuantity: 0,
       modalComment: "",
+      modalRecommendations: "",
       orders: new Array<OrderItemState>(),
       modalSecondButton: "Add to order",
       modalSecondButtonDisable: true,
@@ -77,6 +81,7 @@ class MenuPage extends React.Component<IProps, IState> {
     this.addToOrder = this.addToOrder.bind(this);
 
     this.handleCloseConfirmModal = this.handleCloseConfirmModal.bind(this);
+    this.recommended = new Array<number>();
   }
 
   generateItemsInCategory(category: CategoriesModel) {
@@ -85,7 +90,9 @@ class MenuPage extends React.Component<IProps, IState> {
     return (
       <div hidden={this.state.value !== categoryName} id={`tabpanel-${category.id}`} key={category.id} aria-labelledby={`tab-${category.id}`}>
         {
-          category.items.map(item => (
+          category.items.map(item => {
+            const recommended = categoryName === "Recommended" ? true : false;
+            return (
             // If there is an item with multiple categories, this will break.
             <Card className={classes.itemcard} key={`${category.id}-${item.id}`}>
               <CardContent>
@@ -95,19 +102,32 @@ class MenuPage extends React.Component<IProps, IState> {
                 <Typography variant="body2" component="p">
                   {item.description}
                 </Typography>
+                {
+                  recommended && <Typography variant="body2" component="p">This item is recommended for you</Typography>
+                }
               </CardContent>
               <CardActions>
                 <Button size="small" onClick={() => this.openModal(item)}>Add item</Button>
               </CardActions>
             </Card>
-          ))
+          )
+        })
         }
       </div>
     )
   }
 
-  goToTable() {
-    history.push('/table');
+  async goBack() {
+    // Check current order. if empty, logout and go to table
+    const client = new Client();
+    const o: OrderModel | null = await client.getCurrentOrder();
+
+    if (o && o?.item_order.length !== 0) {
+      history.push('/waiting');
+    } else {
+      const r = await client.customerLogout();
+      if (r) history.push('/table');
+    }
   }
 
   handleTabChange(event: React.ChangeEvent<{}>, newValue: string) {
@@ -116,12 +136,28 @@ class MenuPage extends React.Component<IProps, IState> {
     });
   }
 
-  openModal(item: ItemModel) {
+  async openModal(item: ItemModel) {
     let quantity = 0;
+    let comment = "";
+
+    const c = new Client();
+    const r = await c.getRecommendations([item.id]);
+
+    if (r) {
+      const rec = r.recommendations[0].name;
+      this.setState({
+        modalRecommendations: "Customer who orders this also order: " + rec,
+      });
+    } else {
+      this.setState({
+        modalRecommendations: "",
+      });
+    }
 
     this.state.orders.forEach((it: OrderItemState) => {
       if (it.item.id === item.id) {
         quantity = it.quantity;
+        comment = it.comment;
       }
     })
 
@@ -135,6 +171,7 @@ class MenuPage extends React.Component<IProps, IState> {
       // Set quantity to 0 for new item. Might need to change this if entry exists
       modalQuantity: quantity,
       modalOriginalQuantity: quantity,
+      modalComment: comment,
 
       // Set second button to modify order if quantity is not 0
       modalSecondButton: quantity === 0 ? "Add to order" : "Modify order",
@@ -168,6 +205,13 @@ class MenuPage extends React.Component<IProps, IState> {
     })
   }
 
+  modifyModalComment(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    this.setState({
+      modalComment: event.target.value,
+      modalSecondButtonDisable: false
+    });
+  }
+
   handleCloseModal(event: React.ChangeEvent<{}>) {
     this.setState({
       openModal: false,
@@ -180,7 +224,7 @@ class MenuPage extends React.Component<IProps, IState> {
     })
   }
 
-  addToOrder(event: React.ChangeEvent<{}>) {
+  async addToOrder(event: React.ChangeEvent<{}>) {
     const item = this.state.modal!;
     const quantity = this.state.modalQuantity;
     const comment = this.state.modalComment;
@@ -196,6 +240,47 @@ class MenuPage extends React.Component<IProps, IState> {
     if (quantity !== 0) {
       orders.push(r);
     }
+
+    const orderid: Array<number> = [];
+    orders.forEach(it => {
+      orderid.push(it.item.id);
+    });
+
+    const c = new Client();
+    const rec: RecommendationsResult | null = await c.getRecommendations(orderid);
+
+    if (rec) {
+      this.recommended = new Array<number>();
+      rec.recommendations.forEach(it => {
+        this.recommended.push(it.item_id);
+      });
+
+      this.setState(prevState => {
+        const nm = prevState.menu!;
+
+        if (nm?.menu[0].name !== "Recommended") {
+          const nc = {
+            id: -1,
+            name: "Recommended",
+            position: -1,
+            items: new Array<ItemModel>(),
+          };
+          nm?.menu.unshift(nc);
+        }
+        // Refresh element every single time
+        nm.menu[0].items = new Array<ItemModel>();
+        prevState.menu?.menu.map(cats => {
+          cats.items.map(it => {
+            if (this.recommended.findIndex((e) => e === it.id) !== -1) {
+              nm.menu[0].items.push(it);
+            }
+          })
+        })
+
+        return {menu: nm};
+      });
+    }
+
     this.setState({
       openModal: false,
       orders: orders,
@@ -231,7 +316,7 @@ class MenuPage extends React.Component<IProps, IState> {
 
     const client = new Client();
     const m: ResponseMessageModel | null = await client.createOrder(s);
-    
+
     if (m) {
       history.push('/waiting');
     }
@@ -240,12 +325,43 @@ class MenuPage extends React.Component<IProps, IState> {
   // Component did mount gets called before render
   async componentDidMount() {
     const client = new Client();
-    const m: MenuModel | null = await client.getMenu();
+    const [m, o] = await Promise.all([client.getMenu(), client.getCurrentOrder()]);
+
+    // Comment if statement below if recommendation needs to be disabled before adding 
+    // item to the queue
+    if (o?.item_order.length !== 0) {
+      const nc = {
+        id: -1,
+        name: "Recommended",
+        position: -1,
+        items: new Array<ItemModel>(),
+      };
+      m?.menu.unshift(nc);
+
+      const itemid = o?.item_order.map(it => it.item_id);
+      const rec: RecommendationsResult | null = await client.getRecommendations(itemid!);
+
+      this.recommended = new Array<number>();
+      rec?.recommendations.forEach(it => {
+        this.recommended.push(it.item_id);
+      });
+
+      m?.menu.map(cats => {
+        cats.items.map(it => {
+          if (this.recommended.findIndex((e) => e === it.id) !== -1) {
+            m.menu[0].items.push(it);
+          }
+        })
+      })
+    }
+
+
     this.setState({
       menu: m,
       value: m?.menu[0].name ? m?.menu[0].name : "",
     });
   }
+  
 
   // This will be called when there is a state change
   componentDidUpdate() {
@@ -263,11 +379,13 @@ class MenuPage extends React.Component<IProps, IState> {
             </div>
           }
           second={
-            <div style={{maxHeight: '100%', overflow: 'auto'}}>
+            <div style={{ height: '100%', overflow: 'auto' , position:'static'}}>
               <AppBar position="static">
                 <Tabs
                   value={this.state.value}
                   onChange={this.handleTabChange}
+                  scrollButtons="auto"
+                  variant="scrollable"
                 >
                   {
                     this.state.menu && this.state.menu?.menu &&
@@ -277,10 +395,12 @@ class MenuPage extends React.Component<IProps, IState> {
                   }
                 </Tabs>
               </AppBar>
+              <div className={classes.overflow}>
               {
                 this.state.menu && this.state.menu?.menu &&
                 this.state.menu?.menu.map(category => this.generateItemsInCategory(category))
               }
+              </div>
             </div>
           }
         />
@@ -289,7 +409,7 @@ class MenuPage extends React.Component<IProps, IState> {
           first={
             <div>
               <Button className={classes.assistancebutton} variant="contained" color="primary">Help</Button>
-              <Button className={classes.gobackbutton} variant="contained" color="secondary" onClick={() => this.goToTable()}>Go back</Button>
+              <Button className={classes.gobackbutton} variant="contained" color="secondary" onClick={() => this.goBack()}>Go back</Button>
             </div>
           }
           second={
@@ -308,6 +428,9 @@ class MenuPage extends React.Component<IProps, IState> {
                           </Typography>
                           <Typography variant="body2" component="p">
                             ${order.item.price} x {order.quantity} = <b>${order.item.price * order.quantity}</b>
+                          </Typography>
+                          <Typography variant="body2" component="p">
+                            {order.comment}
                           </Typography>
                         </CardContent>
                       </Card>
@@ -349,8 +472,10 @@ class MenuPage extends React.Component<IProps, IState> {
 
               {/* Second col */}
               <Grid item xs={8}>
-                insert image here
-                    </Grid>
+                <div className={classes.imageboxmodaldiv}>
+                    <img src={this.state.modal?.image_url} className={classes.imageboxmodal} />
+                </div>
+              </Grid>
               <Grid item xs={4}>
                 <Typography variant="h6">Ingredients</Typography>
                 <FormControl>
@@ -365,11 +490,13 @@ class MenuPage extends React.Component<IProps, IState> {
                     }
                   </FormGroup>
                 </FormControl>
+                <Typography variant="subtitle1">Est time: {this.state.modal?.time} mins</Typography>
               </Grid>
 
               {/* Third col */}
               <Grid item xs={8}>
                 <Typography variant="subtitle1">{this.state.modal?.description}</Typography>
+                <Typography variant="subtitle1">{this.state.modalRecommendations}</Typography>
               </Grid>
               <Grid item xs={4}>
                 <Typography variant="subtitle1">$ {this.state.modal?.price.toString()}</Typography>
@@ -385,7 +512,7 @@ class MenuPage extends React.Component<IProps, IState> {
 
               {/* Last col */}
               <Grid item xs={7}>
-                <TextField id="standard-basic" label="Comment" />
+                <TextField id="standard-basic" label="Comment" onChange={(e) => this.modifyModalComment(e)} defaultValue={this.state.modalComment} />
               </Grid>
               <Grid item xs={5}>
                 <Button variant="contained" onClick={this.handleCloseModal}>Cancel</Button>
@@ -422,6 +549,7 @@ class MenuPage extends React.Component<IProps, IState> {
                         <TableCell>Name</TableCell>
                         <TableCell>Quantity x Price</TableCell>
                         <TableCell>Price</TableCell>
+                        <TableCell>Comment</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -433,6 +561,7 @@ class MenuPage extends React.Component<IProps, IState> {
                               <TableCell>{it.item.name}</TableCell>
                               <TableCell>{it.item.price} x {it.quantity}</TableCell>
                               <TableCell>{it.quantity * it.item.price}</TableCell>
+                              <TableCell>{it.comment}</TableCell>
                             </TableRow>
                           )
                         })

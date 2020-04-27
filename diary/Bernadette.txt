@@ -1,0 +1,88 @@
+COMP3900 - Work Diary
+By: Bernadette Sharon Setio - z5098717
+Aburi Salmon Group
+
+
+Week 1
+Group formed with Kevin and Hui Min (Yemi).
+GitHub, Google Docs, messenger group, slack chat account was made.
+Appointed as the scrum master.
+Finished 1st deliverables.
+Discussed team name, logo, and project details such as the product description, purpose, features, software architecture, system process and flow and project methodology.
+Divide roles, I will work on back end.
+Finished the background, technical details, task allocation and timeline, project methodology and some of the epic & user stories for the proposal.
+Discuss database structure
+Created Jira account and add all members
+
+Week 2
+Two additional members on our group - Kaveh and Noah. Invited them on jira, github, messenger and slack. 
+We decided to stick on the "Waiter" project. 
+We changed the backend software architecture from Typescript to using python and FLASK. 
+Explained what we have in mind for the "waiter" project to the new members.
+Decided on a name for the system.
+We divided our roles and set up a weekly meetings day.
+Added more user stories and edited the epic stories.
+Discussed and modified the currently made database.
+Planned to finish the project proposals by the end of this week.
+Discussed how to make our system different than the currently available system on the market.
+Did some research on the currently available "waiter" system on the market.
+
+Week 3
+Transferred the epic stories and user stories to Jira
+Fixed existing user stories and added more user stories
+Finalised epic stories and its story points
+Arrange the wireframes on the project proposal
+Setting up virtual environment and python
+Transferred new and edit US and ES from google docs to Jira
+Added story points to all US
+Added customer wireframe to proposal
+Edited the database to the new changes
+Edited and finalised proposal
+Submitted the proposal
+
+Week 4
+Added README.md for capstone
+Assigned people in Jira
+Added subtasks for each user stories
+Create new sprint
+Made login
+Made register
+Made edit staff info
+
+Week 5:
+Create new sprint
+Added subtasks for each user stories
+Made menu
+Made edit orders
+
+Week 6:
+Create new sprint
+Added subtasks for each user stories
+Made changes to orders
+Trying to fix some problems on unable to run frontend properly
+
+Week 7
+Create new sprint
+Added subtasks for each user stories
+Edited orders
+Edited menu database, added menu and image
+Still trying to fix some problems on unable to run frontend properly
+
+Week 8:
+Create new sprint
+Added subtasks for each user stories
+Edited menu database
+Made estimated time taken calculation for order
+Matching ingredients with item menu on database
+Still trying to fix some problems on unable to run frontend properly
+
+Week 9
+Create new sprint
+Added subtasks for each user stories
+Refactor code
+Added comments
+Prepare for project demo
+
+Week 10
+Project Demo
+Work on project report

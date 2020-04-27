@@ -3,7 +3,8 @@ import { createStyles, Theme, fade } from "@material-ui/core";
 export const styles = (theme: Theme) =>
   createStyles({
     waitingpage: {
-
+      height: '97vh',
+      width: '100%',
     },
     title: {
       margin: '30px',
@@ -12,6 +13,7 @@ export const styles = (theme: Theme) =>
     },
     rightdiv: {
       width: '100%',
+      padding: '15px',
     },
     modal: {
       position: 'fixed',
@@ -33,5 +35,30 @@ export const styles = (theme: Theme) =>
       boxShadow: theme.shadows[5],
       padding: theme.spacing(2, 4, 3),
       transform: `translate(-50%,-50%)`,
+    },
+    imageboxmodaldiv: {
+      height: 450,
+      width: 600,
+    },
+    imageboxmodal: {
+      height: '100%',
+      maxHeight: '100%',
+      width: 'auto',
+      maxWidth: '100%',
+    },
+    assistancebutton: {
+      marginTop: '12px',
+      margin: '5px',
+      fontSize: '15px',
+    },
+    additembutton: {
+      marginTop: '12px',
+      margin: '5px',
+      fontSize: '15px',
+    },
+    paybillbutton: {
+      marginTop: '12px',
+      margin: '5px',
+      fontSize: '18px',
     },
   });

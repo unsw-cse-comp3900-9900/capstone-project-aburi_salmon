@@ -1,22 +1,55 @@
-import { Tables, Menu, ItemList, Order, Item, ItemId,  ItemQuantityPair, CreateOrder, ResponseMessage, AddItemToOrderResponseMessage, OrderItemQuantityPair, ItemOrder, TableInfo, AssistanceTables, AllStaff, AllItemStats, Ingredient } from "./models";
+import { Tables, Menu, ItemList, Order, Item, StaffLogin,  ItemQuantityPair, CreateOrder, ResponseMessage, AddItemToOrderResponseMessage, OrderItemQuantityPair, TableInfo, AssistanceTables, AllStaff, AllItemStats, Ingredient, WholeItemList, StaffInfo, Bill, RecommendationsResult, Time } from "./models";
 
 const apiUrl = "http://localhost:5000";
 
 export class Client {
 
-  login(username: string, password: string) {
-    return fetch(apiUrl + '/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({
-        username: username,
-        password: password
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      credentials: 'include',
-      mode: 'cors'
+  async login(username: string, password: string) {
+    try{
+      const r: Response = await fetch(apiUrl + '/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({
+          username: username,
+          password: password
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        mode: 'cors'
     });
+
+      const m: StaffLogin | null = await r.json();  
+      return m;
+
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async changeRegistrationKey(type: string, key: string) {
+    try {
+      const r: Response = await fetch(apiUrl + '/auth/registration', {
+        method: 'PUT',
+        body: JSON.stringify({
+          type,
+          key,
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        mode: 'cors'
+      });
+
+      const m: ResponseMessage = await r.json();
+
+      return m;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   }
 
   async selectTable(table: number) {
@@ -29,6 +62,23 @@ export class Client {
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include',
+        mode: 'cors'
+      });
+
+      const m: ResponseMessage = await r.json();
+
+      return m;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async customerLogout() {
+    try {
+      const r: Response = await fetch(apiUrl + '/auth/customer/logout', {
+        method: 'POST',
         credentials: 'include',
         mode: 'cors'
       });
@@ -283,35 +333,71 @@ export class Client {
   }
 
   async freeTable(tableNum: number) {
-
-    return fetch(apiUrl + '/table/free/' + tableNum, {
+    try {
+      const r: Response = await fetch(apiUrl + '/table/free/' + tableNum, {
       method: 'POST',
       credentials: 'include',
       mode: 'cors',
     });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   }
 
-  async assistance(order_id: number, assistance: boolean) {
+  async assistance(table: number | null, assistance: boolean) {
+    try {
+      const r: Response = await fetch(apiUrl + '/table/assistance', {
+        method: 'PUT',
+        credentials: 'include',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(
+          {
+            assistance: assistance,
+            table: table,
+          }
+        ),
+      });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
 
-    return fetch(apiUrl + '/table/assistance', {
-      method: 'PUT',
-      credentials: 'include',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(
-        {
-          assistance: assistance,
-          order_id: order_id,
-        }
-      ),
-    });
+  }
 
+  async requestBill() {
+    try {
+      const r: Response = await fetch(apiUrl + '/table/bill', {
+        method: 'PUT',
+        credentials: 'include',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(
+          {
+            bill: true,
+          }
+        ),
+      });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   }
 
   async updateOrderStatus(itemId: number, newStatus: number) {
-    return fetch(apiUrl + '/order/item/status/' + itemId, {
+    try {
+      const r: Response = await fetch(apiUrl + '/order/item/status/' + itemId, {
       method: 'PUT',
       credentials: 'include',
       mode: 'cors',
@@ -324,6 +410,13 @@ export class Client {
         }
       ),
     });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+
   }
 
   async getStaff() {
@@ -345,7 +438,8 @@ export class Client {
 
   async deleteStaff(staff_id: number) {
 
-    return (fetch(apiUrl + '/staff_profile/edit', {
+    try {
+      const r: Response = await fetch(apiUrl + '/staff_profile/edit', {
       method: 'DELETE',
       credentials: 'include',
       mode: 'cors',
@@ -357,14 +451,20 @@ export class Client {
           staff_id: staff_id,
         }
       ),
+    });
+      const j: number = await r.status;
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
     }
-    ));
 
   }
 
   async changeStaffType(staff_id: number, name: string, username: string, staff_type_id: number) {
 
-    return (fetch(apiUrl + '/staff_profile/edit', {
+    try {
+      const r: Response = await fetch(apiUrl + '/staff_profile/edit', {
       method: 'PATCH',
       credentials: 'include',
       mode: 'cors',
@@ -379,8 +479,13 @@ export class Client {
           staff_type_id: staff_type_id,
         }
       ),
+      });
+      const j: number = await r.status;
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
     }
-    ));
 
   }
 
@@ -401,8 +506,9 @@ export class Client {
     }
   }
 
-  async addCategory(categoryName: string, position: number) {
-    return fetch(apiUrl + '/menu/category', {
+  async addCategory(categoryName: string) {
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/category', {
       method: 'POST',
       credentials: 'include',
       mode: 'cors',
@@ -412,46 +518,60 @@ export class Client {
       body: JSON.stringify(
         {
           name: categoryName,
-          position: position,
         }
       ),
+    });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
     }
-    )
   }
 
   async editCategory(categoryName: string, position: number | undefined, id: number | undefined) {
-    return fetch(apiUrl + '/menu/category/' + id, {
-      method: 'PUT',
-      credentials: 'include',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(
-        {
-          name: categoryName,
-          position: position,
-        }
-      ),
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/category/' + id, {
+        method: 'PUT',
+        credentials: 'include',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(
+          {
+            name: categoryName,
+            position: position,
+          }
+        ),
+    });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
     }
-    )
   }
 
 
   async deleteCat(id: number | undefined) {
+   
     try {
-      await fetch(apiUrl + '/menu/category/' + id, {
+      const r: Response = await fetch(apiUrl + '/menu/category/' + id, {
         method: 'DELETE',
         credentials: 'include',
         mode: 'cors',
       });
-      return "Success"
+      const j = await r.json();
+      return j;
     } catch (e) {
       console.error(e);
-      return "Failed";
+      return null;
     }
+
   }
-  async addItem(name: string, description: string, price: number, visible: boolean, position: number, catId: number) {
+  
+  async addItem(name: string, description: string, price: number, visible: boolean, image_url: string) {
     try {
       const r: Response = await fetch(apiUrl + '/menu/item', {
         method: 'POST',
@@ -466,20 +586,20 @@ export class Client {
             description: description,
             price: price,
             visible: visible,
+            image_url: image_url,
           }
         ),
       });
-      const j: ItemId = await r.json();
-      return this.addItemToCat(position, catId, j.item_id);
-
-
+      const j: ResponseMessage = await r.json();
+      return j;
     } catch (e) {
       console.error(e);
       return null;
     }
+     
   }
 
-  async editItem(name: string, description: string, price: number, visible: boolean, catId: number, itemId: number) {
+  async editItem(name: string, description: string, price: number, visible: boolean, itemId: number, image_url: string) {
     try {
       const r: Response = await fetch(apiUrl + '/menu/item/' + itemId, {
         method: 'PUT',
@@ -494,29 +614,33 @@ export class Client {
             description: description,
             price: price,
             visible: visible,
+            image_url: image_url,
           }
         ),
       });
-      const j: ItemId = await r.json();
-      return this.addItemToCat(0, catId, itemId);
+      const j: ResponseMessage = await r.json();
+      return j;
     } catch (e) {
       console.error(e);
       return null;
     }
+
   }
 
-  async deleteItem(id:number) {
+  async deleteItem(id:number | undefined) {
     try {
-      await fetch(apiUrl + '/menu/item/' + id, {
+      const r: Response = await fetch(apiUrl + '/menu/item/' + id, {
         method: 'DELETE',
         credentials: 'include',
         mode: 'cors',
-      });
-      return "Success"
-    } catch (e) {
-      console.error(e);
-      return "Failed";
-    }
+    });
+    const j: ResponseMessage = await r.json();
+    return j;
+  } catch(e) {
+    console.error(e);
+    return null;
+  }
+    
   }
 
   async addItemToCat(position: number, catId: number, itemId: number) {
@@ -534,9 +658,8 @@ export class Client {
           }
         ),
       });
-      const j = await r.json();
+      const j: ResponseMessage = await r.json();
       return j;
-
     } catch (e) {
       console.error(e);
       return null;
@@ -544,7 +667,8 @@ export class Client {
   }
 
   async addIngredient(name: string){
-    return fetch(apiUrl + '/menu/ingredient', {
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/ingredient', {
       method: 'POST',
       credentials: 'include',
       mode: 'cors',
@@ -556,8 +680,13 @@ export class Client {
           name: name,
         }
       ),
+    });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
     }
-    )
   }
 
   async getIngredients(){
@@ -578,12 +707,150 @@ export class Client {
   }
 
   async deleteIngredient(id: number) {
-   return(fetch(apiUrl + '/menu/ingredient/' + id, {
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/ingredient/' + id, {
         method: 'DELETE',
         credentials: 'include',
         mode: 'cors',
-      }))
+      });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
     
   }
 
+  async getAllItems(){
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/item', {
+        method: 'GET',
+        credentials: 'include',
+        mode: 'cors',
+      });
+
+      const j: WholeItemList = await r.json();
+      return j;
+
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async removeItemFromCat(itemId: number | undefined, catId: number | undefined){
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/category/' + catId + '/item/' + itemId, {
+      method: 'DELETE',
+      credentials: 'include',
+      mode: 'cors',
+      });
+      const j: ResponseMessage = await r.json();
+      return j;    
+    } catch(e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async removeIngredFromItem(itemId: number, ingredId: number){
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/item/' + itemId + '/ingredient/' + ingredId,{
+      method: 'DELETE',
+      credentials: 'include',
+      mode: 'cors',
+      });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async addIngredToItem(itemId: number, ingredId: number){
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/item/' + itemId + '/ingredient/' + ingredId, {
+      method: 'POST',
+      credentials: 'include',
+      mode: 'cors',
+      });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async catSwitch(cat1Id: number, cat2Id: number | undefined){
+    try {
+      const r: Response = await fetch(apiUrl + '/menu/category/swap/' + cat1Id + '/' + cat2Id, {
+      method: 'POST',
+      credentials: 'include',
+      mode: 'cors',
+      });
+      const j: ResponseMessage = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async getBill(){
+    try {
+      const r: Response = await fetch(apiUrl + '/table/bill', {
+        method: 'GET',
+        credentials: 'include',
+        mode: 'cors',
+      });
+      const j: Bill = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async getRecommendations(items: Array<Number>) {
+    try {
+      const r: Response = await fetch(apiUrl + '/stats/recommend', {
+        method: 'POST',
+        credentials: 'include',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(
+          {
+            items: items,
+          }
+        ),
+      });
+      const j: RecommendationsResult = await r.json();
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async getTime() {
+    try {
+      const r: Response = await fetch(apiUrl + '/order/time', {
+        method: 'GET',
+        credentials: 'include',
+        mode: 'cors'
+      });
+
+      const j: Time = await r.json();
+
+      return j;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
 }

@@ -3,10 +3,13 @@ from flask_restx import Resource, abort, reqparse, fields
 from flask_jwt_extended import get_jwt_claims, jwt_required
 
 from app import api, db
+from db.menu_db import menu_DB
+
 import model.request_model as request_model
 import model.response_model as response_model
 from model.response_model import menu_items_model, menu_item_model
 
+menu_db = menu_DB(db)
 menu = api.namespace('menu', description='Menu Route')
 
 @menu.route('/')
@@ -17,12 +20,12 @@ class Menu(Resource):
     def get(self):
         # Return the entire menu
 
-        categories = db.get_categories()
+        categories = menu_db.get_categories()
 
         menu = []
 
         for category in categories:
-            menu.append(db.get_category(category['id']))
+            menu.append(menu_db.get_category(category['id']))
     
         return { 'menu': menu }
 
@@ -36,7 +39,7 @@ class CreateMenuItem(Resource):
     def post(self):
         # Create a new menu item
         item = request.get_json()
-        item_id = db.create_item(item)
+        item_id = menu_db.create_item(item)
         if (not item_id):
             abort(400, 'Invalid request')
         
@@ -47,36 +50,19 @@ class CreateMenuItem(Resource):
     @menu.response(400, 'Invalid Request')
     def get(self):
         # Get all menu items
-        items = db.get_all_menu_items()
+        items = menu_db.get_all_menu_items()
         return jsonify({ 'items': items })
 
-@menu.route('/item/<int:id>')
+@menu.route('/item/<int:item_id>')
 class MenuItem(Resource):
     @jwt_required
     @menu.response(200, 'Success')
     @menu.response(400, 'Invalid Request')
     @menu.expect(request_model.menu_item_model)
-    def put(self, id):
+    def put(self, item_id):
         # Modify a menu item
         edit = request.get_json()
-        editArr = []
-        editStatement = 'UPDATE item SET '
-        if (edit.get('name')):
-            editStatement += "name = %s, "
-            editArr.append(edit.get('name'))
-        if (edit.get('description')):
-            editStatement += "description = %s, "
-            editArr.append(edit.get('description'))
-        if (edit.get('price')):
-            editStatement += "price = %s, "
-            editArr.append(edit.get('price'))
-        if (edit.get('visible')):
-            editStatement += "visible = %s, "
-            editArr.append(edit.get('visible'))
-
-        editStatement = editStatement.strip(', ') + ' WHERE id = %s'
-        editArr.append(id)
-        if (not db.edit_item(editStatement, editArr)):
+        if (not menu_db.edit_item(edit, item_id)):
             abort(400, 'Something went wrong')
 
         return jsonify({ 'status': 'success' })
@@ -85,9 +71,9 @@ class MenuItem(Resource):
     @jwt_required
     @menu.response(200, 'Success', model=response_model.menu_item_model)
     @menu.response(400, 'Invalid Request')
-    def get(self, id):
+    def get(self, item_id):
         # Get a specific menu item
-        item = db.get_item_by_id(id)
+        item = menu_db.get_item_by_id(item_id)
         if (not item):
             abort(400, 'Invalid request')
         
@@ -96,9 +82,9 @@ class MenuItem(Resource):
     @jwt_required
     @menu.response(200, 'Success')
     @menu.response(400, 'Invalid Request')
-    def delete(self, id):
+    def delete(self, item_id):
         # Delete a specific menu item
-        if (not db.delete_item(id)):
+        if (not menu_db.delete_item(item_id)):
             abort(400, 'Invalid request')
 
         return jsonify({ 'status': 'success' })
@@ -115,7 +101,7 @@ class CreateMenuCategory(Resource):
         if (not name):
             abort(400, 'Missing required field \'name\'')
 
-        if (not db.create_category(name)):
+        if (not menu_db.create_category(name)):
             abort(400, 'Invalid request')
 
         return jsonify({ 'status': 'success' })
@@ -124,20 +110,21 @@ class CreateMenuCategory(Resource):
     @menu.response(200, 'Success', model=response_model.category_model)
     @menu.response(400, 'Invalid Request')
     def get(self):
-        categories = db.get_categories()
+        categories = menu_db.get_categories()
         if (not categories):
             abort(400, 'Invalid request')
 
         return jsonify({ 'categories': categories })
 
 
-@menu.route('/category/<int:id>')
+@menu.route('/category/<int:category_id>')
 class MenuCategory(Resource):
     @jwt_required
     @menu.response(200, 'Success')
     @menu.response(400, 'Invalid Request')
     @menu.expect(request_model.category_model)
-    def put(self, id):
+    def put(self, category_id):
+
         edit = request.get_json()
         editArr = []
         editStatement = 'UPDATE category SET '
@@ -145,12 +132,13 @@ class MenuCategory(Resource):
         if (edit.get('name')):
             editStatement += "name = %s, "
             editArr.append(edit.get('name'))
-        else:
-            abort(400, 'Missing required field \'name\'')
+        if (edit.get('position')):
+            editStatement += "position = %s, "
+            editArr.append(edit.get('position'))
 
         editStatement = editStatement.strip(', ') + ' WHERE id = %s'
-        editArr.append(id)
-        if (not db.edit_category(editStatement, editArr)):
+        editArr.append(category_id)
+        if (not menu_db.edit_category(editStatement, editArr)):
             abort(400, 'Something went wrong')
         
         return jsonify({ 'status': 'success' })
@@ -158,8 +146,8 @@ class MenuCategory(Resource):
     @jwt_required
     @menu.response(200, 'Success', model=response_model.specific_category_model)
     @menu.response(400, 'Invalid Request')
-    def get(self, id):
-        category = db.get_category(id)
+    def get(self, category_id):
+        category = menu_db.get_category(category_id)
         if (not category):
             abort(400, 'Invalid request')
 
@@ -168,15 +156,16 @@ class MenuCategory(Resource):
     @jwt_required
     @menu.response(200, 'Success')
     @menu.response(400, 'Invalid Request')
-    def delete(self, id):
-        items = db.get_items_by_category(id)
+    def delete(self, category_id):
+        items = menu_db.get_items_by_category(category_id)
         if (len(items) > 0):
             abort(400, 'Can only delete empty category')
 
         # Delete a category
-        if (not db.delete_category(id)):
+        if (not menu_db.delete_category(category_id)):
             abort(400, 'Invalid request')
-        
+
+
         return jsonify({ 'status': 'success' })
 
 @menu.route('/category/swap/<int:category_id1>/<int:category_id2>')
@@ -189,7 +178,7 @@ class ManuCategorySwap(Resource):
         id1 = min(category_id1, category_id2)
         id2 = max(category_id1, category_id2)
 
-        if (not db.swapCategoryPositions(id1, id2)):
+        if (not menu_db.swapCategoryPositions(id1, id2)):
             abort(400, 'Failed to swap category positions')
         
         return jsonify({ 'status': 'success' })
@@ -201,7 +190,7 @@ class MenuCategoryItem(Resource):
     @menu.response(400, 'Invalid Request')
     def post(self, category_id, item_id):
         # Add an item to a category
-        if (not db.add_item_to_category(category_id, item_id)):
+        if (not menu_db.add_item_to_category(category_id, item_id)):
             abort(400, 'Invalid request')
         
         return jsonify({ 'status': 'success' })
@@ -211,7 +200,7 @@ class MenuCategoryItem(Resource):
     @menu.response(400, 'Invalid Request')
     def delete(self, category_id, item_id):
         # Remove an item from a category
-        if (not db.remove_item_from_category(category_id, item_id)):
+        if (not menu_db.remove_item_from_category(category_id, item_id)):
             abort(400, 'Invalid request')
 
         return jsonify({ 'status': 'success' })
@@ -225,7 +214,7 @@ class CreateMenuIngredient(Resource):
     @menu.response(400, 'Invalid Request')
     def get(self):
         # Get a list of all ingredients
-        ingredients = db.get_all_ingredients()
+        ingredients = menu_db.get_all_ingredients()
         if (not ingredients):
             abort(400, 'Invalid request')
         
@@ -241,7 +230,7 @@ class CreateMenuIngredient(Resource):
         if (not name):
             abort(400, 'Missing ingredient name')
 
-        if (not db.create_ingredient(name)):
+        if (not menu_db.create_ingredient(name)):
             abort(400, 'Something went wrong')
 
         return jsonify({ 'status': 'success' })
@@ -253,7 +242,7 @@ class MenuIngredient(Resource):
     @menu.response(400, 'Invalid Request')
     def get(self, id):
         # Return a specific ingredient
-        ingredient = db.get_ingredient_by_id(id)
+        ingredient = menu_db.get_ingredient_by_id(id)
         if (not ingredient):
             abort(400, 'Invalid request, ingredient not found')
         
@@ -268,11 +257,8 @@ class MenuIngredient(Resource):
         name = request.get_json().get('name')
         if (not name):
             abort(400, 'Invalid request')
-        
-        editStatement = 'UPDATE ingredient SET name = %s WHERE id = %s'
-        editArr = [name, id]
 
-        if (not db.edit_ingredient(editStatement, editArr)):
+        if (not menu_db.edit_ingredient(name, id)):
             abort(400, 'Something went wrong')
 
         return jsonify({ 'status': 'success' })
@@ -284,7 +270,7 @@ class MenuIngredient(Resource):
         # Delete a specific ingredient
         # Only if not used
 
-        if (not db.delete_ingredient(id)):
+        if (not menu_db.delete_ingredient(id)):
             abort(400, 'Ingredient still in use')
 
         return jsonify({ 'status': 'success' })
@@ -296,7 +282,7 @@ class MenuItemIngredient(Resource):
     @menu.response(400, 'Invalid Request')
     def post(self, item_id, ingredient_id):
         # Add an ingredient to an item
-        if (not db.add_ingredient_to_item(item_id, ingredient_id)):
+        if (not menu_db.add_ingredient_to_item(item_id, ingredient_id)):
             abort(400, 'Something went wrong')
 
         return jsonify({ 'status': 'success' })
@@ -306,7 +292,7 @@ class MenuItemIngredient(Resource):
     @menu.response(400, 'Invalid Request')
     def delete(self, item_id, ingredient_id):
         # Remove ingredient from an item
-        if (not db.remove_ingredient_from_item(item_id, ingredient_id)):
+        if (not menu_db.remove_ingredient_from_item(item_id, ingredient_id)):
             abort(400, 'Something went wrong')
 
         return jsonify({ 'status': 'success' })

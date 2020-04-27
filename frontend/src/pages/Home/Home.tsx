@@ -2,7 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './../Home/Homepage.css';
 import history from '../../history';
+import { socket } from '../../api/socketio';
 
+//Renders the home page
 
 class PureHome extends React.Component {
   goToTable() {
@@ -16,8 +18,7 @@ class PureHome extends React.Component {
   render() {
     return (
       <div className="wrapper">
-        {/*<img src={restlogo} className="restlogo" alt="Logo" />*/}
-        <h1 className="restlogo">Restuarant Name</h1>
+        <h1 className="restlogo">Welcome!</h1>
         <button className="myButton" onClick={() => this.goToTable()}>
           Start Ordering
           </button>
@@ -28,10 +29,12 @@ class PureHome extends React.Component {
   }
 }
 
-const  logOut = () => {
+//logs staff out
+const logOut = async () => {
+  socket.emit('leave')
   localStorage.setItem('username', "");
   localStorage.setItem('staff', 'false');
-  fetch("http://localhost:5000/auth/logout", {
+  await fetch("http://localhost:5000/auth/logout", {
     method: 'POST',
     credentials: 'include',
     mode: 'cors'
@@ -47,8 +50,7 @@ const  logOut = () => {
   history.push('/');
 }
 
-
-
+//checks if is logged in
 const isLoggedIn = () => {
   if (localStorage.getItem('staff') !== 'true') {
     return (
@@ -58,11 +60,7 @@ const isLoggedIn = () => {
     );
   }
   else {
-    return (
-      <Link to='/' className="stafflogin" onClick={() => logOut()}>
-        Log Out
-      </Link>
-    );
+    history.push('/staff');
   }
 
 }

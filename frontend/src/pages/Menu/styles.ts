@@ -72,5 +72,20 @@ export const styles = (theme: Theme) =>
       boxShadow: theme.shadows[5],
       padding: theme.spacing(2, 4, 3),
       transform: `translate(-50%,-50%)`,
-    }
+    },
+    imageboxmodaldiv: {
+      height: 450,
+      width: 600,
+    },
+    imageboxmodal: {
+      height: '100%',
+      maxHeight: '100%',
+      width: 'auto',
+      maxWidth: '100%',
+    },
+    overflow: {
+      overflow: 'auto',
+      height: '90%',
+      position: 'static',
+    },
   });

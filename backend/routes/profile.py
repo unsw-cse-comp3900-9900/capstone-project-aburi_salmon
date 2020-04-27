@@ -7,10 +7,13 @@ from flask_jwt_extended import create_access_token, set_access_cookies, unset_jw
 
 import config
 from app import api, db
+from db.profile_db import profile_DB
+
 from model.request_model import edit_profile_model
 from util.hasher import hash_password
 from util.user import User
 
+profile_db = profile_DB(db)
 profile = api.namespace('profile', description='Profile route')
 
 
@@ -21,7 +24,7 @@ class GetProfile(Resource):
         # Gets username from JWT
         curr_user = get_jwt_identity()   #username
         
-        profile_dict = db.get_profile(curr_user)
+        profile_dict = profile_db.get_profile(curr_user)
         curr_name = profile_dict['name']
         curr_staff_type_id =profile_dict['staff_type_id']
 
@@ -71,7 +74,7 @@ class GetProfile(Resource):
             else:
                 abort(403, 'Wrong registration key')
         
-        upd = db.update_staff(username, name, staff_type_id)
+        upd = profile_db.update_staff(username, name, staff_type_id)
 
         if upd is None:
             abort(400, 'Backend is not working as intended or the supplied information was malformed.')

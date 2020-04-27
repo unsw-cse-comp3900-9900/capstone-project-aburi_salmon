@@ -1,34 +1,16 @@
 import React from 'react';
-import { AppBar, Toolbar,  Typography, createStyles, Button, withStyles, WithStyles, Theme, MenuItem, Menu} from '@material-ui/core';
-import background from './../../assets/FoodBackground.jpg';
+import { AppBar, Toolbar,  Typography, Button, withStyles, WithStyles, MenuItem, Menu} from '@material-ui/core';
 import history from '../../history';
-import { KitchenStaff } from './../Staff/StaffType/Kitchen';
-import { WaitStaff } from './../Staff/StaffType/Wait';
-import { ManageStaff } from './../Staff/StaffType/Manage';
-import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
-//import { PopupState } from 'material-ui-popup-state/core';
+import { KitchenStaff } from './../Staff/StaffComponents/Kitchen';
+import { WaitStaff } from './../Staff/StaffComponents/Wait';
+import { ManageStaff } from './../Staff/StaffComponents/Manage';
+//import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
+import { socket } from '../../api/socketio';
+import {styles} from './styles';
 
-const styles = (theme: Theme) =>
-    createStyles({
-        title: {
-            flexGrow: 1,
-        },      
-        wrapper: {
-            height: '97vh',
-            width: '100%',
-            backgroundImage: background,
-        },
-        menubutton: {
-            marginRight: theme.spacing(1),
-            paddingRight: '10px',
-        },
-        root: {
-            display: 'flex',
-        },
-        appbar: {
-            background: 'black',
-        }
-    });
+//Just a container to display staff pages
+//Depending on which type of staff is one, it will render which component
+
 export interface IProps extends WithStyles<typeof styles> { }
 
 interface IState{
@@ -40,14 +22,15 @@ class StaffPage extends React.Component<IProps, IState>{
     constructor(props: any){
         super(props);
         this.state = {
-            staffType: "Manage",
+            staffType: "",
         };
     }
 
-    logOut() {
+    async logOut() {
+        socket.emit('leave');
         localStorage.setItem('username', "");
         localStorage.setItem('staff', 'false');
-        fetch("http://localhost:5000/auth/logout", {
+        await fetch("http://localhost:5000/auth/logout", {
             method: 'POST',
             credentials: 'include',
             mode: 'cors'
@@ -70,26 +53,34 @@ class StaffPage extends React.Component<IProps, IState>{
         }
     }
 
-    displayStaff(){
-        if (this.state.staffType === 'Wait'){
-            return(
+    displayStaff() {
+        if (localStorage.getItem('stafftype') === 'waiter') {
+            return (
                 <WaitStaff />
             );
-        } else if(this.state.staffType === 'Kitchen'){
-            return(
+        } else if (localStorage.getItem('stafftype') === 'kitchen') {
+            return (
                 <KitchenStaff />
             );
 
-        } else if(this.state.staffType === 'Manage'){
-            return(
+        } else if (localStorage.getItem('stafftype') === 'admin') {
+            return (
                 <ManageStaff />
             );
-        } else {
-            alert('You are not a valid staff');
-            history.push('/');
         }
     }
 
+    displayStaffType(){
+        if (localStorage.getItem('stafftype') === 'waiter'){
+            return 'Waiter'
+        } else if (localStorage.getItem('stafftype') === 'kitchen') {
+            return 'Kitchen Staff'
+        } else if (localStorage.getItem('stafftype') === 'admin') {
+            return 'Admin'
+        }
+    }
+
+    //convenience in testing
     changeStaffType(popupState: any, staffType: string){
         this.setState({staffType: staffType});
     }
@@ -99,7 +90,7 @@ class StaffPage extends React.Component<IProps, IState>{
         return (
             <div className={classes.wrapper}>
                 {this.isStaff()}
-                For Testing Purposes:
+                {/*For Testing Purposes:
                 <PopupState variant="popover" popupId="demo-popup-menu">
                     {popupState => (
                         <React.Fragment>
@@ -113,11 +104,11 @@ class StaffPage extends React.Component<IProps, IState>{
                             </Menu>
                         </React.Fragment>
                     )}
-                </PopupState>
+                    </PopupState>*/}
                 <AppBar position="static" className={classes.appbar}>
                     <Toolbar>
                         <Typography variant="h6" className={classes.title}>
-                        {localStorage.getItem('username')}: {this.state.staffType} staff
+                        {localStorage.getItem('username')}: {this.displayStaffType()}
                     </Typography>
                         <Button color="inherit" onClick={() => this.logOut()}>Logout</Button>
                     </Toolbar>
