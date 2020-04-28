@@ -6,18 +6,22 @@ from flask_jwt_extended import get_jwt_claims, jwt_required
 
 from app import api, db
 from db.profile_db import profile_DB
-from model.request_model import edit_staff_model, delete_staff_model
+import model.staff_profiles_model as staff_profiles_model
 
 profile_db = profile_DB(db)
 staff_profile = api.namespace('staff_profile', description='Staff''s Profile Route')
 
 @staff_profile.route('/staff_list')
 class Staff_list(Resource):
-    #@jwt_required
-    @staff_profile.response(200, 'Success')
+    @jwt_required
+    @staff_profile.response(200, 'Success', model=staff_profiles_model.staff_list_response_model)
     @staff_profile.response(400, 'Invalid request')
     def get(self):
-
+        # Make sure user is a manager
+        role = get_jwt_claims().get('role')
+        if db.get_staff_title(role) != 'Manage':
+            abort(400, 'User is not a manager')
+        
         # Gets lists of staffs and all their details
         staff_list = profile_db.get_all_staff()
         return { 'staff_list': staff_list }
@@ -25,11 +29,15 @@ class Staff_list(Resource):
 
 @staff_profile.route('/edit')
 class Staff_edit(Resource):
-    #@jwt_required
-    @staff_profile.expect(edit_staff_model)
+    @jwt_required
+    @staff_profile.expect(staff_profiles_model.edit_staff_request_model)
     @staff_profile.response(200, 'Success')
     @staff_profile.response(400, 'Invalid request')
     def patch(self):
+        # Make sure user is a manager
+        role = get_jwt_claims().get('role')
+        if db.get_staff_title(role) != 'Manage':
+            abort(400, 'User is not a manager')
 
         # Edit staff details
         edit_staff_input = request.get_json()               # get json input for new details
@@ -75,11 +83,15 @@ class Staff_edit(Resource):
             'status': 'success'
         })
 
-    #@jwt_required
-    @staff_profile.expect(delete_staff_model)
+    @jwt_required
+    @staff_profile.expect(staff_profiles_model.delete_staff_request_model)
     @staff_profile.response(200, 'Success')
     @staff_profile.response(400, 'Invalid request')
     def delete(self):
+        # Make sure user is a manager
+        role = get_jwt_claims().get('role')
+        if db.get_staff_title(role) != 'Manage':
+            abort(400, 'User is not a manager')
 
         # Delete staff record
         delete_order = request.get_json()                   # get staff_id to be deleted from json input

@@ -6,8 +6,6 @@ from app import api, db
 from db.order_db import order_DB
 
 import model.order_model as order_model
-import model.response_model as response_model
-import model.request_model as request_model
 from util.socket import socket
 
 order_db = order_DB(db)
@@ -195,7 +193,7 @@ class ModifyItemOrderStatus(Resource):
         order_id = order_db.get_orderId(item_order_id)
         print('item_id is ' + str(order_id))
         customerRoom = 'customer' + str(order_id)
-          if status == 2 :
+        if status == 2 :
             print('customer room is ' + customerRoom)
             socket.emit('cooking', room=customerRoom)
             socket.emit('cooking', room='staff1')
