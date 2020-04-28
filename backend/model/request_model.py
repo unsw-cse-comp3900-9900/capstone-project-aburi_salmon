@@ -52,22 +52,6 @@ delete_order_model = api.model('delete_order_model', {
     "id": fields.Integer(description="item_order_id")
 })
 
-
-menu_item_model = api.model('menu_item_model', {
-    'name': fields.String(description='name of new menu item'),
-    'description': fields.String(description='description of new menu item'),
-    'price': fields.Float(description='price of the new item'),
-    'visible': fields.Boolean(description='is the item visible on the menu')
-})
-
-category_model = api.model('category_model', {
-    'name': fields.String(description='category name')
-})
-
-ingredient_model = api.model('ingredient_model', {
-    'name': fields.String(description='ingredient name')
-})
-
 table_model = api.model('table_model', {
     'table': fields.Integer(description='New table number')
 })

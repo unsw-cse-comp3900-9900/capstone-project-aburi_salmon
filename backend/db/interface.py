@@ -24,7 +24,6 @@ class DB:
         rows = c.fetchall()
         
         c.close()
-        print(rows)
         return rows if len(rows) else None
 
     # Update the DB
@@ -75,3 +74,10 @@ class DB:
         c.close()
         self.__conn.commit()
         return True
+
+    # Map staff type id to a staff title
+    def get_staff_title(self, staff_type_id):
+        rows = self.query("SELECT title FROM staff_type WHERE id = %s", [staff_type_id])
+        if not rows or not rows[0]:
+            return -1
+        return rows[0][0]

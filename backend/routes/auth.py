@@ -12,7 +12,6 @@ import config
 from app import api, db
 from db.auth_db import auth_DB
 import model.auth_model as auth_model
-from model.request_model import customer_session_model
 from util.hasher import hash_password
 from util.user import User
 
@@ -141,7 +140,7 @@ class Registration(Resource):
     def get(self):
         role = get_jwt_claims().get('role')
         # Make sure user is a manager
-        if auth_db.get_staff_title(role) != 'Manage':
+        if db.get_staff_title(role) != 'Manage':
             abort(400, 'User is not a manager')
 
         # Get a list of all registration keys
@@ -157,7 +156,7 @@ class Registration(Resource):
     def put(self):
         role = get_jwt_claims().get('role')
         # Make sure user is a manager
-        if auth_db.get_staff_title(role) != 'Manage':
+        if db.get_staff_title(role) != 'Manage':
             abort(400, 'User is not a manager')
 
         # Extract the staff type and new registration key from the request body
@@ -184,7 +183,7 @@ class RegistrationList(Resource):
     def get(self, staff_type):
         role = get_jwt_claims().get('role')
         # Make sure user is a manager
-        if auth_db.get_staff_title(role) != 'Manage':
+        if db.get_staff_title(role) != 'Manage':
             abort(400, 'User is not a manager')
 
         # Get the registration key of for a given staff type
