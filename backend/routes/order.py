@@ -31,6 +31,7 @@ class Order(Resource):
             abort(404, 'No order found on database.')
 
         # List the price of an order
+        total = 0
         for k in item_order:
             total = total + k.get('price')
 
@@ -260,7 +261,7 @@ class OrderTime(Resource):
     def get(self):
         order_id = get_jwt_claims().get('order')
 
-        time = db.get_order_time(order_id)
+        time = order_db.get_order_time(order_id)
 
         return { 
             'estimated_time': time

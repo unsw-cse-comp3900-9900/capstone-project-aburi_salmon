@@ -204,7 +204,7 @@ class TablePaid(Resource):
     def get(self):
         # Make sure user is a manager or waitstaff
         role = get_jwt_claims().get('role')
-        if db.get_staff_title(role) in ('Manage', 'Wait'):
+        if db.get_staff_title(role) not in ('Manage', 'Wait'):
             abort(400, 'User is not a waitstaff or manager')
 
         # Return a list of tables that have paid
@@ -223,7 +223,7 @@ class TablePaid(Resource):
     def put(self):
         # Make sure user is a manager or waitstaff
         role = get_jwt_claims().get('role')
-        if db.get_staff_title(role) in ('Manage', 'Wait'):
+        if db.get_staff_title(role) not in ('Manage', 'Wait'):
             abort(400, 'User is not a waitstaff or manager')
 
         body = request.get_json()
@@ -254,7 +254,7 @@ class TableBill(Resource):
     def get(self):
         # Make sure user is a manager or waitstaff
         role = get_jwt_claims().get('role')
-        if db.get_staff_title(role) in ('Manage', 'Wait'):
+        if db.get_staff_title(role) not in ('Manage', 'Wait'):
             abort(401, 'User is not a waitstaff or manager')
         
         # Return a list of tables that have paid

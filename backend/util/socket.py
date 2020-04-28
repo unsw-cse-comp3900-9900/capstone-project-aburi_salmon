@@ -7,6 +7,8 @@ from app import flask_app
 from app import flask_app
 from app import api, db
 
+from db.table_db import table_DB
+table_db = table_DB(db)
 
 socket = SocketIO(flask_app, cors_allowed_origins="*")
 
@@ -85,7 +87,7 @@ def staff_finished():
 @jwt_required
 def request_assistance():
     orderNumber = get_jwt_claims().get('order')
-    table = db.get_table_number(orderNumber)
+    table = table_db.get_order_id(orderNumber)
     print("Customer from table %d is requesting assistance" % (table))
     emit('assistance', { 'table': table })
 

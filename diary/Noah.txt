@@ -1,0 +1,115 @@
+Week 1:
+    This week I formed a group with Kav in my tutorial. We have decided to do the stock portfolio management system (project 5) as our project. We spent the first tutorial discussing a broad idea of what we expect the system to be able to do, and what sort of programming stack will be most accessible to use. We then proceeded to come up with some of the main epic and user stories, as well as some basic acceptance criteria. Throughout the rest of the week Kav and I both explored how to set up a skeleton for our project using python flask, and some finance APIs that will come in handy.
+
+Week 2:
+    Tuesday
+    Unfortunately, due to a lack of group members, Kav and I have had to give up on our current project and join a new team (Aburi Salmon). Our new project is to build a ‘Waiter’ system for restaurants, where customers can manage their dining experience through an online portal. I spent the majority of the lab attempting to understand the new project and defining what my role will be. 
+
+    Thursday
+    I’ve tried to add a few new user stories to the notifications section, and have added some acceptance criteria. It’s difficult to add new things without confirming my ideas with the team, as we may have different perspectives of how the end system should look/operate.
+
+    Friday
+    Unfortunately I was unable to make it to the group meeting on Friday as I was at work. However I will catch up with the team at the next lab and hopefully we can finish off our proposal and get started on our first sprint.
+
+Week 3:
+    Monday
+    I’ve finished some draft acceptance criteria for all the user stories under the notifications epic story. I will meet with my team in the lab tomorrow and get a better understanding of how to modify these user stories to meet our combined goals for the project. We can also finalise what’s left to complete for the project proposal, and possibly even begin planning out and starting our first sprint.
+
+    Tuesday
+    Had a good meeting with my group. We discussed more about what we want to build. Yemi did a really good prototype of what the product will look like. I feel like I have a good idea in my head of what we are going to build. I am not very familiar with most of the tools that we will be using to build the application, however it shouldn’t take too long to figure out what’s what.
+
+    Saturday
+    Read over the proposal, added some more clarification over JWTs, and signed off on submitting. Got my backend set-up and running.
+
+Week 4:
+    Tuesday
+    Had our group meeting today. Went over the boilerplate frontend and backend code that was set up by Yemi and Kevin. Divided up tasks to do over the next week. I had some trouble setting up my frontend, so I’ve wiped my computer. Everything seems to be working now, and I can begin to start contributing more to the project.
+    I will be in Melbourne from Friday to Monday, so it will be hard to keep on top of everything but I’ll do my best.
+
+    Wednesday
+    Spent a bit of time going through how the backend works and familiarising myself with the libraries we are using. I haven’t used flask in about 2 years so it’s taking a while to get back into everything. I’ve branched off and am trying to test my understanding by building a manager route that will let the manager add a new registration key into the database. My assigned ticket for the week is to create a route for kitchen staff to markoff an item as ‘ready to serve’. However, I feel like this registration key part needs to come first, and it will help me improve my understanding of the system to a point where implementing the kitchen staff task will be simple.
+
+    Saturday
+    Currently I’ve built out a route to create new registration keys for a kitchen staff. I feel like I understand what I’m doing to a much greater extent. I will work on adding the ability to mark an item as ‘ready to serve’ tomorrow.
+
+    Sunday
+    Added a route for kitchen staff to update the status of an order, and to get a list of all the current orders. I’m having some doubts about whether I’ve structured the routes correctly, so will have a discussion with the group on tuesday about this.
+
+Week 5
+    Monday
+    Kevin and Yemi were having some issues with CORS for sending requests from the frontend to the backend. After some research and guesswork, I managed to resolve the issue. I’ve notified them about this, and we will discuss it at tomorrow's meeting.
+
+
+    Tuesday
+    Had our group meeting today. Probably going to be the last in person meeting with the whole virus going on. The CORS solution was helpful to the frontend guys. Kevin was able to clarify how we should structure different routes, so I am clear on how to set everything out moving forward.
+
+    Friday
+    Had a group meeting today on discord. Just discussed where we are at and what needs to be done. I haven’t done much this week as I had a databases assignment that was due today. Basically I’m gonna build a dummy placeholder route for getting information about the tables, which can be used by Kevin. Then I will work on the manager-related backend stuff that have not been fully implemented, or needs improvement. This includes generating and listing registration keys for all the different types of staff, fixing the signup logic to validate the key, and allowing the manager to update the menu.
+
+    Saturday
+    Finished off the placeholder table route for Kevin, as well as all the registration related fixes. I’ve submitted merge requests, which Kevin has approved and merged for me.
+
+Week 6
+    Monday
+    Our group had another meeting today just to discuss where we are up to. I’ve finally managed to finish off the menu route, which gives us the ability to request the menu, and modify items, categories and ingredients however we need.
+
+    Tuesday
+    Today was our tutorial. We presented our progress to Heather via Zoom. I’ve also worked on issuing session cookies for customers when they begin ordering, and finishing the table route, so that we can list tables, add/delete tables, set tables as ‘unoccupied’, and request assistance for a table.
+
+    Sunday
+    Finish up with table route functions. Fix up order route stuff and migrate over from the kitchen route.
+
+Week 7
+    Monday
+    Fix some bugs that i made with the order route stuff. Created a stats route for getting sales data and recommendations. Investigated socketio stuff and got a basic connection working between front and backend. Group meeting in evening to discuss.
+
+    Tuesday
+    Added a functionality for getting the total number of sales and revenue for a specific category. Had our meeting with Heather, she’s happy with our progress.
+
+    Sunday
+    Added the table for order/status route as requested by Yemi. Started doing some more work around the sockets and while doing so I found some issues with the connection between the frontend and backend. For example clicking logout does not unset the jwt cookies for the browser.
+
+Week 8
+    Monday
+    Fixed up some stuff in the menu route - removing position column from category_item table, created an endpoint to swap the positions of two categories, finish delete category. Had a call with Kav about the socket stuff. We have a good understanding of how we are gonna implement everything now, and just divided up the work. I’ve also been fixing up some more issues that Yemi has found with the backend.
+
+    Tuesday
+    Fixed some more problems on the backend with deleting items and automatically choosing a position for a new category. Had our weekly meeting with Heather, she advised us that the end of the term is approaching soon and that there’s lots left to do. Afterwards I spent some time implementing some forgotten features such as requesting the bill, and setting an order as paid.
+
+Week 9
+    Monday
+    Been really busy most the week with work and completing my database assignment. Finally got around to working on the assignment. Managed to alter how registration works to fix the needs of the frontend.
+
+    Tuesday
+    Met with Heather and the team on Zoom today, discussed our progress. Afterwards our team jumped on a meeting together to figure out our goals for the rest of the week, and to spit up the work that’s left.
+
+    Thursday
+    - Another meeting
+    - Refactor db file
+    - Try minimise queries
+
+    Sunday
+    Worked on refactoring the db. Stated with the menu route. Also added some documentation in the comments
+
+Week 10
+    Monday
+    Finished off the refactoring that was assigned to me (menu, stats and auth), and also fixed some other minor bugs that arose from refactoring or from elsewhere. I tried to remove redundant code where possible. Yemi has made a recording for us of all the functionality of our application, and we have split up who will say what in the demo tomorrow. I expect that after the demo we will continue to clean up some of the code so that it is easier to understand when the markers attempt to run it on their own machine.
+
+    Tuesday
+    Met with the team at 9am to run through the demo. We split up the parts as required and did a few runthoughs to ensure that we could present the functionality of our project as well as possible.
+    The presentation went surprisingly well, Heather was happy with the work that we’d done and the quality of our presentation.
+
+    Sunday
+    Worked a bit on final code refactoring and documentation.
+
+
+Week 10
+    Monday
+    Continued final code refactoring + documentation
+
+    Tuesday
+    Proof-read report
+    Add some extra content to the 3rd party functionality section
+    Commit my diary
+    Finish off refactoring, extracting the models into their own file for each route
+
