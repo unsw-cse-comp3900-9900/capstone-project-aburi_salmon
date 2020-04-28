@@ -31,13 +31,3 @@ class Session(Resource):
                 'identifier': order_claim
             }
         )
-
-# Attach table number in JWT token when reserving a table, and clear when table has finished
-# @session.route("/table", strict_slashes=False)
-# class Table(Resource):
-#     @session.response(200, 'Success')
-#     def post(self):
-#         pass
-
-#     def delete(self):
-#         pass
