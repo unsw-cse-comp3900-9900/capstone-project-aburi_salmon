@@ -4,7 +4,16 @@ from app import api
 
 
 menu_response_model = api.schema_model('Menu-Response-Model', {
-
+    "type": "object",
+    "required": ["menu"],
+    "properties": {
+        "menu": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Category-Items-Response-Model"
+            }
+        }
+    }
 })
 
 
@@ -27,7 +36,7 @@ menu_items_response_model = api.schema_model('Menu-Items-Response-Model',  {
         'items': {
             'type': 'array',
             'items': {
-                '$ref': '#/definitions/item'
+                '$ref': '#/definitions/Menu-Item-Response-Model'
             }
         }
     }
@@ -45,7 +54,7 @@ menu_item_response_model = api.schema_model('Menu-Item-Response-Model', {
         'ingredient': { 
             'type': 'array',
             'items': {
-                '$ref': '#/definitions/ingredient' 
+                '$ref': '#/definitions/Ingredient-Response-Model' 
             }
         }
     }
@@ -84,7 +93,7 @@ category_items_response_model = api.schema_model('Category-Items-Response-Model'
         'items': {
             'type': 'array',
             'items': {
-                '$ref': '#/definitions/item'
+                '$ref': '#/definitions/Menu-Item-Response-Model'
             }
         }
     }

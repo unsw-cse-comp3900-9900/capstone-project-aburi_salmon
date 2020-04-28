@@ -7,9 +7,6 @@ from db.stats_db import stats_DB
 
 import model.stats_model as stats_model
 
-import model.request_model as request_model
-import model.response_model as response_model
-
 stats_db = stats_DB(db)
 stats = api.namespace('stats', description='Stats Route')
 

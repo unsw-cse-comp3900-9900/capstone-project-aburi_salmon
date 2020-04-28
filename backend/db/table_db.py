@@ -33,7 +33,7 @@ class table_DB:
 
     # Get an oOder ID, given a table ID
     def get_order_id(self, table_id):
-        rows = self.dbquery(
+        rows = self.db.query(
             'SELECT max(o.id) FROM "order" o JOIN "table" t on (o.table_id = t.id) WHERE o.table_id = %s AND t.state = %s',
             [table_id, True]
         )
@@ -42,6 +42,26 @@ class table_DB:
             return None
 
         return rows[0][0]
+
+    # Get the order ID of an item
+    def get_ordered_items(self, order_id):
+        rows = self.db.query(
+            'SELECT i.name, io.quantity, i.price, io.id, io.status_id FROM "order" o JOIN item_order io on (o.id = io.order_id) JOIN item i on (i.id = io.item_id) WHERE o.id = %s',
+            [order_id]
+        )
+
+        if (not rows):
+            return []
+
+        orders = [{
+            'itemName': row[0],
+            'quantity': row[1],
+            'price': row[2],
+            'id': row[3],
+            'status_id': row[4]
+        } for row in rows]
+        
+        return orders
 
     # Get a list of ordered items from a customer
     def get_ordered_items_customer(self, order_id):
