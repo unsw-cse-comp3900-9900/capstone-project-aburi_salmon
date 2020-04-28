@@ -4,7 +4,8 @@ from flask_jwt_extended import get_jwt_claims, jwt_required
 
 from app import api, db
 from db.order_db import order_DB
-#from db import order_db
+
+import model.order_model as order_model
 import model.response_model as response_model
 import model.request_model as request_model
 from util.socket import socket
@@ -15,21 +16,27 @@ order = api.namespace('order', description='Order Route')
 @order.route('/', strict_slashes=False)
 class Order(Resource):
     @jwt_required
-    @order.response(200, 'Success')
+    @order.response(200, 'Success', model=order_model.customer_order_response_model)
     @order.response(400, 'Invalid request')
+    @order.response(404, 'No order found on database')
     def get(self):
-
         # Gets lists of ordered items and Total Bill
 
+        # Check user is a customer
         order_id = get_jwt_claims().get('order')
+        if order_id is None:
+            abort(400, 'Invalid request. Not a customer')
 
+        # Get list of items ordered by customer
         item_order = order_db.get_ordered_items_customer(order_id)
+        # Check if bill has been requested
         bill_request = order_db.get_order_status(order_id)
-        total = 0
 
         if item_order is None:
             abort(404, 'No order found on database.')
 
+        # Calculate total table bill
+        total = 0
         for k in item_order:
             total = total + k.get('price')
 
@@ -40,11 +47,10 @@ class Order(Resource):
         }
 
     @jwt_required
-    @order.expect(request_model.new_order_model)
+    @order.expect(order_model.order_request_model)
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
     @order.response(500, 'Something went wrong')
-
     def post(self):
 
         new_order = request.get_json()
@@ -77,8 +83,8 @@ class Order(Resource):
 
 @order.route('/item')
 class Item(Resource):
-    @order.expect(request_model.add_order_model)
-    @order.response(200, 'Success')
+    @order.expect(order_model.item_order_request_model)
+    @order.response(200, 'Success', model=order_model.create_item_order_response_model)
     @order.response(400, 'Invalid request')
     def put(self):
         add_order = request.get_json()
@@ -108,15 +114,14 @@ class Item(Resource):
         }
         
 
-    #@jwt_required
     @jwt_required
-    @order.expect(request_model.modify_order_model)
+    @order.expect(order_model.item_order_request_model)
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
     def patch(self):
 
         modify_order = request.get_json()
-        item_order_id = modify_order.get('id')
+        item_order_id = modify_order.get('item_id')
         quantity = modify_order.get('quantity')
         comment = modify_order.get('comment')
 
@@ -139,12 +144,10 @@ class Item(Resource):
             'status': 'success'
         })
 
-    #@jwt_required
-    @order.expect(request_model.delete_order_model)
+    @jwt_required
+    @order.expect(order_model.delete_item_order_request_model)
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
-    @jwt_required
-
     def delete(self):
         delete_order = request.get_json()
         item_order_id = delete_order.get('id')
@@ -178,8 +181,7 @@ class ModifyItemOrderStatus(Resource):
     @order.response(200, 'Success')
     @order.response(400, 'Invalid Request')
     @order.response(500, 'Something went wrong')
-    @order.expect(request_model.edit_item_order_status_model)
-
+    @order.expect(order_model.edit_item_order_status_request_model)
     def put(self, item_order_id):
         status = request.get_json().get('status')
         print('the status is ' + str(status))
@@ -189,15 +191,13 @@ class ModifyItemOrderStatus(Resource):
         if (not order_db.update_item_ordered_status(item_order_id, status)):
             abort(500, 'Something went wrong')
         print('item_id is ' + str(item_order_id))
-        #order_id = get_jwt_claims().get('order')
+
         order_id = order_db.get_orderId(item_order_id)
         print('item_id is ' + str(order_id))
         customerRoom = 'customer' + str(order_id)
   
-        # orderNumber = get_jwt_claims().get('order')
-        # room = 'customer' + str(orderNumber)
-        # print('room')
-        if status == 2 :
+        # Notify wait staff, kitchen staff and customer of item order status
+        if status == 2:
             print('customer room is ' + customerRoom)
             socket.emit('cooking', room=customerRoom)
             socket.emit('cooking', room='staff1')
@@ -225,7 +225,7 @@ class ItemOrderById(Resource):
     # Most the methods for getting information about an order should be done via the table route
 
     @jwt_required
-    @order.response(200, 'Success', model=response_model.item_order_response_model)
+    @order.response(200, 'Success', model=order_model.item_order_response_model)
     @order.response(500, 'Internal Error')
     def get(self, order_id):
         itemList = order_db.get_ordered_items(order_id)
@@ -237,26 +237,24 @@ class ItemOrderById(Resource):
 @order.route('/status/<int:status_id>')
 class OrdersByStatus(Resource):
     @jwt_required
-    @order.response(200, 'Success', model=response_model.item_order_status_response_model)
-    @order.response(400, 'Invalid Request')
+    @order.response(200, 'Success', model=order_model.item_order_status_response_model)
+    @order.response(500, 'Something went wrong')
     def get(self, status_id):
         itemlist = order_db.get_order_list(status_id)
         if (not itemlist):
-            abort(400, 'Invalid request')
+            abort(500, 'Something went wrong')
 
         return jsonify({'itemList' : itemlist})
 
 @order.route('/time', strict_slashes=False)
 class OrderTime(Resource):
     @jwt_required
-    @order.response(200, 'Success')
+    @order.response(200, 'Success', model=order_model.order_time_response_model)
     @order.response(400, 'Invalid request')
-    @order.expect(request_model.order_time_model)
+    @order.expect(order_model.order_time_request_model)
     def post(self):
 
         # Gets estimated order time
-        # Input = order_id
-
         order_id = request.get_json().get('order_id')
 
         time = order_db.get_order_time(order_id)
@@ -266,7 +264,7 @@ class OrderTime(Resource):
         }
 
     @jwt_required
-    @order.response(200, 'Success')
+    @order.response(200, 'Success', model=order_model.order_time_response_model)
     @order.response(400, 'Invalid request')
     def get(self):
         order_id = get_jwt_claims().get('order')
