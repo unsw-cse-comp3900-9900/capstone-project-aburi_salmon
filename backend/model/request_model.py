@@ -35,16 +35,3 @@ table_bill_model = api.model('table_paid_mdoel', {
     'bill': fields.Boolean(description='The payment status of a table session'),
     'table': fields.Integer(description='Optional field for table')
 })
-
-recommendations_model = api.schema_model('recommendations_model', {
-    'type': 'object',
-    'required': ['items'],
-    'properties': {
-        'items': {
-            'type': 'array',
-            'items': {
-                'type': 'integer'
-            }
-        }
-    }
-})

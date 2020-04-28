@@ -9,6 +9,7 @@ import config
 from app import api, db
 from db.profile_db import profile_DB
 
+import model.profile_model as profile_model
 from model.request_model import edit_profile_model
 from util.hasher import hash_password
 from util.user import User
