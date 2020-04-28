@@ -9,7 +9,7 @@ class DB:
     def __init__(self, dbConfig=DbConfig):
         self.__conn = psycopg2.connect(dbConfig.config())
     
-    # allow user to query the DB
+    # Allow user to query the DB
     def query(self, query, params=[]):
         c = self.__conn.cursor()
         try:
@@ -24,16 +24,9 @@ class DB:
         rows = c.fetchall()
         
         c.close()
-        print(rows)
         return rows if len(rows) else None
 
-    def __query(self, query, params=[]):
-        return self.query(query, params)
-
     # Update the DB
-    def __update(self, update, params):
-        return self.update(update, params)
-
     def update(self, update, params):
         c = self.__conn.cursor()
         try:
@@ -51,9 +44,6 @@ class DB:
         return True
 
     # Insert items into the DB
-    def __insert(self, insert, params):
-        return self.insert(insert, params)
-
     def insert(self, insert, params):
         c = self.__conn.cursor()
 
@@ -68,11 +58,8 @@ class DB:
 
         c.close()
         self.__conn.commit()
-
-    # Delete items from the DB
-    def __delete(self, delete, params=[]):
-        return self.delete(delete, params)
     
+    # Delete items from the DB
     def delete(self, delete, params=[]):
         c = self.__conn.cursor()
         try:
@@ -88,11 +75,9 @@ class DB:
         self.__conn.commit()
         return True
 
-
-    def return_number(self, number):
-        rows = self.__query("SELECT %s AS example;", [number])
-        if (not rows):
-            return None
-    
+    # Map staff type id to a staff title
+    def get_staff_title(self, staff_type_id):
+        rows = self.query("SELECT title FROM staff_type WHERE id = %s", [staff_type_id])
+        if not rows or not rows[0]:
+            return -1
         return rows[0][0]
-

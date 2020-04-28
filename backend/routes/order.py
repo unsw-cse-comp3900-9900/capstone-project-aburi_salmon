@@ -4,9 +4,8 @@ from flask_jwt_extended import get_jwt_claims, jwt_required
 
 from app import api, db
 from db.order_db import order_DB
-#from db import order_db
-import model.response_model as response_model
-import model.request_model as request_model
+
+import model.order_model as order_model
 from util.socket import socket
 
 order_db = order_DB(db)
@@ -16,21 +15,23 @@ order = api.namespace('order', description='Order Route')
 @order.route('/', strict_slashes=False)
 class Order(Resource):
     @jwt_required
-    @order.response(200, 'Success')
+    @order.response(200, 'Success', model=order_model.customer_order_response_model)
     @order.response(400, 'Invalid request')
+    @order.response(404, 'No order found on database')
     def get(self):
 
         # Claim information of orders
         order_id = get_jwt_claims().get('order')
         item_order = order_db.get_ordered_items_customer(order_id)
+        # Check if bill has been requested
         bill_request = order_db.get_order_status(order_id)
-        total = 0
 
         # Basic error checking
         if item_order is None:
             abort(404, 'No order found on database.')
 
         # List the price of an order
+        total = 0
         for k in item_order:
             total = total + k.get('price')
 
@@ -41,11 +42,10 @@ class Order(Resource):
         }
 
     @jwt_required
-    @order.expect(request_model.new_order_model)
+    @order.expect(order_model.order_request_model)
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
     @order.response(500, 'Something went wrong')
-
     def post(self):
 
         new_order = request.get_json()
@@ -77,8 +77,8 @@ class Order(Resource):
 
 @order.route('/item')
 class Item(Resource):
-    @order.expect(request_model.add_order_model)
-    @order.response(200, 'Success')
+    @order.expect(order_model.item_order_request_model)
+    @order.response(200, 'Success', model=order_model.create_item_order_response_model)
     @order.response(400, 'Invalid request')
     def put(self):
         # Add an order
@@ -111,15 +111,14 @@ class Item(Resource):
         }
         
 
-    #@jwt_required
     @jwt_required
-    @order.expect(request_model.modify_order_model)
+    @order.expect(order_model.item_order_request_model)
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
     def patch(self):
         
         modify_order = request.get_json()
-        item_order_id = modify_order.get('id')
+        item_order_id = modify_order.get('item_id')
         quantity = modify_order.get('quantity')
         comment = modify_order.get('comment')
         order_id = get_jwt_claims().get('order')
@@ -142,12 +141,10 @@ class Item(Resource):
             'status': 'success'
         })
 
-    # Deleting an order using a given order_id
-    @order.expect(request_model.delete_order_model)
+    @jwt_required
+    @order.expect(order_model.delete_item_order_request_model)
     @order.response(200, 'Success')
     @order.response(400, 'Invalid request')
-    @jwt_required
-
     def delete(self):
         delete_order = request.get_json()
         item_order_id = delete_order.get('id')
@@ -181,8 +178,7 @@ class ModifyItemOrderStatus(Resource):
     @order.response(200, 'Success')
     @order.response(400, 'Invalid Request')
     @order.response(500, 'Something went wrong')
-    @order.expect(request_model.edit_item_order_status_model)
-    # For the order menu page
+    @order.expect(order_model.edit_item_order_status_request_model)
     def put(self, item_order_id):
         status = request.get_json().get('status')
         print('the status is ' + str(status))
@@ -198,7 +194,7 @@ class ModifyItemOrderStatus(Resource):
         order_id = order_db.get_orderId(item_order_id)
         print('item_id is ' + str(order_id))
         customerRoom = 'customer' + str(order_id)
-          if status == 2 :
+        if status == 2 :
             print('customer room is ' + customerRoom)
             socket.emit('cooking', room=customerRoom)
             socket.emit('cooking', room='staff1')
@@ -221,7 +217,7 @@ class ModifyItemOrderStatus(Resource):
 @order.route('/<int:order_id>')
 class ItemOrderById(Resource):
     @jwt_required
-    @order.response(200, 'Success', model=response_model.item_order_response_model)
+    @order.response(200, 'Success', model=order_model.item_order_response_model)
     @order.response(500, 'Internal Error')
     def get(self, order_id):
         itemList = order_db.get_ordered_items(order_id)
@@ -233,12 +229,12 @@ class ItemOrderById(Resource):
 @order.route('/status/<int:status_id>')
 class OrdersByStatus(Resource):
     @jwt_required
-    @order.response(200, 'Success', model=response_model.item_order_status_response_model)
-    @order.response(400, 'Invalid Request')
+    @order.response(200, 'Success', model=order_model.item_order_status_response_model)
+    @order.response(500, 'Something went wrong')
     def get(self, status_id):
         itemlist = order_db.get_order_list(status_id)
-        if (not itemlist):
-            abort(400, 'Invalid request')
+        if (itemlist is None):
+            abort(500, 'Something went wrong')
 
         return jsonify({'itemList' : itemlist})
 
@@ -247,9 +243,9 @@ class OrdersByStatus(Resource):
 @order.route('/time', strict_slashes=False)
 class OrderTime(Resource):
     @jwt_required
-    @order.response(200, 'Success')
+    @order.response(200, 'Success', model=order_model.order_time_response_model)
     @order.response(400, 'Invalid request')
-    @order.expect(request_model.order_time_model)
+    @order.expect(order_model.order_time_request_model)
     def post(self):
         order_id = request.get_json().get('order_id')
 
@@ -260,12 +256,12 @@ class OrderTime(Resource):
         }
 
     @jwt_required
-    @order.response(200, 'Success')
+    @order.response(200, 'Success', model=order_model.order_time_response_model)
     @order.response(400, 'Invalid request')
     def get(self):
         order_id = get_jwt_claims().get('order')
 
-        time = db.get_order_time(order_id)
+        time = order_db.get_order_time(order_id)
 
         return { 
             'estimated_time': time

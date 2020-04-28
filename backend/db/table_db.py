@@ -31,17 +31,37 @@ class table_DB:
         return self.db.delete('DELETE FROM "table" WHERE id = (SELECT max(id) FROM "table")')
 
 
-    # Get an oOder ID, given a table ID
+    # Get an order ID, given a table ID
     def get_order_id(self, table_id):
-        rows = self.dbquery(
-            'SELECT max(o.id) FROM "order" o JOIN "table" t on (o.table_id = t.id) WHERE o.table_id = %s AND t.state = %s',
-            [table_id, True]
+        rows = self.db.query(
+            'SELECT max(o.id) FROM "order" o JOIN "table" t on (o.table_id = t.id) WHERE o.table_id = %s',
+            [table_id]
         )
 
         if (not rows or not rows[0]):
             return None
 
         return rows[0][0]
+
+    # Get the order ID of an item
+    def get_ordered_items(self, order_id):
+        rows = self.db.query(
+            'SELECT i.name, io.quantity, i.price, io.id, io.status_id FROM "order" o JOIN item_order io on (o.id = io.order_id) JOIN item i on (i.id = io.item_id) WHERE o.id = %s',
+            [order_id]
+        )
+
+        if (not rows):
+            return []
+
+        orders = [{
+            'itemName': row[0],
+            'quantity': row[1],
+            'price': row[2],
+            'id': row[3],
+            'status_id': row[4]
+        } for row in rows]
+        
+        return orders
 
     # Get a list of ordered items from a customer
     def get_ordered_items_customer(self, order_id):
@@ -84,7 +104,11 @@ class table_DB:
     # Get assistance provided a specific table
     def get_assistance_tables(self):
         rows = self.db.query(
-            'SELECT distinct t.id, t.state FROM "table" t JOIN "order" o on (t.id = o.table_id) WHERE o.assistance = True AND t.state = True'
+            """
+            SELECT distinct t.id, t.state 
+            FROM "table" t JOIN "order" o on (t.id = o.table_id)
+            WHERE o.assistance = True AND t.state = True AND o.id = (SELECT max(o1.id) FROM "table" t1 JOIN "order" o1 ON (t1.id = o1.table_id) WHERE t.id = t1.id)
+            """
         )
 
         if (not rows or not rows[0]):
@@ -139,7 +163,12 @@ class table_DB:
     # Get a bill from a table
     def get_bill_tables(self):
         rows = self.db.query(
-            'SELECT distinct t.id, t.state FROM "table" t JOIN "order" o on (t.id = o.table_id) WHERE o.bill_request = True AND t.state = True'
+            """
+            SELECT distinct t.id, t.state
+            FROM "table" t JOIN "order" o on (t.id = o.table_id)
+            WHERE o.bill_request = True AND t.state = True AND 
+                o.id = (SELECT max(o1.id) FROM "table" t1 JOIN "order" o1 ON (t1.id = o1.table_id) WHERE t.id = t1.id)
+            """
         )
 
         if (not rows or not rows[0]):

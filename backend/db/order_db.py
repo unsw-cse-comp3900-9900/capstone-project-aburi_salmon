@@ -145,18 +145,22 @@ class order_DB:
 
     # Get a list of orders with a specific status
     def get_order_list(self, status):
+        
         rows = self.db.query(
             """
             SELECT item.name, io.quantity, item.price, io.id, io.status_id, o.table_id, io.comment
             FROM item_order io JOIN item ON (io.item_id = item.id)
                                JOIN "order" o ON (o.id = io.order_id)
-            WHERE io.status_id = %s
+                               JOIN "table" t ON (t.id = o.table_id)
+            WHERE io.status_id = %s AND t.state = True AND 
+                o.id = (SELECT max(o1.id) FROM "order" o1 JOIN "table" t1 ON o1.table_id = t1.id WHERE t1.id = t.id)
             ORDER BY io.id
             """,
             [status])
 
+        print(rows)
         if (not rows):
-            return None
+            return []
 
         orders = [{
             'itemName': row[0],
