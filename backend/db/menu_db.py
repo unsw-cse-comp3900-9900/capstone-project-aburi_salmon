@@ -69,14 +69,9 @@ class menu_DB:
 
     # Insert a new item into the database and return the item id
     def create_item(self, item):
-        image_url = item.get('image_url')
-
-        if image_url is None:
-            image_url = ""
-
         rows = self.db.query(
             'INSERT INTO item (name, description, price, visible, image_url) VALUES (%s, %s, %s, %s, %s) RETURNING id',
-            [item.get('name'), item.get('description'), item.get('price'), item.get('visible'), image_url]
+            [item.get('name'), item.get('description'), item.get('price'), item.get('visible'), item.get('image_url')]
         )
         if not rows or not rows[0]:
             return None
@@ -164,19 +159,16 @@ class menu_DB:
         return True
     
     # Update a category in the menu
-    def edit_category(self, editStatement, editArr):
-        
-        #editArr = []
-        #editStatement = 'UPDATE category SET '
+    def edit_category(self, edit):
+        editArr = []
+        editStatement = 'UPDATE category SET '
 
-        #if (edit.get('name')):
-        #    editStatement += "name = %s, "
-        #    editArr.append(edit.get('name'))
-        #else:
-        #    abort(400, 'Missing required field \'name\'')
+        if (edit.get('name')):
+            editStatement += "name = %s, "
+            editArr.append(edit.get('name'))
 
-        #editStatement = editStatement.strip(', ') + ' WHERE id = %s'
-        #editArr.append(category_id)
+        editStatement = editStatement.strip(', ') + ' WHERE id = %s'
+        editArr.append(category_id)
 
         return self.db.update(editStatement, editArr)
 

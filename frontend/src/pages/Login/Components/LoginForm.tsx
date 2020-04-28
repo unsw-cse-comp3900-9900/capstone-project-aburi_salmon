@@ -99,8 +99,8 @@ class PureLogin extends React.Component<{}, IState> {
         } else if (this.state.username === '') {
             this.setError('Username Required');
             this.setState({ usererror: true });
-        } else if (!/^[a-zA-Z/s]+$/.test(this.state.username)) {
-            this.setError('Username can only be letters or spaces')
+        } else if (!/^[a-zA-Z0-9_]+$/.test(this.state.username)) {
+            this.setError('Username can only be letters, numbers or underscore')
             this.setState({ usererror: true });
         } else {
             this.checkLogin();
