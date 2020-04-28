@@ -31,11 +31,11 @@ class table_DB:
         return self.db.delete('DELETE FROM "table" WHERE id = (SELECT max(id) FROM "table")')
 
 
-    # Get an oOder ID, given a table ID
+    # Get an order ID, given a table ID
     def get_order_id(self, table_id):
         rows = self.db.query(
-            'SELECT max(o.id) FROM "order" o JOIN "table" t on (o.table_id = t.id) WHERE o.table_id = %s AND t.state = %s',
-            [table_id, True]
+            'SELECT max(o.id) FROM "order" o JOIN "table" t on (o.table_id = t.id) WHERE o.table_id = %s',
+            [table_id]
         )
 
         if (not rows or not rows[0]):
