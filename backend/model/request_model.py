@@ -6,19 +6,6 @@ from app import api
 
 # This is for request payload that you can see in Swagger documentation
 
-login_model = api.model('login', {
-    "username": fields.String(description='Username'),
-    "password": fields.String(description='Password')
-})
-
-signup_model = api.model('signup', {
-    "name": fields.String(description='Name'),
-    "username": fields.String(description='Username'),
-    "password": fields.String(description='Password'),
-    "registration_key": fields.String(description='Registration_Key')
-#    "staff_type_id": fields.Integer(description='Staff_type_id')
-})
-
 edit_profile_model = api.model('edit_profile', {
     "name": fields.String(description='Name'),
 #    "username": fields.String(description='Username'),
@@ -65,10 +52,6 @@ delete_order_model = api.model('delete_order_model', {
     "id": fields.Integer(description="item_order_id")
 })
 
-registration_model = api.model('registration_model', {
-    "type": fields.String(description='Name of staff type'),
-    "key": fields.String(description='new registration key for that staff type')
-})
 
 menu_item_model = api.model('menu_item_model', {
     'name': fields.String(description='name of new menu item'),
@@ -83,10 +66,6 @@ category_model = api.model('category_model', {
 
 ingredient_model = api.model('ingredient_model', {
     'name': fields.String(description='ingredient name')
-})
-
-customer_session_model = api.model('customer_session_mode', {
-    'table': fields.Integer(description='Table number of new order')
 })
 
 table_model = api.model('table_model', {
