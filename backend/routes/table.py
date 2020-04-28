@@ -157,27 +157,26 @@ class Assistance(Resource):
     def put(self):
         # Make sure user is a manager, waitstaff or customer
         claims = get_jwt_claims()
-        order = claims.get('order')
+        order_id = claims.get('order')
         role = claims.get('role')
-        if db.get_staff_title(role) not in ('Manage', 'Wait') and order is None:
+
+        if db.get_staff_title(role) not in ('Manage', 'Wait') and order_id is None:
             abort(400, 'User is not a waitstaff, manager or customer')
 
         body = request.get_json()
 
         # Validate request and determine order_id and table_number
         assistance = body.get('assistance')
-        order_id = get_jwt_claims().get('order')
         table_id = body.get('table')
 
-
-        if (not order_id and not table_id):
+        if (order_id is None and table_id is None):
             abort(400, 'Invalid request')
-        elif (not order_id):
+        elif (order_id is None):
             order_id = table_db.get_order_id(table_id)
-        elif (not table_id):
+        elif (table_id is None):
             table_id = table_db.get_table_id(order_id)
 
-        if (not order_id or not table_id):
+        if (order_id is None or  table_id is None):
             abort(401, 'Unauthorised')
 
         if (assistance != True and assistance != False):

@@ -104,7 +104,11 @@ class table_DB:
     # Get assistance provided a specific table
     def get_assistance_tables(self):
         rows = self.db.query(
-            'SELECT distinct t.id, t.state FROM "table" t JOIN "order" o on (t.id = o.table_id) WHERE o.assistance = True AND t.state = True'
+            """
+            SELECT distinct t.id, t.state 
+            FROM "table" t JOIN "order" o on (t.id = o.table_id)
+            WHERE o.assistance = True AND t.state = True AND o.id = (SELECT max(o1.id) FROM "table" t1 JOIN "order" o1 ON (t1.id = o1.table_id) WHERE t.id = t1.id)
+            """
         )
 
         if (not rows or not rows[0]):
@@ -159,7 +163,12 @@ class table_DB:
     # Get a bill from a table
     def get_bill_tables(self):
         rows = self.db.query(
-            'SELECT distinct t.id, t.state FROM "table" t JOIN "order" o on (t.id = o.table_id) WHERE o.bill_request = True AND t.state = True'
+            """
+            SELECT distinct t.id, t.state
+            FROM "table" t JOIN "order" o on (t.id = o.table_id)
+            WHERE o.bill_request = True AND t.state = True AND 
+                o.id = (SELECT max(o1.id) FROM "table" t1 JOIN "order" o1 ON (t1.id = o1.table_id) WHERE t.id = t1.id)
+            """
         )
 
         if (not rows or not rows[0]):

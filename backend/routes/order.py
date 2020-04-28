@@ -233,7 +233,7 @@ class OrdersByStatus(Resource):
     @order.response(500, 'Something went wrong')
     def get(self, status_id):
         itemlist = order_db.get_order_list(status_id)
-        if (not itemlist):
+        if (itemlist is None):
             abort(500, 'Something went wrong')
 
         return jsonify({'itemList' : itemlist})

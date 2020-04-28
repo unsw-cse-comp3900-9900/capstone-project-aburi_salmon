@@ -88,7 +88,7 @@ def staff_finished():
 def request_assistance():
     orderNumber = get_jwt_claims().get('order')
     table = table_db.get_order_id(orderNumber)
-    print("Customer from table %d is requesting assistance" % (table))
+    print("Customer from table {} is requesting assistance".format(table))
     emit('assistance', { 'table': table })
 
 @socket.on('Bill Request')
